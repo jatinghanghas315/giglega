@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Sign Up - GigLega Beta</title>
@@ -16,229 +16,266 @@
         background: white;
         padding: 40px;
         border-radius: 14px;
-        box-shadow: 0 4px 25px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 25px rgba(0,0,0,0.1);
       }
       .signup-title {
-        font-size: 32px;
-        font-weight: 800;
-        color: var(--color-primary);
-        margin-bottom: 8px;
+        margin: 0 0 10px;
+        color: #003366;
+        font-size: 2em;
         text-align: center;
       }
       .signup-subtitle {
-        font-size: 15px;
         color: #666;
         text-align: center;
-        margin-bottom: 32px;
+        margin-bottom: 30px;
       }
       .form-group {
         margin-bottom: 20px;
       }
       .form-group label {
         display: block;
-        font-weight: 600;
         margin-bottom: 8px;
-        color: var(--color-primary);
+        color: #003366;
+        font-weight: 600;
       }
-      .form-control {
+      .form-group input,
+      .form-group select {
         width: 100%;
         padding: 12px;
-        border: 1px solid #ddd;
+        border: 2px solid #e0e0e0;
         border-radius: 8px;
-        font-family: inherit;
+        font-size: 1em;
+        font-family: 'Poppins', sans-serif;
+        box-sizing: border-box;
+        transition: border 0.3s;
       }
-
-      .role-grid {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 12px;
-        margin-top: 8px;
+      .form-group input:focus,
+      .form-group select:focus {
+        outline: none;
+        border-color: #FFA500;
       }
-      .role-card {
-        border: 2px solid #eee;
-        padding: 16px;
+      .error-message {
+        display: none;
+        background: #ffebee;
+        color: #c62828;
+        padding: 12px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        font-size: 0.9em;
+      }
+      .submit-btn {
+        width: 100%;
+        padding: 15px;
+        background: linear-gradient(135deg, #FFA500, #FF6B35);
+        color: white;
+        border: none;
         border-radius: 10px;
+        font-size: 1.1em;
+        font-weight: bold;
         cursor: pointer;
-        transition: all 0.2s;
-        position: relative;
+        font-family: 'Poppins', sans-serif;
+        transition: all 0.3s;
       }
-      .role-card:hover {
-        border-color: var(--color-secondary);
-        background: var(--color-card-remote);
+      .submit-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(255,165,0,0.3);
       }
-      .role-card input {
-        position: absolute;
-        opacity: 0;
-      }
-      .role-card.selected {
-        border-color: var(--color-secondary);
-        background: var(--color-card-remote);
-      }
-      .role-name {
-        font-weight: 700;
-        color: var(--color-primary);
-        display: block;
-        margin-bottom: 2px;
-      }
-      .role-desc {
-        font-size: 13px;
-        color: #666;
+      .submit-btn:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+        transform: none;
       }
     </style>
-  </head>
-  <body style="background: var(--color-bg)">
-    <!-- Beta Banner -->
+</head>
+<body style="background: var(--color-bg);">
     <div class="beta-banner">
-      🚀 GigLega Beta ab Gurugram mein Live hai! Pehle 100 users mein shaamil ho
-      jao — Join Karo, Free Hai!
+      🎉 GigLega Beta ab Gurugram mein Live hai! Pehle 100 users mein shaamil ho jao — Join Karo, Free Hai!
     </div>
 
-    <div class="signup-container">
-      <div style="text-align: center; margin-bottom: 24px">
-        <svg
-          width="60"
-          height="60"
-          viewBox="0 0 100 100"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <defs>
-            <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" style="stop-color: #0d2157; stop-opacity: 1" />
-              <stop
-                offset="100%"
-                style="stop-color: #00b4a6; stop-opacity: 1"
-              />
-            </linearGradient>
-          </defs>
-          <circle cx="50" cy="50" r="48" fill="url(#logoGrad)" />
-          <text
-            x="50"
-            y="62"
-            font-family="Poppins, sans-serif"
-            font-size="38"
-            font-weight="800"
-            fill="white"
-            text-anchor="middle"
-          >
-            GL
-          </text>
-        </svg>
+    <nav>
+      <div class="nav-container">
+        <div class="logo">
+          <svg style="width: 60px; height: 60px" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color: #0d2157; stop-opacity: 1" />
+                <stop offset="100%" style="stop-color: #006894; stop-opacity: 1" />
+              </linearGradient>
+            </defs>
+            <circle cx="50" cy="50" r="48" fill="url(#logoGrad)" />
+            <text x="50" y="58" text-anchor="middle" fill="#FFA500" font-size="46" font-weight="bold" font-family="Poppins, sans-serif">G</text>
+          </svg>
+          <span>GigLega</span>
+        </div>
+
+        <ul class="nav-links">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="browse.html">Browse Gigs</a></li>
+          <li><a href="post-gig.html">Post Gig</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+
+        <a href="login.html" class="cta-button">Login</a>
       </div>
+    </nav>
 
-      <h1 class="signup-title">Join GigLega</h1>
-      <p class="signup-subtitle">Bharat ke badalte kaam ka naya thikana.</p>
+    <div class="signup-container">
+      <h2 class="signup-title">Free Mein Judo! 🚀</h2>
+      <p class="signup-subtitle">Apna account banao aur gigs dhundna shuru karo</p>
 
-      <form id="signupForm">
+      <div id="error-message" class="error-message"></div>
+
+      <form id="signup-form">
         <div class="form-group">
-          <label>Full Name</label>
-          <input
-            type="text"
-            class="form-control"
-            placeholder="Aapka Naam"
-            required
-          />
+          <label for="name">Pura Naam *</label>
+          <input type="text" id="name" placeholder="Apna naam likho" required />
         </div>
 
         <div class="form-group">
-          <label>Phone Number</label>
-          <input
-            type="tel"
-            class="form-control"
-            placeholder="+91 00000-00000"
-            required
-          />
+          <label for="email">Email *</label>
+          <input type="email" id="email" placeholder="example@gmail.com" required />
         </div>
 
         <div class="form-group">
-          <label>Email Address</label>
-          <input
-            type="email"
-            class="form-control"
-            placeholder="example@gmail.com"
-            required
-          />
+          <label for="password">Password *</label>
+          <input type="password" id="password" placeholder="Kam se kam 6 characters" required minlength="6" />
         </div>
 
         <div class="form-group">
-          <label>Main kaun hoon? (Select your role)</label>
-          <div class="role-grid">
-            <label class="role-card" id="role-freelancer">
-              <input type="radio" name="role" value="freelancer" required />
-              <span class="role-name">💻 Freelancer</span>
-              <span class="role-desc"
-                >Main online/remotely kaam karta hoon (design, coding, writing,
-                etc.)</span
-              >
-            </label>
-            <label class="role-card" id="role-gigworker">
-              <input type="radio" name="role" value="gigworker" />
-              <span class="role-name">🛵 Gig Worker</span>
-              <span class="role-desc"
-                >Main apne area mein local kaam karta hoon (delivery, cleaning,
-                tutoring, etc.)</span
-              >
-            </label>
-            <label class="role-card" id="role-client">
-              <input type="radio" name="role" value="client" />
-              <span class="role-name">🤝 Client / Hirer</span>
-              <span class="role-desc"
-                >Mujhe kisi ko hire karna hai ya kaam karwana hai</span
-              >
-            </label>
-          </div>
+          <label for="phone">Phone Number *</label>
+          <input type="tel" id="phone" placeholder="9876543210" required pattern="[0-9]{10}" />
         </div>
 
         <div class="form-group">
-          <label>Password</label>
-          <input
-            type="password"
-            class="form-control"
-            placeholder="Min. 8 characters"
-            required
-          />
+          <label for="role">Main Role *</label>
+          <select id="role" required>
+            <option value="">Select karo...</option>
+            <option value="Gig Worker">Gig Worker (Local/Hyperlocal kaam)</option>
+            <option value="Freelancer">Freelancer (Remote/Digital kaam)</option>
+            <option value="Both">Both (Dono kaam kar sakta hun)</option>
+            <option value="Client">Client (Kaam dena hai)</option>
+          </select>
         </div>
 
-        <button
-          type="submit"
-          class="btn btn-primary"
-          style="width: 100%; padding: 16px; font-size: 18px; margin-top: 10px"
-        >
-          Account Banao — Free Hai!
+        <div class="form-group">
+          <label for="location">Location *</label>
+          <input type="text" id="location" placeholder="Gurugram, Sector XX" value="Gurugram" required />
+        </div>
+
+        <button type="submit" id="signup-btn" class="submit-btn">
+          Free Mein Judo!
         </button>
       </form>
 
-      <div
-        style="
-          text-align: center;
-          margin-top: 24px;
-          font-size: 14px;
-          color: #666;
-        "
-      >
-        Pehle se account hai?
-        <a
-          href="login.html"
-          style="color: var(--color-secondary); font-weight: 600"
-          >Login Karein</a
-        >
-      </div>
+      <p style="margin-top: 20px; text-align: center; color: #666;">
+        Pehle se account hai? <a href="login.html" style="color: #FFA500; font-weight: 600; text-decoration: none;">Login Karo</a>
+      </p>
     </div>
 
-    <script>
-      // Visual selection for role cards
-      const roleCards = document.querySelectorAll(".role-card");
-      roleCards.forEach((card) => {
-        card.addEventListener("click", () => {
-          roleCards.forEach((c) => c.classList.remove("selected"));
-          card.classList.add("selected");
-        });
-      });
+    <footer>
+      <div>
+        <h3>GigLega</h3>
+        <p>Gurugram ka apna hyperlocal gig platform</p>
+        <p>&copy; 2025 GigLega Beta. Made with ❤️ for Gurugram.</p>
+      </div>
+      <div>
+        <h4>Legal</h4>
+        <a href="terms.html">Terms & Conditions</a>
+        <a href="privacy-policy.html">Privacy Policy</a>
+        <a href="trust-safety.html">Trust & Safety</a>
+      </div>
+      <div>
+        <h4>Support</h4>
+        <a href="help-center.html">Help Center</a>
+        <a href="contact.html">Contact Us</a>
+      </div>
+      <div>
+        <h4>Contact</h4>
+        <p><strong>Email: </strong>Giglega.official@gmail.com</p>
+        <p><strong>Call us: </strong><a href="https://wa.me/919319635257">9319635257</a></p>
+        <p><strong>Address: </strong>H.no 82 Om Vihar Phase 1 palam Vihar Extn, Opp Sec 23A h.u.d.a park- 122017</p>
+      </div>
+    </footer>
 
-      document.getElementById("signupForm").addEventListener("submit", (e) => {
+    <script type="module">
+      import { auth, db } from './firebase-config.js';
+      import { createUserWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+      import { doc, setDoc } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+
+      const signupForm = document.getElementById('signup-form');
+      const errorMessage = document.getElementById('error-message');
+      const signupBtn = document.getElementById('signup-btn');
+
+      function showError(message) {
+        errorMessage.textContent = message;
+        errorMessage.style.display = 'block';
+        setTimeout(() => {
+          errorMessage.style.display = 'none';
+        }, 5000);
+      }
+
+      signupForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        alert("Aapka account ban gaya hai! Namaste to GigLega.");
-        window.location.href = "index.html";
+        
+        const name = document.getElementById('name').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value;
+        const phone = document.getElementById('phone').value.trim();
+        const role = document.getElementById('role').value;
+        const location = document.getElementById('location').value.trim();
+
+        if (!role) {
+          showError('Please select a role!');
+          return;
+        }
+
+        signupBtn.textContent = 'Account ban raha hai...';
+        signupBtn.disabled = true;
+
+        try {
+          // Create auth user
+          const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+          const user = userCredential.user;
+          
+          console.log('User created:', user.uid);
+
+          // Create user profile in Firestore
+          await setDoc(doc(db, 'users', user.uid), {
+            name: name,
+            email: email,
+            phone: phone,
+            role: role,
+            location: location,
+            createdAt: new Date().toISOString(),
+            rating: 0,
+            gigsPosted: 0,
+            gigsCompleted: 0
+          });
+
+          console.log('Profile created in Firestore');
+          
+          // Redirect to dashboard
+          alert('🎉 Welcome to GigLega! Account successfully ban gaya!');
+          window.location.href = '/dashboard.html';
+        } catch (error) {
+          console.error('Signup error:', error);
+          let errorMsg = 'Signup mein problem aayi. Please try again.';
+          
+          if (error.code === 'auth/email-already-in-use') {
+            errorMsg = 'Email pehle se registered hai. Login karo!';
+          } else if (error.code === 'auth/invalid-email') {
+            errorMsg = 'Email format galat hai.';
+          } else if (error.code === 'auth/weak-password') {
+            errorMsg = 'Password weak hai. Kam se kam 6 characters chahiye.';
+          } else if (error.code === 'auth/network-request-failed') {
+            errorMsg = 'Network problem hai. Internet check karo.';
+          }
+          
+          showError(errorMsg);
+          signupBtn.textContent = 'Free Mein Judo!';
+          signupBtn.disabled = false;
+        }
       });
     </script>
-  </body>
+</body>
 </html>
