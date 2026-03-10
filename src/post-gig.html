@@ -1,290 +1,219 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Post a Gig - GigLega Beta</title>
     <link rel="stylesheet" href="./styles.css" />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap"
-      rel="stylesheet"
-    />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <style>
-      .form-container {
-        max-width: 800px;
-        margin: 40px auto;
-        background: white;
-        padding: 40px;
-        border-radius: 14px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-      }
-      .form-title {
-        font-size: 32px;
-        font-weight: 800;
-        color: var(--color-primary);
-        margin-bottom: 8px;
-        text-align: center;
-      }
-      .form-subtitle {
-        font-size: 16px;
-        color: #666;
-        text-align: center;
-        margin-bottom: 32px;
-      }
-      .form-group {
-        margin-bottom: 24px;
-      }
-      .form-group label {
-        display: block;
-        font-weight: 600;
-        margin-bottom: 8px;
-        color: var(--color-primary);
-        font-size: 15px;
-      }
-      .form-control {
-        width: 100%;
-        padding: 12px;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        font-family: inherit;
-        font-size: 15px;
-      }
-      .radio-group {
-        display: flex;
-        gap: 24px;
-        margin-top: 8px;
-      }
-      .radio-item {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        cursor: pointer;
-      }
-      .budget-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 16px;
-      }
-      .helper-text {
-        font-size: 13px;
-        color: #666;
-        margin-top: 6px;
-        font-style: italic;
-      }
+      body { background: var(--color-bg); }
+      .form-container { max-width: 800px; margin: 60px auto 40px; background: white; padding: 40px; border-radius: 14px; box-shadow: 0 4px 25px rgba(0,0,0,0.1); }
+      .form-title { font-size: 2em; font-weight: 800; color: #003366; margin-bottom: 8px; text-align: center; }
+      .form-subtitle { font-size: 1em; color: #666; text-align: center; margin-bottom: 32px; }
+      .form-group { margin-bottom: 24px; }
+      .form-group label { display: block; margin-bottom: 8px; color: #003366; font-weight: 600; font-size: 0.95em; }
+      .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 1em; font-family: 'Poppins', sans-serif; box-sizing: border-box; transition: border 0.3s; }
+      .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: #FFA500; }
+      .form-group textarea { min-height: 120px; resize: vertical; }
+      .error-msg { display: none; background: #ffebee; color: #c62828; padding: 12px; border-radius: 8px; margin-bottom: 20px; font-size: 0.9em; }
+      .success-msg { display: none; background: #e8f5e9; color: #2e7d32; padding: 12px; border-radius: 8px; margin-bottom: 20px; font-size: 0.9em; }
+      .submit-btn { width: 100%; padding: 15px; background: linear-gradient(135deg, #FFA500, #FF6B35); color: white; border: none; border-radius: 10px; font-size: 1.1em; font-weight: bold; cursor: pointer; font-family: 'Poppins', sans-serif; transition: all 0.3s; }
+      .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(255,165,0,0.3); }
+      .submit-btn:disabled { background: #ccc; cursor: not-allowed; transform: none; }
+      .info-box { background: #e3f2fd; border-left: 4px solid #2196F3; padding: 15px; margin-bottom: 25px; border-radius: 5px; }
+      .info-box h4 { margin: 0 0 8px 0; color: #1976D2; }
+      .info-box p { margin: 0; color: #555; font-size: 0.9em; }
     </style>
-  </head>
-  <body>
-    <!-- Beta Banner -->
-    <div class="beta-banner">
-      🚀 GigLega Beta ab Gurugram mein Live hai! Pehle 100 users mein shaamil ho
-      jao — Join Karo, Free Hai!
-    </div>
+</head>
+<body>
+    <div class="beta-banner">🎉 GigLega Beta ab Gurugram mein Live hai! Pehle 100 users mein shaamil ho jao — Join Karo, Free Hai!</div>
 
-    <!-- Navigation -->
-    <nav class="navbar">
-      <div class="container">
-        <div class="logo-container">
-          <svg
-            class="logo-icon"
-            viewBox="0 0 100 100"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <defs>
-              <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop
-                  offset="0%"
-                  style="stop-color: #0d2157; stop-opacity: 1"
-                />
-                <stop
-                  offset="100%"
-                  style="stop-color: #00b4a6; stop-opacity: 1"
-                />
-              </linearGradient>
-            </defs>
+    <nav>
+      <div class="nav-container">
+        <div class="logo">
+          <svg style="width: 60px; height: 60px" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <defs><linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color: #0d2157; stop-opacity: 1" /><stop offset="100%" style="stop-color: #006894; stop-opacity: 1" /></linearGradient></defs>
             <circle cx="50" cy="50" r="48" fill="url(#logoGrad)" />
-            <text
-              x="50"
-              y="62"
-              font-family="Poppins, sans-serif"
-              font-size="38"
-              font-weight="800"
-              fill="white"
-              text-anchor="middle"
-            >
-              GL
-            </text>
+            <text x="50" y="58" text-anchor="middle" fill="#FFA500" font-size="46" font-weight="bold" font-family="Poppins, sans-serif">G</text>
           </svg>
-          <div class="logo-text">
-            <span class="gig">Gig</span><span class="lega">Lega</span
-            ><sup class="beta-tag">Beta</sup>
-          </div>
+          <span>GigLega</span>
         </div>
-
         <ul class="nav-links">
           <li><a href="index.html">Home</a></li>
           <li><a href="browse.html">Browse Gigs</a></li>
-          <li><a href="post-gig.html" class="active">Post a Gig</a></li>
-          <li><a href="index.html#how-it-works">How It Works</a></li>
+          <li><a href="post-gig.html" class="active">Post Gig</a></li>
+          <li><a href="dashboard.html">Dashboard</a></li>
           <li><a href="contact.html">Contact</a></li>
         </ul>
-
-        <div class="auth-buttons">
-          <a href="signup.html" class="btn btn-outline">Log In</a>
-          <a href="signup.html" class="btn btn-primary">Free Mein Judo!</a>
-        </div>
+        <a href="signup.html" class="cta-button">Free Mein Judo!</a>
       </div>
     </nav>
 
-    <main class="container">
-      <div class="form-container">
-        <h1 class="form-title">Kaam Post Karein!</h1>
-        <p class="form-subtitle">
-          Post your requirement and find the best local or remote talent in
-          minutes.
-        </p>
+    <div class="form-container">
+      <h2 class="form-title">Apna Gig Post Karo! 💼</h2>
+      <p class="form-subtitle">Kaam ki zarurat hai? Yahan batao aur perfect worker dhundho</p>
 
-        <form id="postGigForm">
-          <div class="form-group">
-            <label>Gig Title (Short & Clear)</label>
-            <input
-              type="text"
-              class="form-control"
-              placeholder="e.g. Need Electrician for Fan Repair"
-              required
-            />
-          </div>
+      <div id="error-msg" class="error-msg"></div>
+      <div id="success-msg" class="success-msg"></div>
 
-          <div class="form-group">
-            <label>Category</label>
-            <select class="form-control" required>
-              <option value="">Select a category</option>
-              <option>Home Services</option>
-              <option>Errands & Delivery</option>
-              <option>Web Development</option>
-              <option>Graphic Design</option>
-              <option>Other</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label>Gig Type</label>
-            <div class="radio-group">
-              <label class="radio-item"
-                ><input
-                  type="radio"
-                  name="gig_type"
-                  value="hyperlocal"
-                  checked
-                />
-                🛵 Hyperlocal (On-site)</label
-              >
-              <label class="radio-item"
-                ><input type="radio" name="gig_type" value="remote" /> 💻 Remote
-                (Online)</label
-              >
-            </div>
-          </div>
-
-          <div class="form-group" id="locationGroup">
-            <label>Location (City/Area in Haryana)</label>
-            <input
-              type="text"
-              class="form-control"
-              placeholder="e.g., Gurugram, Sector 45"
-            />
-          </div>
-
-          <div class="form-group">
-            <label>Detailed Description</label>
-            <textarea
-              class="form-control"
-              rows="5"
-              placeholder="Kaam ki puri jaankari dein (Explain the task clearly)..."
-              required
-            ></textarea>
-          </div>
-
-          <div class="form-group">
-            <label>Budget Range (₹)</label>
-            <div class="budget-grid">
-              <input type="number" class="form-control" placeholder="Min" />
-              <input type="number" class="form-control" placeholder="Max" />
-            </div>
-            <p class="helper-text">
-              Tip: Fair pay leads to better quality work. Consider Haryana's
-              standard rates.
-            </p>
-          </div>
-
-          <button
-            type="submit"
-            class="btn btn-primary"
-            style="width: 100%; padding: 16px; font-size: 18px"
-          >
-            Post Gig Abhi!
-          </button>
-        </form>
+      <div class="info-box">
+        <h4>👋 Kya Post Karna Hai?</h4>
+        <p>Koi bhi legal kaam jo aapko karwana hai - delivery, housekeeping, tutoring, tech work, design, ya kuch aur!</p>
       </div>
-    </main>
 
-    <footer class="footer">
-      <div class="container">
-        <div class="footer-grid">
-          <div class="footer-col">
-            <div class="footer-logo">
-              <span class="gig">Gig</span><span class="lega">Lega</span>
-            </div>
-            <p>Made with ❤️ in Gurugram, India</p>
-          </div>
-          <div class="footer-col">
-            <h4>Workers ke liye</h4>
-            <ul>
-              <li><a href="browse.html">Find Gigs</a></li>
-              <li><a href="#">Success Stories</a></li>
-              <li><a href="#">Resources</a></li>
-            </ul>
-          </div>
-          <div class="footer-col">
-            <h4>Clients ke liye</h4>
-            <ul>
-              <li><a href="post-gig.html">Post a Gig</a></li>
-              <li><a href="#">Hire Talent</a></li>
-              <li><a href="#">Enterprise</a></li>
-            </ul>
-          </div>
-          <div class="footer-col">
-            <h4>Support</h4>
-            <ul>
-              <li><a href="contact.html">Contact Us</a></li>
-              <li><a href="#">Help Center</a></li>
-              <li><a href="#">Trust & Safety</a></li>
-            </ul>
-          </div>
+      <form id="gig-form">
+        <div class="form-group">
+          <label for="title">Gig Title (Short Heading) *</label>
+          <input type="text" id="title" placeholder="E.g., 'Need Delivery Boy for 2 hours in Sector 29'" required maxlength="100" />
         </div>
-        <div class="footer-bottom">© 2026 GigLega | Terms | Privacy Policy</div>
-      </div>
+
+        <div class="form-group">
+          <label for="description">Description (Detail mein batao) *</label>
+          <textarea id="description" placeholder="Gig ke baare mein puri details likho - kya kaam hai, kitne time ke liye, kya requirements hain, etc." required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="category">Category *</label>
+          <select id="category" required>
+            <option value="">Select Category...</option>
+            <option value="Delivery & Logistics">Delivery & Logistics</option>
+            <option value="Household Services">Household Services (Cleaning, Cooking)</option>
+            <option value="Tutoring & Education">Tutoring & Education</option>
+            <option value="Tech & IT">Tech & IT</option>
+            <option value="Design & Creative">Design & Creative</option>
+            <option value="Marketing & Sales">Marketing & Sales</option>
+            <option value="Events & Hospitality">Events & Hospitality</option>
+            <option value="Beauty & Wellness">Beauty & Wellness</option>
+            <option value="Repair & Maintenance">Repair & Maintenance</option>
+            <option value="Data Entry & Admin">Data Entry & Admin</option>
+            <option value="Driver & Transport">Driver & Transport</option>
+            <option value="Security & Guard">Security & Guard Services</option>
+            <option value="Pet Care">Pet Care</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="gig-type">Gig Type *</label>
+          <select id="gig-type" required>
+            <option value="">Select Type...</option>
+            <option value="Hyperlocal">Hyperlocal (Physical work in Gurugram)</option>
+            <option value="Remote">Remote (Online/Digital work)</option>
+            <option value="Hybrid">Hybrid (Both online & offline)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="location">Location *</label>
+          <input type="text" id="location" placeholder="Sector/Area in Gurugram (e.g., Sector 29, DLF Phase 3)" value="Gurugram" required />
+        </div>
+
+        <div class="form-group">
+          <label for="budget">Budget (in ₹) *</label>
+          <input type="number" id="budget" placeholder="E.g., 500" required min="50" />
+        </div>
+
+        <div class="form-group">
+          <label for="duration">Duration</label>
+          <input type="text" id="duration" placeholder="E.g., 2 hours, 1 day, 1 week" />
+        </div>
+
+        <button type="submit" id="submit-btn" class="submit-btn">Post Gig 🚀</button>
+      </form>
+    </div>
+
+    <footer style="margin-top:60px;">
+      <div><h3>GigLega</h3><p>Gurugram ka apna hyperlocal gig platform</p><p>&copy; 2025 GigLega Beta. Made with ❤️ for Gurugram.</p></div>
+      <div><h4>Legal</h4><a href="terms.html">Terms & Conditions</a><a href="privacy-policy.html">Privacy Policy</a><a href="trust-safety.html">Trust & Safety</a></div>
+      <div><h4>Support</h4><a href="help-center.html">Help Center</a><a href="contact.html">Contact Us</a></div>
+      <div><h4>Contact</h4><p><strong>Email: </strong>Giglega.official@gmail.com</p><p><strong>Call us: </strong><a href="https://wa.me/919319635257">9319635257</a></p></div>
     </footer>
 
-    <script>
-      // Toggle location field based on gig type
-      const typeRadios = document.querySelectorAll('input[name="gig_type"]');
-      const locationGroup = document.getElementById("locationGroup");
+    <script type="module">
+      import { auth, db } from './firebase-config.js';
+      import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+      import { collection, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
 
-      typeRadios.forEach((radio) => {
-        radio.addEventListener("change", (e) => {
-          if (e.target.value === "remote") {
-            locationGroup.style.display = "none";
-          } else {
-            locationGroup.style.display = "block";
-          }
-        });
+      const gigForm = document.getElementById('gig-form');
+      const submitBtn = document.getElementById('submit-btn');
+      const errorMsg = document.getElementById('error-msg');
+      const successMsg = document.getElementById('success-msg');
+      let currentUser = null;
+
+      function showError(msg) {
+        errorMsg.textContent = msg;
+        errorMsg.style.display = 'block';
+        setTimeout(() => { errorMsg.style.display = 'none'; }, 5000);
+      }
+
+      function showSuccess(msg) {
+        successMsg.textContent = msg;
+        successMsg.style.display = 'block';
+      }
+
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          currentUser = user;
+        } else {
+          showError('Pehle login karo to post gig! Redirecting...');
+          setTimeout(() => { window.location.href = '/login.html'; }, 2000);
+        }
       });
 
-      document.getElementById("postGigForm").addEventListener("submit", (e) => {
+      gigForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        alert("Aapka Gig submit ho gaya hai! Redirecting to browse...");
-        window.location.href = "browse.html";
+        
+        if (!currentUser) {
+          showError('Pehle login karo!');
+          return;
+        }
+
+        const title = document.getElementById('title').value.trim();
+        const description = document.getElementById('description').value.trim();
+        const category = document.getElementById('category').value;
+        const gigType = document.getElementById('gig-type').value;
+        const location = document.getElementById('location').value.trim();
+        const budget = document.getElementById('budget').value;
+        const duration = document.getElementById('duration').value.trim();
+
+        if (!category || !gigType) {
+          showError('Please select all required fields!');
+          return;
+        }
+
+        submitBtn.textContent = 'Posting...';
+        submitBtn.disabled = true;
+
+        try {
+          await addDoc(collection(db, 'gigs'), {
+            title,
+            description,
+            category,
+            gigType,
+            location,
+            budget: parseInt(budget),
+            duration: duration || 'Not specified',
+            userId: currentUser.uid,
+            userEmail: currentUser.email,
+            status: 'active',
+            createdAt: serverTimestamp(),
+            applicants: 0
+          });
+
+          showSuccess('🎉 Gig successfully posted! Ab workers apply kar sakte hain.');
+          gigForm.reset();
+          
+          setTimeout(() => {
+            window.location.href = '/dashboard.html';
+          }, 2000);
+        } catch (error) {
+          console.error('Error posting gig:', error);
+          showError('Gig post karne mein problem aayi. Phir se try karo!');
+          submitBtn.textContent = 'Post Gig 🚀';
+          submitBtn.disabled = false;
+        }
       });
     </script>
-  </body>
+</body>
 </html>
