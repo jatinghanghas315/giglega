@@ -1,436 +1,153 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Contact Us - GigLega Beta</title>
     <link rel="stylesheet" href="./styles.css" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap"
-      rel="stylesheet"
-    />
-  </head>
-  <body>
-    <!-- Beta Banner -->
-    <div class="beta-banner">
-      🚀 GigLega Beta ab Gurugram mein Live hai! Pehle 100 users mein shaamil ho
-      jao — Join Karo, Free Hai!
-    </div>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <style>
+      body { background: var(--color-bg); }
+      .contact-container { max-width: 800px; margin: 60px auto 40px; padding: 0 20px; }
+      .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 40px; }
+      .contact-form { background: white; padding: 40px; border-radius: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+      .contact-info { padding: 20px; }
+      .form-group { margin-bottom: 20px; }
+      .form-group label { display: block; margin-bottom: 8px; color: #003366; font-weight: 600; }
+      .form-group input, .form-group textarea { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-family: 'Poppins', sans-serif; font-size: 1em; box-sizing: border-box; }
+      .form-group textarea { min-height: 150px; resize: vertical; }
+      .submit-btn { width: 100%; padding: 15px; background: linear-gradient(135deg, #FFA500, #FF6B35); color: white; border: none; border-radius: 10px; font-size: 1.1em; font-weight: bold; cursor: pointer; transition: all 0.3s; }
+      .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(255,165,0,0.3); }
+      .submit-btn:disabled { background: #ccc; cursor: not-allowed; }
+      .success-msg, .error-msg { display: none; padding: 12px; border-radius: 8px; margin-bottom: 20px; text-align: center; }
+      .success-msg { background: #e8f5e9; color: #2e7d32; }
+      .error-msg { background: #ffebee; color: #c62828; }
+      .info-card { background: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+      .info-card h3 { color: #003366; margin: 0 0 10px 0; }
+      @media (max-width: 768px) { .contact-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <div class="beta-banner">🎉 GigLega Beta ab Gurugram mein Live hai! Pehle 100 users mein shaamil ho jao — Join Karo, Free Hai!</div>
 
-    <!-- Navigation -->
-    <nav class="navbar">
-      <div class="container">
-        <div class="logo-container">
-          <svg
-            class="logo-icon"
-            viewBox="0 0 100 100"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <defs>
-              <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop
-                  offset="0%"
-                  style="stop-color: #0d2157; stop-opacity: 1"
-                />
-                <stop
-                  offset="100%"
-                  style="stop-color: #00b894; stop-opacity: 1"
-                />
-              </linearGradient>
-            </defs>
+    <nav>
+      <div class="nav-container">
+        <div class="logo">
+          <svg style="width: 60px; height: 60px" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <defs><linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color: #0d2157; stop-opacity: 1" /><stop offset="100%" style="stop-color: #006894; stop-opacity: 1" /></linearGradient></defs>
             <circle cx="50" cy="50" r="48" fill="url(#logoGrad)" />
-            <text
-              x="50"
-              y="58"
-              text-anchor="middle"
-              fill="white"
-              font-size="36"
-              font-weight="bold"
-              font-family="Poppins, sans-serif"
-            >
-              GL
-            </text>
+            <text x="50" y="58" text-anchor="middle" fill="#FFA500" font-size="46" font-weight="bold" font-family="Poppins, sans-serif">G</text>
           </svg>
-          <div class="logo-text">
-            <span class="gig">Gig</span><span class="lega">Lega</span>
-            <sup class="beta-tag">Beta</sup>
-          </div>
+          <span>GigLega</span>
         </div>
-        <div class="location-badge">📍 Gurugram Beta</div>
         <ul class="nav-links">
           <li><a href="index.html">Home</a></li>
           <li><a href="browse.html">Browse Gigs</a></li>
-          <li><a href="post-gig.html">Post a Gig</a></li>
-          <li><a href="index.html">How It Works</a></li>
+          <li><a href="post-gig.html">Post Gig</a></li>
+          <li><a href="dashboard.html">Dashboard</a></li>
           <li><a href="contact.html" class="active">Contact</a></li>
         </ul>
-        <div class="auth-buttons">
-          <a href="login.html" class="btn btn-outline">Log In</a>
-          <a href="signup.html" class="btn btn-primary">Free Mein Judo!</a>
-        </div>
+        <a href="signup.html" class="cta-button">Free Mein Judo!</a>
       </div>
     </nav>
 
-    <!-- Contact Page -->
-    <main style="padding: 60px 0; background: #f8f9fa; min-height: 70vh">
-      <div class="container">
-        <div style="text-align: center; margin-bottom: 48px">
-          <h1
-            style="
-              font-size: 2.5rem;
-              color: var(--color-primary);
-              font-weight: 800;
-            "
-          >
-            Sawaal Hai? Humse Puchein! 🙋
-          </h1>
-          <p style="color: #666; font-size: 1.1rem; margin-top: 12px">
-            Hum yahan hain aapki help ke liye — Gurugram Beta mein koi bhi issue
-            ho, batao!
-          </p>
+    <div class="contact-container">
+      <h1 style="text-align: center; color: #003366; margin-bottom: 10px;">Message Bhejo! 📧</h1>
+      <p style="text-align: center; color: #666; margin-bottom: 40px;">Koi sawal hai? Koi problem? Humse baat karo!</p>
+
+      <div class="contact-grid">
+        <div class="contact-form">
+          <div id="success-msg" class="success-msg"></div>
+          <div id="error-msg" class="error-msg"></div>
+
+          <form id="contact-form">
+            <div class="form-group">
+              <label for="name">Aapka Naam *</label>
+              <input type="text" id="name" name="name" required placeholder="Apna naam likho" />
+            </div>
+            <div class="form-group">
+              <label for="email">Email *</label>
+              <input type="email" id="email" name="email" required placeholder="your@email.com" />
+            </div>
+            <div class="form-group">
+              <label for="phone">Phone (Optional)</label>
+              <input type="tel" id="phone" name="phone" placeholder="9876543210" />
+            </div>
+            <div class="form-group">
+              <label for="message">Message *</label>
+              <textarea id="message" name="message" required placeholder="Apna message yahan likho..."></textarea>
+            </div>
+            <button type="submit" id="submit-btn" class="submit-btn">Message Bhejo 🚀</button>
+          </form>
         </div>
 
-        <div
-          style="
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 48px;
-            align-items: start;
-          "
-        >
-          <!-- Contact Info -->
-          <div>
-            <div
-              style="
-                background: white;
-                border-radius: 16px;
-                padding: 40px;
-                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-              "
-            >
-              <h2
-                style="
-                  color: var(--color-primary);
-                  font-size: 1.5rem;
-                  margin-bottom: 32px;
-                "
-              >
-                Humse Milo
-              </h2>
-
-              <div style="display: flex; flex-direction: column; gap: 24px">
-                <div style="display: flex; align-items: flex-start; gap: 16px">
-                  <span style="font-size: 2rem">📍</span>
-                  <div>
-                    <h4 style="color: var(--color-primary); margin-bottom: 4px">
-                      Office Address
-                    </h4>
-                    <p style="color: #555; line-height: 1.6">
-                      H.no 82 Om Vihar Phase 1,<br />Palam Vihar Extn, Opp Sec 23A H.U.D.A Park, Gurugram — 122017
-                    </p>
-                  </div>
-                </div>
-
-                <div style="display: flex; align-items: flex-start; gap: 16px">
-                  <span style="font-size: 2rem">📧</span>
-                  <div>
-                    <h4 style="color: var(--color-primary); margin-bottom: 4px">
-                      Email Karo
-                    </h4>
-                    <p style="color: #555">Giglega.official@gmail.com</p>
-                  </div>
-                </div>
-
-                <div style="display: flex; align-items: flex-start; gap: 16px">
-                  <span style="font-size: 2rem">📱</span>
-                  <div>
-                    <h4 style="color: var(--color-primary); margin-bottom: 4px">
-                      Call / WhatsApp
-                    </h4>
-                    <p style="color: #555">+91 9319635257</p>
-                    <p style="color: #888; font-size: 0.85rem">
-                      Mon-Sat, 9am - 7pm
-                    </p>
-                  </div>
-                </div>
-
-                <div style="display: flex; align-items: flex-start; gap: 16px">
-                  <span style="font-size: 2rem">⏰</span>
-                  <div>
-                    <h4 style="color: var(--color-primary); margin-bottom: 4px">
-                      Working Hours
-                    </h4>
-                    <p style="color: #555">Monday – Saturday</p>
-                    <p style="color: #555">9:00 AM – 7:00 PM</p>
-                  </div>
-                </div>
-              </div>
-
-              <div
-                style="
-                  margin-top: 32px;
-                  padding-top: 24px;
-                  border-top: 1px solid #eee;
-                "
-              >
-                <h4 style="color: var(--color-primary); margin-bottom: 16px">
-                  Social Media pe milein
-                </h4>
-                <div style="display: flex; gap: 12px">
-                  <a
-                    href=https://www.instagram.com/giglega.official/#"
-                    style="
-                      background: var(--color-accent);
-                      color: white;
-                      padding: 8px 16px;
-                      border-radius: 8px;
-                      text-decoration: none;
-                      font-weight: 600;
-                      font-size: 0.9rem;
-                    "
-                    >Instagram</a
-                  >
-                  <a
-                    href="#"
-                    style="
-                      background: var(--color-primary);
-                      color: white;
-                      padding: 8px 16px;
-                      border-radius: 8px;
-                      text-decoration: none;
-                      font-weight: 600;
-                      font-size: 0.9rem;
-                    "
-                    >LinkedIn</a
-                  >
-                  <a
-                    href="#"
-                    style="
-                      background: #25d366;
-                      color: white;
-                      padding: 8px 16px;
-                      border-radius: 8px;
-                      text-decoration: none;
-                      font-weight: 600;
-                      font-size: 0.9rem;
-                    "
-                    >WhatsApp</a
-                  >
-                </div>
-              </div>
-            </div>
+        <div class="contact-info">
+          <div class="info-card">
+            <h3>📞 Call/WhatsApp Karo</h3>
+            <p style="font-size: 1.2em; font-weight: 600; color: #FFA500;"><a href="https://wa.me/919319635257" style="color: #FFA500; text-decoration: none;">+91 9319635257</a></p>
           </div>
 
-          <!-- Contact Form -->
-          <div>
-            <div
-              style="
-                background: white;
-                border-radius: 16px;
-                padding: 40px;
-                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-              "
-            >
-              <h2
-                style="
-                  color: var(--color-primary);
-                  font-size: 1.5rem;
-                  margin-bottom: 32px;
-                "
-              >
-                Message Bhejo
-              </h2>
-              <form
-                id="contactForm"
-                style="display: flex; flex-direction: column; gap: 20px"
-              >
-                <div>
-                  <label
-                    style="
-                      display: block;
-                      font-weight: 600;
-                      color: var(--color-primary);
-                      margin-bottom: 8px;
-                    "
-                    >Aapka Naam *</label
-                  >
-                  <input
-                    type="text"
-                    placeholder="Full Name"
-                    required
-                    style="
-                      width: 100%;
-                      padding: 14px 16px;
-                      border: 2px solid #e1e5e9;
-                      border-radius: 10px;
-                      font-size: 1rem;
-                      font-family: Poppins, sans-serif;
-                      box-sizing: border-box;
-                      outline: none;
-                      transition: border-color 0.2s;
-                    "
-                    onfocus="this.style.borderColor='#00b894'"
-                    onblur="this.style.borderColor='#e1e5e9'"
-                  />
-                </div>
-                <div>
-                  <label
-                    style="
-                      display: block;
-                      font-weight: 600;
-                      color: var(--color-primary);
-                      margin-bottom: 8px;
-                    "
-                    >Phone Number</label
-                  >
-                  <input
-                    type="tel"
-                    placeholder="+91 00000-00000"
-                    style="
-                      width: 100%;
-                      padding: 14px 16px;
-                      border: 2px solid #e1e5e9;
-                      border-radius: 10px;
-                      font-size: 1rem;
-                      font-family: Poppins, sans-serif;
-                      box-sizing: border-box;
-                      outline: none;
-                      transition: border-color 0.2s;
-                    "
-                    onfocus="this.style.borderColor='#00b894'"
-                    onblur="this.style.borderColor='#e1e5e9'"
-                  />
-                </div>
-                <div>
-                  <label
-                    style="
-                      display: block;
-                      font-weight: 600;
-                      color: var(--color-primary);
-                      margin-bottom: 8px;
-                    "
-                    >Email Address *</label
-                  >
-                  <input
-                    type="email"
-                    placeholder="example@gmail.com"
-                    required
-                    style="
-                      width: 100%;
-                      padding: 14px 16px;
-                      border: 2px solid #e1e5e9;
-                      border-radius: 10px;
-                      font-size: 1rem;
-                      font-family: Poppins, sans-serif;
-                      box-sizing: border-box;
-                      outline: none;
-                      transition: border-color 0.2s;
-                    "
-                    onfocus="this.style.borderColor='#00b894'"
-                    onblur="this.style.borderColor='#e1e5e9'"
-                  />
-                </div>
-                <div>
-                  <label
-                    style="
-                      display: block;
-                      font-weight: 600;
-                      color: var(--color-primary);
-                      margin-bottom: 8px;
-                    "
-                    >Aapka Sawaal / Message *</label
-                  >
-                  <textarea
-                    placeholder="Puri baat likhein... hum zaroor jawab denge!"
-                    required
-                    rows="5"
-                    style="
-                      width: 100%;
-                      padding: 14px 16px;
-                      border: 2px solid #e1e5e9;
-                      border-radius: 10px;
-                      font-size: 1rem;
-                      font-family: Poppins, sans-serif;
-                      box-sizing: border-box;
-                      outline: none;
-                      resize: vertical;
-                      transition: border-color 0.2s;
-                    "
-                    onfocus="this.style.borderColor='#00b894'"
-                    onblur="this.style.borderColor='#e1e5e9'"
-                  ></textarea>
-                </div>
-                <button
-                  type="submit"
-                  class="btn btn-primary"
-                  style="
-                    padding: 16px;
-                    font-size: 1.1rem;
-                    border: none;
-                    cursor: pointer;
-                    border-radius: 10px;
-                  "
-                >
-                  🚀 Message Bhejo!
-                </button>
-              </form>
-            </div>
+          <div class="info-card">
+            <h3>✉️ Email Karo</h3>
+            <p style="font-size: 1.1em; color: #666;"><a href="mailto:Giglega.official@gmail.com" style="color: #666; text-decoration: none;">Giglega.official@gmail.com</a></p>
+          </div>
+
+          <div class="info-card">
+            <h3>📍 Office Address</h3>
+            <p style="color: #666; line-height: 1.6;">H.no 82 Om Vihar Phase 1<br/>Palam Vihar Extn<br/>Opp Sec 23A H.U.D.A Park<br/>Gurugram - 122017</p>
+          </div>
+
+          <div class="info-card">
+            <h3>🕗 Timings</h3>
+            <p style="color: #666;">Monday - Saturday<br/>10:00 AM - 6:00 PM</p>
           </div>
         </div>
       </div>
-    </main>
+    </div>
 
-    <!-- Footer -->
-    <footer class="footer">
-      <div class="container">
-        <div class="footer-grid">
-          <div class="footer-col footer-brand">
-            <div class="footer-logo">
-              <span class="gig">Gig</span><span class="lega">Lega</span>
-            </div>
-            <p>Made with ❤️ in Gurugram, India</p>
-          </div>
-          <div class="footer-col">
-            <h4>Workers ke liye</h4>
-            <ul>
-              <li><a href="browse.html">Find Gigs</a></li>
-              <li><a href="#">Success Stories</a></li>
-              <li><a href="#">Resources</a></li>
-            </ul>
-          </div>
-          <div class="footer-col">
-            <h4>Clients ke liye</h4>
-            <ul>
-              <li><a href="post-gig.html">Post a Gig</a></li>
-              <li><a href="#">Hire Talent</a></li>
-              <li><a href="#">Enterprise</a></li>
-            </ul>
-          </div>
-          <div class="footer-col">
-            <h4>Support</h4>
-            <ul>
-              <li><a href="contact.html">Contact Us</a></li>
-              <li><a href="#">Help Center</a></li>
-              <li><a href="#">Trust & Safety</a></li>
-            </ul>
-          </div>
-        </div>
-        <div class="footer-bottom">
-          &copy; 2026 GigLega | Terms | Privacy Policy
-        </div>
-      </div>
+    <footer style="margin-top:80px;">
+      <div><h3>GigLega</h3><p>Gurugram ka apna hyperlocal gig platform</p><p>&copy; 2025 GigLega Beta. Made with ❤️ for Gurugram.</p></div>
+      <div><h4>Legal</h4><a href="terms.html">Terms</a><a href="privacy-policy.html">Privacy</a><a href="trust-safety.html">Trust & Safety</a></div>
+      <div><h4>Support</h4><a href="help-center.html">Help Center</a><a href="contact.html">Contact</a></div>
+      <div><h4>Contact</h4><p><strong>Email: </strong>Giglega.official@gmail.com</p><p><strong>Call: </strong><a href="https://wa.me/919319635257">9319635257</a></p></div>
     </footer>
 
     <script>
-      document.getElementById("contactForm").addEventListener("submit", (e) => {
+      emailjs.init('YOUR_PUBLIC_KEY');
+
+      const form = document.getElementById('contact-form');
+      const submitBtn = document.getElementById('submit-btn');
+      const successMsg = document.getElementById('success-msg');
+      const errorMsg = document.getElementById('error-msg');
+
+      form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        alert(
-          "Dhanyawad! Aapka message mil gaya. Hum jald hi aapse baat karenge. 🙏"
-        );
-        e.target.reset();
+        
+        const name = document.getElementById('name').value;
+        const email = document.getElementById('email').value;
+        const phone = document.getElementById('phone').value;
+        const message = document.getElementById('message').value;
+
+        submitBtn.textContent = 'Bhej rahe hain...';
+        submitBtn.disabled = true;
+
+        const mailtoLink = `mailto:Giglega.official@gmail.com?subject=Message from ${encodeURIComponent(name)}&body=${encodeURIComponent(`Name: ${name}\nEmail: ${email}\nPhone: ${phone}\n\nMessage:\n${message}`)}`;
+        
+        window.location.href = mailtoLink;
+        
+        setTimeout(() => {
+          successMsg.textContent = '✅ Email client khul gaya! Wahan se send kar do.';
+          successMsg.style.display = 'block';
+          form.reset();
+          submitBtn.textContent = 'Message Bhejo 🚀';
+          submitBtn.disabled = false;
+          
+          setTimeout(() => {
+            successMsg.style.display = 'none';
+          }, 5000);
+        }, 1000);
       });
     </script>
-  </body>
+</body>
 </html>
