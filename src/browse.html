@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Browse Gigs - GigLega Beta</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* Page specific styles */
+      .filter-section {
+        background: white;
+        padding: 24px 0;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        sticky: top;
+        top: 110px;
+        z-index: 100;
+      }
+      .filter-bar {
+        display: flex;
+        gap: 16px;
+        align-items: flex-end;
+        flex-wrap: wrap;
+      }
+      .filter-group {
+        flex: 1;
+        min-width: 200px;
+      }
+      .filter-group label {
+        display: block;
+        font-size: 13px;
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: var(--color-primary);
+      }
+      .filter-group input,
+      .filter-group select {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-family: inherit;
+      }
+      .gig-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 24px;
+        padding: 40px 0;
+      }
+      .gig-card {
+        background: white;
+        border-radius: 14px;
+        padding: 24px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s;
+        display: flex;
+        flex-direction: column;
+        border-left: 5px solid transparent;
+      }
+      .gig-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+      }
+      .gig-card.hyperlocal {
+        background: var(--color-card-hyperlocal);
+        border-left-color: var(--color-accent);
+      }
+      .gig-card.remote {
+        background: var(--color-card-remote);
+        border-left-color: var(--color-secondary);
+      }
+      .gig-badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 50px;
+        font-size: 11px;
+        font-weight: 700;
+        margin-bottom: 12px;
+        text-transform: uppercase;
+      }
+      .badge-hyperlocal {
+        background: var(--color-accent);
+        color: var(--color-primary);
+      }
+      .badge-remote {
+        background: var(--color-secondary);
+        color: white;
+      }
+      .gig-cat {
+        font-size: 12px;
+        color: #666;
+        margin-bottom: 4px;
+      }
+      .gig-title {
+        font-size: 19px;
+        font-weight: 700;
+        margin-bottom: 10px;
+        color: var(--color-primary);
+      }
+      .gig-desc {
+        font-size: 14px;
+        color: #444;
+        margin-bottom: 16px;
+        flex-grow: 1;
+        line-height: 1.5;
+      }
+      .gig-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-top: 1px solid rgba(0, 0, 0, 0.06);
+        pt: 16px;
+      }
+      .gig-price {
+        font-weight: 700;
+        font-size: 16px;
+        color: var(--color-primary);
+      }
+      .gig-loc {
+        font-size: 13px;
+        color: var(--color-secondary);
+        font-weight: 500;
+      }
+      .gig-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 16px;
+      }
+      .gig-rating {
+        font-size: 13px;
+        font-weight: 600;
+        color: #555;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Beta Banner -->
+    <div class="beta-banner">
+      🚀 GigLega Beta ab Gurugram mein Live hai! Pehle 100 users mein shaamil ho
+      jao — Join Karo, Free Hai!
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+      <div class="container">
+        <div class="logo-container">
+          <svg
+            class="logo-icon"
+            viewBox="0 0 100 100"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <defs>
+              <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop
+                  offset="0%"
+                  style="stop-color: #0d2157; stop-opacity: 1"
+                />
+                <stop
+                  offset="100%"
+                  style="stop-color: #00b4a6; stop-opacity: 1"
+                />
+              </linearGradient>
+            </defs>
+            <circle cx="50" cy="50" r="48" fill="url(#logoGrad)" />
+            <text
+              x="50"
+              y="62"
+              font-family="Poppins, sans-serif"
+              font-size="38"
+              font-weight="800"
+              fill="white"
+              text-anchor="middle"
+            >
+              GL
+            </text>
+          </svg>
+          <div class="logo-text">
+            <span class="gig">Gig</span><span class="lega">Lega</span
+            ><sup class="beta-tag">Beta</sup>
+          </div>
+        </div>
+
+        <ul class="nav-links">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="browse.html" class="active">Browse Gigs</a></li>
+          <li><a href="post-gig.html">Post a Gig</a></li>
+          <li><a href="index.html">How It Works</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+
+        <div class="auth-buttons">
+          <a href="signup.html" class="btn btn-outline">Log In</a>
+          <a href="signup.html" class="btn btn-primary">Free Mein Judo!</a>
+        </div>
+      </div>
+    </nav>
+
+    <main>
+      <!-- Filter Bar -->
+      <div class="filter-section">
+        <div class="container">
+          <div class="filter-bar">
+            <div class="filter-group">
+              <label>Search Gigs</label>
+              <input
+                type="text"
+                placeholder="e.g. 'Plumber', 'Logo Design'..."
+              />
+            </div>
+            <div class="filter-group">
+              <label>Category</label>
+              <select>
+                <option>All Categories</option>
+                <option>Home Services</option>
+                <option>Errands & Delivery</option>
+                <option>Web Development</option>
+                <option>Graphic Design</option>
+              </select>
+            </div>
+            <div class="filter-group">
+              <label>Sort By</label>
+              <select>
+                <option>Newest First</option>
+                <option>Budget: High to Low</option>
+                <option>Budget: Low to High</option>
+              </select>
+            </div>
+            <button class="btn btn-primary" style="padding: 10px 30px">
+              Search
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Gigs Grid -->
+      <div class="container">
+        <div class="gig-grid">
+          <!-- Gig 1 -->
+          <div class="gig-card hyperlocal">
+            <span class="gig-badge badge-hyperlocal">🛵 Hyperlocal</span>
+            <div class="gig-cat">Home Services</div>
+            <h3 class="gig-title">Ghar ki Deep Cleaning Chahiye</h3>
+            <p class="gig-desc">
+              Suncity, Sector 54 mein 3BHK flat ki complete deep cleaning ke
+              liye help chahiye. Sab materials provide kiye jayenge.
+            </p>
+            <div class="gig-loc">📍 Sector 54, Gurugram</div>
+            <div class="gig-footer">
+              <div class="gig-price">₹1,200 (Fixed)</div>
+              <div class="gig-rating">⭐ 4.8 (12)</div>
+            </div>
+          </div>
+
+          <!-- Gig 2 -->
+          <div class="gig-card remote">
+            <span class="gig-badge badge-remote">💻 Remote</span>
+            <div class="gig-cat">Graphic Design</div>
+            <h3 class="gig-title">Modern Logo for E-commerce</h3>
+            <p class="gig-desc">
+              Looking for a creative designer to build a brand identity and logo
+              for a new clothing line. Hinglish understanding is a plus.
+            </p>
+            <div class="gig-loc">🌍 Online / Remote</div>
+            <div class="gig-footer">
+              <div class="gig-price">₹5,000 - ₹8,000</div>
+              <div class="gig-rating">⭐ 4.9 (45)</div>
+            </div>
+          </div>
+
+          <!-- Gig 3 -->
+          <div class="gig-card hyperlocal">
+            <span class="gig-badge badge-hyperlocal">🛵 Hyperlocal</span>
+            <div class="gig-cat">Errands & Delivery</div>
+            <h3 class="gig-title">Dog Walker for Labrador</h3>
+            <p class="gig-desc">
+              Morning and Evening walks needed for my 2-year old Labrador.
+              Approx 30 mins per walk. Monthly basis preferable.
+            </p>
+            <div class="gig-loc">📍 DLF Phase 2, Gurugram</div>
+            <div class="gig-footer">
+              <div class="gig-price">₹60/hr</div>
+              <div class="gig-rating">⭐ New</div>
+            </div>
+          </div>
+
+          <!-- Gig 4 -->
+          <div class="gig-card remote">
+            <span class="gig-badge badge-remote">💻 Remote</span>
+            <div class="gig-cat">Web Development</div>
+            <h3 class="gig-title">React.js Portfolio Site</h3>
+            <p class="gig-desc">
+              Need a clean, minimal portfolio website built using React and
+              Tailwind CSS. Design will be provided.
+            </p>
+            <div class="gig-loc">🌍 Online / Remote</div>
+            <div class="gig-footer">
+              <div class="gig-price">₹15,000 Fixed</div>
+              <div class="gig-rating">⭐ 4.7 (8)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="container">
+        <div class="footer-grid">
+          <div class="footer-col">
+            <div class="footer-logo">
+              <span class="gig">Gig</span><span class="lega">Lega</span>
+            </div>
+            <p>Made with ❤️ in Gurugram, India</p>
+          </div>
+          <div class="footer-col">
+            <h4>Workers ke liye</h4>
+            <ul>
+              <li><a href="browse.html">Find Gigs</a></li>
+              <li><a href="#">Success Stories</a></li>
+              <li><a href="#">Resources</a></li>
+            </ul>
+          </div>
+          <div class="footer-col">
+            <h4>Clients ke liye</h4>
+            <ul>
+              <li><a href="post-gig.html">Post a Gig</a></li>
+              <li><a href="#">Hire Talent</a></li>
+              <li><a href="#">Enterprise</a></li>
+            </ul>
+          </div>
+          <div class="footer-col">
+            <h4>Support</h4>
+            <ul>
+              <li><a href="contact.html">Contact Us</a></li>
+              <li><a href="#">Help Center</a></li>
+              <li><a href="#">Trust & Safety</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="footer-bottom">© 2026 GigLega | Terms | Privacy Policy</div>
+      </div>
+    </footer>
+  </body>
+</html>
