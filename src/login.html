@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Login - GigLega Beta</title>
@@ -11,44 +11,18 @@
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
-  </head>
-  <body style="background: var(--color-bg)">
+</head>
+<body style="background: var(--color-bg);">
     <!-- Beta Banner -->
     <div class="beta-banner">
-      🚀 GigLega Beta ab Gurugram mein Live hai! Pehle 100 users mein shaamil ho
-      jao — Join Karo, Free Hai!
+      🎉 GigLega Beta ab Gurugram mein Live hai! Pehle 100 users mein shaamil ho jao — Join Karo, Free Hai!
     </div>
 
-    <!-- Main Content -->
-    <main
-      style="
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 60px 20px 40px;
-      "
-    >
-      <div
-        style="
-          background: white;
-          border-radius: 20px;
-          box-shadow: 0 8px 40px rgba(0, 0, 0, 0.12);
-          padding: 48px;
-          max-width: 450px;
-          width: 100%;
-          text-align: center;
-        "
-      >
+    <!-- Navigation Bar -->
+    <nav>
+      <div class="nav-container">
         <!-- Logo -->
-        <div
-          style="
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 32px;
-          "
-        >
+        <div class="logo">
           <svg
             style="width: 60px; height: 60px"
             viewBox="0 0 100 100"
@@ -62,7 +36,7 @@
                 />
                 <stop
                   offset="100%"
-                  style="stop-color: #00b894; stop-opacity: 1"
+                  style="stop-color: #006894; stop-opacity: 1"
                 />
               </linearGradient>
             </defs>
@@ -71,171 +45,251 @@
               x="50"
               y="58"
               text-anchor="middle"
-              fill="white"
-              font-size="36"
+              fill="#FFA500"
+              font-size="46"
               font-weight="bold"
               font-family="Poppins, sans-serif"
             >
-              GL
+              G
             </text>
           </svg>
+          <span>GigLega</span>
         </div>
 
-        <h1
-          style="
-            font-size: 2rem;
-            color: var(--color-primary);
-            font-weight: 800;
-            margin-bottom: 8px;
-          "
-        >
-          Wapas Aaye! 🙏
-        </h1>
-        <p style="color: #666; margin-bottom: 32px">
-          Apne account mein login karein aur kaam dhundo ya post karein!
-        </p>
+        <!-- Nav Links -->
+        <ul class="nav-links">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="browse.html">Browse Gigs</a></li>
+          <li><a href="post-gig.html">Post Gig</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
 
-        <form
-          id="loginForm"
-          style="
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            text-align: left;
-          "
-        >
-          <div>
-            <label
-              style="
-                display: block;
-                font-weight: 600;
-                color: var(--color-primary);
-                margin-bottom: 8px;
-              "
-              >Email ya Phone Number *</label
-            >
-            <input
-              type="text"
-              placeholder="example@gmail.com ya +91 00000-00000"
-              required
-              style="
-                width: 100%;
-                padding: 14px 16px;
-                border: 2px solid #e1e5e9;
-                border-radius: 10px;
-                font-size: 1rem;
-                font-family: Poppins, sans-serif;
-                box-sizing: border-box;
-                outline: none;
-                transition: border-color 0.2s;
-              "
-              onfocus="this.style.borderColor='#00b894'"
-              onblur="this.style.borderColor='#e1e5e9'"
-            />
-          </div>
-
-          <div>
-            <label
-              style="
-                display: block;
-                font-weight: 600;
-                color: var(--color-primary);
-                margin-bottom: 8px;
-              "
-              >Password *</label
-            >
-            <input
-              type="password"
-              placeholder="Min. 8 characters"
-              required
-              style="
-                width: 100%;
-                padding: 14px 16px;
-                border: 2px solid #e1e5e9;
-                border-radius: 10px;
-                font-size: 1rem;
-                font-family: Poppins, sans-serif;
-                box-sizing: border-box;
-                outline: none;
-                transition: border-color 0.2s;
-              "
-              onfocus="this.style.borderColor='#00b894'"
-              onblur="this.style.borderColor='#e1e5e9'"
-            />
-          </div>
-
-          <div style="text-align: right">
-            <a
-              href="#"
-              style="
-                color: var(--color-accent);
-                text-decoration: none;
-                font-size: 0.9rem;
-                font-weight: 600;
-              "
-              >Password Bhool Gaye?</a
-            >
-          </div>
-
-          <button
-            type="submit"
-            class="btn btn-primary"
-            style="
-              padding: 16px;
-              font-size: 1.1rem;
-              border: none;
-              cursor: pointer;
-              border-radius: 10px;
-              margin-top: 8px;
-            "
-          >
-            🚀 Login Karein!
-          </button>
-        </form>
-
-        <div
-          style="
-            margin-top: 24px;
-            padding-top: 24px;
-            border-top: 1px solid #eee;
-          "
-        >
-          <p style="color: #666; font-size: 0.95rem">
-            Pehli baar aaye ho?
-            <a
-              href="signup.html"
-              style="
-                color: var(--color-accent);
-                text-decoration: none;
-                font-weight: 600;
-              "
-              >Account Banao — Free Hai!</a
-            >
-          </p>
-        </div>
-
-        <div style="margin-top: 32px">
-          <a
-            href="index.html"
-            style="
-              color: var(--color-primary);
-              text-decoration: none;
-              font-weight: 600;
-              font-size: 0.9rem;
-            "
-          >
-            ← Homepage pe Wapas Jao
-          </a>
-        </div>
+        <!-- CTA -->
+        <a href="signup.html" class="cta-button">Free Mein Judo!</a>
       </div>
-    </main>
+    </nav>
 
-    <script>
-      document.getElementById("loginForm").addEventListener("submit", (e) => {
+    <!-- Login Form -->
+    <div style="
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 8px 40px rgba(0, 0, 0, 0.12);
+        padding: 48px;
+        max-width: 450px;
+        width: 100%;
+        text-align: center;
+        margin: 80px auto 40px;
+      ">
+      <h2 style="margin: 0 0 10px; color: #003366; font-size: 2em;">Welcome Back!</h2>
+      <p style="color: #666; margin-bottom: 30px;">Apne account mein login karo</p>
+
+      <div id="error-message" style="
+          display: none;
+          background: #ffebee;
+          color: #c62828;
+          padding: 12px;
+          border-radius: 8px;
+          margin-bottom: 20px;
+          font-size: 0.9em;
+        "></div>
+
+      <form id="login-form">
+        <input
+          type="email"
+          id="email"
+          placeholder="Email Address"
+          required
+          style="
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1em;
+            font-family: 'Poppins', sans-serif;
+            box-sizing: border-box;
+          "
+        />
+        <input
+          type="password"
+          id="password"
+          placeholder="Password"
+          required
+          style="
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1em;
+            font-family: 'Poppins', sans-serif;
+            box-sizing: border-box;
+          "
+        />
+
+        <button
+          type="submit"
+          id="login-btn"
+          style="
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #FFA500, #FF6B35);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Poppins', sans-serif;
+          "
+        >
+          Login Karo
+        </button>
+      </form>
+
+      <div style="margin: 25px 0; color: #999; position: relative;">
+        <span style="background: white; padding: 0 15px; position: relative; z-index: 1;">Ya</span>
+        <div style="position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: #e0e0e0; z-index: 0;"></div>
+      </div>
+
+      <button
+        id="google-login-btn"
+        style="
+          width: 100%;
+          padding: 15px;
+          background: white;
+          color: #666;
+          border: 2px solid #e0e0e0;
+          border-radius: 10px;
+          font-size: 1em;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.3s;
+          font-family: 'Poppins', sans-serif;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 10px;
+        "
+      >
+        <svg width="20" height="20" viewBox="0 0 20 20">
+          <path fill="#4285F4" d="M19.6 10.23c0-.82-.1-1.42-.25-2.05H10v3.72h5.5c-.15.96-.74 2.31-2.04 3.22v2.45h3.16c1.89-1.73 2.98-4.3 2.98-7.34z"/>
+          <path fill="#34A853" d="M13.46 15.13c-.83.59-1.96 1-3.46 1-2.64 0-4.88-1.74-5.68-4.15H1.07v2.52C2.72 17.75 6.09 20 10 20c2.7 0 4.96-.89 6.62-2.42l-3.16-2.45z"/>
+          <path fill="#FBBC05" d="M3.99 10c0-.69.12-1.35.32-1.97V5.51H1.07A9.973 9.973 0 000 10c0 1.61.39 3.14 1.07 4.49l3.24-2.52c-.2-.62-.32-1.28-.32-1.97z"/>
+          <path fill="#EA4335" d="M10 3.88c1.88 0 3.13.81 3.85 1.48l2.84-2.76C14.96.99 12.7 0 10 0 6.09 0 2.72 2.25 1.07 5.51l3.24 2.52C5.12 5.62 7.36 3.88 10 3.88z"/>
+        </svg>
+        Google se Login Karo
+      </button>
+
+      <p style="margin-top: 25px; color: #666;">
+        Nayi user ho? <a href="signup.html" style="color: #FFA500; font-weight: 600; text-decoration: none;">Free Mein Judo!</a>
+      </p>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+      <div>
+        <h3>GigLega</h3>
+        <p>Gurugram ka apna hyperlocal gig platform</p>
+        <p>&copy; 2025 GigLega Beta. Made with ❤️ for Gurugram.</p>
+      </div>
+      <div>
+        <h4>Legal</h4>
+        <a href="terms.html">Terms & Conditions</a>
+        <a href="privacy-policy.html">Privacy Policy</a>
+        <a href="trust-safety.html">Trust & Safety</a>
+      </div>
+      <div>
+        <h4>Support</h4>
+        <a href="help-center.html">Help Center</a>
+        <a href="contact.html">Contact Us</a>
+      </div>
+      <div>
+        <h4>Contact</h4>
+        <p><strong>Email: </strong>Giglega.official@gmail.com</p>
+        <p><strong>Call us: </strong><a href="https://wa.me/919319635257">9319635257</a></p>
+        <p><strong>Address: </strong>H.no 82 Om Vihar Phase 1 palam Vihar Extn, Opp Sec 23A h.u.d.a park- 122017</p>
+      </div>
+    </footer>
+
+    <script type="module">
+      import { auth, googleProvider } from './firebase-config.js';
+      import { signInWithEmailAndPassword, signInWithPopup } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+
+      const loginForm = document.getElementById('login-form');
+      const googleLoginBtn = document.getElementById('google-login-btn');
+      const errorMessage = document.getElementById('error-message');
+
+      function showError(message) {
+        errorMessage.textContent = message;
+        errorMessage.style.display = 'block';
+        setTimeout(() => {
+          errorMessage.style.display = 'none';
+        }, 5000);
+      }
+
+      // Email/Password Login
+      loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        alert("Login successful! Aap ab apne dashboard pe ja rahe hain. 🎉");
-        window.location.href = "index.html";
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const loginBtn = document.getElementById('login-btn');
+
+        loginBtn.textContent = 'Login ho raha hai...';
+        loginBtn.disabled = true;
+
+        try {
+          const userCredential = await signInWithEmailAndPassword(auth, email, password);
+          console.log('Login successful:', userCredential.user);
+          window.location.href = '/dashboard.html';
+        } catch (error) {
+          console.error('Login error:', error);
+          let errorMsg = 'Login mein problem aayi. Please try again.';
+          
+          if (error.code === 'auth/user-not-found') {
+            errorMsg = 'Email not found. Pehle signup karo!';
+          } else if (error.code === 'auth/wrong-password') {
+            errorMsg = 'Password galat hai. Phir se try karo.';
+          } else if (error.code === 'auth/invalid-email') {
+            errorMsg = 'Email format galat hai.';
+          } else if (error.code === 'auth/too-many-requests') {
+            errorMsg = 'Bahut zyada attempts. Thodi der baad try karo.';
+          }
+          
+          showError(errorMsg);
+          loginBtn.textContent = 'Login Karo';
+          loginBtn.disabled = false;
+        }
+      });
+
+      // Google Login
+      googleLoginBtn.addEventListener('click', async () => {
+        googleLoginBtn.textContent = 'Google login ho raha hai...';
+        googleLoginBtn.disabled = true;
+
+        try {
+          const result = await signInWithPopup(auth, googleProvider);
+          console.log('Google login successful:', result.user);
+          
+          // Check if user profile exists in Firestore, if not redirect to complete profile
+          // For now, just redirect to dashboard
+          window.location.href = '/dashboard.html';
+        } catch (error) {
+          console.error('Google login error:', error);
+          let errorMsg = 'Google login mein problem aayi.';
+          
+          if (error.code === 'auth/popup-closed-by-user') {
+            errorMsg = 'Popup band kar diya. Phir se try karo.';
+          } else if (error.code === 'auth/popup-blocked') {
+            errorMsg = 'Popup blocked hai. Browser settings check karo.';
+          }
+          
+          showError(errorMsg);
+          googleLoginBtn.textContent = 'Google se Login Karo';
+          googleLoginBtn.disabled = false;
+        }
       });
     </script>
-  </body>
+</body>
 </html>
