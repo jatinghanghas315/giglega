@@ -70,6 +70,9 @@
   --border-gradient: linear-gradient(135deg, rgba(13, 148, 136, 0.28), rgba(245, 158, 11, 0.22));
 }
 
+/* ============================================
+   Dark Mode Base Variables
+   ============================================ */
 html.dark-mode {
   --surface: #0f172a;
   --surface-soft: #111827;
@@ -83,7 +86,147 @@ html.dark-mode {
   --shadow-sm: 0 10px 24px rgba(0, 0, 0, 0.28);
   --shadow-md: 0 18px 44px rgba(0, 0, 0, 0.36);
   --shadow-lg: 0 28px 64px rgba(0, 0, 0, 0.42);
+
+  /* ── BUG #2 FIX 1: Gray scale override ──────────────────
+     --gray-700 was #334155 (near-black) — used on labels,
+     chips, nav links. Invisible on dark backgrounds.
+     Flip the scale so lighter numbers = darker tones.     */
+  --gray-25:  #0d1525;
+  --gray-50:  #111827;
+  --gray-100: #1e293b;
+  --gray-150: #1a2438;
+  --gray-200: #334155;
+  --gray-300: #475569;
+  --gray-400: #64748b;
+  --gray-500: #94a3b8;
+  --gray-600: #cbd5e1;
+  --gray-700: #e2e8f0;
 }
+
+/* ── BUG #2 FIX 2: Explicit input / textarea / select ────
+   CSS custom properties can lose cascade in browser
+   shadow DOM for native form controls. Set bg + color
+   explicitly so dark surface actually applies.           */
+html.dark-mode input:not([type="checkbox"]):not([type="radio"]),
+html.dark-mode select,
+html.dark-mode textarea {
+  background: #1e293b;
+  color: #f8fafc;
+  border-color: rgba(255, 255, 255, 0.12);
+  color-scheme: dark; /* FIX 4: date pickers / scrollbars use dark OS variant */
+}
+
+html.dark-mode input::placeholder,
+html.dark-mode textarea::placeholder {
+  color: #64748b;
+}
+
+html.dark-mode input:focus,
+html.dark-mode select:focus,
+html.dark-mode textarea:focus {
+  border-color: rgba(13, 148, 136, 0.6);
+  box-shadow: 0 0 0 4px rgba(13, 148, 136, 0.18);
+  background: #1e293b;
+}
+
+html.dark-mode input.error,
+html.dark-mode textarea.error,
+html.dark-mode select.error {
+  border-color: rgba(239, 68, 68, 0.55);
+  box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1);
+  background: #1e293b;
+}
+
+html.dark-mode input.success,
+html.dark-mode textarea.success,
+html.dark-mode select.success {
+  border-color: rgba(16, 185, 129, 0.55);
+  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+  background: #1e293b;
+}
+
+/* ── BUG #2 FIX 3: Chrome / Safari autofill override ─────
+   Chrome forcefully injects background: rgb(232,240,254)
+   on autofilled inputs — making text invisible on dark bg.
+   The ONLY way to override it is -webkit-box-shadow inset.
+   !important is required — browser ignores anything else.  */
+html.dark-mode input:-webkit-autofill,
+html.dark-mode input:-webkit-autofill:hover,
+html.dark-mode input:-webkit-autofill:focus,
+html.dark-mode input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px #1e293b inset !important;
+  -webkit-text-fill-color: #f8fafc !important;
+  caret-color: #f8fafc;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  transition: background-color 9999s ease-in-out 0s; /* freeze bg change */
+}
+
+/* ── BUG #2 FIX 5: Native <select> option list ───────────
+   <option> elements are OS-rendered and completely ignore
+   CSS custom properties. Must set explicit bg + color.    */
+html.dark-mode select option {
+  background: #1e293b;
+  color: #f8fafc;
+}
+
+/* ── BUG #2 FIX 6: Form labels ───────────────────────────
+   .form-group label uses color: var(--gray-700) = #334155
+   in light mode — near-black and invisible on dark bg.
+   Now overridden via the gray scale flip above, but kept
+   explicit here as a safety net.                          */
+html.dark-mode .form-group label,
+html.dark-mode .field-group label {
+  color: var(--text-muted);
+}
+
+/* ── BUG #2 FIX: Components that use --gray-100 ──────────
+   Modal close, chips, dropdowns all use --gray-100 for bg.
+   With the gray scale flip above they now get #1e293b
+   automatically — these rules make it explicit + safe.    */
+html.dark-mode .modal-close {
+  background: #1e293b;
+  color: #e2e8f0;
+}
+
+html.dark-mode .chip {
+  background: #1e293b;
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #cbd5e1;
+}
+
+html.dark-mode .chip.active {
+  background: rgba(13, 148, 136, 0.18);
+  color: #5eead4;
+  border-color: rgba(13, 148, 136, 0.28);
+}
+
+html.dark-mode .location-dropdown {
+  background: #111827;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+html.dark-mode .location-dropdown li {
+  color: #e2e8f0;
+}
+
+html.dark-mode .location-dropdown li:hover,
+html.dark-mode .location-dropdown li.active {
+  background: #1e293b;
+}
+
+html.dark-mode .pw-toggle {
+  color: #94a3b8;
+}
+
+html.dark-mode .field-feedback.error {
+  color: #fca5a5;
+}
+
+html.dark-mode .field-feedback.success {
+  color: #6ee7b7;
+}
+
+/* ─────────────────────────────────────────────────────── */
 
 *,
 *::before,
@@ -1268,9 +1411,9 @@ html.dark-mode .loader-overlay {
 }
 
 .social-icon[aria-label="Instagram"]::before { content: "IG"; }
-.social-icon[aria-label="WhatsApp"]::before { content: "WA"; }
-.social-icon[aria-label="LinkedIn"]::before { content: "IN"; }
-.social-icon[aria-label="YouTube"]::before { content: "YT"; }
+.social-icon[aria-label="WhatsApp"]::before  { content: "WA"; }
+.social-icon[aria-label="LinkedIn"]::before  { content: "IN"; }
+.social-icon[aria-label="YouTube"]::before   { content: "YT"; }
 
 .footer-bottom {
   border-top: 1px solid rgba(255, 255, 255, 0.08);
@@ -1407,7 +1550,7 @@ html.dark-mode .loader-overlay {
 }
 
 @keyframes shimmer {
-  0% { background-position: 200% 0; }
+  0%   { background-position: 200% 0; }
   100% { background-position: -200% 0; }
 }
 
@@ -1424,7 +1567,7 @@ html.dark-mode .loader-overlay {
 
 @keyframes fadeIn {
   from { opacity: 0; }
-  to { opacity: 1; }
+  to   { opacity: 1; }
 }
 
 /* Responsive */
