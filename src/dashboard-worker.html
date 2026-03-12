@@ -515,7 +515,8 @@
         var user = getCurrentUser();
         if (!user) return;
 
-        document.getElementById("userAvatarLg").textContent     = getInitials(user.name);
+       document.getElementById("userAvatarLg").textContent = getInitials(user.name);
+renderAvatar(document.getElementById("userAvatarLg"), user); // ← ADD THIS
         document.getElementById("userCardName").textContent     = safeS(user.name, "User");
         document.getElementById("userCardRole").textContent     = "👷 Worker · GigLega Member";
         document.getElementById("userCardLocation").textContent = safeS(user.location, "");
