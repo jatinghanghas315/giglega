@@ -1,268 +1,779 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+  <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Login - GigLega Beta</title>
-    <link rel="stylesheet" href="./styles.css" />
-        <link rel="icon" type="image/png" href="./logo.png">
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap"
-      rel="stylesheet"
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Join GigLega — Free Signup & Login</title>
+    <meta
+      name="description"
+      content="GigLega par free mein register karo ya login karo. Gurugram ke local gigs browse karo ya post karo."
     />
-</head>
-<body style="background: var(--color-bg);">
-    <!-- Beta Banner -->
-    <div class="beta-banner">
-      🎉 GigLega Beta ab Gurugram mein Live hai! Pehle 100 users mein shaamil ho jao — Join Karo, Free Hai!
-    </div>
+    <link rel="stylesheet" href="styles.css" />
+    <script defer src="shared.js"></script>
 
-    <!-- Navigation Bar -->
-    <nav>
-      <div class="nav-container">
-        <!-- Logo -->
-        <div class="logo">
-                      <img src="./logo.png" alt="GigLega Logo" style="width:45px;height:45px;border-radius:50%;object-fit:cover;">
-            pan>GigLega</span>
-        </div>
-
-        <!-- Nav Links -->
-        <ul class="nav-links">
-          <li><a href="index.html">Home</a></li>
-          <li><a href="browse.html">Browse Gigs</a></li>
-          <li><a href="post-gig.html">Post Gig</a></li>
-          <li><a href="contact.html">Contact</a></li>
-        </ul>
-
-        <!-- CTA -->
-        <a href="signup.html" class="cta-button">Free Mein Judo!</a>
-      </div>
-    </nav>
-
-    <!-- Login Form -->
-    <div style="
-        background: white;
-        border-radius: 20px;
-        box-shadow: 0 8px 40px rgba(0, 0, 0, 0.12);
-        padding: 48px;
-        max-width: 450px;
-        width: 100%;
-        text-align: center;
-        margin: 80px auto 40px;
-      ">
-      <h2 style="margin: 0 0 10px; color: #003366; font-size: 2em;">Welcome Back!</h2>
-      <p style="color: #666; margin-bottom: 30px;">Apne account mein login karo</p>
-
-      <div id="error-message" style="
-          display: none;
-          background: #ffebee;
-          color: #c62828;
-          padding: 12px;
-          border-radius: 8px;
-          margin-bottom: 20px;
-          font-size: 0.9em;
-        "></div>
-
-      <form id="login-form">
-        <input
-          type="email"
-          id="email"
-          placeholder="Email Address"
-          required
-          style="
-            width: 100%;
-            padding: 15px;
-            margin-bottom: 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            font-size: 1em;
-            font-family: 'Poppins', sans-serif;
-            box-sizing: border-box;
-          "
-        />
-        <input
-          type="password"
-          id="password"
-          placeholder="Password"
-          required
-          style="
-            width: 100%;
-            padding: 15px;
-            margin-bottom: 20px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            font-size: 1em;
-            font-family: 'Poppins', sans-serif;
-            box-sizing: border-box;
-          "
-        />
-
-        <button
-          type="submit"
-          id="login-btn"
-          style="
-            width: 100%;
-            padding: 15px;
-            background: linear-gradient(135deg, #FFA500, #FF6B35);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 1.1em;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-family: 'Poppins', sans-serif;
-          "
-        >
-          Login Karo
-        </button>
-      </form>
-
-      <div style="margin: 25px 0; color: #999; position: relative;">
-        <span style="background: white; padding: 0 15px; position: relative; z-index: 1;">Ya</span>
-        <div style="position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: #e0e0e0; z-index: 0;"></div>
-      </div>
-
-      <button
-        id="google-login-btn"
-        style="
-          width: 100%;
-          padding: 15px;
-          background: white;
-          color: #666;
-          border: 2px solid #e0e0e0;
-          border-radius: 10px;
-          font-size: 1em;
-          font-weight: 600;
-          cursor: pointer;
-          transition: all 0.3s;
-          font-family: 'Poppins', sans-serif;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 10px;
-        "
-      >
-        <svg width="20" height="20" viewBox="0 0 20 20">
-          <path fill="#4285F4" d="M19.6 10.23c0-.82-.1-1.42-.25-2.05H10v3.72h5.5c-.15.96-.74 2.31-2.04 3.22v2.45h3.16c1.89-1.73 2.98-4.3 2.98-7.34z"/>
-          <path fill="#34A853" d="M13.46 15.13c-.83.59-1.96 1-3.46 1-2.64 0-4.88-1.74-5.68-4.15H1.07v2.52C2.72 17.75 6.09 20 10 20c2.7 0 4.96-.89 6.62-2.42l-3.16-2.45z"/>
-          <path fill="#FBBC05" d="M3.99 10c0-.69.12-1.35.32-1.97V5.51H1.07A9.973 9.973 0 000 10c0 1.61.39 3.14 1.07 4.49l3.24-2.52c-.2-.62-.32-1.28-.32-1.97z"/>
-          <path fill="#EA4335" d="M10 3.88c1.88 0 3.13.81 3.85 1.48l2.84-2.76C14.96.99 12.7 0 10 0 6.09 0 2.72 2.25 1.07 5.51l3.24 2.52C5.12 5.62 7.36 3.88 10 3.88z"/>
-        </svg>
-        Google se Login Karo
-      </button>
-
-      <p style="margin-top: 25px; color: #666;">
-        Nayi user ho? <a href="signup.html" style="color: #FFA500; font-weight: 600; text-decoration: none;">Free Mein Judo!</a>
-      </p>
-    </div>
-
-    <!-- Footer -->
-    <footer>
-      <div>
-        <h3>GigLega</h3>
-        <p>Gurugram ka apna hyperlocal gig platform</p>
-        <p>&copy; 2025 GigLega Beta. Made with ❤️ for Gurugram.</p>
-      </div>
-      <div>
-        <h4>Legal</h4>
-        <a href="terms.html">Terms & Conditions</a>
-        <a href="privacy-policy.html">Privacy Policy</a>
-        <a href="trust-safety.html">Trust & Safety</a>
-      </div>
-      <div>
-        <h4>Support</h4>
-        <a href="help-center.html">Help Center</a>
-        <a href="contact.html">Contact Us</a>
-      </div>
-      <div>
-        <h4>Contact</h4>
-        <p><strong>Email: </strong>Giglega.official@gmail.com</p>
-        <p><strong>Call us: </strong><a href="https://wa.me/919319635257">9319635257</a></p>
-        <p><strong>Address: </strong>H.no 82 Om Vihar Phase 1 palam Vihar Extn, Opp Sec 23A h.u.d.a park- 122017</p>
-      </div>
-    </footer>
-
-    <script type="module">
-      import { auth, googleProvider } from './firebase-config.js';
-      import { signInWithEmailAndPassword, signInWithPopup } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
-
-      const loginForm = document.getElementById('login-form');
-      const googleLoginBtn = document.getElementById('google-login-btn');
-      const errorMessage = document.getElementById('error-message');
-
-      function showError(message) {
-        errorMessage.textContent = message;
-        errorMessage.style.display = 'block';
-        setTimeout(() => {
-          errorMessage.style.display = 'none';
-        }, 5000);
+    <style>
+      /* ── Page wrapper ────────────────────────────── */
+      .auth-page {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: clamp(32px, 6vw, 64px) 0;
+        background: linear-gradient(160deg, #f0fdfa 0%, #f8fafc 60%, #eff6ff 100%);
       }
 
-      // Email/Password Login
-      loginForm.addEventListener('submit', async (e) => {
+      .auth-center {
+        width: 100%;
+        max-width: 480px;
+        margin: 0 auto;
+        padding: 0 16px;
+      }
+
+      /* ── Logo bar ────────────────────────────────── */
+      .auth-logo {
+        text-align: center;
+        margin-bottom: 28px;
+      }
+
+      .auth-logo a {
+        text-decoration: none;
+        font-size: 2rem;
+        font-weight: 900;
+        letter-spacing: -0.05em;
+      }
+
+      .auth-logo .gig  { color: var(--teal); }
+      .auth-logo .lega { color: var(--navy, #1a3c5e); }
+
+      .auth-logo sup {
+        font-size: 0.6rem;
+        font-weight: 700;
+        color: var(--text-muted);
+        vertical-align: super;
+        letter-spacing: 0;
+      }
+
+      .auth-logo p {
+        margin: 6px 0 0;
+        color: var(--text-muted);
+        font-size: 0.92rem;
+      }
+
+      /* ── Card ────────────────────────────────────── */
+      .auth-card {
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: 26px;
+        padding: clamp(24px, 5vw, 42px);
+        box-shadow: 0 8px 40px rgba(13, 148, 136, 0.07), 0 2px 12px rgba(26, 60, 94, 0.06);
+      }
+
+      /* ── Tab switcher ────────────────────────────── */
+      .auth-tabs {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4px;
+        background: var(--bg-subtle, #f1f5f9);
+        border-radius: 14px;
+        padding: 4px;
+        margin-bottom: 28px;
+      }
+
+      .auth-tab-btn {
+        padding: 10px;
+        border: none;
+        border-radius: 11px;
+        background: transparent;
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: var(--text-muted);
+        cursor: pointer;
+        transition: background 0.18s, color 0.18s, box-shadow 0.18s;
+      }
+
+      .auth-tab-btn.active {
+        background: #fff;
+        color: var(--teal);
+        box-shadow: 0 2px 8px rgba(13, 148, 136, 0.12);
+      }
+
+      /* ── Tab panels ──────────────────────────────── */
+      .auth-panel {
+        display: none;
+      }
+
+      .auth-panel.active {
+        display: block;
+      }
+
+      .auth-panel h2 {
+        margin: 0 0 6px;
+        font-size: 1.35rem;
+      }
+
+      .auth-panel > p {
+        margin: 0 0 24px;
+        color: var(--text-muted);
+        font-size: 0.92rem;
+        line-height: 1.55;
+      }
+
+      /* ── Form groups ─────────────────────────────── */
+      .form-group {
+        margin-bottom: 16px;
+      }
+
+      .form-group label {
+        display: block;
+        font-weight: 700;
+        font-size: 0.9rem;
+        margin-bottom: 6px;
+        color: var(--text);
+      }
+
+      .form-group input,
+      .form-group select {
+        width: 100%;
+        padding: 12px 14px;
+        border: 1.5px solid var(--border);
+        border-radius: 13px;
+        font-size: 0.97rem;
+        font-family: inherit;
+        color: var(--text);
+        background: #fff;
+        outline: none;
+        transition: border-color 0.18s, box-shadow 0.18s;
+      }
+
+      .form-group input:focus,
+      .form-group select:focus {
+        border-color: var(--teal);
+        box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
+      }
+
+      /* ── Password wrap ───────────────────────────── */
+      .pw-wrap {
+        position: relative;
+      }
+
+      .pw-wrap input {
+        padding-right: 52px;
+      }
+
+      .pw-toggle {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 0.82rem;
+        font-weight: 700;
+        color: var(--teal);
+        padding: 4px 6px;
+        border-radius: 6px;
+      }
+
+      /* ── Role cards ──────────────────────────────── */
+      .role-cards {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-bottom: 18px;
+      }
+
+      .role-card {
+        padding: 16px 14px;
+        border: 2px solid var(--border);
+        border-radius: 16px;
+        cursor: pointer;
+        text-align: center;
+        transition: border-color 0.16s, background 0.16s;
+        user-select: none;
+      }
+
+      .role-card:hover {
+        border-color: var(--teal);
+      }
+
+      .role-card.selected {
+        border-color: var(--teal);
+        background: rgba(13, 148, 136, 0.06);
+      }
+
+      .role-card-icon {
+        font-size: 1.8rem;
+        margin-bottom: 6px;
+        display: block;
+      }
+
+      .role-card strong {
+        display: block;
+        font-size: 0.95rem;
+        color: var(--text);
+      }
+
+      .role-card span {
+        font-size: 0.78rem;
+        color: var(--text-muted);
+        line-height: 1.4;
+      }
+
+      /* ── Submit button ───────────────────────────── */
+      .auth-submit {
+        width: 100%;
+        padding: 14px;
+        font-size: 1rem;
+        font-weight: 800;
+        border-radius: 14px;
+        margin-top: 6px;
+      }
+
+      /* ── Divider ─────────────────────────────────── */
+      .auth-divider {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 18px 0;
+        color: var(--text-muted);
+        font-size: 0.82rem;
+      }
+
+      .auth-divider::before,
+      .auth-divider::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: var(--border);
+      }
+
+      /* ── Footer links ────────────────────────────── */
+      .auth-foot {
+        margin-top: 18px;
+        text-align: center;
+        font-size: 0.88rem;
+        color: var(--text-muted);
+      }
+
+      .auth-foot a {
+        color: var(--teal);
+        font-weight: 700;
+        text-decoration: none;
+      }
+
+      .auth-foot a:hover {
+        text-decoration: underline;
+      }
+
+      /* ── Terms note ──────────────────────────────── */
+      .terms-note {
+        margin-top: 14px;
+        text-align: center;
+        font-size: 0.78rem;
+        color: var(--text-muted);
+        line-height: 1.5;
+      }
+
+      .terms-note a {
+        color: var(--teal);
+        text-decoration: none;
+      }
+
+      /* ── Trust strip ─────────────────────────────── */
+      .auth-trust {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: center;
+        margin-top: 22px;
+        font-size: 0.82rem;
+        color: var(--text-muted);
+      }
+
+      .auth-trust span {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-weight: 600;
+      }
+
+      /* ── Already logged in banner ────────────────── */
+      .already-in-banner {
+        padding: 20px 22px;
+        border-radius: 18px;
+        background: rgba(13, 148, 136, 0.06);
+        border: 1px solid rgba(13, 148, 136, 0.22);
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      .already-in-banner strong {
+        display: block;
+        font-size: 1rem;
+        margin-bottom: 6px;
+      }
+
+      .already-in-banner p {
+        margin: 0 0 14px;
+        font-size: 0.88rem;
+        color: var(--text-muted);
+      }
+    </style>
+  </head>
+
+  <body style="background:transparent;">
+    <div id="announce-bar"></div>
+    <div id="navbar"></div>
+
+    <main>
+      <div class="auth-page">
+        <div class="auth-center">
+
+          <!-- Logo -->
+          <div class="auth-logo fade-up">
+            <a href="index.html">
+              <span class="gig">Gig</span><span class="lega">Lega</span><sup>Beta</sup>
+            </a>
+            <p>Gurugram ka #1 hyperlocal gig platform</p>
+          </div>
+
+          <!-- Already logged in banner -->
+          <div id="alreadyInBanner" class="already-in-banner fade-up" style="display:none;">
+            <strong>✅ Aap already logged in hain!</strong>
+            <p>Agar dusre account se login karna chahte ho toh pehle logout karo.</p>
+            <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+              <a href="dashboard.html" class="btn btn-primary btn-sm">Go to Dashboard</a>
+              <button class="btn btn-outline btn-sm" id="logoutSwitchBtn">Logout & Switch</button>
+            </div>
+          </div>
+
+          <!-- Auth card -->
+          <div class="auth-card fade-up" id="authCard">
+
+            <!-- Tab buttons -->
+            <div class="auth-tabs" role="tablist" aria-label="Auth tabs">
+              <button
+                class="auth-tab-btn active"
+                id="tabSignup"
+                role="tab"
+                aria-selected="true"
+                aria-controls="panelSignup"
+              >
+                🚀 Sign Up
+              </button>
+              <button
+                class="auth-tab-btn"
+                id="tabLogin"
+                role="tab"
+                aria-selected="false"
+                aria-controls="panelLogin"
+              >
+                🔑 Log In
+              </button>
+            </div>
+
+            <!-- ══ SIGNUP PANEL ══ -->
+            <div class="auth-panel active" id="panelSignup" role="tabpanel" aria-labelledby="tabSignup">
+              <h2>Free mein join karo</h2>
+              <p>Ek minute mein account banao — koi fees nahi, koi catch nahi.</p>
+
+              <form id="signupForm" novalidate autocomplete="off">
+
+                <div class="form-group">
+                  <label for="suName">Full Name *</label>
+                  <input
+                    type="text"
+                    id="suName"
+                    placeholder="Apna pura naam"
+                    maxlength="80"
+                    autocomplete="name"
+                  />
+                </div>
+
+                <div class="form-group">
+                  <label for="suEmail">Email *</label>
+                  <input
+                    type="email"
+                    id="suEmail"
+                    placeholder="aapka@email.com"
+                    maxlength="100"
+                    autocomplete="email"
+                  />
+                </div>
+
+                <div class="form-group">
+                  <label for="suPhone">Phone Number *</label>
+                  <input
+                    type="tel"
+                    id="suPhone"
+                    placeholder="+91 98765 43210"
+                    data-phone
+                    maxlength="15"
+                    autocomplete="tel"
+                  />
+                </div>
+
+                <div class="form-group">
+                  <label for="suPass">Password *</label>
+                  <div class="pw-wrap">
+                    <input
+                      type="password"
+                      id="suPass"
+                      placeholder="Minimum 6 characters"
+                      maxlength="64"
+                      autocomplete="new-password"
+                    />
+                    <button type="button" class="pw-toggle" aria-label="Show password">Show</button>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label>I am a... *</label>
+                  <div class="role-cards" id="suRoleCards">
+                    <div class="role-card" data-role="worker" tabindex="0" role="button" aria-pressed="false">
+                      <span class="role-card-icon">💼</span>
+                      <strong>Worker</strong>
+                      <span>Kaam dhundh raha hoon</span>
+                    </div>
+                    <div class="role-card" data-role="client" tabindex="0" role="button" aria-pressed="false">
+                      <span class="role-card-icon">🏢</span>
+                      <strong>Client</strong>
+                      <span>Kaam karwana chahta hoon</span>
+                    </div>
+                  </div>
+                  <input type="hidden" id="suRole" name="role" />
+                  <div id="suRoleFeedback" style="font-size:0.82rem;margin-top:2px;"></div>
+                </div>
+
+                <div class="form-group">
+                  <label for="suLocation">Location <span style="font-weight:400;color:var(--text-muted);">(optional)</span></label>
+                  <input
+                    type="text"
+                    id="suLocation"
+                    placeholder="e.g. Sector 29, Gurugram"
+                    maxlength="80"
+                  />
+                </div>
+
+                <button type="submit" class="btn btn-primary auth-submit" id="signupBtn">
+                  Create Free Account 🎉
+                </button>
+
+                <p class="terms-note">
+                  Register karke aap GigLega ki
+                  <a href="terms.html" target="_blank">Terms of Service</a> aur
+                  <a href="privacy-policy.html" target="_blank">Privacy Policy</a>
+                  se agree karte ho.
+                </p>
+              </form>
+
+              <div class="auth-divider">already a member?</div>
+
+              <div class="auth-foot">
+                Already account hai?
+                <a href="#" id="goToLoginLink">Log In karo →</a>
+              </div>
+            </div>
+
+            <!-- ══ LOGIN PANEL ══ -->
+            <div class="auth-panel" id="panelLogin" role="tabpanel" aria-labelledby="tabLogin">
+              <h2>Wapas aao! 👋</h2>
+              <p>
+                Apne account mein login karo aur Gurugram ke latest gigs explore karo.
+              </p>
+
+              <form id="loginForm" novalidate autocomplete="off">
+
+                <div class="form-group">
+                  <label for="liEmail">Email *</label>
+                  <input
+                    type="email"
+                    id="liEmail"
+                    placeholder="aapka@email.com"
+                    maxlength="100"
+                    autocomplete="email"
+                  />
+                </div>
+
+                <div class="form-group">
+                  <label for="liPass">Password *</label>
+                  <div class="pw-wrap">
+                    <input
+                      type="password"
+                      id="liPass"
+                      placeholder="Apna password"
+                      maxlength="64"
+                      autocomplete="current-password"
+                    />
+                    <button type="button" class="pw-toggle" aria-label="Show password">Show</button>
+                  </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary auth-submit" id="loginBtn">
+                  Log In 🔑
+                </button>
+
+              </form>
+
+              <div class="auth-divider">new here?</div>
+
+              <div class="auth-foot">
+                Account nahi hai?
+                <a href="#" id="goToSignupLink">Free mein join karo →</a>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Trust badges -->
+          <div class="auth-trust fade-up">
+            <span>✅ 100% Free</span>
+            <span>🔒 Safe & Secure</span>
+            <span>📍 Gurugram Local</span>
+            <span>⚡ Instant Access</span>
+          </div>
+
+        </div>
+      </div>
+    </main>
+
+    <footer id="footer"></footer>
+
+    <script>
+      /* ─────────────────────────────────────────────
+         TAB SWITCHING
+      ───────────────────────────────────────────── */
+      var tabSignup  = document.getElementById("tabSignup");
+      var tabLogin   = document.getElementById("tabLogin");
+      var panelSignup = document.getElementById("panelSignup");
+      var panelLogin  = document.getElementById("panelLogin");
+
+      function showTab(tab) {
+        var isLogin = tab === "login";
+
+        tabSignup.classList.toggle("active", !isLogin);
+        tabLogin.classList.toggle("active",   isLogin);
+        tabSignup.setAttribute("aria-selected", String(!isLogin));
+        tabLogin.setAttribute("aria-selected",  String(isLogin));
+
+        panelSignup.classList.toggle("active", !isLogin);
+        panelLogin.classList.toggle("active",   isLogin);
+
+        document.title = isLogin
+          ? "Login — GigLega"
+          : "Join GigLega — Free Signup";
+      }
+
+      tabSignup.addEventListener("click", function () { showTab("signup"); });
+      tabLogin.addEventListener("click",  function () { showTab("login");  });
+
+      document.getElementById("goToLoginLink").addEventListener("click", function (e) {
         e.preventDefault();
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
-        const loginBtn = document.getElementById('login-btn');
-
-        loginBtn.textContent = 'Login ho raha hai...';
-        loginBtn.disabled = true;
-
-        try {
-          const userCredential = await signInWithEmailAndPassword(auth, email, password);
-          console.log('Login successful:', userCredential.user);
-          window.location.href = '/dashboard.html';
-        } catch (error) {
-          console.error('Login error:', error);
-          let errorMsg = 'Login mein problem aayi. Please try again.';
-          
-          if (error.code === 'auth/user-not-found') {
-            errorMsg = 'Email not found. Pehle signup karo!';
-          } else if (error.code === 'auth/wrong-password') {
-            errorMsg = 'Password galat hai. Phir se try karo.';
-          } else if (error.code === 'auth/invalid-email') {
-            errorMsg = 'Email format galat hai.';
-          } else if (error.code === 'auth/too-many-requests') {
-            errorMsg = 'Bahut zyada attempts. Thodi der baad try karo.';
-          }
-          
-          showError(errorMsg);
-          loginBtn.textContent = 'Login Karo';
-          loginBtn.disabled = false;
-        }
+        showTab("login");
       });
 
-      // Google Login
-      googleLoginBtn.addEventListener('click', async () => {
-        googleLoginBtn.textContent = 'Google login ho raha hai...';
-        googleLoginBtn.disabled = true;
+      document.getElementById("goToSignupLink").addEventListener("click", function (e) {
+        e.preventDefault();
+        showTab("signup");
+      });
 
-        try {
-          const result = await signInWithPopup(auth, googleProvider);
-          console.log('Google login successful:', result.user);
-          
-          // Check if user profile exists in Firestore, if not redirect to complete profile
-          // For now, just redirect to dashboard
-          window.location.href = '/dashboard.html';
-        } catch (error) {
-          console.error('Google login error:', error);
-          let errorMsg = 'Google login mein problem aayi.';
-          
-          if (error.code === 'auth/popup-closed-by-user') {
-            errorMsg = 'Popup band kar diya. Phir se try karo.';
-          } else if (error.code === 'auth/popup-blocked') {
-            errorMsg = 'Popup blocked hai. Browser settings check karo.';
+      /* ─────────────────────────────────────────────
+         ROLE CARD KEYBOARD SUPPORT
+      ───────────────────────────────────────────── */
+      document.querySelectorAll("#suRoleCards .role-card").forEach(function (card) {
+        card.addEventListener("keydown", function (e) {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            card.click();
           }
-          
-          showError(errorMsg);
-          googleLoginBtn.textContent = 'Google se Login Karo';
-          googleLoginBtn.disabled = false;
+        });
+
+        card.addEventListener("click", function () {
+          document.querySelectorAll("#suRoleCards .role-card").forEach(function (c) {
+            c.classList.remove("selected");
+            c.setAttribute("aria-pressed", "false");
+          });
+          card.classList.add("selected");
+          card.setAttribute("aria-pressed", "true");
+          document.getElementById("suRole").value = card.getAttribute("data-role");
+          var fb = document.getElementById("suRoleFeedback");
+          fb.textContent = "";
+        });
+      });
+
+      /* ─────────────────────────────────────────────
+         SIGNUP FORM
+      ───────────────────────────────────────────── */
+      document.getElementById("signupForm").addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        /* Role check */
+        var role = document.getElementById("suRole").value;
+        if (!role) {
+          var fb = document.getElementById("suRoleFeedback");
+          fb.textContent = "❌ Worker ya Client select karo";
+          fb.style.color = "#ef4444";
+          fb.style.fontWeight = "700";
+          return;
+        }
+
+        var result = validateForm({
+          suName:  { required: true, label: "Full Name",  minLength: 2, maxLength: 80 },
+          suEmail: {
+            required: true, label: "Email",
+            pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+            patternMsg: "Valid email address dalo"
+          },
+          suPhone: {
+            required: true, label: "Phone",
+            pattern: /^[6-9]\d{9}$|^\+91\s?[6-9]\d{4}\s?\d{5}$/,
+            patternMsg: "Valid Indian mobile number dalo"
+          },
+          suPass: {
+            required: true, label: "Password",
+            minLength: 6, maxLength: 64
+          }
+        });
+
+        if (!result.valid) return;
+
+        var email = document.getElementById("suEmail").value.trim().toLowerCase();
+        var users = lsGet(GL.STORAGE_KEY_USERS, []);
+
+        /* Duplicate email check */
+        var existing = users.find(function (u) {
+          return String(u.email || "").toLowerCase() === email;
+        });
+
+        if (existing) {
+          showFieldError("suEmail", "Yeh email already registered hai — Log In karo");
+          return;
+        }
+
+        var btn = document.getElementById("signupBtn");
+        setButtonLoading(btn, "Creating account...");
+
+        setTimeout(function () {
+          var newUser = {
+            id:        uid(),
+            name:      document.getElementById("suName").value.trim(),
+            email:     email,
+            phone:     document.getElementById("suPhone").value.trim(),
+            password:  btoa(document.getElementById("suPass").value), /* basic obfuscation */
+            role:      role,
+            location:  document.getElementById("suLocation").value.trim(),
+            bio:       "",
+            skills:    "",
+            joinedAt:  new Date().toISOString()
+          };
+
+          users.push(newUser);
+          lsSet(GL.STORAGE_KEY_USERS, users);
+          lsSet(GL.STORAGE_KEY_AUTH, "logged_in");
+          lsSet(GL.STORAGE_KEY_USER, newUser);
+
+          resetButton(btn);
+          showToast("Account ban gaya! GigLega par welcome hai 🎉", "success", 3000);
+
+          setTimeout(function () {
+            var params  = new URLSearchParams(window.location.search);
+            var nextUrl = params.get("next");
+            window.location.href = nextUrl || "dashboard.html";
+          }, 900);
+        }, 700);
+      });
+
+      /* ─────────────────────────────────────────────
+         LOGIN FORM
+      ───────────────────────────────────────────── */
+      document.getElementById("loginForm").addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        var result = validateForm({
+          liEmail: {
+            required: true, label: "Email",
+            pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+            patternMsg: "Valid email address dalo"
+          },
+          liPass: { required: true, label: "Password", minLength: 1 }
+        });
+
+        if (!result.valid) return;
+
+        var email    = document.getElementById("liEmail").value.trim().toLowerCase();
+        var password = document.getElementById("liPass").value;
+        var users    = lsGet(GL.STORAGE_KEY_USERS, []);
+
+        var user = users.find(function (u) {
+          return String(u.email || "").toLowerCase() === email;
+        });
+
+        if (!user) {
+          showFieldError("liEmail", "Yeh email registered nahi hai — Sign Up karo");
+          return;
+        }
+
+        /* Password verify — btoa obfuscation matches signup */
+        var storedPass = user.password || "";
+        var inputPass  = btoa(password);
+
+        if (storedPass !== inputPass) {
+          showFieldError("liPass", "Password galat hai — dobara try karo");
+          return;
+        }
+
+        var btn = document.getElementById("loginBtn");
+        setButtonLoading(btn, "Logging in...");
+
+        setTimeout(function () {
+          lsSet(GL.STORAGE_KEY_AUTH, "logged_in");
+          lsSet(GL.STORAGE_KEY_USER, user);
+
+          resetButton(btn);
+          showToast("Login successful! Welcome back " + (user.name || "") + " 👋", "success", 3000);
+
+          setTimeout(function () {
+            var params  = new URLSearchParams(window.location.search);
+            var nextUrl = params.get("next");
+            window.location.href = nextUrl || "dashboard.html";
+          }, 900);
+        }, 600);
+      });
+
+      /* ─────────────────────────────────────────────
+         LOGOUT SWITCH BUTTON
+      ───────────────────────────────────────────── */
+      document.getElementById("logoutSwitchBtn").addEventListener("click", function () {
+        lsRemove(GL.STORAGE_KEY_AUTH);
+        lsRemove(GL.STORAGE_KEY_USER);
+        document.getElementById("alreadyInBanner").style.display = "none";
+        document.getElementById("authCard").style.display = "";
+        showToast("Logged out! Ab dusre account se login karo.", "info");
+      });
+
+      /* ─────────────────────────────────────────────
+         BOOT — URL param checks
+      ───────────────────────────────────────────── */
+      document.addEventListener("DOMContentLoaded", function () {
+        var params = new URLSearchParams(window.location.search);
+        var tab    = params.get("tab");
+
+        /* If already logged in — show banner, hide form */
+        if (isLoggedIn()) {
+          var user = getCurrentUser();
+          document.getElementById("alreadyInBanner").style.display = "block";
+          document.getElementById("alreadyInBanner").querySelector("strong").textContent =
+            "✅ " + (user && user.name ? user.name + ", aap already logged in hain!" : "Aap already logged in hain!");
+          document.getElementById("authCard").style.display = "none";
+          return;
+        }
+
+        /* ?tab=login pre-selects login tab */
+        if (tab === "login") {
+          showTab("login");
         }
       });
     </script>
-</body>
+  </body>
 </html>
-
