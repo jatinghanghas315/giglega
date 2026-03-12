@@ -9,6 +9,38 @@
     <script defer src="shared.js"></script>
 
     <style>
+      /* BUG #6 FIX — Avatar upload overlay */
+.avatar-upload-wrap {
+  position: relative;
+  cursor: pointer;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.avatar-edit-overlay {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.48);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+
+.avatar-upload-wrap:hover .avatar-edit-overlay,
+.avatar-upload-wrap:focus-within .avatar-edit-overlay {
+  opacity: 1;
+}
+
+.avatar-upload-wrap:hover .user-avatar-lg {
+  filter: brightness(0.75);
+  transition: filter 0.2s ease;
+}
+
       .dash-wrap { padding: clamp(24px,4vw,44px) 0 clamp(48px,8vw,80px); }
       .dash-grid { display: grid; gap: 24px; }
       .dash-sidebar { display: grid; gap: 12px; align-content: start; }
@@ -152,7 +184,7 @@
             <!-- ══ SIDEBAR ══ -->
             <aside class="dash-sidebar">
               <div class="user-card card fade-up" id="userCard">
-                <div class="user-avatar-lg" id="userAvatarLg">U</div>
+                <div class="avatar-upload-wrap" id="avatarUploadWrap" title="Photo change karne ke liye click karo">   <div class="avatar-upload-wrap" id="avatarUploadWrap" title="Photo change karne ke liye click karo">   <div class="user-avatar-lg" id="userAvatarLg">U</div>   <div class="avatar-edit-overlay">📷</div>   <input type="file" id="avatarInput" accept="image/*" style="display:none;" /> </div>   <div class="avatar-edit-overlay">📷</div>   <input type="file" id="avatarInput" accept="image/*" style="display:none;" /> </div>
                 <div>
                   <h3 id="userCardName">Loading...</h3>
                   <p id="userCardRole">Client</p>
