@@ -9,13 +9,12 @@
     <script defer src="shared.js"></script>
 
     <style>
-      /* Reuse same shell CSS — paste same styles block from worker */
       .dash-wrap { padding: clamp(24px,4vw,44px) 0 clamp(48px,8vw,80px); }
       .dash-grid { display: grid; gap: 24px; }
       .dash-sidebar { display: grid; gap: 12px; align-content: start; }
       .user-card {
         padding: 22px 18px; border: 1px solid var(--border);
-        border-radius: 22px; background: #fff;
+        border-radius: 22px; background: var(--surface);
         display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center;
       }
       .user-avatar-lg {
@@ -29,7 +28,7 @@
       .profile-bar-wrap { width:100%; background:#e5e7eb; border-radius:99px; height:8px; overflow:hidden; }
       .profile-bar-fill  { height:100%; border-radius:99px; background:linear-gradient(90deg,var(--teal),#0ea5e9); transition:width .6s ease; }
       .profile-bar-label { font-size:0.8rem; color:var(--text-muted); font-weight:700; }
-      .sidebar-nav { background:#fff; border:1px solid var(--border); border-radius:18px; overflow:hidden; }
+      .sidebar-nav { background:var(--surface); border:1px solid var(--border); border-radius:18px; overflow:hidden; }
       .sidebar-nav-item {
         display:flex; align-items:center; gap:10px; padding:13px 18px;
         font-size:0.95rem; font-weight:700; color:var(--text-muted);
@@ -37,7 +36,7 @@
         border-bottom:1px solid var(--border); transition:background .14s,color .14s;
       }
       .sidebar-nav-item:last-child { border-bottom:none; }
-      .sidebar-nav-item:hover { background:#f8fafc; color:var(--text); }
+      .sidebar-nav-item:hover { background:var(--surface-soft); color:var(--text); }
       .sidebar-nav-item.active { background:rgba(13,148,136,.07); color:var(--teal); border-left:3px solid var(--teal); }
       .sidebar-nav-item .nav-icon { font-size:1.1rem; flex-shrink:0; }
       .sidebar-nav-item .nav-badge {
@@ -52,13 +51,12 @@
       .panel-header h2 { margin:0; font-size:1.35rem; }
       .panel-header p  { margin:4px 0 0; color:var(--text-muted); font-size:.9rem; }
       .stat-strip { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-bottom:24px; }
-      .stat-cell { padding:18px 16px; border:1px solid var(--border); border-radius:18px; background:#fff; }
+      .stat-cell { padding:18px 16px; border:1px solid var(--border); border-radius:18px; background:var(--surface); }
       .stat-cell-label { font-size:.78rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:.04em; margin-bottom:4px; }
       .stat-cell-value { font-size:1.8rem; font-weight:900; letter-spacing:-.04em; color:var(--teal); line-height:1; }
 
-      /* Gig management card */
       .gig-manage-card {
-        border: 1px solid var(--border); border-radius: 18px; background: #fff;
+        border: 1px solid var(--border); border-radius: 18px; background: var(--surface);
         margin-bottom: 12px; overflow: hidden; transition: box-shadow 0.16s;
       }
       .gig-manage-card:hover { box-shadow: 0 4px 16px rgba(13,148,136,0.09); }
@@ -77,14 +75,13 @@
       .gig-status-pill {
         padding: 3px 10px; border-radius: 99px; font-size: .78rem; font-weight: 800;
       }
-      .gig-status-pill.active   { background:#f0fdf4; color:#16a34a; }
-      .gig-status-pill.closed   { background:#f1f5f9; color:#64748b; }
+      .gig-status-pill.active { background:#f0fdf4; color:#16a34a; }
+      .gig-status-pill.closed { background:#f1f5f9; color:#64748b; }
 
-      /* Apps inside gig card */
       .gig-apps-wrap {
         display: none;
         padding: 14px 18px;
-        background: #fafafa;
+        background: var(--surface-soft);
       }
       .gig-manage-card.open .gig-apps-wrap { display: block; }
       .applicant-row {
@@ -103,14 +100,15 @@
       .applicant-detail { font-size: .82rem; color: var(--text-muted); }
       .applicant-msg {
         width: 100%; margin-top: 6px; padding: 8px 12px;
-        background: #fff; border: 1px solid var(--border); border-radius: 10px;
+        background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
         font-size: .83rem; color: var(--text-muted); font-style: italic;
       }
       .applicant-actions { display: flex; gap: 6px; flex-wrap: wrap; margin-left: auto; }
 
       .empty-state {
         padding: 48px 24px; text-align: center;
-        border: 1.5px dashed var(--border); border-radius: 18px; background: #fafafa;
+        border: 1.5px dashed var(--border); border-radius: 18px;
+        background: var(--surface-soft);
       }
       .empty-state .empty-icon { font-size: 2.5rem; margin-bottom: 12px; }
       .empty-state h3 { margin: 0 0 8px; font-size: 1.05rem; }
@@ -120,7 +118,8 @@
       .form-group label { display:block; font-weight:700; font-size:.9rem; margin-bottom:6px; }
       .form-group input, .form-group textarea {
         width:100%; padding:11px 14px; border:1.5px solid var(--border);
-        border-radius:12px; font-size:.95rem; font-family:inherit; color:var(--text); background:#fff;
+        border-radius:12px; font-size:.95rem; font-family:inherit;
+        color:var(--text); background:var(--surface);
         outline:none; resize:vertical; transition:border-color .18s,box-shadow .18s;
       }
       .form-group input:focus, .form-group textarea:focus {
@@ -249,7 +248,7 @@
                       </div>
                       <div class="form-group">
                         <label for="pfEmail">Email</label>
-                        <input type="email" id="pfEmail" readonly style="background:#f8fafc;cursor:not-allowed;" />
+                        <input type="email" id="pfEmail" readonly style="opacity:0.6;cursor:not-allowed;" />
                       </div>
                       <div class="form-group">
                         <label for="pfPhone">Phone *</label>
@@ -295,6 +294,7 @@
                       <strong style="display:block;color:#ef4444;">Logout</strong>
                       <span style="font-size:.85rem;color:var(--text-muted);">Is device se log out karo</span>
                     </div>
+                    <!-- 🔴 BUG #11 CARRY-OVER FIX — safeLogout instead of logout -->
                     <button class="btn btn-outline btn-sm" style="color:#ef4444;border-color:#ef4444;" id="dashLogoutBtn">Logout</button>
                   </div>
                 </div>
@@ -319,7 +319,6 @@
         return s || (fb || "");
       }
 
-      /* ── Update gig status ────────────────────── */
       function updateGigStatus(gigId, newStatus) {
         var gigs = getAllGigs();
         var idx  = gigs.findIndex(function (g) { return String(g.id) === String(gigId); });
@@ -330,14 +329,13 @@
         showToast("Gig " + (newStatus === "active" ? "reopen" : "close") + " ho gaya!", "success");
       }
 
-      /* ── Render gig card with embedded apps ───── */
       function renderGigManageCard(gig, apps) {
-        var title   = safeS(gig.title, "Gig");
-        var loc     = safeS(gig.location, "Gurugram");
-        var budget  = typeof gig.budget === "number" ? formatCurrency(gig.budget) : safeS(gig.budget,"—");
-        var type    = safeS(gig.type, "Gig");
-        var status  = safeS(gig.status, "active");
-        var time    = gig.postedAt ? formatRelativeTime(gig.postedAt) : "—";
+        var title    = safeS(gig.title, "Gig");
+        var loc      = safeS(gig.location, "Gurugram");
+        var budget   = typeof gig.budget === "number" ? formatCurrency(gig.budget) : safeS(gig.budget,"—");
+        var type     = safeS(gig.type, "Gig");
+        var status   = safeS(gig.status, "active");
+        var time     = gig.postedAt ? formatRelativeTime(gig.postedAt) : "—";
         var isUrgent = !!gig.urgent;
 
         var gigApps = apps.filter(function (a) {
@@ -347,7 +345,7 @@
 
         var appsHtml = "";
         if (!gigApps.length) {
-          appsHtml = '<p style="color:var(--text-muted);font-size:.88rem;padding:10px 0;">Abhi koi application nahi — share karo gig!</p>';
+          appsHtml = '<p style="color:var(--text-muted);font-size:.88rem;padding:10px 0;">Abhi koi application nahi — gig share karo!</p>';
         } else {
           appsHtml = gigApps.map(function (a) {
             return '<div class="applicant-row">' +
@@ -383,15 +381,14 @@
               '<span class="gig-status-pill ' + escH(status) + '">' + (status === "active" ? "🟢 Active" : "⚫ Closed") + '</span>' +
               '<a href="gig-detail.html?id=' + encodeURIComponent(gig.id) + '" class="btn btn-outline btn-sm">View</a>' +
               (status === "active"
-                ? '<button class="btn btn-outline btn-sm" onclick="updateGigStatus(\'' + escH(String(gig.id)) + '\',\'closed\')">Close Gig</button>'
-                : '<button class="btn btn-outline btn-sm" onclick="updateGigStatus(\'' + escH(String(gig.id)) + '\',\'active\')">Reopen</button>') +
+                ? '<button class="btn btn-outline btn-sm" onclick="updateGigStatus(\\'' + escH(String(gig.id)) + '\\',\\'closed\\')">Close Gig</button>'
+                : '<button class="btn btn-outline btn-sm" onclick="updateGigStatus(\\'' + escH(String(gig.id)) + '\\',\\'active\\')">Reopen</button>') +
             '</div>' +
           '</div>' +
           '<div class="gig-apps-wrap">' + appsHtml + '</div>' +
         '</div>';
       }
 
-      /* ── Load all data ────────────────────────── */
       function loadDashboard() {
         var user = getCurrentUser();
         if (!user) return;
@@ -402,14 +399,13 @@
         document.getElementById("greetingText").textContent = "Namaste, " + safeS(user.name,"Bhai") + "! 👋";
 
         var pct = calcProfileCompletion(user);
-        document.getElementById("profilePct").textContent  = pct + "%";
-        document.getElementById("profileBar").style.width  = pct + "%";
+        document.getElementById("profilePct").textContent = pct + "%";
+        document.getElementById("profileBar").style.width = pct + "%";
 
-        var myGigs = getUserGigs() || [];
-        var allApps = lsGet(GL.STORAGE_KEY_APPS, []);
+        var myGigs   = getGigsByUser(user.id) || [];
+        var allApps  = lsGet(GL.STORAGE_KEY_APPS, []);
 
-        /* Only apps on my gigs */
-        var myGigIds = myGigs.map(function (g) { return String(g.id); });
+        var myGigIds    = myGigs.map(function (g) { return String(g.id); });
         var myGigTitles = myGigs.map(function (g) { return String(g.title || "").toLowerCase(); });
         var incomingApps = allApps.filter(function (a) {
           return myGigIds.indexOf(String(a.gigId)) > -1 ||
@@ -421,17 +417,17 @@
         document.getElementById("gigsCountBadge").textContent = myGigs.length;
         document.getElementById("appsCountBadge").textContent = incomingApps.length;
 
-        /* Stats */
         document.getElementById("clientStats").innerHTML =
-          statCell("Total Gigs",       myGigs.length,         "📌") +
-          statCell("Active",           activeGigs.length,     "🟢") +
-          statCell("Applications In",  incomingApps.length,   "📥") +
-          statCell("Total Spent",      "Free",                "💸");
+          statCell("Total Gigs",      myGigs.length,       "📌") +
+          statCell("Active",          activeGigs.length,   "🟢") +
+          statCell("Applications In", incomingApps.length, "📥") +
+          statCell("Total Spent",     "Free",              "💸");
 
-        /* Recent gigs overview */
+        /* Recent gigs — overview */
         var rgEl = document.getElementById("recentGigsOverview");
         if (!myGigs.length) {
-          rgEl.innerHTML = emptyState("📭","Abhi koi gig post nahi ki","Apni pehli gig post karo — bilkul free!",
+          rgEl.innerHTML = emptyState("📭", "Abhi koi gig post nahi ki",
+            "Apni pehli gig post karo — bilkul free!",
             '<a href="post-gig.html" class="btn btn-primary">Post a Gig</a>');
         } else {
           rgEl.innerHTML = myGigs.slice(0,3).map(function (g) {
@@ -442,7 +438,8 @@
         /* My gigs panel */
         var mgEl = document.getElementById("myGigsList");
         if (!myGigs.length) {
-          mgEl.innerHTML = emptyState("📭","Koi gig nahi mili","Pehli gig post karo aur workers tak pahuncho!",
+          mgEl.innerHTML = emptyState("📭", "Koi gig nahi mili",
+            "Pehli gig post karo aur workers tak pahuncho!",
             '<a href="post-gig.html" class="btn btn-primary">Post First Gig</a>');
         } else {
           mgEl.innerHTML = myGigs.map(function (g) {
@@ -450,11 +447,19 @@
           }).join("");
         }
 
-        /* Incoming apps flat list */
+        /* ── BUG #3 FIX ─────────────────────────────────────────────
+           Old: "Gigs share karo — WhatsApp, Instagram, har jagah!"
+                button → Browse Platform → browse.html  (wrong!)
+           New: Relevant empty state for Applications tab
+                button → Post a Gig → post-gig.html     (correct!)  */
         var iaEl = document.getElementById("incomingAppsList");
         if (!incomingApps.length) {
-          iaEl.innerHTML = emptyState("📭","Koi application nahi aayi","Gigs share karo — WhatsApp, Instagram, har jagah!",
-            '<a href="browse.html" class="btn btn-primary">Browse Platform</a>');
+          iaEl.innerHTML = emptyState(
+            "📋",
+            "Koi application abhi nahi aayi",
+            "Gig post karo aur workers se connect ho! Jab koi apply karega, yahan dikhega.",
+            '<a href="post-gig.html" class="btn btn-primary">+ Post a Gig</a>'
+          );
         } else {
           iaEl.innerHTML = incomingApps.map(function (a) {
             return '<div class="gig-manage-card" style="padding:16px 18px;">' +
@@ -485,7 +490,7 @@
         document.getElementById("pfLocation").value = safeS(user.location);
         document.getElementById("pfBio").value      = safeS(user.bio);
 
-        /* Wire gig accordion toggles */
+        /* Gig accordion toggles */
         document.querySelectorAll(".gig-manage-header").forEach(function (hdr) {
           hdr.addEventListener("click", function (e) {
             if (e.target.closest("a") || e.target.closest("button")) return;
@@ -510,7 +515,7 @@
           '</div>';
       }
 
-      /* ── Profile save ─────────────────────────── */
+      /* ── Profile save ── */
       document.getElementById("profileForm").addEventListener("submit", function (e) {
         e.preventDefault();
         var result = validateForm({
@@ -523,7 +528,7 @@
         });
         if (!result.valid) return;
         var btn = document.getElementById("saveProfileBtn");
-        setButtonLoading(btn, "Saving...");
+        setButtonLoading(btn, true, "Saving...");
         setTimeout(function () {
           var user = getCurrentUser() || {};
           var updated = Object.assign({}, user, {
@@ -536,14 +541,17 @@
           var users = lsGet(GL.STORAGE_KEY_USERS, []);
           var idx = users.findIndex(function (u) { return u.id === updated.id || u.email === updated.email; });
           if (idx > -1) { users[idx] = updated; lsSet(GL.STORAGE_KEY_USERS, users); }
-          resetButton(btn);
+          setButtonLoading(btn, false);
           showToast("Profile save ho gayi! ✅", "success");
           loadDashboard();
         }, 600);
       });
 
       document.getElementById("cancelProfileBtn").addEventListener("click", loadDashboard);
-      document.getElementById("dashLogoutBtn").addEventListener("click", function () { logout(); });
+
+      /* 🔴 BUG #11 CARRY-OVER FIX — safeLogout with confirmation modal */
+      document.getElementById("dashLogoutBtn").addEventListener("click", function () { safeLogout(); });
+
       document.getElementById("switchToWorkerBtn").addEventListener("click", function () {
         var user = getCurrentUser() || {};
         lsSet(GL.STORAGE_KEY_USER, Object.assign({}, user, { role: "worker" }));
@@ -551,7 +559,6 @@
         setTimeout(function () { window.location.href = "dashboard-worker.html"; }, 900);
       });
 
-      /* Panel goto */
       document.addEventListener("click", function (e) {
         var btn = e.target.closest("[data-panel-goto]");
         if (!btn) return;
@@ -559,13 +566,21 @@
         if (navItem) navItem.click();
       });
 
-      /* ── Boot ─────────────────────────────────── */
+      /* ── Boot ── */
       document.addEventListener("DOMContentLoaded", function () {
         if (!requireAuth("dashboard-client.html")) return;
         buildBreadcrumb("dashBreadcrumb", [
           { label: "Home", href: "index.html" },
           { label: "Dashboard" }
         ]);
+
+        /* Activate first sidebar panel */
+        var hash = location.hash.slice(1);
+        var firstPanel = hash
+          ? document.querySelector('.sidebar-nav-item[data-panel="' + hash + '"]')
+          : document.querySelector(".sidebar-nav-item[data-panel]");
+        if (firstPanel) firstPanel.click();
+
         loadDashboard();
         initFadeAnimations();
       });
