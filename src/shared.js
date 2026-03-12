@@ -173,6 +173,54 @@ function logout(redirect = "index.html") {
   }, 800);
 }
 
+/* 🔴 BUG #1 FIX — Logout confirmation modal */
+function showLogoutConfirm(onConfirm) {
+  if (document.getElementById("glLogoutModal")) return;
+  const overlay = document.createElement("div");
+  overlay.id = "glLogoutModal";
+  overlay.style.cssText =
+    "position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.5);" +
+    "display:flex;align-items:center;justify-content:center;padding:20px;";
+  overlay.innerHTML = `
+    <div style="background:#fff;border-radius:22px;padding:32px 28px;
+      max-width:360px;width:100%;text-align:center;
+      box-shadow:0 24px 64px rgba(0,0,0,0.22);font-family:inherit;">
+      <div style="font-size:2.8rem;margin-bottom:12px;">👋</div>
+      <h3 style="margin:0 0 8px;font-size:1.15rem;font-weight:800;letter-spacing:-0.02em;">
+        Logout karna chahte ho?
+      </h3>
+      <p style="margin:0 0 24px;font-size:0.9rem;color:#64748b;line-height:1.6;">
+        Tumhari session clear ho jayegi.<br>Wapas login karke access kar sakte ho.
+      </p>
+      <div style="display:flex;gap:10px;justify-content:center;">
+        <button id="glLogoutCancel"
+          style="padding:11px 24px;border-radius:12px;border:1.5px solid #e2e8f0;
+          background:#fff;font-size:0.9rem;font-weight:700;cursor:pointer;
+          font-family:inherit;color:#334155;">
+          Cancel
+        </button>
+        <button id="glLogoutConfirm"
+          style="padding:11px 24px;border-radius:12px;border:none;
+          background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;
+          font-size:0.9rem;font-weight:800;cursor:pointer;font-family:inherit;">
+          Logout 🚪
+        </button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  document.getElementById("glLogoutCancel").onclick = () => overlay.remove();
+  overlay.addEventListener("click", (e) => { if (e.target === overlay) overlay.remove(); });
+  document.getElementById("glLogoutConfirm").onclick = () => {
+    overlay.remove();
+    if (typeof onConfirm === "function") onConfirm();
+  };
+}
+
+function safeLogout() {
+  showLogoutConfirm(() => logout("index.html"));
+}
+
 function requireAuth(redirectBack = "") {
   if (!isLoggedIn()) {
     const dest = "signup.html" + (redirectBack ? `?next=${encodeURIComponent(redirectBack)}` : "");
@@ -233,12 +281,26 @@ function initNavbar() {
     </div>
   `;
 
+  /* 🔴 BUG #1 FIX — teal avatar link (not red logout circle) + BUG #8 role-aware dashLink */
+  const dashLink = user?.role === "client" ? "dashboard-client.html" : "dashboard-worker.html";
+
   const userCTAs = `
     <div class="nav-user visible" id="nav-user">
-      <div class="user-avatar">${getInitials(user?.name || "User")}</div>
+      <a href="${dashLink}"
+        style="width:34px;height:34px;border-radius:50%;
+        background:linear-gradient(135deg,var(--teal,#0d9488),#0369a1);
+        color:#fff;font-weight:900;font-size:0.85rem;
+        display:flex;align-items:center;justify-content:center;
+        text-decoration:none;flex-shrink:0;border:2px solid rgba(255,255,255,0.3);"
+        title="Dashboard — ${user?.name || "User"}">
+        ${getInitials(user?.name || "User")}
+      </a>
       <span class="user-name-nav">${truncateText(user?.name || "User", 14)}</span>
-      <a href="dashboard.html" class="btn-login btn-sm">Dashboard</a>
-      <button class="btn-logout btn-sm" id="nav-logout-btn">Logout</button>
+      <a href="${dashLink}" class="btn-login btn-sm">Dashboard</a>
+      <button class="btn-logout btn-sm" id="nav-logout-btn"
+        style="background:#fff5f5;color:#dc2626;border:1.5px solid #fecaca;">
+        Logout
+      </button>
     </div>
   `;
 
@@ -267,7 +329,7 @@ function initNavbar() {
         <a href="browse.html" data-nav="browse">Browse Gigs</a>
         <a href="post-gig.html" data-nav="post">Post a Gig</a>
         <a href="index.html#how-it-works" data-nav="how">How It Works</a>
-        <a href="dashboard.html" data-nav="dashboard">Dashboard</a>
+        <a href="${dashLink}" data-nav="dashboard">Dashboard</a>
         <a href="contact.html" data-nav="contact">Contact</a>
       </nav>
 
@@ -292,12 +354,12 @@ function initNavbar() {
     <a href="browse.html" data-nav="browse">Browse Gigs</a>
     <a href="post-gig.html" data-nav="post">Post a Gig</a>
     <a href="index.html#how-it-works" data-nav="how">How It Works</a>
-    <a href="dashboard.html" data-nav="dashboard">Dashboard</a>
+    <a href="${dashLink}" data-nav="dashboard">Dashboard</a>
     <a href="contact.html" data-nav="contact">Contact</a>
     <div class="mobile-ctas">
       ${
         loggedIn
-          ? `<a href="dashboard.html" class="btn btn-secondary btn-sm">Dashboard</a>
+          ? `<a href="${dashLink}" class="btn btn-secondary btn-sm">Dashboard</a>
              <button class="btn btn-outline btn-sm" id="mobile-logout-btn">Logout</button>`
           : `<a href="signup.html?tab=login" class="btn btn-outline-teal btn-sm">Log In</a>
              <a href="signup.html" class="btn btn-primary btn-sm">Free Mein Judo!</a>`
@@ -311,6 +373,8 @@ function initNavbar() {
     "browse.html": "browse",
     "post-gig.html": "post",
     "dashboard.html": "dashboard",
+    "dashboard-client.html": "dashboard",
+    "dashboard-worker.html": "dashboard",
     "contact.html": "contact"
   };
   const activeKey = pageMap[page];
@@ -341,8 +405,9 @@ function initNavbar() {
     });
   });
 
-  document.getElementById("nav-logout-btn")?.addEventListener("click", () => logout());
-  document.getElementById("mobile-logout-btn")?.addEventListener("click", () => logout());
+  /* 🔴 BUG #11 FIX — safeLogout instead of logout */
+  document.getElementById("nav-logout-btn")?.addEventListener("click", () => safeLogout());
+  document.getElementById("mobile-logout-btn")?.addEventListener("click", () => safeLogout());
 
   const locBtn = document.getElementById("location-btn");
   const locDrop = document.getElementById("location-dropdown");
@@ -407,10 +472,11 @@ function initFooter() {
           Kaam Dhundo. Kaam Do. Saath Badhte Hain.
         </p>
         <div class="footer-social">
-          <a href="https://instagram.com" target="_blank" rel="noopener" class="social-icon" aria-label="Instagram"></a>
+          <!-- 🟡 BUG #9 FIX — real GigLega social URLs -->
+          <a href="https://www.instagram.com/giglega.official/" target="_blank" rel="noopener" class="social-icon" aria-label="Instagram"></a>
           <a href="https://wa.me/${GL.WA_NUMBER}" target="_blank" rel="noopener" class="social-icon" aria-label="WhatsApp"></a>
-          <a href="https://linkedin.com" target="_blank" rel="noopener" class="social-icon" aria-label="LinkedIn"></a>
-          <a href="https://youtube.com" target="_blank" rel="noopener" class="social-icon" aria-label="YouTube"></a>
+          <a href="https://www.linkedin.com/company/giglega/" target="_blank" rel="noopener" class="social-icon" aria-label="LinkedIn"></a>
+          <a href="https://www.youtube.com/@giglega" target="_blank" rel="noopener" class="social-icon" aria-label="YouTube"></a>
         </div>
       </div>
 
@@ -1238,74 +1304,99 @@ function saveApplication(application) {
     ...application,
     id: uid(),
     appliedAt: new Date().toISOString(),
-    status: "applied"
+    status: "pending"
   };
   apps.unshift(entry);
   lsSet(GL.STORAGE_KEY_APPS, apps);
   return entry;
 }
 
-function getUserApplications() {
-  const user = getCurrentUser();
-  if (!user) return [];
-  const apps = lsGet(GL.STORAGE_KEY_APPS, []);
-  return apps.filter((a) => a.userId === user.id || a.userEmail === user.email);
+function getApplicationsForGig(gigId) {
+  return lsGet(GL.STORAGE_KEY_APPS, []).filter((a) => a.gigId === gigId);
 }
 
-function getUserGigs() {
-  const user = getCurrentUser();
-  if (!user) return [];
-  const gigs = getAllGigs();
-  return gigs.filter((g) => g.userId === user.id || g.userEmail === user.email);
+function getApplicationsByUser(userId) {
+  return lsGet(GL.STORAGE_KEY_APPS, []).filter((a) => a.userId === userId);
 }
 
+function getGigsByUser(userId) {
+  return getAllGigs().filter((g) => g.postedBy === userId);
+}
+
+/* =========================================================
+   User / Profile
+   ========================================================= */
+
+function saveUserProfile(updatedUser) {
+  lsSet(GL.STORAGE_KEY_USER, updatedUser);
+  const users = lsGet(GL.STORAGE_KEY_USERS, []);
+  const idx = users.findIndex((u) => u.id === updatedUser.id);
+  if (idx !== -1) {
+    users[idx] = { ...users[idx], ...updatedUser };
+    lsSet(GL.STORAGE_KEY_USERS, users);
+  }
+}
+
+/* 🟡 BUG #7 FIX — weighted profile completion */
 function calcProfileCompletion(user) {
   if (!user) return 0;
-  const fields = ["name", "email", "phone", "role", "location", "bio", "skills"];
-  const filled = fields.filter((field) => user[field] && String(user[field]).trim().length > 0).length;
-  return Math.round((filled / fields.length) * 100);
+  const fields = [
+    { key: "name",     weight: 20 },
+    { key: "phone",    weight: 20 },
+    { key: "email",    weight: 15 },
+    { key: "location", weight: 15 },
+    { key: "role",     weight: 10 },
+    { key: "bio",      weight: 10 },
+    { key: "skills",   weight: 10 }
+  ];
+  return fields.reduce((total, f) => {
+    return total + (user[f.key] && String(user[f.key]).trim().length > 0 ? f.weight : 0);
+  }, 0);
+}
+
+/* 🟡 BUG #7 FIX — show what's missing to reach 100% */
+function getCompletionTips(user) {
+  if (!user) return [];
+  const tips = [];
+  if (!user.bio      || !String(user.bio).trim())      tips.push("About / Bio add karo (+10%)");
+  if (!user.skills   || !String(user.skills).trim())   tips.push("Skills add karo (+10%)");
+  if (!user.location || !String(user.location).trim()) tips.push("Location set karo (+15%)");
+  if (!user.phone    || !String(user.phone).trim())    tips.push("Phone number dalo (+20%)");
+  return tips;
+}
+
+function setButtonLoading(btn, loading, loadingText = "Loading...") {
+  if (!btn) return;
+  if (loading) {
+    btn.dataset.originalText = btn.textContent;
+    btn.textContent = loadingText;
+    btn.disabled = true;
+    btn.classList.add("loading");
+  } else {
+    btn.textContent = btn.dataset.originalText || btn.textContent;
+    btn.disabled = false;
+    btn.classList.remove("loading");
+  }
+}
+
+function saveContactForm(data) {
+  const contacts = lsGet(GL.STORAGE_KEY_CONTACTS, []);
+  const entry = { ...data, id: uid(), submittedAt: new Date().toISOString() };
+  contacts.unshift(entry);
+  lsSet(GL.STORAGE_KEY_CONTACTS, contacts);
+  return entry;
 }
 
 /* =========================================================
-   Buttons / Coming Soon
+   Init All
    ========================================================= */
 
-function setButtonLoading(btn, loadingText = "Loading...") {
-  if (!btn) return;
-  btn._originalHTML = btn.innerHTML;
-  btn._originalDisabled = btn.disabled;
-  btn.disabled = true;
-  btn.classList.add("loading");
-  btn.innerHTML = loadingText;
-}
-
-function resetButton(btn) {
-  if (!btn) return;
-  btn.disabled = btn._originalDisabled ?? false;
-  btn.classList.remove("loading");
-  if (btn._originalHTML !== undefined) btn.innerHTML = btn._originalHTML;
-}
-
-function initComingSoonLinks() {
-  document.addEventListener("click", (e) => {
-    const el = e.target.closest("[data-coming-soon]");
-    if (!el) return;
-    e.preventDefault();
-    showToast(el.dataset.comingSoon || "Yeh feature jald aayega! 🚀", "info", 3000);
-  });
-}
-
-/* =========================================================
-   Boot
-   ========================================================= */
-
-document.addEventListener("DOMContentLoaded", () => {
+function initAll() {
   initTheme();
   initAnnounceBar();
   initNavbar();
   initFooter();
   initFABs();
-
   initModals();
   initTabs();
   initForms();
@@ -1314,21 +1405,17 @@ document.addEventListener("DOMContentLoaded", () => {
   initAccordions();
   initFaqSearch();
   initSmoothScroll();
-  initRoleCards();
-  initStarRating();
+  initStatCounters();
+  initLazyImages();
+  initFadeAnimations();
   initClipboard();
   initThemeToggle();
-  initFadeAnimations();
-  initLazyImages();
-  initStatCounters();
+  initRoleCards();
   initDashboardNav();
-  initComingSoonLinks();
+  initStarRating();
+}
 
-  const main = document.querySelector("main");
-  if (main && !main.classList.contains("page-wrapper")) {
-    main.classList.add("page-wrapper");
-  }
-});
+document.addEventListener("DOMContentLoaded", initAll);
 
 /* =========================================================
    Global Exports
@@ -1351,12 +1438,12 @@ Object.assign(window, {
   showEl,
   hideEl,
   toggleEl,
-
   isLoggedIn,
   getCurrentUser,
   logout,
+  safeLogout,
+  showLogoutConfirm,
   requireAuth,
-
   showToast,
   dismissToast,
   openModal,
@@ -1366,32 +1453,29 @@ Object.assign(window, {
   hideLoader,
   showSkeleton,
   hideSkeleton,
-
-  showFieldError,
-  showFieldSuccess,
-  clearFieldState,
-  validateForm,
-  formatIndianPhone,
-  isValidIndianPhone,
-
   buildBreadcrumb,
   renderPagination,
   setupLoadMore,
-
-  initTheme,
+  copyToClipboard,
   applyTheme,
   toggleTheme,
-  copyToClipboard,
   openWhatsApp,
   buildGigWAMessage,
-
   getAllGigs,
   saveGig,
   saveApplication,
-  getUserApplications,
-  getUserGigs,
+  getApplicationsForGig,
+  getApplicationsByUser,
+  getGigsByUser,
+  saveUserProfile,
   calcProfileCompletion,
-
+  getCompletionTips,
   setButtonLoading,
-  resetButton
+  saveContactForm,
+  validateForm,
+  showFieldError,
+  showFieldSuccess,
+  clearFieldState,
+  formatIndianPhone,
+  isValidIndianPhone
 });
