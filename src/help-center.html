@@ -3,346 +3,403 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Help Center — GigLega</title>
+    <title>Trust & Safety — GigLega</title>
     <meta
       name="description"
-      content="GigLega Help Center — platform use karne mein koi problem? Yahan sab answers milenge."
+      content="GigLega Trust & Safety — platform par safe rahne ke tips, fraud se bachne ke tarike aur reporting guide."
     />
     <link rel="stylesheet" href="styles.css" />
     <script defer src="shared.js"></script>
 
     <style>
       /* ── Page ─────────────────────────────────── */
-      .help-wrap {
+      .ts-wrap {
         padding: clamp(28px,5vw,52px) 0 clamp(56px,8vw,88px);
       }
 
       /* ── Hero ─────────────────────────────────── */
-      .help-hero {
+      .ts-hero {
         text-align: center;
-        padding: clamp(36px,6vw,64px) clamp(16px,4vw,40px);
+        padding: clamp(40px,7vw,72px) clamp(16px,4vw,48px);
         border-radius: 28px;
-        background: linear-gradient(135deg,#f0fdfa 0%,#eff6ff 60%,#fdf4ff 100%);
+        background: linear-gradient(135deg,#f0fdf4 0%,#f0fdfa 40%,#eff6ff 100%);
         border: 1px solid var(--border);
-        margin-bottom: clamp(32px,5vw,52px);
+        margin-bottom: clamp(36px,5vw,56px);
+        position: relative;
+        overflow: hidden;
       }
 
-      .help-hero h1 {
-        margin: 12px 0 12px;
-        font-size: clamp(1.9rem,4vw,2.9rem);
+      .ts-hero::before {
+        content: "🛡️";
+        position: absolute;
+        font-size: 18rem;
+        opacity: 0.04;
+        right: -2rem;
+        top: -2rem;
+        pointer-events: none;
+        line-height: 1;
+      }
+
+      .ts-hero h1 {
+        margin: 12px 0 14px;
+        font-size: clamp(2rem,4.5vw,3rem);
         letter-spacing: -0.04em;
       }
 
-      .help-hero p {
+      .ts-hero p {
         margin: 0 auto 28px;
-        max-width: 48ch;
+        max-width: 52ch;
         color: var(--text-muted);
         font-size: 1rem;
-        line-height: 1.65;
+        line-height: 1.7;
       }
 
-      /* ── Search bar ───────────────────────────── */
-      .help-search-wrap {
-        max-width: 540px;
-        margin: 0 auto;
-        position: relative;
-      }
-
-      .help-search-wrap input {
-        width: 100%;
-        padding: 15px 50px 15px 18px;
-        border: 2px solid var(--border);
-        border-radius: 16px;
-        font-size: 1rem;
-        font-family: inherit;
-        background: #fff;
-        color: var(--text);
-        outline: none;
-        box-shadow: 0 4px 20px rgba(13,148,136,0.08);
-        transition: border-color 0.18s, box-shadow 0.18s;
-      }
-
-      .help-search-wrap input:focus {
-        border-color: var(--teal);
-        box-shadow: 0 0 0 4px rgba(13,148,136,0.1);
-      }
-
-      .help-search-icon {
-        position: absolute;
-        right: 16px;
-        top: 50%;
-        transform: translateY(-50%);
-        font-size: 1.1rem;
-        pointer-events: none;
-      }
-
-      .search-results-count {
-        text-align: center;
-        margin-top: 12px;
-        font-size: 0.88rem;
-        color: var(--text-muted);
-        font-weight: 600;
-        min-height: 20px;
-      }
-
-      /* ── Quick stats ──────────────────────────── */
-      .help-stats {
+      .ts-hero-stats {
         display: flex;
         flex-wrap: wrap;
-        gap: 20px;
+        gap: 14px;
         justify-content: center;
-        margin-top: 22px;
-        font-size: 0.85rem;
-        color: var(--text-muted);
-        font-weight: 700;
       }
 
-      .help-stats span {
+      .ts-hero-stat {
+        padding: 10px 20px;
+        background: #fff;
+        border: 1px solid rgba(13,148,136,0.2);
+        border-radius: 99px;
+        font-size: 0.88rem;
+        font-weight: 700;
+        color: var(--text);
         display: flex;
         align-items: center;
-        gap: 5px;
+        gap: 6px;
       }
 
-      /* ── Category cards grid ──────────────────── */
-      .categories-grid {
+      /* ── Promise strip ────────────────────────── */
+      .promise-strip {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(200px,1fr));
         gap: 14px;
         margin-bottom: clamp(36px,5vw,56px);
       }
 
-      .cat-card {
+      .promise-card {
         padding: 22px 18px;
         border: 1.5px solid var(--border);
         border-radius: 20px;
         background: #fff;
-        cursor: pointer;
         text-align: center;
-        transition: border-color 0.16s, box-shadow 0.16s, transform 0.16s;
-        user-select: none;
+        transition: box-shadow 0.16s, transform 0.16s;
       }
 
-      .cat-card:hover {
-        border-color: var(--teal);
+      .promise-card:hover {
         box-shadow: 0 4px 18px rgba(13,148,136,0.1);
         transform: translateY(-2px);
       }
 
-      .cat-card.active {
-        border-color: var(--teal);
-        background: rgba(13,148,136,0.05);
+      .promise-icon { font-size: 2rem; margin-bottom: 10px; }
+      .promise-title { font-size: 0.97rem; font-weight: 800; margin-bottom: 5px; }
+      .promise-text  { font-size: 0.82rem; color: var(--text-muted); line-height: 1.55; }
+
+      /* ── Section header ───────────────────────── */
+      .ts-section-head {
+        margin-bottom: clamp(20px,3vw,30px);
+        padding-bottom: 14px;
+        border-bottom: 2px solid var(--border);
       }
 
-      .cat-icon { font-size: 2rem; margin-bottom: 8px; }
-      .cat-title { font-size: 0.97rem; font-weight: 800; margin-bottom: 4px; }
-      .cat-count { font-size: 0.8rem; color: var(--text-muted); }
+      .ts-section-head h2 {
+        margin: 0 0 6px;
+        font-size: clamp(1.35rem,2.5vw,1.7rem);
+        letter-spacing: -0.03em;
+      }
 
-      /* ── FAQ section ──────────────────────────── */
-      .faq-section-header {
+      .ts-section-head p {
+        margin: 0;
+        color: var(--text-muted);
+        font-size: 0.93rem;
+      }
+
+      /* ── Two column layout ────────────────────── */
+      .ts-two-col {
+        display: grid;
+        gap: 16px;
+        margin-bottom: clamp(36px,5vw,56px);
+      }
+
+      /* ── Info cards ───────────────────────────── */
+      .ts-card {
+        padding: clamp(20px,3vw,30px);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        background: #fff;
+      }
+
+      .ts-card h3 {
+        margin: 0 0 14px;
+        font-size: 1.05rem;
+        font-weight: 800;
         display: flex;
         align-items: center;
-        justify-content: space-between;
-        flex-wrap: wrap;
-        gap: 12px;
-        margin-bottom: 18px;
+        gap: 8px;
       }
 
-      .faq-section-header h2 {
-        margin: 0;
-        font-size: 1.3rem;
-        letter-spacing: -0.02em;
-      }
-
-      .faq-section-header p {
-        margin: 4px 0 0;
-        font-size: 0.88rem;
+      .ts-card p {
+        margin: 0 0 10px;
         color: var(--text-muted);
+        font-size: 0.92rem;
+        line-height: 1.7;
       }
 
-      /* ── Accordion ────────────────────────────── */
-      .help-accordion { display: grid; gap: 10px; }
+      .ts-card p:last-child { margin-bottom: 0; }
 
-      .acc-item {
+      .ts-card ul {
+        margin: 8px 0;
+        padding-left: 18px;
+        color: var(--text-muted);
+        font-size: 0.92rem;
+        line-height: 1.8;
+      }
+
+      .ts-card ul li { margin-bottom: 4px; }
+
+      .ts-card a {
+        color: var(--teal);
+        font-weight: 600;
+        text-decoration: none;
+      }
+
+      .ts-card a:hover { text-decoration: underline; }
+
+      /* ── Red flags grid ───────────────────────── */
+      .red-flags-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(240px,1fr));
+        gap: 12px;
+        margin-bottom: clamp(36px,5vw,56px);
+      }
+
+      .red-flag-card {
+        padding: 18px 16px;
+        border: 1.5px solid #fecaca;
+        border-radius: 18px;
+        background: #fff5f5;
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+      }
+
+      .red-flag-icon {
+        font-size: 1.5rem;
+        flex-shrink: 0;
+        margin-top: 1px;
+      }
+
+      .red-flag-body strong {
+        display: block;
+        font-size: 0.93rem;
+        font-weight: 800;
+        margin-bottom: 3px;
+        color: #b91c1c;
+      }
+
+      .red-flag-body span {
+        font-size: 0.83rem;
+        color: #7f1d1d;
+        line-height: 1.55;
+      }
+
+      /* ── Green flags grid ─────────────────────── */
+      .green-flags-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(240px,1fr));
+        gap: 12px;
+        margin-bottom: clamp(36px,5vw,56px);
+      }
+
+      .green-flag-card {
+        padding: 18px 16px;
+        border: 1.5px solid #bbf7d0;
+        border-radius: 18px;
+        background: #f0fdf4;
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+      }
+
+      .green-flag-icon { font-size: 1.5rem; flex-shrink: 0; margin-top: 1px; }
+
+      .green-flag-body strong {
+        display: block;
+        font-size: 0.93rem;
+        font-weight: 800;
+        margin-bottom: 3px;
+        color: #15803d;
+      }
+
+      .green-flag-body span {
+        font-size: 0.83rem;
+        color: #166534;
+        line-height: 1.55;
+      }
+
+      /* ── Steps ────────────────────────────────── */
+      .steps-list {
+        display: grid;
+        gap: 14px;
+        margin-bottom: clamp(36px,5vw,56px);
+      }
+
+      .step-card {
+        padding: 18px 20px;
         border: 1px solid var(--border);
-        border-radius: 16px;
+        border-radius: 18px;
         background: #fff;
-        overflow: hidden;
+        display: flex;
+        gap: 16px;
+        align-items: flex-start;
         transition: box-shadow 0.16s;
       }
 
-      .acc-item:hover { box-shadow: 0 3px 12px rgba(13,148,136,0.07); }
+      .step-card:hover { box-shadow: 0 3px 14px rgba(13,148,136,0.08); }
 
-      .acc-item[data-category] { transition: opacity 0.2s; }
-      .acc-item.hidden-faq     { display: none; }
-
-      .acc-header {
-        padding: 16px 20px;
-        display: flex;
-        align-items: flex-start;
-        justify-content: space-between;
-        gap: 12px;
-        cursor: pointer;
-        user-select: none;
-        font-weight: 700;
-        font-size: 0.97rem;
-        line-height: 1.4;
-        transition: background 0.14s;
-      }
-
-      .acc-header:hover { background: #f8fafc; }
-
-      .acc-header-left {
-        display: flex;
-        align-items: flex-start;
-        gap: 12px;
-        flex: 1;
-      }
-
-      .acc-cat-dot {
-        width: 8px; height: 8px;
+      .step-num {
+        width: 36px; height: 36px;
         border-radius: 50%;
-        flex-shrink: 0;
-        margin-top: 6px;
-      }
-
-      .acc-toggle {
-        font-size: 1.2rem;
-        font-weight: 700;
-        color: var(--teal);
-        flex-shrink: 0;
-        transition: transform 0.22s;
-        line-height: 1;
-        margin-top: 2px;
-      }
-
-      .acc-item.open .acc-toggle { transform: rotate(45deg); }
-
-      .acc-body {
-        max-height: 0;
-        overflow: hidden;
-        transition: max-height 0.32s ease, padding 0.2s;
-        padding: 0 20px;
-        color: var(--text-muted);
-        font-size: 0.92rem;
-        line-height: 1.75;
-      }
-
-      .acc-item.open .acc-body {
-        max-height: 600px;
-        padding: 0 20px 18px;
-      }
-
-      .acc-body p  { margin: 0 0 10px; }
-      .acc-body p:last-child { margin-bottom: 0; }
-      .acc-body ul { margin: 8px 0; padding-left: 18px; }
-      .acc-body li { margin-bottom: 5px; }
-      .acc-body a  { color: var(--teal); font-weight: 600; text-decoration: none; }
-      .acc-body a:hover { text-decoration: underline; }
-
-      .acc-body .tip-box {
-        margin: 10px 0;
-        padding: 10px 14px;
-        border-radius: 10px;
-        background: rgba(13,148,136,0.05);
-        border: 1px solid rgba(13,148,136,0.18);
+        background: linear-gradient(135deg, var(--teal), #0369a1);
+        color: #fff;
         font-size: 0.88rem;
-      }
-
-      .acc-body .tip-box strong { color: var(--teal); }
-
-      /* ── Was helpful row ──────────────────────── */
-      .acc-footer {
-        display: none;
-        padding: 10px 20px 14px;
-        font-size: 0.82rem;
-        color: var(--text-muted);
+        font-weight: 900;
+        display: flex;
         align-items: center;
-        gap: 10px;
-        border-top: 1px solid var(--border);
-        flex-wrap: wrap;
+        justify-content: center;
+        flex-shrink: 0;
       }
 
-      .acc-item.open .acc-footer { display: flex; }
+      .step-body h4 {
+        margin: 0 0 4px;
+        font-size: 0.97rem;
+        font-weight: 800;
+      }
 
-      .helpful-btn {
-        padding: 4px 12px;
-        border-radius: 99px;
-        border: 1px solid var(--border);
+      .step-body p {
+        margin: 0;
+        font-size: 0.88rem;
+        color: var(--text-muted);
+        line-height: 1.6;
+      }
+
+      /* ── Report card ──────────────────────────── */
+      .report-card {
+        padding: clamp(24px,4vw,40px);
+        border-radius: 24px;
+        background: linear-gradient(135deg,#fef2f2 0%,#fff5f5 100%);
+        border: 1.5px solid #fecaca;
+        margin-bottom: clamp(36px,5vw,56px);
+        display: grid;
+        gap: 20px;
+      }
+
+      .report-card h2 {
+        margin: 0 0 8px;
+        font-size: 1.4rem;
+        letter-spacing: -0.03em;
+        color: #991b1b;
+      }
+
+      .report-card > p {
+        margin: 0;
+        color: #7f1d1d;
+        font-size: 0.93rem;
+        line-height: 1.65;
+      }
+
+      .report-options {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px,1fr));
+        gap: 12px;
+      }
+
+      .report-opt {
+        padding: 16px 14px;
+        border: 1.5px solid #fecaca;
+        border-radius: 16px;
         background: #fff;
-        font-size: 0.8rem;
-        font-weight: 700;
-        cursor: pointer;
-        transition: background 0.14s, border-color 0.14s;
-      }
-
-      .helpful-btn:hover { background: #f0fdf4; border-color: #16a34a; color: #16a34a; }
-      .helpful-btn.nope:hover { background: #fef2f2; border-color: #dc2626; color: #dc2626; }
-
-      /* ── No results ───────────────────────────── */
-      .no-results {
+        text-decoration: none;
+        color: var(--text);
         text-align: center;
-        padding: 48px 24px;
-        border: 1.5px dashed var(--border);
-        border-radius: 18px;
-        background: #fafafa;
-        display: none;
+        transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
       }
 
-      .no-results.visible { display: block; }
-      .no-results .nr-icon { font-size: 2.5rem; margin-bottom: 12px; }
-      .no-results h3 { margin: 0 0 8px; }
-      .no-results p  { margin: 0 0 20px; color: var(--text-muted); font-size: 0.9rem; }
+      .report-opt:hover {
+        border-color: #ef4444;
+        box-shadow: 0 4px 14px rgba(239,68,68,0.12);
+        transform: translateY(-2px);
+      }
 
-      /* ── Still need help ──────────────────────── */
-      .still-help {
-        margin-top: clamp(36px,5vw,56px);
-        padding: clamp(28px,4vw,44px);
+      .report-opt-icon { font-size: 1.8rem; margin-bottom: 8px; }
+      .report-opt strong { display: block; font-size: 0.9rem; margin-bottom: 3px; color: #991b1b; }
+      .report-opt span   { font-size: 0.78rem; color: #7f1d1d; }
+
+      /* ── Policy cards ─────────────────────────── */
+      .policy-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(240px,1fr));
+        gap: 14px;
+        margin-bottom: clamp(36px,5vw,56px);
+      }
+
+      .policy-card {
+        padding: 22px 18px;
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        background: #fff;
+        transition: box-shadow 0.16s, transform 0.16s;
+      }
+
+      .policy-card:hover {
+        box-shadow: 0 4px 16px rgba(13,148,136,0.09);
+        transform: translateY(-2px);
+      }
+
+      .policy-card-icon { font-size: 1.8rem; margin-bottom: 10px; }
+      .policy-card h4   { margin: 0 0 8px; font-size: 0.97rem; }
+      .policy-card p    { margin: 0 0 14px; font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; }
+      .policy-card a    { color: var(--teal); font-weight: 700; font-size: 0.85rem; text-decoration: none; }
+      .policy-card a:hover { text-decoration: underline; }
+
+      /* ── Highlight / warn boxes ───────────────── */
+      .green-box {
+        padding: 14px 16px; border-radius: 14px;
+        background: rgba(13,148,136,0.05);
+        border: 1px solid rgba(13,148,136,0.2);
+        font-size: 0.9rem; color: var(--text-muted); line-height: 1.65;
+      }
+
+      .green-box strong { color: var(--teal); }
+
+      .amber-box {
+        padding: 14px 16px; border-radius: 14px;
+        background: #fefce8; border: 1px solid #fde047;
+        font-size: 0.88rem; color: #713f12; line-height: 1.65;
+      }
+
+      /* ── CTA ──────────────────────────────────── */
+      .ts-cta {
+        padding: clamp(32px,5vw,52px);
         border-radius: 26px;
         background: linear-gradient(135deg,#f0fdfa 0%,#eff6ff 100%);
         border: 1px solid rgba(13,148,136,0.2);
         text-align: center;
       }
 
-      .still-help h2 { margin: 0 0 8px; font-size: 1.4rem; letter-spacing: -0.03em; }
-      .still-help p  { margin: 0 0 28px; color: var(--text-muted); font-size: 0.95rem; line-height: 1.65; }
+      .ts-cta h2 { margin: 0 0 10px; font-size: 1.5rem; letter-spacing: -0.03em; }
+      .ts-cta p  { margin: 0 0 26px; color: var(--text-muted); font-size: 0.95rem; line-height: 1.65; max-width: 48ch; margin-left: auto; margin-right: auto; }
+      .ts-cta-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
 
-      .contact-options {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(180px,1fr));
-        gap: 14px;
-        max-width: 600px;
-        margin: 0 auto;
+      /* ── Responsive ───────────────────────────── */
+      @media (min-width: 640px) {
+        .ts-two-col { grid-template-columns: 1fr 1fr; }
       }
-
-      .contact-opt {
-        padding: 18px 14px;
-        border: 1.5px solid rgba(13,148,136,0.2);
-        border-radius: 18px;
-        background: #fff;
-        text-decoration: none;
-        color: var(--text);
-        transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
-        text-align: center;
-      }
-
-      .contact-opt:hover {
-        border-color: var(--teal);
-        box-shadow: 0 4px 16px rgba(13,148,136,0.12);
-        transform: translateY(-2px);
-      }
-
-      .contact-opt-icon { font-size: 1.8rem; margin-bottom: 8px; }
-      .contact-opt strong { display: block; font-size: 0.92rem; margin-bottom: 3px; }
-      .contact-opt span { font-size: 0.8rem; color: var(--text-muted); }
-
-      /* ── Category color dots ──────────────────── */
-      .dot-getting-started { background: #10b981; }
-      .dot-workers         { background: #3b82f6; }
-      .dot-clients         { background: #8b5cf6; }
-      .dot-payments        { background: #f59e0b; }
-      .dot-account         { background: #ef4444; }
-      .dot-safety          { background: #0ea5e9; }
-      .dot-technical       { background: #6366f1; }
     </style>
   </head>
 
@@ -351,765 +408,412 @@
     <div id="navbar"></div>
 
     <main>
-      <div class="help-wrap">
+      <div class="ts-wrap">
         <div class="container">
 
-          <div id="helpBreadcrumb" class="fade-up" style="margin-bottom:18px;"></div>
+          <div id="tsBreadcrumb" class="fade-up" style="margin-bottom:18px;"></div>
 
           <!-- ══ HERO ══ -->
-          <div class="help-hero fade-up">
-            <span class="badge badge-teal">🆘 Help Center</span>
-            <h1>Kaise Help Kar Sakte Hain?</h1>
-            <p>GigLega use karne mein koi bhi sawaal ho — yahan search karo ya category choose karo.</p>
-
-            <div class="help-search-wrap">
-              <input
-                type="search"
-                id="helpSearch"
-                placeholder="e.g. apply kaise karein, payment, account delete..."
-                autocomplete="off"
-                maxlength="100"
-              />
-              <span class="help-search-icon">🔍</span>
-            </div>
-            <div class="search-results-count" id="searchCount"></div>
-
-            <div class="help-stats">
-              <span>📋 35+ Articles</span>
-              <span>⚡ Instant Answers</span>
-              <span>💬 WhatsApp Support</span>
-            </div>
-          </div>
-
-          <!-- ══ CATEGORIES ══ -->
-          <div class="fade-up" style="margin-bottom:20px;">
-            <div class="categories-grid" id="categoriesGrid">
-
-              <div class="cat-card active" data-filter="all">
-                <div class="cat-icon">📚</div>
-                <div class="cat-title">Sab Dekho</div>
-                <div class="cat-count">35 articles</div>
-              </div>
-
-              <div class="cat-card" data-filter="getting-started">
-                <div class="cat-icon">🚀</div>
-                <div class="cat-title">Getting Started</div>
-                <div class="cat-count">6 articles</div>
-              </div>
-
-              <div class="cat-card" data-filter="workers">
-                <div class="cat-icon">💼</div>
-                <div class="cat-title">Workers</div>
-                <div class="cat-count">8 articles</div>
-              </div>
-
-              <div class="cat-card" data-filter="clients">
-                <div class="cat-icon">🏢</div>
-                <div class="cat-title">Clients</div>
-                <div class="cat-count">7 articles</div>
-              </div>
-
-              <div class="cat-card" data-filter="payments">
-                <div class="cat-icon">💸</div>
-                <div class="cat-title">Payments</div>
-                <div class="cat-count">5 articles</div>
-              </div>
-
-              <div class="cat-card" data-filter="account">
-                <div class="cat-icon">👤</div>
-                <div class="cat-title">Account</div>
-                <div class="cat-count">5 articles</div>
-              </div>
-
-              <div class="cat-card" data-filter="safety">
-                <div class="cat-icon">🛡️</div>
-                <div class="cat-title">Safety & Trust</div>
-                <div class="cat-count">4 articles</div>
-              </div>
-
-            </div>
-          </div>
-
-          <!-- ══ FAQ ARTICLES ══ -->
-          <div class="faq-section-header fade-up">
-            <div>
-              <h2 id="faqSectionTitle">📚 Sab Articles</h2>
-              <p id="faqSectionSub">Sab categories ke common sawaal</p>
-            </div>
-            <button class="btn btn-outline btn-sm" id="expandAllBtn">Sab Kholna</button>
-          </div>
-
-          <div class="help-accordion fade-up" id="helpAccordion">
-
-            <!-- ────────── GETTING STARTED ────────── -->
-            <div class="acc-item" data-category="getting-started">
-              <div class="acc-header">
-                <div class="acc-header-left">
-                  <span class="acc-cat-dot dot-getting-started"></span>
-                  GigLega kya hai aur kaise kaam karta hai?
-                </div>
-                <span class="acc-toggle">+</span>
-              </div>
-              <div class="acc-body">
-                <p>GigLega Gurugram ka <strong>#1 hyperlocal gig platform</strong> hai jahan local workers aur clients directly connect hote hain — bina kisi middleman ke.</p>
-                <ul>
-                  <li><strong>Workers</strong> available gigs browse karte hain aur apply karte hain</li>
-                  <li><strong>Clients</strong> job post karte hain aur suitable workers dhundte hain</li>
-                  <li>Dono ke liye platform 100% free hai abhi Beta phase mein</li>
-                </ul>
-                <div class="tip-box"><strong>Pro tip:</strong> Register karo → Profile complete karo → Browse/Post karo → Connect ho jao. Bas itna simple hai!</div>
-              </div>
-              <div class="acc-footer">
-                Kya yeh helpful tha?
-                <button class="helpful-btn" onclick="markHelpful(this, true)">👍 Haan</button>
-                <button class="helpful-btn nope" onclick="markHelpful(this, false)">👎 Nahi</button>
-              </div>
-            </div>
-
-            <div class="acc-item" data-category="getting-started">
-              <div class="acc-header">
-                <div class="acc-header-left">
-                  <span class="acc-cat-dot dot-getting-started"></span>
-                  Account kaise banate hain?
-                </div>
-                <span class="acc-toggle">+</span>
-              </div>
-              <div class="acc-body">
-                <p>Account banana 1 minute se kam mein ho jaata hai:</p>
-                <ul>
-                  <li><a href="signup.html">signup.html</a> par jao</li>
-                  <li>Apna naam, email, phone aur password dalo</li>
-                  <li>Role choose karo — <strong>Worker</strong> (kaam dhundna) ya <strong>Client</strong> (kaam karwana)</li>
-                  <li>"Create Free Account" button press karo</li>
-                </ul>
-                <div class="tip-box"><strong>Note:</strong> Abhi email verification nahi hai Beta mein — direct access milta hai register karte hi.</div>
-              </div>
-              <div class="acc-footer">
-                Kya yeh helpful tha?
-                <button class="helpful-btn" onclick="markHelpful(this, true)">👍 Haan</button>
-                <button class="helpful-btn nope" onclick="markHelpful(this, false)">👎 Nahi</button>
-              </div>
-            </div>
-
-            <div class="acc-item" data-category="getting-started">
-              <div class="acc-header">
-                <div class="acc-header-left">
-                  <span class="acc-cat-dot dot-getting-started"></span>
-                  GigLega free hai kya — koi hidden charges?
-                </div>
-                <span class="acc-toggle">+</span>
-              </div>
-              <div class="acc-body">
-                <p><strong>Haan, bilkul free hai!</strong> Koi hidden charges nahi hain:</p>
-                <ul>
-                  <li>Workers ke liye register karna — Free ✅</li>
-                  <li>Gigs browse aur apply karna — Free ✅</li>
-                  <li>Clients ke liye gig post karna — Free ✅ (Beta)</li>
-                  <li>Platform use karna — Free ✅</li>
-                </ul>
-                <p>GigLega platform fees ya commission nahi leta. Payment seedha worker aur client ke beech hoti hai.</p>
-                <div class="tip-box"><strong>Future mein:</strong> Premium features aane par optional paid plans introduce ho sakte hain — lekin basic features free rahenge.</div>
-              </div>
-              <div class="acc-footer">
-                Kya yeh helpful tha?
-                <button class="helpful-btn" onclick="markHelpful(this, true)">👍 Haan</button>
-                <button class="helpful-btn nope" onclick="markHelpful(this, false)">👎 Nahi</button>
-              </div>
-            </div>
-
-            <div class="acc-item" data-category="getting-started">
-              <div class="acc-header">
-                <div class="acc-header-left">
-                  <span class="acc-cat-dot dot-getting-started"></span>
-                  GigLega kaunse cities mein available hai?
-                </div>
-                <span class="acc-toggle">+</span>
-              </div>
-              <div class="acc-body">
-                <p>Abhi GigLega <strong>Gurugram, Haryana</strong> mein officially launch hua hai.</p>
-                <p>Jald aane wali cities:</p>
-                <ul>
-                  <li>🔜 Delhi (NCR)</li>
-                  <li>🔜 Noida</li>
-                  <li>🔜 Faridabad</li>
-                  <li>🔜 Ghaziabad</li>
-                </ul>
-                <div class="tip-box"><strong>Updates ke liye:</strong> Instagram follow karo ya WhatsApp par subscribe karo — launch hone par pehle batayenge!</div>
-              </div>
-              <div class="acc-footer">
-                Kya yeh helpful tha?
-                <button class="helpful-btn" onclick="markHelpful(this, true)">👍 Haan</button>
-                <button class="helpful-btn nope" onclick="markHelpful(this, false)">👎 Nahi</button>
-              </div>
-            </div>
-
-            <div class="acc-item" data-category="getting-started">
-              <div class="acc-header">
-                <div class="acc-header-left">
-                  <span class="acc-cat-dot dot-getting-started"></span>
-                  Worker aur Client mein kya fark hai?
-                </div>
-                <span class="acc-toggle">+</span>
-              </div>
-              <div class="acc-body">
-                <table style="width:100%;border-collapse:collapse;font-size:.88rem;">
-                  <tr style="background:#f8fafc;">
-                    <th style="padding:8px 12px;text-align:left;border:1px solid var(--border);">Feature</th>
-                    <th style="padding:8px 12px;text-align:left;border:1px solid var(--border);">Worker 💼</th>
-                    <th style="padding:8px 12px;text-align:left;border:1px solid var(--border);">Client 🏢</th>
-                  </tr>
-                  <tr>
-                    <td style="padding:8px 12px;border:1px solid var(--border);">Goal</td>
-                    <td style="padding:8px 12px;border:1px solid var(--border);">Kaam dhundna</td>
-                    <td style="padding:8px 12px;border:1px solid var(--border);">Kaam karwana</td>
-                  </tr>
-                  <tr style="background:#fafafa;">
-                    <td style="padding:8px 12px;border:1px solid var(--border);">Action</td>
-                    <td style="padding:8px 12px;border:1px solid var(--border);">Gigs apply karna</td>
-                    <td style="padding:8px 12px;border:1px solid var(--border);">Gigs post karna</td>
-                  </tr>
-                  <tr>
-                    <td style="padding:8px 12px;border:1px solid var(--border);">Dashboard</td>
-                    <td style="padding:8px 12px;border:1px solid var(--border);">Applications track</td>
-                    <td style="padding:8px 12px;border:1px solid var(--border);">Gigs + applicants manage</td>
-                  </tr>
-                </table>
-                <div class="tip-box" style="margin-top:12px;"><strong>Switch kar sakte ho:</strong> Dashboard ke Settings mein "Switch Role" option milega — Worker ↔ Client언제든지.</div>
-              </div>
-              <div class="acc-footer">
-                Kya yeh helpful tha?
-                <button class="helpful-btn" onclick="markHelpful(this, true)">👍 Haan</button>
-                <button class="helpful-btn nope" onclick="markHelpful(this, false)">👎 Nahi</button>
-              </div>
-            </div>
-
-            <!-- ────────── WORKERS ────────── -->
-            <div class="acc-item" data-category="workers">
-              <div class="acc-header">
-                <div class="acc-header-left">
-                  <span class="acc-cat-dot dot-workers"></span>
-                  Gig ke liye apply kaise karein?
-                </div>
-                <span class="acc-toggle">+</span>
-              </div>
-              <div class="acc-body">
-                <ol>
-                  <li><a href="browse.html">Browse Gigs</a> page par jao</li>
-                  <li>Apni category aur location filter karo</li>
-                  <li>Interesting gig pe click karo — detail page khulega</li>
-                  <li>"Apply Now" button press karo</li>
-                  <li>Apna naam, phone aur short message dalo</li>
-                  <li>Submit karo — client ko notification jaayegi</li>
-                </ol>
-                <div class="tip-box"><strong>Better chances ke liye:</strong> Message field mein apna relevant experience briefly mention karo — generic "apply kar raha hoon" se zyada effective hota hai.</div>
-              </div>
-              <div class="acc-footer">
-                Kya yeh helpful tha?
-                <button class="helpful-btn" onclick="markHelpful(this, true)">👍 Haan</button>
-                <button class="helpful-btn nope" onclick="markHelpful(this, false)">👎 Nahi</button>
-              </div>
-            </div>
-
-            <div class="acc-item" data-category="workers">
-              <div class="acc-header">
-                <div class="acc-header-left">
-                  <span class="acc-cat-dot dot-workers"></span>
-                  Apply karne ke baad kya hoga?
-                </div>
-                <span class="acc-toggle">+</span>
-              </div>
-              <div class="acc-body">
-                <p>Apply karne ke baad:</p>
-                <ul>
-                  <li>Aapki application client ke dashboard mein dikhai deti hai</li>
-                  <li>Client aapko <strong>directly phone/WhatsApp</strong> karta hai — jo number diya hai usi par</li>
-                  <li>Urgent gigs mein usually <strong>1-24 ghante</strong> mein contact hota hai</li>
-                  <li>Agar koi response na aaye toh aap gig detail page par jaake client se directly contact kar sakte ho</li>
-                </ul>
-                <p>Dashboard mein <strong>"My Applications"</strong> section mein apni saari applications track kar sakte ho.</p>
-              </div>
-              <div class="acc-footer">
-                Kya yeh helpful tha?
-                <button class="helpful-btn" onclick="markHelpful(this, true)">👍 Haan</button>
-                <button class="helpful-btn nope" onclick="markHelpful(this, false)">👎 Nahi</button>
-              </div>
-            </div>
-
-            <div class="acc-item" data-category="workers">
-              <div class="acc-header">
-                <div class="acc-header-left">
-                  <span class="acc-cat-dot dot-workers"></span>
-                  Profile complete karna kyun zarooori hai?
-                </div>
-                <span class="acc-toggle">+</span>
-              </div>
-              <div class="acc-body">
-                <p>Complete profile se aapke chances significantly improve hote hain kyunki:</p>
-                <ul>
-                  <li>Clients pehle complete profiles wale workers pe trust karte hain</li>
-                  <li>Skills mention karne se relevant gigs zyada milte hain</li>
-                  <li>Bio se client samajhta hai ki tum suitable candidate ho</li>
-                  <li>Location se local gigs matching improve hoti hai</li>
-                </ul>
-                <p>Profile mein yeh fill karo: <strong>Name, Phone, Location, Bio, Skills</strong> — 100% completion ke liye.</p>
-                <div class="tip-box"><strong>Quick tip:</strong> Dashboard → Edit Profile mein jao aur 2 minute mein complete karo.</div>
-              </div>
-              <div class="acc-footer">
-                Kya yeh helpful tha?
-                <button class="helpful-btn" onclick="markHelpful(this, true)">👍 Haan</button>
-                <button class="helpful-btn nope" onclick="markHelpful(this, false)">👎 Nahi</button>
-              </div>
-            </div>
-
-            <div class="acc-item" data-category="workers">
-              <div class="acc-header">
-                <div class="acc-header-left">
-                  <span class="acc-cat-dot dot-workers"></span>
-                  Ek hi gig par baar baar apply kar sakte hain?
-                </div>
-                <span class="acc-toggle">+</span>
-              </div>
-              <div class="acc-body">
-                <p>Technically aap multiple baar apply kar sakte ho lekin yeh recommended nahi hai:</p>
-                <ul>
-                  <li>Client ko spam lagta hai — reject karne ke chances badh jaate hain</li>
-                  <li>Ek thoughtful application zyada effective hai</li>
-                  <li>Agar pehli application mein kuch choot gayi ho toh contact form se update bhej sakte ho</li>
-                </ul>
-                <div class="tip-box"><strong>Better approach:</strong> Ek strong message likho pehli baar mein — experience, availability aur contact clearly mention karo.</div>
-              </div>
-              <div class="acc-footer">
-                Kya yeh helpful tha?
-                <button class="helpful-btn" onclick="markHelpful(this, true)">👍 Haan</button>
-                <button class="helpful-btn nope" onclick="markHelpful(this, false)">👎 Nahi</button>
-              </div>
-            </div>
-
-            <div class="acc-item" data-category="workers">
-              <div class="acc-header">
-                <div class="acc-header-left">
-                  <span class="acc-cat-dot dot-workers"></span>
-                  Koi gig fake lage toh kya karein?
-                </div>
-                <span class="acc-toggle">+</span>
-              </div>
-              <div class="acc-body">
-                <p>Agar koi gig suspicious lage — advance fee maange, unrealistic salary ho, ya personal financial info maange — toh:</p>
-                <ul>
-                  <li>Apply <strong>mat karo</strong></li>
-                  <li>Gig detail page par "Report" button use karo</li>
-                  <li>Humein WhatsApp karo: <a href="https://wa.me/919319635257" target="_blank" rel="noopener">+91 93196 35257</a></li>
-                  <li>Screenshot ke saath report karo</li>
-                </ul>
-                <div class="tip-box"><strong>Red flags:</strong> Advance payment maangna, interview fee, unrealistic salaries (₹5000/day for basic work), vague job descriptions.</div>
-              </div>
-              <div class="acc-footer">
-                Kya yeh helpful tha?
-                <button class="helpful-btn" onclick="markHelpful(this, true)">👍 Haan</button>
-                <button class="helpful-btn nope" onclick="markHelpful(this, false)">👎 Nahi</button>
-              </div>
-            </div>
-
-            <!-- ────────── CLIENTS ────────── -->
-            <div class="acc-item" data-category="clients">
-              <div class="acc-header">
-                <div class="acc-header-left">
-                  <span class="acc-cat-dot dot-clients"></span>
-                  Gig post kaise karein?
-                </div>
-                <span class="acc-toggle">+</span>
-              </div>
-              <div class="acc-body">
-                <ol>
-                  <li>Login karo (account nahi hai toh pehle banao)</li>
-                  <li><a href="post-gig.html">Post a Gig</a> page par jao</li>
-                  <li>Title, category, description fill karo</li>
-                  <li>Budget aur type (per hour/day/project) set karo</li>
-                  <li>Location aur urgency set karo</li>
-                  <li>"Post Gig" press karo — turant live ho jaayega</li>
-                </ol>
-                <div class="tip-box"><strong>Better responses ke liye:</strong> Clear description likho — exactly kya kaam hai, kab chahiye, aur payment kab milega. Zyada detail = better applicants.</div>
-              </div>
-              <div class="acc-footer">
-                Kya yeh helpful tha?
-                <button class="helpful-btn" onclick="markHelpful(this, true)">👍 Haan</button>
-                <button class="helpful-btn nope" onclick="markHelpful(this, false)">👎 Nahi</button>
-              </div>
-            </div>
-
-            <div class="acc-item" data-category="clients">
-              <div class="acc-header">
-                <div class="acc-header-left">
-                  <span class="acc-cat-dot dot-clients"></span>
-                  Applications kahan dikhti hain?
-                </div>
-                <span class="acc-toggle">+</span>
-              </div>
-              <div class="acc-body">
-                <p>Applications manage karne ke 2 jagah hain:</p>
-                <ul>
-                  <li><strong>Dashboard → My Posted Gigs:</strong> Har gig pe click karo — uski saari applications expand ho jaayengi</li>
-                  <li><strong>Dashboard → All Applications:</strong> Flat list mein saari incoming applications ek saath</li>
-                </ul>
-                <p>Har applicant ka naam, phone aur message dikh ta hai. <strong>Contact</strong> button se directly WhatsApp karo.</p>
-              </div>
-              <div class="acc-footer">
-                Kya yeh helpful tha?
-                <button class="helpful-btn" onclick="markHelpful(this, true)">👍 Haan</button>
-                <button class="helpful-btn nope" onclick="markHelpful(this, false)">👎 Nahi</button>
-              </div>
-            </div>
-
-            <div class="acc-item" data-category="clients">
-              <div class="acc-header">
-                <div class="acc-header-left">
-                  <span class="acc-cat-dot dot-clients"></span>
-                  Gig close ya edit kaise karein?
-                </div>
-                <span class="acc-toggle">+</span>
-              </div>
-              <div class="acc-body">
-                <p><strong>Gig close karna:</strong></p>
-                <ul>
-                  <li>Dashboard → My Posted Gigs par jao</li>
-                  <li>Gig ke "Close Gig" button press karo</li>
-                  <li>Closed gig browse page mein nahi dikhegi — workers apply nahi kar sakte</li>
-                  <li>"Reopen" button se wapas active kar sakte ho</li>
-                </ul>
-                <div class="tip-box"><strong>Kaam ho gaya?</strong> Gig hire ho jane ke baad close karo taaki extra applications na aayein.</div>
-              </div>
-              <div class="acc-footer">
-                Kya yeh helpful tha?
-                <button class="helpful-btn" onclick="markHelpful(this, true)">👍 Haan</button>
-                <button class="helpful-btn nope" onclick="markHelpful(this, false)">👎 Nahi</button>
-              </div>
-            </div>
-
-            <div class="acc-item" data-category="clients">
-              <div class="acc-header">
-                <div class="acc-header-left">
-                  <span class="acc-cat-dot dot-clients"></span>
-                  Ek saath kitne gigs post kar sakte hain?
-                </div>
-                <span class="acc-toggle">+</span>
-              </div>
-              <div class="acc-body">
-                <p>Beta phase mein koi strict limit nahi hai — aap multiple gigs post kar sakte ho.</p>
-                <p>Lekin recommend karte hain ki:</p>
-                <ul>
-                  <li>Sirf genuine, active requirements post karo</li>
-                  <li>Purani ya filled positions ko close karo</li>
-                  <li>Spam posting account suspension ka reason ban sakti hai</li>
-                </ul>
-              </div>
-              <div class="acc-footer">
-                Kya yeh helpful tha?
-                <button class="helpful-btn" onclick="markHelpful(this, true)">👍 Haan</button>
-                <button class="helpful-btn nope" onclick="markHelpful(this, false)">👎 Nahi</button>
-              </div>
-            </div>
-
-            <!-- ────────── PAYMENTS ────────── -->
-            <div class="acc-item" data-category="payments">
-              <div class="acc-header">
-                <div class="acc-header-left">
-                  <span class="acc-cat-dot dot-payments"></span>
-                  Payment kaise hoti hai?
-                </div>
-                <span class="acc-toggle">+</span>
-              </div>
-              <div class="acc-body">
-                <p>GigLega <strong>payment process nahi karta</strong> — yeh ek connection platform hai.</p>
-                <p>Payment client aur worker ke beech directly hoti hai:</p>
-                <ul>
-                  <li>💵 Cash (in hand)</li>
-                  <li>📱 UPI (PhonePe, GPay, Paytm)</li>
-                  <li>🏦 Bank Transfer / NEFT</li>
-                  <li>Jo bhi dono parties agree karein</li>
-                </ul>
-                <div class="tip-box"><strong>Safe rahne ke liye:</strong> Kaam start karne se pehle payment terms — amount, timing, mode — clearly agree kar lo. Writing mein (WhatsApp pe) confirm karo.</div>
-              </div>
-              <div class="acc-footer">
-                Kya yeh helpful tha?
-                <button class="helpful-btn" onclick="markHelpful(this, true)">👍 Haan</button>
-                <button class="helpful-btn nope" onclick="markHelpful(this, false)">👎 Nahi</button>
-              </div>
-            </div>
-
-            <div class="acc-item" data-category="payments">
-              <div class="acc-header">
-                <div class="acc-header-left">
-                  <span class="acc-cat-dot dot-payments"></span>
-                  Client ne payment nahi ki — kya karein?
-                </div>
-                <span class="acc-toggle">+</span>
-              </div>
-              <div class="acc-body">
-                <p>Yeh unfortunate situation mein:</p>
-                <ul>
-                  <li>Pehle client se directly contact karo — politely remind karo</li>
-                  <li>WhatsApp messages ko evidence ke roop mein save karo</li>
-                  <li>GigLega ko report karo — <a href="contact.html">contact form</a> ya WhatsApp</li>
-                  <li>Hum mediation karenge lekin legally enforce nahi kar sakte</li>
-                  <li>Agar amount significant hai — consumer court ya local police se help lo</li>
-                </ul>
-                <div class="tip-box"><strong>Prevention best:</strong> Agar possible ho toh advance ya partial payment pehle lo. Small tasks ke liye kaam pura hone ke baad turant payment lo.</div>
-              </div>
-              <div class="acc-footer">
-                Kya yeh helpful tha?
-                <button class="helpful-btn" onclick="markHelpful(this, true)">👍 Haan</button>
-                <button class="helpful-btn nope" onclick="markHelpful(this, false)">👎 Nahi</button>
-              </div>
-            </div>
-
-            <div class="acc-item" data-category="payments">
-              <div class="acc-header">
-                <div class="acc-header-left">
-                  <span class="acc-cat-dot dot-payments"></span>
-                  GigLega koi commission leta hai?
-                </div>
-                <span class="acc-toggle">+</span>
-              </div>
-              <div class="acc-body">
-                <p><strong>Nahi — abhi GigLega koi commission nahi leta.</strong></p>
-                <p>Jo bhi payment client deta hai — 100% worker ko milti hai. GigLega beech mein kuch nahi kaata.</p>
-                <p>Future mein optional premium features aa sakte hain — lekin basic platform use free rahega.</p>
-              </div>
-              <div class="acc-footer">
-                Kya yeh helpful tha?
-                <button class="helpful-btn" onclick="markHelpful(this, true)">👍 Haan</button>
-                <button class="helpful-btn nope" onclick="markHelpful(this, false)">👎 Nahi</button>
-              </div>
-            </div>
-
-            <!-- ────────── ACCOUNT ────────── -->
-            <div class="acc-item" data-category="account">
-              <div class="acc-header">
-                <div class="acc-header-left">
-                  <span class="acc-cat-dot dot-account"></span>
-                  Password bhool gaya — reset kaise karein?
-                </div>
-                <span class="acc-toggle">+</span>
-              </div>
-              <div class="acc-body">
-                <p>Beta phase mein automatic password reset feature abhi nahi hai.</p>
-                <p>Password reset ke liye:</p>
-                <ul>
-                  <li>WhatsApp karo: <a href="https://wa.me/919319635257" target="_blank" rel="noopener">+91 93196 35257</a></li>
-                  <li>Registered email aur phone number batao verification ke liye</li>
-                  <li>Hum manually help karenge</li>
-                </ul>
-                <div class="tip-box"><strong>Easier solution:</strong> Browser mein localStorage clear karo aur new account banao — Beta mein data migration simple hai.</div>
-              </div>
-              <div class="acc-footer">
-                Kya yeh helpful tha?
-                <button class="helpful-btn" onclick="markHelpful(this, true)">👍 Haan</button>
-                <button class="helpful-btn nope" onclick="markHelpful(this, false)">👎 Nahi</button>
-              </div>
-            </div>
-
-            <div class="acc-item" data-category="account">
-              <div class="acc-header">
-                <div class="acc-header-left">
-                  <span class="acc-cat-dot dot-account"></span>
-                  Account delete kaise karein?
-                </div>
-                <span class="acc-toggle">+</span>
-              </div>
-              <div class="acc-body">
-                <p>Account delete karne ke 2 ways hain:</p>
-                <p><strong>Option 1 — Self delete (Beta):</strong></p>
-                <ul>
-                  <li>Browser DevTools kholna (F12)</li>
-                  <li>Application → LocalStorage → giglega.in → Clear All</li>
-                  <li>Yeh saara data instantly delete kar deta hai</li>
-                </ul>
-                <p><strong>Option 2 — Request karo:</strong></p>
-                <ul>
-                  <li>Email: <a href="mailto:Giglega.official@gmail.com">Giglega.official@gmail.com</a></li>
-                  <li>Subject: "Account Deletion Request"</li>
-                  <li>Hum 7 business days mein process karenge</li>
-                </ul>
-              </div>
-              <div class="acc-footer">
-                Kya yeh helpful tha?
-                <button class="helpful-btn" onclick="markHelpful(this, true)">👍 Haan</button>
-                <button class="helpful-btn nope" onclick="markHelpful(this, false)">👎 Nahi</button>
-              </div>
-            </div>
-
-            <div class="acc-item" data-category="account">
-              <div class="acc-header">
-                <div class="acc-header-left">
-                  <span class="acc-cat-dot dot-account"></span>
-                  Worker se Client role switch kaise karein?
-                </div>
-                <span class="acc-toggle">+</span>
-              </div>
-              <div class="acc-body">
-                <p>Role switch karna easy hai:</p>
-                <ul>
-                  <li>Dashboard par jao</li>
-                  <li>Settings tab kholna</li>
-                  <li>"Switch to Client" ya "Switch to Worker" button press karo</li>
-                  <li>Automatically dusre dashboard par redirect ho jaoge</li>
-                </ul>
-                <p>Dono roles pe kaam kar sakte ho — Worker hote hue gig bhi post kar sakte ho agar role switch karo.</p>
-              </div>
-              <div class="acc-footer">
-                Kya yeh helpful tha?
-                <button class="helpful-btn" onclick="markHelpful(this, true)">👍 Haan</button>
-                <button class="helpful-btn nope" onclick="markHelpful(this, false)">👎 Nahi</button>
-              </div>
-            </div>
-
-            <!-- ────────── SAFETY ────────── -->
-            <div class="acc-item" data-category="safety">
-              <div class="acc-header">
-                <div class="acc-header-left">
-                  <span class="acc-cat-dot dot-safety"></span>
-                  Platform safe hai? Personal info kaun dekh sakta hai?
-                </div>
-                <span class="acc-toggle">+</span>
-              </div>
-              <div class="acc-body">
-                <p>Aapki personal info kab visible hoti hai:</p>
-                <ul>
-                  <li><strong>Phone number:</strong> Sirf tab jab aap kisi gig par apply karte ho — uss gig ke client ko visible hota hai</li>
-                  <li><strong>Email:</strong> Public profile mein visible nahi — sirf aapko dikh ti hai dashboard mein</li>
-                  <li><strong>Public profile:</strong> Naam, role, location, bio, skills — sab dekh sakte hain</li>
-                </ul>
-                <div class="tip-box"><strong>Tip:</strong> Sirf genuine gigs par apply karo. Unknown clients se milne ka plan ho toh public jagah milo.</div>
-              </div>
-              <div class="acc-footer">
-                Kya yeh helpful tha?
-                <button class="helpful-btn" onclick="markHelpful(this, true)">👍 Haan</button>
-                <button class="helpful-btn nope" onclick="markHelpful(this, false)">👎 Nahi</button>
-              </div>
-            </div>
-
-            <div class="acc-item" data-category="safety">
-              <div class="acc-header">
-                <div class="acc-header-left">
-                  <span class="acc-cat-dot dot-safety"></span>
-                  Suspicious user ya fraud report kaise karein?
-                </div>
-                <span class="acc-toggle">+</span>
-              </div>
-              <div class="acc-body">
-                <p>Kisi bhi fraud ya suspicious activity ke liye:</p>
-                <ul>
-                  <li>💬 WhatsApp: <a href="https://wa.me/919319635257" target="_blank" rel="noopener">+91 93196 35257</a> — fastest</li>
-                  <li>📧 Email: <a href="mailto:Giglega.official@gmail.com">Giglega.official@gmail.com</a></li>
-                  <li>📋 <a href="contact.html">Contact Form</a> — detailed report</li>
-                </ul>
-                <p>Report mein include karo: User name/ID, gig link, screenshot, kya hua briefly.</p>
-                <p>Hum <strong>24 ghante</strong> mein investigate karenge.</p>
-              </div>
-              <div class="acc-footer">
-                Kya yeh helpful tha?
-                <button class="helpful-btn" onclick="markHelpful(this, true)">👍 Haan</button>
-                <button class="helpful-btn nope" onclick="markHelpful(this, false)">👎 Nahi</button>
-              </div>
-            </div>
-
-            <!-- ────────── TECHNICAL ────────── -->
-            <div class="acc-item" data-category="technical">
-              <div class="acc-header">
-                <div class="acc-header-left">
-                  <span class="acc-cat-dot dot-technical"></span>
-                  Data ek device se dusre device par kyun nahi dikh raha?
-                </div>
-                <span class="acc-toggle">+</span>
-              </div>
-              <div class="acc-body">
-                <p>Yeh Beta phase ki limitation hai — GigLega abhi <strong>localStorage</strong> use karta hai.</p>
-                <p>Matlab aapka data sirf us device aur browser mein save hota hai jahan register kiya.</p>
-                <ul>
-                  <li>Mobile par kiya tha → Desktop par nahi dikhega</li>
-                  <li>Chrome mein kiya tha → Firefox mein nahi dikhega</li>
-                </ul>
-                <div class="tip-box"><strong>Solution coming soon:</strong> Backend server launch hone par cross-device sync automatically kaam karega — sab devices par ek account!</div>
-              </div>
-              <div class="acc-footer">
-                Kya yeh helpful tha?
-                <button class="helpful-btn" onclick="markHelpful(this, true)">👍 Haan</button>
-                <button class="helpful-btn nope" onclick="markHelpful(this, false)">👎 Nahi</button>
-              </div>
-            </div>
-
-            <div class="acc-item" data-category="technical">
-              <div class="acc-header">
-                <div class="acc-header-left">
-                  <span class="acc-cat-dot dot-technical"></span>
-                  Page load nahi ho raha / website broken dikh rahi hai
-                </div>
-                <span class="acc-toggle">+</span>
-              </div>
-              <div class="acc-body">
-                <p>Yeh steps try karo order mein:</p>
-                <ol>
-                  <li>Page hard refresh karo — <strong>Ctrl+Shift+R</strong> (Windows) ya <strong>Cmd+Shift+R</strong> (Mac)</li>
-                  <li>Browser cache clear karo</li>
-                  <li>Different browser mein try karo</li>
-                  <li>Internet connection check karo</li>
-                  <li>Incognito/private mode mein try karo</li>
-                </ol>
-                <p>Agar phir bhi issue ho toh screenshot ke saath WhatsApp karo — hum fix karenge!</p>
-              </div>
-              <div class="acc-footer">
-                Kya yeh helpful tha?
-                <button class="helpful-btn" onclick="markHelpful(this, true)">👍 Haan</button>
-                <button class="helpful-btn nope" onclick="markHelpful(this, false)">👎 Nahi</button>
-              </div>
-            </div>
-
-          </div>
-
-          <!-- No results -->
-          <div class="no-results" id="noResults">
-            <div class="nr-icon">🔍</div>
-            <h3>Koi article nahi mila</h3>
-            <p id="noResultsText">Is topic ke baare mein directly humse poochho — hum help karenge!</p>
-            <a
-              href="https://wa.me/919319635257"
-              target="_blank"
-              rel="noopener"
-              class="btn btn-primary"
-            >
-              💬 WhatsApp Karo
-            </a>
-          </div>
-
-          <!-- ══ STILL NEED HELP ══ -->
-          <div class="still-help fade-up">
-            <span style="font-size:2.2rem;">🤝</span>
-            <h2>Abhi Bhi Sawaal Hai?</h2>
+          <div class="ts-hero fade-up">
+            <span class="badge" style="background:rgba(16,185,129,0.1);color:#059669;border:1px solid rgba(16,185,129,0.2);">🛡️ Trust & Safety</span>
+            <h1>Aapki Safety<br />Humari Priority Hai</h1>
             <p>
-              Help Center mein answer nahi mila? Humari team se directly baat karo —
-              hum usually <strong>15 minutes</strong> mein reply karte hain WhatsApp par!
+              GigLega par har transaction safe aur transparent ho — yahi humara commitment hai.
+              Yahan jaano platform par safe kaise rahein aur fraud se kaise bachein.
             </p>
-            <div class="contact-options">
+            <div class="ts-hero-stats">
+              <div class="ts-hero-stat">✅ Verified Platform</div>
+              <div class="ts-hero-stat">🔒 Secure Connections</div>
+              <div class="ts-hero-stat">⚡ 24hr Fraud Response</div>
+              <div class="ts-hero-stat">🆓 Zero Hidden Fees</div>
+            </div>
+          </div>
+
+          <!-- ══ OUR PROMISE ══ -->
+          <div class="ts-section-head fade-up">
+            <h2>🤝 GigLega Ka Promise</h2>
+            <p>Yeh cheezein hum guarantee karte hain — always.</p>
+          </div>
+
+          <div class="promise-strip fade-up">
+            <div class="promise-card">
+              <div class="promise-icon">🆓</div>
+              <div class="promise-title">Always Free</div>
+              <div class="promise-text">Workers se koi commission nahi — koi hidden charges nahi. Kabhi nahi.</div>
+            </div>
+            <div class="promise-card">
+              <div class="promise-icon">🔍</div>
+              <div class="promise-title">Active Moderation</div>
+              <div class="promise-text">Fake aur fraudulent gigs ko 24 ghante mein remove karte hain.</div>
+            </div>
+            <div class="promise-card">
+              <div class="promise-icon">🔒</div>
+              <div class="promise-title">Data Protection</div>
+              <div class="promise-text">Personal info sirf zaroori jagah share hoti hai — sell kabhi nahi karte.</div>
+            </div>
+            <div class="promise-card">
+              <div class="promise-icon">⚡</div>
+              <div class="promise-title">Fast Support</div>
+              <div class="promise-text">Safety issues par ~15 min mein WhatsApp response — hum available hain.</div>
+            </div>
+            <div class="promise-card">
+              <div class="promise-icon">⚖️</div>
+              <div class="promise-title">Fair Platform</div>
+              <div class="promise-text">Workers aur clients dono ke rights equally protect kiye jaate hain.</div>
+            </div>
+            <div class="promise-card">
+              <div class="promise-icon">🚫</div>
+              <div class="promise-title">Zero Tolerance</div>
+              <div class="promise-text">Fraud, harassment ya exploitation ke liye — permanent ban on first offence.</div>
+            </div>
+          </div>
+
+          <!-- ══ FOR WORKERS ══ -->
+          <div class="ts-section-head fade-up">
+            <h2>💼 Workers Ke Liye Safety Tips</h2>
+            <p>Kaam dhundte waqt inhe follow karo — safe rahoge.</p>
+          </div>
+
+          <div class="ts-two-col fade-up" style="margin-bottom:clamp(36px,5vw,56px);">
+            <div class="ts-card">
+              <h3>✅ Yeh Zaroor Karo</h3>
+              <ul>
+                <li>Profile mein <strong>real name aur phone</strong> dalo — clients trust karte hain</li>
+                <li>Apply karne se pehle gig description carefully padho</li>
+                <li>Pehli baar milne ka plan ho toh <strong>public jagah</strong> chunna</li>
+                <li>Payment terms — amount, timing, mode — <strong>WhatsApp pe confirm</strong> karo</li>
+                <li>Kaam shuru karne se pehle advance ya partial payment lo agar bada kaam ho</li>
+                <li>Client ke saath saari baat WhatsApp par karo — <strong>record rehega</strong></li>
+                <li>Koi bhi suspicious activity immediately GigLega ko report karo</li>
+              </ul>
+            </div>
+            <div class="ts-card">
+              <h3>🚫 Yeh Mat Karo</h3>
+              <ul>
+                <li>Kisi ko bhi <strong>advance fees mat do</strong> — GigLega kabhi nahi maangta</li>
+                <li>Kisi ka OTP, UPI PIN ya bank details mat batao</li>
+                <li>Unknown location par akele mat jao — kisi ko batao kahan ja rahe ho</li>
+                <li>Gig mein di gayi info ke alawa extra personal info mat share karo</li>
+                <li>Kaam shuru mat karo jab tak payment terms clear na ho</li>
+                <li>Pressure mein aake koi agreement sign mat karo bina padhe</li>
+                <li>Too-good-to-be-true offers par blindly trust mat karo</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- ══ FOR CLIENTS ══ -->
+          <div class="ts-section-head fade-up">
+            <h2>🏢 Clients Ke Liye Safety Tips</h2>
+            <p>Workers hire karte waqt inhe dhyan mein rakho.</p>
+          </div>
+
+          <div class="ts-two-col fade-up" style="margin-bottom:clamp(36px,5vw,56px);">
+            <div class="ts-card">
+              <h3>✅ Best Practices</h3>
+              <ul>
+                <li>Gig description mein <strong>exact kaam clearly</strong> likho — vague listings kam responses dete hain</li>
+                <li>Realistic budget set karo — unrealistic offers credibility harm karte hain</li>
+                <li>Worker se milne se pehle <strong>phone par baat karo</strong> pehle</li>
+                <li>References ya past work examples maango agar bada project ho</li>
+                <li>Payment schedule pehle se agree karo — milestone-based better hai</li>
+                <li>Worker ko clearly batao kaam kab tak chahiye</li>
+                <li>Kaam complete hone par <strong>time par payment karo</strong></li>
+              </ul>
+            </div>
+            <div class="ts-card">
+              <h3>⚠️ Avoid These Mistakes</h3>
+              <ul>
+                <li>Illegal ya unethical kaam ke liye platform mat use karo</li>
+                <li>Workers se bina payment ke "trial work" mat karwao</li>
+                <li>Personal financial information workers ke saath share mat karo</li>
+                <li>Misleading gig titles mat use karo — clickbait descriptions banned hain</li>
+                <li>Hire karne ke baad unexpectedly scope mat badhao bina extra pay ke</li>
+                <li>Workers ko harass ya threaten mat karo</li>
+                <li>Spam gigs post mat karo — account ban ho sakta hai</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- ══ RED FLAGS ══ -->
+          <div class="ts-section-head fade-up">
+            <h2>🚩 Red Flags — Inse Bacho</h2>
+            <p>Yeh cheezein dikhein toh immediate action lo — report karo ya avoid karo.</p>
+          </div>
+
+          <div class="red-flags-grid fade-up">
+
+            <div class="red-flag-card">
+              <span class="red-flag-icon">💰</span>
+              <div class="red-flag-body">
+                <strong>Advance Fee Maangna</strong>
+                <span>Koi bhi genuine client ya platform register karne, training ya "security deposit" ke liye fee nahi maangta.</span>
+              </div>
+            </div>
+
+            <div class="red-flag-card">
+              <span class="red-flag-icon">🤑</span>
+              <div class="red-flag-body">
+                <strong>Unrealistic Pay</strong>
+                <span>₹5000/day for basic tasks, ₹50,000 monthly for simple delivery — too good to be true hai toh fake hai.</span>
+              </div>
+            </div>
+
+            <div class="red-flag-card">
+              <span class="red-flag-icon">📵</span>
+              <div class="red-flag-body">
+                <strong>Platform Se Bahar Le Jaana</strong>
+                <span>"Telegram pe aao", "Yeh app download karo" — genuine clients platform par hi communicate karte hain.</span>
+              </div>
+            </div>
+
+            <div class="red-flag-card">
+              <span class="red-flag-icon">🏦</span>
+              <div class="red-flag-body">
+                <strong>Bank Details Maangna</strong>
+                <span>Interview se pehle account number, IFSC ya UPI ID maangna — never share karo.</span>
+              </div>
+            </div>
+
+            <div class="red-flag-card">
+              <span class="red-flag-icon">🔏</span>
+              <div class="red-flag-body">
+                <strong>OTP ya Password Maangna</strong>
+                <span>Koi bhi legitimate employer kabhi OTP, PIN ya password nahi maangta — yeh pure fraud hai.</span>
+              </div>
+            </div>
+
+            <div class="red-flag-card">
+              <span class="red-flag-icon">⏰</span>
+              <div class="red-flag-body">
+                <strong>Urgency Pressure</strong>
+                <span>"Aaj hi decide karo", "Last chance hai" — fake urgency create karna fraud ka classic sign hai.</span>
+              </div>
+            </div>
+
+            <div class="red-flag-card">
+              <span class="red-flag-icon">📝</span>
+              <div class="red-flag-body">
+                <strong>Vague Job Description</strong>
+                <span>No clear tasks, no clear pay, no clear location — agar kuch bhi clear nahi toh apply mat karo.</span>
+              </div>
+            </div>
+
+            <div class="red-flag-card">
+              <span class="red-flag-icon">🧑‍💻</span>
+              <div class="red-flag-body">
+                <strong>Fake Identity</strong>
+                <span>Profile photo stolen, company name unknown ya unverifiable, contact info fake — trust mat karo.</span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- ══ GREEN FLAGS ══ -->
+          <div class="ts-section-head fade-up">
+            <h2>✅ Green Flags — Trustworthy Signs</h2>
+            <p>Yeh cheezein dikhein toh proceed karna safe hai.</p>
+          </div>
+
+          <div class="green-flags-grid fade-up">
+
+            <div class="green-flag-card">
+              <span class="green-flag-icon">📋</span>
+              <div class="green-flag-body">
+                <strong>Clear Job Description</strong>
+                <span>Exact tasks, clear budget, defined timeline — professional client ki pehchaan.</span>
+              </div>
+            </div>
+
+            <div class="green-flag-card">
+              <span class="green-flag-icon">📞</span>
+              <div class="green-flag-body">
+                <strong>Phone Par Baat Karna</strong>
+                <span>Real clients baat karne mein comfortable hote hain — text-only avoid karte hain fraudsters.</span>
+              </div>
+            </div>
+
+            <div class="green-flag-card">
+              <span class="green-flag-icon">💼</span>
+              <div class="green-flag-body">
+                <strong>Local Business / Real Address</strong>
+                <span>Verifiable Gurugram address ya local business name — legitimacy ka sign hai.</span>
+              </div>
+            </div>
+
+            <div class="green-flag-card">
+              <span class="green-flag-icon">🤝</span>
+              <div class="green-flag-body">
+                <strong>Interview Ya Meeting</strong>
+                <span>In-person ya video call interview — genuine employers candidates meet karna chahte hain.</span>
+              </div>
+            </div>
+
+            <div class="green-flag-card">
+              <span class="green-flag-icon">💸</span>
+              <div class="green-flag-body">
+                <strong>Market Rate Pay</strong>
+                <span>Realistic salary — na bahut zyada na bahut kam. Market standard ke around.</span>
+              </div>
+            </div>
+
+            <div class="green-flag-card">
+              <span class="green-flag-icon">📑</span>
+              <div class="green-flag-body">
+                <strong>Written Agreement</strong>
+                <span>Payment terms WhatsApp ya document par — professional hai aur evidence bhi.</span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- ══ MEETING SAFETY ══ -->
+          <div class="ts-section-head fade-up">
+            <h2>🤝 Pehli Baar Milne Ke Tips</h2>
+            <p>Client ya worker se physically milne ka plan ho toh yeh steps follow karo.</p>
+          </div>
+
+          <div class="steps-list fade-up">
+
+            <div class="step-card">
+              <div class="step-num">1</div>
+              <div class="step-body">
+                <h4>Kisi Ko Batao Kahan Ja Rahe Ho</h4>
+                <p>Family member ya friend ko exact location, time aur client/worker ka naam aur number batao. Simple safety habit.</p>
+              </div>
+            </div>
+
+            <div class="step-card">
+              <div class="step-num">2</div>
+              <div class="step-body">
+                <h4>Public Jagah Chunna</h4>
+                <p>Pehli meeting kisi cafe, mall ya public office mein karo — unknown person ke ghar ya isolated jagah mat jao pehli baar.</p>
+              </div>
+            </div>
+
+            <div class="step-card">
+              <div class="step-num">3</div>
+              <div class="step-body">
+                <h4>Phone Par Pehle Baat Karo</h4>
+                <p>In-person jaane se pehle ek short phone call karo — genuineness verify karo. Real employer call se nervous nahi hota.</p>
+              </div>
+            </div>
+
+            <div class="step-card">
+              <div class="step-num">4</div>
+              <div class="step-body">
+                <h4>Payment Terms Pehle Confirm Karo</h4>
+                <p>Meeting mein sirf kaam discuss karo — payment WhatsApp par pehle se agree honi chahiye. Ambiguity avoid karo.</p>
+              </div>
+            </div>
+
+            <div class="step-card">
+              <div class="step-num">5</div>
+              <div class="step-body">
+                <h4>Kuch Bhi Uncomfortable Lage Toh Leave Karo</h4>
+                <p>Apni gut feeling trust karo. Koi pressure dal raha ho, unsafe feel ho raha ho — politely leave karo aur report karo.</p>
+              </div>
+            </div>
+
+            <div class="step-card">
+              <div class="step-num">6</div>
+              <div class="step-body">
+                <h4>Meeting Ka Record Rakho</h4>
+                <p>Agreement WhatsApp message par confirm karo meeting ke baad — oral agreements ke proof nahi hote.</p>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- ══ REPORT ══ -->
+          <div class="report-card fade-up">
+            <div>
+              <h2>🚨 Kuch Galat Laga? Turant Report Karo</h2>
+              <p>
+                Fraud, fake gig, harassment ya koi bhi suspicious activity — humein batao.
+                Hum <strong>24 ghante ke andar</strong> investigate karenge aur action lenge.
+                Report karna free hai aur anonymous bhi ho sakta hai.
+              </p>
+            </div>
+            <div class="report-options">
               <a
-                href="https://wa.me/919319635257?text=Hi%20GigLega!%20Help%20Center%20se%20aa%20raha%20hoon%20-%20kuch%20poochna%20tha."
+                href="https://wa.me/919319635257?text=🚨%20Safety%20Report:%20GigLega%20par%20kuch%20suspicious%20mila%20hai.%20Report%20karna%20chahta%20hoon."
                 target="_blank"
                 rel="noopener"
-                class="contact-opt"
+                class="report-opt"
               >
-                <div class="contact-opt-icon">💬</div>
-                <strong>WhatsApp</strong>
-                <span>~15 min reply</span>
+                <div class="report-opt-icon">💬</div>
+                <strong>WhatsApp Report</strong>
+                <span>Sabse fast — screenshot bhejo</span>
               </a>
-              <a href="contact.html" class="contact-opt">
-                <div class="contact-opt-icon">📋</div>
-                <strong>Contact Form</strong>
-                <span>~24 hrs reply</span>
+              <a href="contact.html?subject=safety-report" class="report-opt">
+                <div class="report-opt-icon">📋</div>
+                <strong>Report Form</strong>
+                <span>Detailed report bhejo</span>
               </a>
-              <a href="mailto:Giglega.official@gmail.com" class="contact-opt">
-                <div class="contact-opt-icon">✉️</div>
-                <strong>Email</strong>
-                <span>~24 hrs reply</span>
+              <a href="mailto:Giglega.official@gmail.com?subject=Safety Report — GigLega" class="report-opt">
+                <div class="report-opt-icon">✉️</div>
+                <strong>Email Report</strong>
+                <span>Evidence attach karo</span>
               </a>
+            </div>
+            <div class="amber-box">
+              ⚠️ <strong>Emergency mein:</strong> Agar aap physically unsafe ho toh pehle <strong>112</strong> (Police) call karo. GigLega se baad mein contact karo.
+            </div>
+          </div>
+
+          <!-- ══ POLICIES ══ -->
+          <div class="ts-section-head fade-up">
+            <h2>📋 Platform Policies</h2>
+            <p>GigLega ke rules aur guidelines — sab transparent hain.</p>
+          </div>
+
+          <div class="policy-grid fade-up">
+            <div class="policy-card">
+              <div class="policy-card-icon">⚖️</div>
+              <h4>Terms of Service</h4>
+              <p>Platform use karne ke rules, rights aur responsibilities.</p>
+              <a href="terms.html">Terms padhna →</a>
+            </div>
+            <div class="policy-card">
+              <div class="policy-card-icon">🔒</div>
+              <h4>Privacy Policy</h4>
+              <p>Aapka data kaise collect aur protect kiya jaata hai.</p>
+              <a href="privacy-policy.html">Privacy Policy →</a>
+            </div>
+            <div class="policy-card">
+              <div class="policy-card-icon">🚫</div>
+              <h4>Prohibited Activities</h4>
+              <p>Kya allowed nahi hai — fraud, spam, illegal content.</p>
+              <a href="terms.html#sec7">Prohibited List →</a>
+            </div>
+            <div class="policy-card">
+              <div class="policy-card-icon">❓</div>
+              <h4>Help Center</h4>
+              <p>Safety se related common sawaalon ke answers.</p>
+              <a href="help-center.html">Help Center →</a>
+            </div>
+          </div>
+
+          <!-- ══ CTA ══ -->
+          <div class="ts-cta fade-up">
+            <span style="font-size:2.5rem;">🛡️</span>
+            <h2>Safe Raho, Aage Badho</h2>
+            <p>
+              GigLega par aap safe hain — lekin aapki vigilance bhi zarooori hai.
+              Koi bhi sawaal ho toh hum hamesha available hain. Milke Gurugram mein
+              safe aur fair gig economy banate hain!
+            </p>
+            <div class="ts-cta-btns">
+              <a href="browse.html" class="btn btn-primary">Browse Safe Gigs 🔍</a>
+              <a
+                href="https://wa.me/919319635257?text=Hi%20GigLega!%20Trust%20%26%20Safety%20page%20se%20aa%20raha%20hoon."
+                target="_blank"
+                rel="noopener"
+                class="btn btn-secondary"
+              >
+                💬 WhatsApp Karo
+              </a>
+              <a href="contact.html" class="btn btn-outline">Contact Team →</a>
             </div>
           </div>
 
@@ -1120,110 +824,10 @@
     <footer id="footer"></footer>
 
     <script>
-      /* ── Category filter ─────────────────────── */
-      var allItems = document.querySelectorAll(".acc-item[data-category]");
-
-      document.querySelectorAll(".cat-card").forEach(function (card) {
-        card.addEventListener("click", function () {
-          var filter = card.getAttribute("data-filter");
-
-          document.querySelectorAll(".cat-card").forEach(function (c) {
-            c.classList.remove("active");
-          });
-          card.classList.add("active");
-
-          var title = card.querySelector(".cat-title").textContent;
-          document.getElementById("faqSectionTitle").textContent =
-            filter === "all" ? "📚 Sab Articles" : card.querySelector(".cat-icon").textContent + " " + title;
-          document.getElementById("faqSectionSub").textContent =
-            filter === "all" ? "Sab categories ke common sawaal" : title + " se related sawaal";
-
-          var visible = 0;
-          allItems.forEach(function (item) {
-            var show = filter === "all" || item.getAttribute("data-category") === filter;
-            item.classList.toggle("hidden-faq", !show);
-            if (show) visible++;
-          });
-
-          document.getElementById("noResults").classList.toggle("visible", visible === 0);
-          document.getElementById("helpSearch").value = "";
-          document.getElementById("searchCount").textContent = "";
-        });
-      });
-
-      /* ── Search ──────────────────────────────── */
-      document.getElementById("helpSearch").addEventListener("input", function () {
-        var q = this.value.trim().toLowerCase();
-
-        document.querySelectorAll(".cat-card").forEach(function (c) {
-          c.classList.remove("active");
-        });
-        document.querySelector(".cat-card[data-filter='all']").classList.add("active");
-
-        var visible = 0;
-        allItems.forEach(function (item) {
-          var text = item.textContent.toLowerCase();
-          var show = !q || text.includes(q);
-          item.classList.toggle("hidden-faq", !show);
-          if (show) visible++;
-          if (show && q) item.classList.add("open");
-        });
-
-        var countEl = document.getElementById("searchCount");
-        if (q) {
-          countEl.textContent = visible + " article" + (visible !== 1 ? "s" : "") + " mile";
-        } else {
-          countEl.textContent = "";
-        }
-
-        document.getElementById("noResults").classList.toggle("visible", visible === 0);
-        if (visible === 0) {
-          document.getElementById("noResultsText").textContent =
-            '"' + this.value.trim() + '" ke baare mein directly humse poochho!';
-        }
-
-        document.getElementById("faqSectionTitle").textContent = q
-          ? '🔍 "' + this.value.trim() + '" Results'
-          : "📚 Sab Articles";
-        document.getElementById("faqSectionSub").textContent = q
-          ? visible + " matching articles"
-          : "Sab categories ke common sawaal";
-      });
-
-      /* ── Accordion ───────────────────────────── */
-      document.querySelectorAll(".acc-header").forEach(function (header) {
-        header.addEventListener("click", function () {
-          var item = header.closest(".acc-item");
-          item.classList.toggle("open");
-        });
-      });
-
-      /* ── Expand all ──────────────────────────── */
-      var expandBtn = document.getElementById("expandAllBtn");
-      var expanded  = false;
-
-      expandBtn.addEventListener("click", function () {
-        expanded = !expanded;
-        document.querySelectorAll(".acc-item:not(.hidden-faq)").forEach(function (item) {
-          item.classList.toggle("open", expanded);
-        });
-        expandBtn.textContent = expanded ? "Sab Bandh Karo" : "Sab Kholna";
-      });
-
-      /* ── Helpful feedback ────────────────────── */
-      function markHelpful(btn, wasHelpful) {
-        var footer = btn.closest(".acc-footer");
-        footer.innerHTML =
-          wasHelpful
-            ? '✅ Shukriya! Helpful tha. <a href="browse.html" style="color:var(--teal);font-weight:700;font-size:0.82rem;">Browse Gigs →</a>'
-            : '🙏 Samajh aata hai. <a href="contact.html" style="color:var(--teal);font-weight:700;font-size:0.82rem;">Humse directly poochho →</a>';
-      }
-
-      /* ── Boot ────────────────────────────────── */
       document.addEventListener("DOMContentLoaded", function () {
-        buildBreadcrumb("helpBreadcrumb", [
-          { label: "Home", href: "index.html" },
-          { label: "Help Center" }
+        buildBreadcrumb("tsBreadcrumb", [
+          { label: "Home",           href: "index.html"  },
+          { label: "Trust & Safety"                       }
         ]);
       });
     </script>
