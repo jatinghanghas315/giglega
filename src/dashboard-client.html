@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Client Dashboard — GigLega</title>
+    <meta name="description" content="GigLega client dashboard — apne posted gigs aur incoming applications manage karo." />
+    <link rel="stylesheet" href="styles.css" />
+    <script defer src="shared.js"></script>
+
+    <style>
+      /* Reuse same shell CSS — paste same styles block from worker */
+      .dash-wrap { padding: clamp(24px,4vw,44px) 0 clamp(48px,8vw,80px); }
+      .dash-grid { display: grid; gap: 24px; }
+      .dash-sidebar { display: grid; gap: 12px; align-content: start; }
+      .user-card {
+        padding: 22px 18px; border: 1px solid var(--border);
+        border-radius: 22px; background: #fff;
+        display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center;
+      }
+      .user-avatar-lg {
+        width: 64px; height: 64px; border-radius: 50%;
+        background: linear-gradient(135deg,#0369a1,var(--teal));
+        color: #fff; font-size: 1.5rem; font-weight: 900;
+        display: flex; align-items: center; justify-content: center;
+      }
+      .user-card h3 { margin: 0; font-size: 1.05rem; }
+      .user-card p  { margin: 0; font-size: 0.85rem; color: var(--text-muted); }
+      .profile-bar-wrap { width:100%; background:#e5e7eb; border-radius:99px; height:8px; overflow:hidden; }
+      .profile-bar-fill  { height:100%; border-radius:99px; background:linear-gradient(90deg,var(--teal),#0ea5e9); transition:width .6s ease; }
+      .profile-bar-label { font-size:0.8rem; color:var(--text-muted); font-weight:700; }
+      .sidebar-nav { background:#fff; border:1px solid var(--border); border-radius:18px; overflow:hidden; }
+      .sidebar-nav-item {
+        display:flex; align-items:center; gap:10px; padding:13px 18px;
+        font-size:0.95rem; font-weight:700; color:var(--text-muted);
+        cursor:pointer; border:none; background:none; width:100%; text-align:left;
+        border-bottom:1px solid var(--border); transition:background .14s,color .14s;
+      }
+      .sidebar-nav-item:last-child { border-bottom:none; }
+      .sidebar-nav-item:hover { background:#f8fafc; color:var(--text); }
+      .sidebar-nav-item.active { background:rgba(13,148,136,.07); color:var(--teal); border-left:3px solid var(--teal); }
+      .sidebar-nav-item .nav-icon { font-size:1.1rem; flex-shrink:0; }
+      .sidebar-nav-item .nav-badge {
+        margin-left:auto; background:var(--teal); color:#fff;
+        font-size:.72rem; font-weight:800; padding:2px 7px;
+        border-radius:99px; min-width:20px; text-align:center;
+      }
+      .dash-main { min-width:0; }
+      .dashboard-panel { display:none; }
+      .dashboard-panel.active { display:block; }
+      .panel-header { margin-bottom:22px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; }
+      .panel-header h2 { margin:0; font-size:1.35rem; }
+      .panel-header p  { margin:4px 0 0; color:var(--text-muted); font-size:.9rem; }
+      .stat-strip { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-bottom:24px; }
+      .stat-cell { padding:18px 16px; border:1px solid var(--border); border-radius:18px; background:#fff; }
+      .stat-cell-label { font-size:.78rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:.04em; margin-bottom:4px; }
+      .stat-cell-value { font-size:1.8rem; font-weight:900; letter-spacing:-.04em; color:var(--teal); line-height:1; }
+
+      /* Gig management card */
+      .gig-manage-card {
+        border: 1px solid var(--border); border-radius: 18px; background: #fff;
+        margin-bottom: 12px; overflow: hidden; transition: box-shadow 0.16s;
+      }
+      .gig-manage-card:hover { box-shadow: 0 4px 16px rgba(13,148,136,0.09); }
+      .gig-manage-header {
+        padding: 16px 18px;
+        display: flex; justify-content: space-between; align-items: flex-start;
+        gap: 10px; flex-wrap: wrap;
+        cursor: pointer;
+        border-bottom: 1px solid transparent;
+        transition: border-color 0.14s;
+      }
+      .gig-manage-card.open .gig-manage-header { border-bottom-color: var(--border); }
+      .gig-manage-title { font-size: 1rem; font-weight: 800; margin: 0 0 4px; }
+      .gig-manage-meta  { font-size: 0.83rem; color: var(--text-muted); display: flex; flex-wrap: wrap; gap: 8px; }
+      .gig-manage-actions { display: flex; gap: 8px; flex-wrap: wrap; flex-shrink: 0; }
+      .gig-status-pill {
+        padding: 3px 10px; border-radius: 99px; font-size: .78rem; font-weight: 800;
+      }
+      .gig-status-pill.active   { background:#f0fdf4; color:#16a34a; }
+      .gig-status-pill.closed   { background:#f1f5f9; color:#64748b; }
+
+      /* Apps inside gig card */
+      .gig-apps-wrap {
+        display: none;
+        padding: 14px 18px;
+        background: #fafafa;
+      }
+      .gig-manage-card.open .gig-apps-wrap { display: block; }
+      .applicant-row {
+        display: flex; align-items: flex-start; gap: 12px; padding: 12px 0;
+        border-bottom: 1px solid var(--border); flex-wrap: wrap;
+      }
+      .applicant-row:last-child { border-bottom: none; padding-bottom: 0; }
+      .applicant-avatar {
+        width: 36px; height: 36px; border-radius: 50%;
+        background: linear-gradient(135deg,var(--teal),#0369a1);
+        color: #fff; font-size: 0.9rem; font-weight: 800;
+        display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+      }
+      .applicant-info { flex: 1; min-width: 0; }
+      .applicant-name { font-weight: 800; font-size: .95rem; margin: 0 0 3px; }
+      .applicant-detail { font-size: .82rem; color: var(--text-muted); }
+      .applicant-msg {
+        width: 100%; margin-top: 6px; padding: 8px 12px;
+        background: #fff; border: 1px solid var(--border); border-radius: 10px;
+        font-size: .83rem; color: var(--text-muted); font-style: italic;
+      }
+      .applicant-actions { display: flex; gap: 6px; flex-wrap: wrap; margin-left: auto; }
+
+      .empty-state {
+        padding: 48px 24px; text-align: center;
+        border: 1.5px dashed var(--border); border-radius: 18px; background: #fafafa;
+      }
+      .empty-state .empty-icon { font-size: 2.5rem; margin-bottom: 12px; }
+      .empty-state h3 { margin: 0 0 8px; font-size: 1.05rem; }
+      .empty-state p  { margin: 0 0 20px; color: var(--text-muted); font-size: .9rem; }
+
+      .form-group { margin-bottom: 0; }
+      .form-group label { display:block; font-weight:700; font-size:.9rem; margin-bottom:6px; }
+      .form-group input, .form-group textarea {
+        width:100%; padding:11px 14px; border:1.5px solid var(--border);
+        border-radius:12px; font-size:.95rem; font-family:inherit; color:var(--text); background:#fff;
+        outline:none; resize:vertical; transition:border-color .18s,box-shadow .18s;
+      }
+      .form-group input:focus, .form-group textarea:focus {
+        border-color:var(--teal); box-shadow:0 0 0 3px rgba(13,148,136,.1);
+      }
+      .profile-form-grid { display:grid; gap:16px; }
+
+      @media (min-width:640px) {
+        .stat-strip { grid-template-columns:repeat(4,1fr); }
+        .profile-form-grid { grid-template-columns:1fr 1fr; }
+      }
+      @media (min-width:1024px) {
+        .dash-grid { grid-template-columns:240px minmax(0,1fr); }
+        .dash-sidebar { position:sticky; top:100px; align-self:start; }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="announce-bar"></div>
+    <div id="navbar"></div>
+
+    <main>
+      <div class="dash-wrap">
+        <div class="container">
+          <div id="dashBreadcrumb" class="fade-up" style="margin-bottom:18px;"></div>
+
+          <div class="dash-grid">
+
+            <!-- ══ SIDEBAR ══ -->
+            <aside class="dash-sidebar">
+              <div class="user-card card fade-up" id="userCard">
+                <div class="user-avatar-lg" id="userAvatarLg">U</div>
+                <div>
+                  <h3 id="userCardName">Loading...</h3>
+                  <p id="userCardRole">Client</p>
+                </div>
+                <div style="width:100%;">
+                  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
+                    <span class="profile-bar-label">Profile Completion</span>
+                    <span class="profile-bar-label" id="profilePct">0%</span>
+                  </div>
+                  <div class="profile-bar-wrap">
+                    <div class="profile-bar-fill" id="profileBar" style="width:0%"></div>
+                  </div>
+                </div>
+              </div>
+
+              <nav class="sidebar-nav fade-up">
+                <button class="sidebar-nav-item" data-panel="overview">
+                  <span class="nav-icon">🏠</span> Overview
+                </button>
+                <button class="sidebar-nav-item" data-panel="my-gigs">
+                  <span class="nav-icon">📌</span> My Posted Gigs
+                  <span class="nav-badge" id="gigsCountBadge">0</span>
+                </button>
+                <button class="sidebar-nav-item" data-panel="incoming">
+                  <span class="nav-icon">📥</span> Applications
+                  <span class="nav-badge" id="appsCountBadge">0</span>
+                </button>
+                <button class="sidebar-nav-item" data-panel="profile">
+                  <span class="nav-icon">👤</span> Edit Profile
+                </button>
+                <button class="sidebar-nav-item" data-panel="settings">
+                  <span class="nav-icon">⚙️</span> Settings
+                </button>
+              </nav>
+            </aside>
+
+            <!-- ══ PANELS ══ -->
+            <div class="dash-main">
+
+              <!-- ── Overview ── -->
+              <div class="dashboard-panel" id="overview">
+                <div class="panel-header fade-up">
+                  <div>
+                    <h2 id="greetingText">Namaste! 👋</h2>
+                    <p>Apne gigs manage karo aur workers se connect ho jao.</p>
+                  </div>
+                  <a href="post-gig.html" class="btn btn-primary btn-sm">+ Post New Gig</a>
+                </div>
+                <div class="stat-strip fade-up" id="clientStats"></div>
+                <div class="fade-up">
+                  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+                    <h3 style="margin:0;font-size:1.05rem;">Recent Gigs</h3>
+                    <button class="btn btn-outline btn-sm" data-panel-goto="my-gigs">View All</button>
+                  </div>
+                  <div id="recentGigsOverview"></div>
+                </div>
+              </div>
+
+              <!-- ── My Gigs ── -->
+              <div class="dashboard-panel" id="my-gigs">
+                <div class="panel-header fade-up">
+                  <div>
+                    <h2>My Posted Gigs</h2>
+                    <p>Gig pe click karo uski applications dekhne ke liye.</p>
+                  </div>
+                  <a href="post-gig.html" class="btn btn-primary btn-sm">+ Post New</a>
+                </div>
+                <div id="myGigsList" class="fade-up"></div>
+              </div>
+
+              <!-- ── Incoming Applications ── -->
+              <div class="dashboard-panel" id="incoming">
+                <div class="panel-header fade-up">
+                  <div>
+                    <h2>All Applications</h2>
+                    <p>Saare workers jo tumhare gigs par apply kar chuke hain.</p>
+                  </div>
+                </div>
+                <div id="incomingAppsList" class="fade-up"></div>
+              </div>
+
+              <!-- ── Profile ── -->
+              <div class="dashboard-panel" id="profile">
+                <div class="panel-header fade-up">
+                  <div><h2>Edit Profile</h2><p>Business details aur contact info update karo.</p></div>
+                </div>
+                <div class="card fade-up" style="padding:clamp(20px,3vw,32px);">
+                  <form id="profileForm" novalidate>
+                    <div class="profile-form-grid">
+                      <div class="form-group">
+                        <label for="pfName">Full Name *</label>
+                        <input type="text" id="pfName" maxlength="80" />
+                      </div>
+                      <div class="form-group">
+                        <label for="pfEmail">Email</label>
+                        <input type="email" id="pfEmail" readonly style="background:#f8fafc;cursor:not-allowed;" />
+                      </div>
+                      <div class="form-group">
+                        <label for="pfPhone">Phone *</label>
+                        <input type="tel" id="pfPhone" data-phone maxlength="15" />
+                      </div>
+                      <div class="form-group">
+                        <label for="pfLocation">Location / Area</label>
+                        <input type="text" id="pfLocation" placeholder="e.g. Cyber City, Gurugram" maxlength="80" />
+                      </div>
+                      <div class="form-group" style="grid-column:1/-1;">
+                        <label for="pfBio">About / Business</label>
+                        <textarea id="pfBio" rows="3" placeholder="Business ya personal info..." maxlength="300"></textarea>
+                      </div>
+                    </div>
+                    <div style="margin-top:20px;display:flex;gap:10px;flex-wrap:wrap;">
+                      <button type="submit" class="btn btn-primary" id="saveProfileBtn">Save Profile</button>
+                      <button type="button" class="btn btn-outline" id="cancelProfileBtn">Cancel</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+
+              <!-- ── Settings ── -->
+              <div class="dashboard-panel" id="settings">
+                <div class="panel-header fade-up"><h2>Settings</h2></div>
+                <div class="card fade-up" style="padding:clamp(20px,3vw,32px);display:grid;gap:16px;">
+                  <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border);">
+                    <div>
+                      <strong style="display:block;">Dark Mode</strong>
+                      <span style="font-size:.85rem;color:var(--text-muted);">Theme toggle karo</span>
+                    </div>
+                    <button class="btn btn-outline btn-sm" data-theme-toggle>Toggle</button>
+                  </div>
+                  <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border);">
+                    <div>
+                      <strong style="display:block;">Switch to Worker</strong>
+                      <span style="font-size:.85rem;color:var(--text-muted);">Kaam dhundna chahte ho?</span>
+                    </div>
+                    <button class="btn btn-outline btn-sm" id="switchToWorkerBtn">Switch</button>
+                  </div>
+                  <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;">
+                    <div>
+                      <strong style="display:block;color:#ef4444;">Logout</strong>
+                      <span style="font-size:.85rem;color:var(--text-muted);">Is device se log out karo</span>
+                    </div>
+                    <button class="btn btn-outline btn-sm" style="color:#ef4444;border-color:#ef4444;" id="dashLogoutBtn">Logout</button>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer id="footer"></footer>
+
+    <script>
+      function escH(v) {
+        return String(v == null ? "" : v)
+          .replace(/&/g,"&amp;").replace(/</g,"&lt;")
+          .replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+      }
+      function safeS(v, fb) {
+        var s = String(v == null ? "" : v).trim();
+        return s || (fb || "");
+      }
+
+      /* ── Update gig status ────────────────────── */
+      function updateGigStatus(gigId, newStatus) {
+        var gigs = getAllGigs();
+        var idx  = gigs.findIndex(function (g) { return String(g.id) === String(gigId); });
+        if (idx === -1) return;
+        gigs[idx].status = newStatus;
+        lsSet(GL.STORAGE_KEY_GIGS, gigs);
+        loadDashboard();
+        showToast("Gig " + (newStatus === "active" ? "reopen" : "close") + " ho gaya!", "success");
+      }
+
+      /* ── Render gig card with embedded apps ───── */
+      function renderGigManageCard(gig, apps) {
+        var title   = safeS(gig.title, "Gig");
+        var loc     = safeS(gig.location, "Gurugram");
+        var budget  = typeof gig.budget === "number" ? formatCurrency(gig.budget) : safeS(gig.budget,"—");
+        var type    = safeS(gig.type, "Gig");
+        var status  = safeS(gig.status, "active");
+        var time    = gig.postedAt ? formatRelativeTime(gig.postedAt) : "—";
+        var isUrgent = !!gig.urgent;
+
+        var gigApps = apps.filter(function (a) {
+          return String(a.gigId) === String(gig.id) ||
+            String(a.gigTitle || "").toLowerCase() === title.toLowerCase();
+        });
+
+        var appsHtml = "";
+        if (!gigApps.length) {
+          appsHtml = '<p style="color:var(--text-muted);font-size:.88rem;padding:10px 0;">Abhi koi application nahi — share karo gig!</p>';
+        } else {
+          appsHtml = gigApps.map(function (a) {
+            return '<div class="applicant-row">' +
+              '<div class="applicant-avatar">' + escH(getInitials(a.name)) + '</div>' +
+              '<div class="applicant-info">' +
+                '<div class="applicant-name">' + escH(safeS(a.name,"Applicant")) + '</div>' +
+                '<div class="applicant-detail">' +
+                  '📞 ' + escH(safeS(a.phone,"—")) +
+                  (a.email ? ' · ✉️ ' + escH(a.email) : '') +
+                  ' · 🕒 ' + escH(a.appliedAt ? formatRelativeTime(a.appliedAt) : "—") +
+                '</div>' +
+                (a.message ? '<div class="applicant-msg">"' + escH(truncateText(a.message, 120)) + '"</div>' : '') +
+              '</div>' +
+              '<div class="applicant-actions">' +
+                '<a href="https://wa.me/' + GL.WA_NUMBER + '?text=' + encodeURIComponent('Hi ' + safeS(a.name,'') + ', GigLega se application mili hai aapki. Baat karte hain!') + '" target="_blank" rel="noopener" class="btn btn-primary btn-sm">💬 Contact</a>' +
+              '</div>' +
+            '</div>';
+          }).join("");
+        }
+
+        return '<div class="gig-manage-card" data-gig-id="' + escH(String(gig.id)) + '">' +
+          '<div class="gig-manage-header">' +
+            '<div style="flex:1;min-width:0;">' +
+              '<div class="gig-manage-title">' + escH(title) + (isUrgent ? ' <span class="badge badge-amber" style="font-size:.72rem;">🔥</span>' : '') + '</div>' +
+              '<div class="gig-manage-meta">' +
+                '<span>📍 ' + escH(loc) + '</span>' +
+                '<span>💸 ' + escH(String(budget)) + ' / ' + escH(type) + '</span>' +
+                '<span>🕒 ' + escH(time) + '</span>' +
+                '<span>👥 ' + gigApps.length + ' applications</span>' +
+              '</div>' +
+            '</div>' +
+            '<div class="gig-manage-actions">' +
+              '<span class="gig-status-pill ' + escH(status) + '">' + (status === "active" ? "🟢 Active" : "⚫ Closed") + '</span>' +
+              '<a href="gig-detail.html?id=' + encodeURIComponent(gig.id) + '" class="btn btn-outline btn-sm">View</a>' +
+              (status === "active"
+                ? '<button class="btn btn-outline btn-sm" onclick="updateGigStatus(\'' + escH(String(gig.id)) + '\',\'closed\')">Close Gig</button>'
+                : '<button class="btn btn-outline btn-sm" onclick="updateGigStatus(\'' + escH(String(gig.id)) + '\',\'active\')">Reopen</button>') +
+            '</div>' +
+          '</div>' +
+          '<div class="gig-apps-wrap">' + appsHtml + '</div>' +
+        '</div>';
+      }
+
+      /* ── Load all data ────────────────────────── */
+      function loadDashboard() {
+        var user = getCurrentUser();
+        if (!user) return;
+
+        document.getElementById("userAvatarLg").textContent = getInitials(user.name);
+        document.getElementById("userCardName").textContent = safeS(user.name, "User");
+        document.getElementById("userCardRole").textContent = "🏢 Client · GigLega Member";
+        document.getElementById("greetingText").textContent = "Namaste, " + safeS(user.name,"Bhai") + "! 👋";
+
+        var pct = calcProfileCompletion(user);
+        document.getElementById("profilePct").textContent  = pct + "%";
+        document.getElementById("profileBar").style.width  = pct + "%";
+
+        var myGigs = getUserGigs() || [];
+        var allApps = lsGet(GL.STORAGE_KEY_APPS, []);
+
+        /* Only apps on my gigs */
+        var myGigIds = myGigs.map(function (g) { return String(g.id); });
+        var myGigTitles = myGigs.map(function (g) { return String(g.title || "").toLowerCase(); });
+        var incomingApps = allApps.filter(function (a) {
+          return myGigIds.indexOf(String(a.gigId)) > -1 ||
+            myGigTitles.indexOf(String(a.gigTitle || "").toLowerCase()) > -1;
+        });
+
+        var activeGigs = myGigs.filter(function (g) { return safeS(g.status,"active") === "active"; });
+
+        document.getElementById("gigsCountBadge").textContent = myGigs.length;
+        document.getElementById("appsCountBadge").textContent = incomingApps.length;
+
+        /* Stats */
+        document.getElementById("clientStats").innerHTML =
+          statCell("Total Gigs",       myGigs.length,         "📌") +
+          statCell("Active",           activeGigs.length,     "🟢") +
+          statCell("Applications In",  incomingApps.length,   "📥") +
+          statCell("Total Spent",      "Free",                "💸");
+
+        /* Recent gigs overview */
+        var rgEl = document.getElementById("recentGigsOverview");
+        if (!myGigs.length) {
+          rgEl.innerHTML = emptyState("📭","Abhi koi gig post nahi ki","Apni pehli gig post karo — bilkul free!",
+            '<a href="post-gig.html" class="btn btn-primary">Post a Gig</a>');
+        } else {
+          rgEl.innerHTML = myGigs.slice(0,3).map(function (g) {
+            return renderGigManageCard(g, incomingApps);
+          }).join("");
+        }
+
+        /* My gigs panel */
+        var mgEl = document.getElementById("myGigsList");
+        if (!myGigs.length) {
+          mgEl.innerHTML = emptyState("📭","Koi gig nahi mili","Pehli gig post karo aur workers tak pahuncho!",
+            '<a href="post-gig.html" class="btn btn-primary">Post First Gig</a>');
+        } else {
+          mgEl.innerHTML = myGigs.map(function (g) {
+            return renderGigManageCard(g, incomingApps);
+          }).join("");
+        }
+
+        /* Incoming apps flat list */
+        var iaEl = document.getElementById("incomingAppsList");
+        if (!incomingApps.length) {
+          iaEl.innerHTML = emptyState("📭","Koi application nahi aayi","Gigs share karo — WhatsApp, Instagram, har jagah!",
+            '<a href="browse.html" class="btn btn-primary">Browse Platform</a>');
+        } else {
+          iaEl.innerHTML = incomingApps.map(function (a) {
+            return '<div class="gig-manage-card" style="padding:16px 18px;">' +
+              '<div style="display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap;">' +
+                '<div class="applicant-avatar" style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--teal),#0369a1);color:#fff;font-size:.9rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;">' +
+                  escH(getInitials(a.name)) +
+                '</div>' +
+                '<div style="flex:1;min-width:0;">' +
+                  '<div style="font-weight:800;font-size:.97rem;">' + escH(safeS(a.name,"Applicant")) + '</div>' +
+                  '<div style="font-size:.83rem;color:var(--text-muted);margin-bottom:4px;">' +
+                    'For: <strong>' + escH(safeS(a.gigTitle,"Gig")) + '</strong> · ' +
+                    '📞 ' + escH(safeS(a.phone,"—")) +
+                    (a.email ? ' · ✉️ ' + escH(a.email) : '') +
+                    ' · 🕒 ' + escH(a.appliedAt ? formatRelativeTime(a.appliedAt) : "—") +
+                  '</div>' +
+                  (a.message ? '<div style="font-size:.83rem;color:var(--text-muted);font-style:italic;">"' + escH(truncateText(a.message,120)) + '"</div>' : '') +
+                '</div>' +
+                '<a href="https://wa.me/' + GL.WA_NUMBER + '?text=' + encodeURIComponent('Hi ' + safeS(a.name,'') + ', GigLega se mili application ke baad contact kar raha hoon!') + '" target="_blank" rel="noopener" class="btn btn-primary btn-sm" style="flex-shrink:0;">💬 Contact</a>' +
+              '</div>' +
+            '</div>';
+          }).join("");
+        }
+
+        /* Profile form */
+        document.getElementById("pfName").value     = safeS(user.name);
+        document.getElementById("pfEmail").value    = safeS(user.email);
+        document.getElementById("pfPhone").value    = safeS(user.phone);
+        document.getElementById("pfLocation").value = safeS(user.location);
+        document.getElementById("pfBio").value      = safeS(user.bio);
+
+        /* Wire gig accordion toggles */
+        document.querySelectorAll(".gig-manage-header").forEach(function (hdr) {
+          hdr.addEventListener("click", function (e) {
+            if (e.target.closest("a") || e.target.closest("button")) return;
+            hdr.closest(".gig-manage-card").classList.toggle("open");
+          });
+        });
+      }
+
+      function statCell(label, value, icon) {
+        return '<div class="stat-cell">' +
+          '<div class="stat-cell-label">' + icon + ' ' + label + '</div>' +
+          '<div class="stat-cell-value">' + value + '</div>' +
+          '</div>';
+      }
+
+      function emptyState(icon, title, text, btnHtml) {
+        return '<div class="empty-state">' +
+          '<div class="empty-icon">' + icon + '</div>' +
+          '<h3>' + title + '</h3>' +
+          '<p>' + text + '</p>' +
+          (btnHtml || '') +
+          '</div>';
+      }
+
+      /* ── Profile save ─────────────────────────── */
+      document.getElementById("profileForm").addEventListener("submit", function (e) {
+        e.preventDefault();
+        var result = validateForm({
+          pfName:  { required: true, label: "Name",  minLength: 2 },
+          pfPhone: {
+            required: true, label: "Phone",
+            pattern: /^[6-9]\d{9}$|^\+91\s?[6-9]\d{4}\s?\d{5}$/,
+            patternMsg: "Valid Indian mobile number dalo"
+          }
+        });
+        if (!result.valid) return;
+        var btn = document.getElementById("saveProfileBtn");
+        setButtonLoading(btn, "Saving...");
+        setTimeout(function () {
+          var user = getCurrentUser() || {};
+          var updated = Object.assign({}, user, {
+            name:     document.getElementById("pfName").value.trim(),
+            phone:    document.getElementById("pfPhone").value.trim(),
+            location: document.getElementById("pfLocation").value.trim(),
+            bio:      document.getElementById("pfBio").value.trim()
+          });
+          lsSet(GL.STORAGE_KEY_USER, updated);
+          var users = lsGet(GL.STORAGE_KEY_USERS, []);
+          var idx = users.findIndex(function (u) { return u.id === updated.id || u.email === updated.email; });
+          if (idx > -1) { users[idx] = updated; lsSet(GL.STORAGE_KEY_USERS, users); }
+          resetButton(btn);
+          showToast("Profile save ho gayi! ✅", "success");
+          loadDashboard();
+        }, 600);
+      });
+
+      document.getElementById("cancelProfileBtn").addEventListener("click", loadDashboard);
+      document.getElementById("dashLogoutBtn").addEventListener("click", function () { logout(); });
+      document.getElementById("switchToWorkerBtn").addEventListener("click", function () {
+        var user = getCurrentUser() || {};
+        lsSet(GL.STORAGE_KEY_USER, Object.assign({}, user, { role: "worker" }));
+        showToast("Worker dashboard par ja raha hai...", "success");
+        setTimeout(function () { window.location.href = "dashboard-worker.html"; }, 900);
+      });
+
+      /* Panel goto */
+      document.addEventListener("click", function (e) {
+        var btn = e.target.closest("[data-panel-goto]");
+        if (!btn) return;
+        var navItem = document.querySelector('.sidebar-nav-item[data-panel="' + btn.getAttribute("data-panel-goto") + '"]');
+        if (navItem) navItem.click();
+      });
+
+      /* ── Boot ─────────────────────────────────── */
+      document.addEventListener("DOMContentLoaded", function () {
+        if (!requireAuth("dashboard-client.html")) return;
+        buildBreadcrumb("dashBreadcrumb", [
+          { label: "Home", href: "index.html" },
+          { label: "Dashboard" }
+        ]);
+        loadDashboard();
+        initFadeAnimations();
+      });
+    </script>
+  </body>
+</html>
