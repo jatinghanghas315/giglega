@@ -1,838 +1,1171 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>GigLega — Gurugram Ka #1 Hyperlocal Gig Platform</title>
-    <meta
-      name="description"
-      content="GigLega connects students, freelancers, and local businesses in Gurugram. Browse gigs, post work, and connect instantly. Zero bakwaas, fast response."
-    />
-    <meta property="og:title" content="GigLega — Gurugram Ka Gig Platform" />
-    <meta
-      property="og:description"
-      content="Kaam Dhundo. Kaam Do. Saath Badhte Hain. Gurugram ka #1 hyperlocal gig platform."
-    />
-    <meta property="og:type" content="website" />
-    <link rel="stylesheet" href="styles.css" />
-    <script defer src="shared.js"></script>
-
-    <style>
-      /* ── Hero ──────────────────────────────────────────────── */
-      .hero {
-        padding: clamp(56px, 10vw, 100px) 0 clamp(40px, 7vw, 72px);
-        text-align: center;
-        position: relative;
-        overflow: hidden;
-      }
-
-      .hero-badge-row {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        justify-content: center;
-        margin-bottom: 22px;
-      }
-
-      .hero h1 {
-        margin: 0 auto 20px;
-        max-width: 820px;
-        font-size: clamp(2.4rem, 6vw, 4.8rem);
-        line-height: 1.03;
-        letter-spacing: -0.04em;
-      }
-
-      .hero h1 .accent {
-        color: var(--teal);
-      }
-
-      .hero-sub {
-        margin: 0 auto 36px;
-        max-width: 56ch;
-        font-size: clamp(1rem, 2vw, 1.2rem);
-        color: var(--text-muted);
-        line-height: 1.65;
-      }
-
-      .hero-ctas {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 14px;
-        justify-content: center;
-        margin-bottom: 44px;
-      }
-
-      .hero-trust {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        justify-content: center;
-        color: var(--text-muted);
-        font-size: 0.9rem;
-      }
-
-      .trust-item {
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-        font-weight: 600;
-      }
-
-      /* ── Stats strip ──────────────────────────────────────── */
-      .stats-strip {
-        padding: 32px 0;
-        border-top: 1px solid var(--border);
-        border-bottom: 1px solid var(--border);
-      }
-
-      .stats-inner {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 18px;
-        text-align: center;
-      }
-
-      .stat-item h3 {
-        margin: 0;
-        font-size: clamp(2rem, 4vw, 3rem);
-        letter-spacing: -0.05em;
-        color: var(--teal);
-      }
-
-      .stat-item p {
-        margin: 4px 0 0;
-        color: var(--text-muted);
-        font-size: 0.9rem;
-      }
-
-      /* ── How It Works ─────────────────────────────────────── */
-      .how-section {
-        padding: clamp(48px, 8vw, 88px) 0;
-      }
-
-      .section-label {
-        text-align: center;
-        margin-bottom: 12px;
-      }
-
-      .section-title {
-        margin: 0 auto 14px;
-        text-align: center;
-        font-size: clamp(1.8rem, 3.5vw, 3rem);
-        letter-spacing: -0.03em;
-        max-width: 640px;
-      }
-
-      .section-sub {
-        margin: 0 auto 44px;
-        text-align: center;
-        max-width: 52ch;
-        color: var(--text-muted);
-        line-height: 1.65;
-      }
-
-      .steps-grid {
-        display: grid;
-        gap: 18px;
-      }
-
-      .step-card {
-        padding: 28px 24px;
-        border: 1px solid var(--border);
-        border-radius: 24px;
-        background: #fff;
-      }
-
-      .step-num {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 44px;
-        height: 44px;
-        border-radius: 14px;
-        background: linear-gradient(135deg, #0d9488, #14b8a6);
-        color: #fff;
-        font-weight: 900;
-        font-size: 1.1rem;
-        margin-bottom: 16px;
-      }
-
-      .step-card h3 {
-        margin: 0 0 8px;
-        font-size: 1.15rem;
-      }
-
-      .step-card p {
-        margin: 0;
-        color: var(--text-muted);
-        line-height: 1.6;
-      }
-
-      /* ── Category Grid ────────────────────────────────────── */
-      .categories-section {
-        padding: clamp(40px, 7vw, 80px) 0;
-        background: var(--bg-subtle, #f8fafc);
-      }
-
-      .cat-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 14px;
-      }
-
-      .cat-card {
-        padding: 22px 18px;
-        border: 1px solid var(--border);
-        border-radius: 20px;
-        background: #fff;
-        cursor: pointer;
-        text-decoration: none;
-        color: var(--text);
-        transition: box-shadow 0.18s, transform 0.18s;
-        display: block;
-      }
-
-      .cat-card:hover {
-        box-shadow: 0 8px 28px rgba(13, 148, 136, 0.12);
-        transform: translateY(-2px);
-      }
-
-      .cat-icon {
-        font-size: 2rem;
-        margin-bottom: 10px;
-        display: block;
-      }
-
-      .cat-card h3 {
-        margin: 0 0 4px;
-        font-size: 1rem;
-      }
-
-      .cat-card p {
-        margin: 0;
-        font-size: 0.87rem;
-        color: var(--text-muted);
-      }
-
-      /* ── Why GigLega ──────────────────────────────────────── */
-      .why-section {
-        padding: clamp(48px, 8vw, 88px) 0;
-      }
-
-      .why-grid {
-        display: grid;
-        gap: 18px;
-      }
-
-      .why-card {
-        padding: 26px 22px;
-        border: 1px solid var(--border);
-        border-radius: 22px;
-        background: #fff;
-      }
-
-      .why-icon {
-        font-size: 2rem;
-        margin-bottom: 14px;
-        display: block;
-      }
-
-      .why-card h3 {
-        margin: 0 0 8px;
-        font-size: 1.1rem;
-      }
-
-      .why-card p {
-        margin: 0;
-        color: var(--text-muted);
-        line-height: 1.62;
-      }
-
-      /* ── Testimonials ─────────────────────────────────────── */
-      .testimonials-section {
-        padding: clamp(40px, 7vw, 80px) 0;
-        background: var(--bg-subtle, #f8fafc);
-      }
-
-      .testi-grid {
-        display: grid;
-        gap: 16px;
-      }
-
-      .testi-card {
-        padding: 24px 20px;
-        border: 1px solid var(--border);
-        border-radius: 20px;
-        background: #fff;
-      }
-
-      .testi-stars {
-        color: #f59e0b;
-        font-size: 1.05rem;
-        margin-bottom: 12px;
-      }
-
-      .testi-text {
-        margin: 0 0 16px;
-        color: var(--text-muted);
-        line-height: 1.65;
-        font-style: italic;
-      }
-
-      .testi-author {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      }
-
-      .testi-avatar {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #0d9488, #1a3c5e);
-        color: #fff;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 800;
-        font-size: 0.95rem;
-        flex-shrink: 0;
-      }
-
-      .testi-meta strong {
-        display: block;
-        font-size: 0.95rem;
-      }
-
-      .testi-meta span {
-        font-size: 0.83rem;
-        color: var(--text-muted);
-      }
-
-      /* ── CTA Banner ───────────────────────────────────────── */
-      .cta-banner {
-        padding: clamp(48px, 8vw, 88px) 0;
-      }
-
-      .cta-inner {
-        padding: clamp(32px, 5vw, 60px) clamp(24px, 5vw, 56px);
-        border-radius: 28px;
-        background: linear-gradient(135deg, #0f3460 0%, #0d9488 100%);
-        color: #fff;
-        text-align: center;
-      }
-
-      .cta-inner h2 {
-        margin: 0 auto 14px;
-        max-width: 600px;
-        font-size: clamp(1.6rem, 3vw, 2.6rem);
-        line-height: 1.1;
-        color: #fff;
-      }
-
-      .cta-inner p {
-        margin: 0 auto 32px;
-        max-width: 48ch;
-        opacity: 0.88;
-        line-height: 1.6;
-      }
-
-      .cta-btns {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 14px;
-        justify-content: center;
-      }
-
-      .btn-white {
-        background: #fff;
-        color: #0d9488;
-        border: none;
-        font-weight: 800;
-        padding: 14px 28px;
-        border-radius: 14px;
-        font-size: 1rem;
-        cursor: pointer;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        transition: opacity 0.16s, transform 0.16s;
-      }
-
-      .btn-white:hover {
-        opacity: 0.92;
-        transform: translateY(-1px);
-      }
-
-      .btn-outline-white {
-        background: transparent;
-        color: #fff;
-        border: 2px solid rgba(255, 255, 255, 0.65);
-        font-weight: 800;
-        padding: 13px 28px;
-        border-radius: 14px;
-        font-size: 1rem;
-        cursor: pointer;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        transition: background 0.16s, border-color 0.16s;
-      }
-
-      .btn-outline-white:hover {
-        background: rgba(255, 255, 255, 0.1);
-        border-color: #fff;
-      }
-
-      /* ── FAQ ──────────────────────────────────────────────── */
-      .faq-section {
-        padding: clamp(40px, 7vw, 80px) 0;
-        background: var(--bg-subtle, #f8fafc);
-      }
-
-      /* ── Responsive ───────────────────────────────────────── */
-      @media (min-width: 600px) {
-        .stats-inner {
-          grid-template-columns: repeat(4, 1fr);
-        }
-
-        .cat-grid {
-          grid-template-columns: repeat(3, 1fr);
-        }
-      }
-
-      @media (min-width: 900px) {
-        .steps-grid {
-          grid-template-columns: repeat(3, 1fr);
-        }
-
-        .why-grid {
-          grid-template-columns: repeat(3, 1fr);
-        }
-
-        .testi-grid {
-          grid-template-columns: repeat(3, 1fr);
-        }
-
-        .cat-grid {
-          grid-template-columns: repeat(4, 1fr);
-        }
-      }
-    </style>
-  </head>
-
-  <body>
-    <div id="announce-bar"></div>
-    <div id="navbar"></div>
-
-    <main>
-
-      <!-- ══════════════ HERO ══════════════ -->
-      <section class="hero" aria-label="Hero">
-        <div class="container">
-          <div class="hero-badge-row fade-up">
-            <span class="badge badge-teal">⚡ Hyperlocal Gigs</span>
-            <span class="badge">📍 Gurugram First</span>
-            <span class="badge badge-amber">💚 Fast Hiring</span>
-          </div>
-
-          <h1 class="fade-up">
-            Gurugram mein<br />
-            <span class="accent">kaam dhundo,</span><br />
-            kaam do,<br />
-            aur turant connect ho jao.
-          </h1>
-
-          <p class="hero-sub fade-up">
-            GigLega students, freelancers, part-timers aur local businesses ko ek hi jagah
-            connect karta hai. Chhote kaam ho ya urgent help, ab local hiring simple aur fast
-            hogi.
-          </p>
-
-          <div class="hero-ctas fade-up">
-            <a href="browse.html" class="btn btn-primary">Browse Gigs</a>
-            <a href="post-gig.html" class="btn btn-secondary">Post a Gig</a>
-          </div>
-
-          <div class="hero-trust fade-up">
-            <span class="trust-item">✅ Zero bakwaas</span>
-            <span class="trust-item">⚡ Fast response</span>
-            <span class="trust-item">📍 Local opportunities</span>
-            <span class="trust-item">🗣️ Hinglish-friendly platform</span>
-          </div>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GigLega — Gurugram ka #1 Gig Platform</title>
+  <meta name="description" content="GigLega — Gurugram mein hyperlocal aur remote gigs dhundo ya post karo. Students, freelancers, aur local businesses ke liye." />
+  <meta property="og:title" content="GigLega — Karo Kaam, Kamao Daam" />
+  <meta property="og:description" content="Gurugram ka fastest gig platform. Kaam dhundo ya kaam do — turant connect ho jao." />
+  <meta property="og:type" content="website" />
+
+  <!-- ✅ NO defer — loads synchronously so auth + nav are available instantly -->
+  <script src="shared.js"></script>
+  <link rel="stylesheet" href="styles.css" />
+
+  <style>
+    /* ══════════════════════════════
+       PAGE-SPECIFIC STYLES
+    ══════════════════════════════ */
+
+    /* ── Hero ── */
+    .hero {
+      background: var(--bg);
+      padding: 72px 16px 80px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: "";
+      position: absolute;
+      top: -120px; left: 50%;
+      transform: translateX(-50%);
+      width: 700px; height: 700px;
+      background: radial-gradient(circle, rgba(13,148,136,.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-badges {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 28px;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 16px;
+      background: var(--surface);
+      border: 1.5px solid var(--gray-200);
+      border-radius: 20px;
+      font-size: .78rem;
+      font-weight: 700;
+      color: var(--gray-600);
+      box-shadow: var(--shadow-sm);
+    }
+    .hero-badge .dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .hero-badge .dot.teal   { background: var(--teal); }
+    .hero-badge .dot.amber  { background: var(--accent); }
+    .hero-badge .dot.green  { background: var(--success); }
+
+    .hero-headline {
+      font-size: clamp(2.2rem, 6vw, 4rem);
+      font-weight: 900;
+      line-height: 1.15;
+      color: var(--primary);
+      margin-bottom: 20px;
+      letter-spacing: -1.5px;
+    }
+    .hero-headline .highlight { color: var(--teal); }
+
+    .hero-sub {
+      font-size: clamp(.95rem, 2vw, 1.1rem);
+      color: var(--gray-500);
+      max-width: 540px;
+      margin: 0 auto 36px;
+      line-height: 1.75;
+    }
+
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 52px;
+    }
+    .hero-cta-primary {
+      padding: 14px 32px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--teal) 100%);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-size: 1rem;
+      font-weight: 800;
+      cursor: pointer;
+      text-decoration: none;
+      box-shadow: 0 4px 18px rgba(13,148,136,.35);
+      transition: transform .2s, box-shadow .2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .hero-cta-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 7px 24px rgba(13,148,136,.45);
+      text-decoration: none;
+      color: #fff;
+    }
+    .hero-cta-secondary {
+      padding: 14px 28px;
+      background: var(--surface);
+      border: 2px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--gray-700);
+      cursor: pointer;
+      text-decoration: none;
+      transition: all .2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .hero-cta-secondary:hover {
+      border-color: var(--teal);
+      color: var(--teal);
+      text-decoration: none;
+    }
+
+    /* Hero stats row */
+    .hero-stats {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 32px;
+      flex-wrap: wrap;
+    }
+    .hero-stat { text-align: center; }
+    .hero-stat-val {
+      font-size: 1.6rem;
+      font-weight: 900;
+      color: var(--primary);
+      line-height: 1;
+    }
+    .hero-stat-lbl {
+      font-size: .75rem;
+      color: var(--gray-400);
+      font-weight: 600;
+      margin-top: 3px;
+    }
+    .hero-stat-div {
+      width: 1px; height: 36px;
+      background: var(--gray-200);
+    }
+
+    /* ── Section wrapper ── */
+    .section { padding: 64px 16px; }
+    .section-alt { background: var(--surface); }
+    .section-inner { max-width: var(--max-width); margin: 0 auto; }
+
+    .section-eyebrow {
+      font-size: .75rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--teal);
+      margin-bottom: 8px;
+    }
+    .section-big-title {
+      font-size: clamp(1.5rem, 3.5vw, 2.2rem);
+      font-weight: 900;
+      color: var(--primary);
+      margin-bottom: 12px;
+      line-height: 1.2;
+    }
+    .section-desc {
+      font-size: .95rem;
+      color: var(--gray-500);
+      max-width: 520px;
+      line-height: 1.7;
+    }
+
+    /* ── How it works ── */
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 24px;
+      margin-top: 40px;
+    }
+    .step-card {
+      background: var(--surface);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 28px 22px;
+      text-align: center;
+      box-shadow: var(--shadow-sm);
+      transition: transform .2s, box-shadow .2s;
+    }
+    .step-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-md);
+    }
+    .step-num {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--teal));
+      color: #fff;
+      font-size: .9rem;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+    }
+    .step-icon { font-size: 1.8rem; margin-bottom: 10px; }
+    .step-card h3 { font-size: 1rem; font-weight: 800; color: var(--primary); margin-bottom: 8px; }
+    .step-card p  { font-size: .84rem; color: var(--gray-500); line-height: 1.6; }
+
+    /* Tab switcher (Poster / Worker) */
+    .how-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 32px;
+      flex-wrap: wrap;
+    }
+    .how-tab {
+      padding: 9px 22px;
+      border-radius: 20px;
+      border: 2px solid var(--gray-200);
+      background: transparent;
+      font-size: .875rem;
+      font-weight: 700;
+      color: var(--gray-500);
+      cursor: pointer;
+      transition: all .2s;
+      font-family: var(--font);
+    }
+    .how-tab.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+    }
+    .how-panel { display: none; }
+    .how-panel.active { display: block; }
+
+    /* ── Categories ── */
+    .cat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 14px;
+      margin-top: 36px;
+    }
+    .cat-card {
+      background: var(--surface);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 20px 14px;
+      text-align: center;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all .2s;
+      box-shadow: var(--shadow-sm);
+    }
+    .cat-card:hover {
+      border-color: var(--teal);
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-md);
+      text-decoration: none;
+    }
+    .cat-icon { font-size: 2rem; margin-bottom: 10px; display: block; }
+    .cat-name { font-size: .83rem; font-weight: 700; color: var(--gray-700); margin-bottom: 4px; }
+    .cat-count { font-size: .72rem; color: var(--gray-400); }
+
+    /* ── Live gigs ticker ── */
+    .gigs-ticker-wrap {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--teal) 100%);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      margin-top: 40px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      overflow: hidden;
+    }
+    .ticker-label {
+      font-size: .75rem;
+      font-weight: 800;
+      color: rgba(255,255,255,.7);
+      text-transform: uppercase;
+      letter-spacing: .8px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .ticker-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: #4ade80;
+      flex-shrink: 0;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+    .ticker-scroll {
+      flex: 1;
+      overflow: hidden;
+      position: relative;
+    }
+    .ticker-inner {
+      display: flex;
+      gap: 32px;
+      animation: ticker 28s linear infinite;
+      white-space: nowrap;
+    }
+    .ticker-inner:hover { animation-play-state: paused; }
+    .ticker-item {
+      font-size: .82rem;
+      font-weight: 600;
+      color: rgba(255,255,255,.85);
+      flex-shrink: 0;
+    }
+    @keyframes ticker {
+      0%   { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* ── Why GigLega ── */
+    .why-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+      margin-top: 40px;
+    }
+    .why-card {
+      background: var(--surface);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      transition: transform .2s, box-shadow .2s;
+    }
+    .why-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+    .why-icon {
+      font-size: 1.6rem;
+      flex-shrink: 0;
+      width: 48px; height: 48px;
+      background: var(--gray-50);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .why-content h3 { font-size: .95rem; font-weight: 800; color: var(--primary); margin-bottom: 6px; }
+    .why-content p  { font-size: .83rem; color: var(--gray-500); line-height: 1.6; }
+
+    /* ── Testimonials ── */
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      margin-top: 40px;
+    }
+    .testi-card {
+      background: var(--surface);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
+    }
+    .testi-stars { color: var(--accent); font-size: .9rem; margin-bottom: 12px; }
+    .testi-text { font-size: .88rem; color: var(--gray-600); line-height: 1.7; margin-bottom: 16px; font-style: italic; }
+    .testi-author { display: flex; align-items: center; gap: 12px; }
+    .testi-avatar {
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--teal));
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .75rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .testi-name { font-size: .85rem; font-weight: 700; color: var(--primary); }
+    .testi-role { font-size: .75rem; color: var(--gray-400); }
+
+    /* ── FAQ ── */
+    .faq-list { margin-top: 36px; display: flex; flex-direction: column; gap: 12px; }
+    .faq-item {
+      background: var(--surface);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+    .faq-q {
+      width: 100%;
+      padding: 16px 20px;
+      background: none;
+      border: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      font-size: .92rem;
+      font-weight: 700;
+      color: var(--text);
+      cursor: pointer;
+      text-align: left;
+      font-family: var(--font);
+      transition: background .15s;
+    }
+    .faq-q:hover { background: var(--gray-50); }
+    .faq-q.open  { color: var(--teal); }
+    .faq-arrow {
+      flex-shrink: 0;
+      font-size: .75rem;
+      color: var(--gray-400);
+      transition: transform .3s;
+    }
+    .faq-q.open .faq-arrow { transform: rotate(180deg); color: var(--teal); }
+    .faq-a {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height .35s ease;
+    }
+    .faq-a.open { max-height: 400px; }
+    .faq-a-inner {
+      padding: 0 20px 16px;
+      font-size: .875rem;
+      color: var(--gray-500);
+      line-height: 1.75;
+      border-top: 1px solid var(--gray-100);
+      padding-top: 14px;
+    }
+
+    /* ── CTA banner ── */
+    .cta-banner {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--teal) 100%);
+      border-radius: var(--radius);
+      padding: 52px 32px;
+      text-align: center;
+      color: #fff;
+      position: relative;
+      overflow: hidden;
+    }
+    .cta-banner::before {
+      content: "";
+      position: absolute;
+      top: -60px; right: -60px;
+      width: 250px; height: 250px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.06);
+      pointer-events: none;
+    }
+    .cta-banner::after {
+      content: "";
+      position: absolute;
+      bottom: -80px; left: -40px;
+      width: 300px; height: 300px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.04);
+      pointer-events: none;
+    }
+    .cta-banner h2 {
+      font-size: clamp(1.5rem, 3.5vw, 2.2rem);
+      font-weight: 900;
+      color: #fff;
+      margin-bottom: 12px;
+      position: relative;
+      z-index: 1;
+    }
+    .cta-banner p {
+      font-size: .95rem;
+      opacity: .8;
+      max-width: 440px;
+      margin: 0 auto 28px;
+      line-height: 1.7;
+      position: relative;
+      z-index: 1;
+    }
+    .cta-banner-actions {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      position: relative;
+      z-index: 1;
+    }
+    .cta-btn-white {
+      padding: 13px 28px;
+      background: #fff;
+      color: var(--primary);
+      border: none;
+      border-radius: var(--radius-sm);
+      font-size: .95rem;
+      font-weight: 800;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all .2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .cta-btn-white:hover { opacity: .9; transform: translateY(-2px); text-decoration: none; color: var(--primary); }
+    .cta-btn-outline-white {
+      padding: 13px 28px;
+      background: transparent;
+      color: #fff;
+      border: 2px solid rgba(255,255,255,.5);
+      border-radius: var(--radius-sm);
+      font-size: .95rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all .2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .cta-btn-outline-white:hover {
+      border-color: #fff;
+      background: rgba(255,255,255,.1);
+      text-decoration: none;
+      color: #fff;
+    }
+
+    /* ── Trust strip ── */
+    .trust-strip {
+      background: var(--surface);
+      border-top: 1.5px solid var(--gray-200);
+      border-bottom: 1.5px solid var(--gray-200);
+      padding: 20px 16px;
+    }
+    .trust-inner {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 32px;
+      flex-wrap: wrap;
+    }
+    .trust-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: .8rem;
+      font-weight: 700;
+      color: var(--gray-500);
+      white-space: nowrap;
+    }
+    .trust-item span:first-child { font-size: 1.1rem; }
+
+    /* ── Dark mode overrides ── */
+    [data-theme="dark"] .step-card   { border-color: var(--gray-700); }
+    [data-theme="dark"] .cat-card    { border-color: var(--gray-700); }
+    [data-theme="dark"] .why-card    { border-color: var(--gray-700); }
+    [data-theme="dark"] .testi-card  { border-color: var(--gray-700); }
+    [data-theme="dark"] .faq-item    { border-color: var(--gray-700); }
+    [data-theme="dark"] .faq-a-inner { border-color: var(--gray-700); }
+    [data-theme="dark"] .faq-q:hover { background: var(--gray-800); }
+    [data-theme="dark"] .hero-badge  { background: var(--gray-800); border-color: var(--gray-700); }
+    [data-theme="dark"] .why-icon    { background: var(--gray-800); }
+    [data-theme="dark"] .trust-strip { border-color: var(--gray-700); }
+    [data-theme="dark"] .how-tab     { border-color: var(--gray-600); color: var(--gray-400); }
+    [data-theme="dark"] .hero-stat-div { background: var(--gray-700); }
+
+    @media (max-width: 600px) {
+      .hero { padding: 48px 16px 56px; }
+      .hero-stat-div { display: none; }
+      .hero-stats { gap: 20px; }
+      .section { padding: 44px 16px; }
+      .cta-banner { padding: 36px 20px; }
+      .trust-inner { gap: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ✅ All 4 required anchor divs -->
+  <div id="announce-bar"></div>
+  <nav id="main-nav"></nav>
+
+  <main>
+
+    <!-- ════════════════════════════
+         HERO
+    ════════════════════════════ -->
+    <section class="hero">
+      <div class="hero-badges">
+        <span class="hero-badge"><span class="dot teal"></span> Hyperlocal Gigs</span>
+        <span class="hero-badge"><span class="dot amber"></span> Gurugram First</span>
+        <span class="hero-badge"><span class="dot green"></span> Fast Hiring</span>
+      </div>
+
+      <h1 class="hero-headline">
+        Gurugram mein<br>
+        <span class="highlight">kaam dhundo,</span><br>
+        kaam do,<br>
+        aur turant connect ho jao.
+      </h1>
+
+      <p class="hero-sub">
+        GigLega students, freelancers, part-timers aur local businesses ko ek hi jagah connect karta hai. Chhote kaam ho ya urgent help, ab local hiring simple aur fast hogi.
+      </p>
+
+      <div class="hero-actions">
+        <a href="login.html?tab=register" class="hero-cta-primary">🚀 Free Mein Join Karo</a>
+        <a href="browse.html" class="hero-cta-secondary">🔍 Gigs Browse Karo</a>
+      </div>
+
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <div class="hero-stat-val" id="statGigs">0</div>
+          <div class="hero-stat-lbl">Gigs Posted</div>
         </div>
-      </section>
-
-      <!-- ══════════════ STATS ══════════════ -->
-      <section class="stats-strip" aria-label="Platform stats">
-        <div class="container">
-          <div class="stats-inner">
-            <div class="stat-item fade-up">
-              <h3>
-                <span
-                  data-count-target="500"
-                  data-count-suffix="+"
-                  data-count-duration="1600"
-                >500+</span>
-              </h3>
-              <p>Registered users</p>
-            </div>
-            <div class="stat-item fade-up">
-              <h3>
-                <span
-                  data-count-target="200"
-                  data-count-suffix="+"
-                  data-count-duration="1600"
-                >200+</span>
-              </h3>
-              <p>Gigs posted so far</p>
-            </div>
-            <div class="stat-item fade-up">
-              <h3>
-                <span
-                  data-count-target="12"
-                  data-count-suffix="+"
-                  data-count-duration="1400"
-                >12+</span>
-              </h3>
-              <p>Categories available</p>
-            </div>
-            <div class="stat-item fade-up">
-              <h3>
-                <span
-                  data-count-target="100"
-                  data-count-suffix="%"
-                  data-count-duration="1400"
-                >100%</span>
-              </h3>
-              <p>Free to join</p>
-            </div>
-          </div>
+        <div class="hero-stat-div"></div>
+        <div class="hero-stat">
+          <div class="hero-stat-val" id="statUsers">0</div>
+          <div class="hero-stat-lbl">Registered Users</div>
         </div>
-      </section>
+        <div class="hero-stat-div"></div>
+        <div class="hero-stat">
+          <div class="hero-stat-val">₹150+</div>
+          <div class="hero-stat-lbl">Starting Pay/hr</div>
+        </div>
+        <div class="hero-stat-div"></div>
+        <div class="hero-stat">
+          <div class="hero-stat-val">6%</div>
+          <div class="hero-stat-lbl">Platform Fee Only</div>
+        </div>
+      </div>
+    </section>
 
-      <!-- ══════════════ HOW IT WORKS ══════════════ -->
-      <section class="how-section" id="how-it-works" aria-label="How it works">
-        <div class="container">
-          <div class="section-label fade-up">
-            <span class="badge">How It Works</span>
-          </div>
-          <h2 class="section-title fade-up">Teen simple steps mein kaam shuru</h2>
-          <p class="section-sub fade-up">
-            GigLega use karna bahut aasaan hai — signup se lekar pehla connect tak sirf
-            kuch minute lagenge.
-          </p>
+    <!-- ════════════════════════════
+         TRUST STRIP
+    ════════════════════════════ -->
+    <div class="trust-strip">
+      <div class="trust-inner">
+        <div class="trust-item"><span>🔒</span><span>Safe & Verified</span></div>
+        <div class="trust-item"><span>⚡</span><span>Instant Connection</span></div>
+        <div class="trust-item"><span>💸</span><span>No Hidden Charges</span></div>
+        <div class="trust-item"><span>📍</span><span>Gurugram Focused</span></div>
+        <div class="trust-item"><span>🤝</span><span>Both Sides Free</span></div>
+        <div class="trust-item"><span>📱</span><span>WhatsApp Support</span></div>
+      </div>
+    </div>
 
+    <!-- ════════════════════════════
+         HOW IT WORKS
+    ════════════════════════════ -->
+    <section class="section section-alt">
+      <div class="section-inner">
+        <div style="text-align:center;margin-bottom:8px">
+          <div class="section-eyebrow">How It Works</div>
+          <h2 class="section-big-title">Simple as 1-2-3</h2>
+          <p class="section-desc" style="margin:0 auto">Chahe gig dhoondna ho ya post karna — poora process sirf 3 steps mein.</p>
+        </div>
+
+        <!-- Tabs -->
+        <div class="how-tabs" style="justify-content:center;margin-top:28px">
+          <button class="how-tab active" data-how="worker">⚡ I Want to Work</button>
+          <button class="how-tab" data-how="poster">📋 I Want to Hire</button>
+        </div>
+
+        <!-- Worker panel -->
+        <div class="how-panel active" id="howWorker">
           <div class="steps-grid">
-            <div class="step-card card fade-up">
+            <div class="step-card">
               <div class="step-num">1</div>
-              <h3>Free mein register karo</h3>
-              <p>
-                Apna naam, role (worker ya client), aur location add karo. Koi fees nahi,
-                koi hidden charges nahi.
-              </p>
+              <div class="step-icon">📝</div>
+              <h3>Register Free</h3>
+              <p>Apna naam, phone, aur city daalo. 30 seconds mein account ready.</p>
             </div>
-            <div class="step-card card fade-up">
+            <div class="step-card">
               <div class="step-num">2</div>
-              <h3>Browse ya post karo</h3>
-              <p>
-                Workers local gigs browse kar ke apply kar sakte hain. Clients ek minute
-                mein gig post kar ke applicants receive kar sakte hain.
-              </p>
+              <div class="step-icon">🔍</div>
+              <h3>Browse Gigs</h3>
+              <p>Category aur location filter karke apne area ke gigs dekho. Real-time updates.</p>
             </div>
-            <div class="step-card card fade-up">
+            <div class="step-card">
               <div class="step-num">3</div>
-              <h3>Connect aur kaam shuru</h3>
-              <p>
-                Match ho jaate hi directly WhatsApp ya call ke through baat karo aur
-                turant kaam start karo. Koi middleman nahi.
-              </p>
+              <div class="step-icon">✅</div>
+              <h3>Accept & Earn</h3>
+              <p>Gig accept karo, kaam karo, aur payment lo. As simple as that.</p>
+            </div>
+            <div class="step-card">
+              <div class="step-num">4</div>
+              <div class="step-icon">⭐</div>
+              <h3>Build Reputation</h3>
+              <p>Rating badhao, zyada gigs milenge. Top workers ko priority listing milti hai.</p>
             </div>
           </div>
         </div>
-      </section>
 
-      <!-- ══════════════ CATEGORIES ══════════════ -->
-      <section class="categories-section" aria-label="Gig categories">
-        <div class="container">
-          <div class="section-label fade-up">
-            <span class="badge badge-amber">Categories</span>
-          </div>
-          <h2 class="section-title fade-up">Har tarah ka kaam, ek hi jagah</h2>
-          <p class="section-sub fade-up">
-            Delivery se leke design tak, GigLega par Gurugram ke real local gigs milte hain.
-          </p>
-
-          <div class="cat-grid">
-            <a href="browse.html?category=delivery" class="cat-card fade-up">
-              <span class="cat-icon">🚴</span>
-              <h3>Delivery</h3>
-              <p>Local runs, parcel drops</p>
-            </a>
-            <a href="browse.html?category=teaching" class="cat-card fade-up">
-              <span class="cat-icon">📚</span>
-              <h3>Tuition / Teaching</h3>
-              <p>Home tutor, coaching</p>
-            </a>
-            <a href="browse.html?category=tech" class="cat-card fade-up">
-              <span class="cat-icon">💻</span>
-              <h3>Tech & IT</h3>
-              <p>Freelance dev, repair</p>
-            </a>
-            <a href="browse.html?category=domestic" class="cat-card fade-up">
-              <span class="cat-icon">🏠</span>
-              <h3>Domestic Help</h3>
-              <p>Cleaning, cooking, care</p>
-            </a>
-            <a href="browse.html?category=event" class="cat-card fade-up">
-              <span class="cat-icon">🎉</span>
-              <h3>Event Work</h3>
-              <p>Setup, hosting, serving</p>
-            </a>
-            <a href="browse.html?category=content" class="cat-card fade-up">
-              <span class="cat-icon">🎬</span>
-              <h3>Content / Social</h3>
-              <p>Reels, editing, posts</p>
-            </a>
-            <a href="browse.html?category=sales" class="cat-card fade-up">
-              <span class="cat-icon">📣</span>
-              <h3>Sales & Promo</h3>
-              <p>Flyers, leaflets, demos</p>
-            </a>
-            <a href="browse.html" class="cat-card fade-up">
-              <span class="cat-icon">➕</span>
-              <h3>More Gigs</h3>
-              <p>Browse all categories</p>
-            </a>
-          </div>
-        </div>
-      </section>
-
-      <!-- ══════════════ WHY GIGLEGA ══════════════ -->
-      <section class="why-section" aria-label="Why GigLega">
-        <div class="container">
-          <div class="section-label fade-up">
-            <span class="badge badge-teal">Why GigLega?</span>
-          </div>
-          <h2 class="section-title fade-up">Kyun GigLega choose karein?</h2>
-          <p class="section-sub fade-up">
-            Sirf ek aur job portal nahi hai — yeh Gurugram ka apna local gig network hai.
-          </p>
-
-          <div class="why-grid">
-            <div class="why-card card fade-up">
-              <span class="why-icon">📍</span>
-              <h3>100% Hyperlocal</h3>
-              <p>
-                Sirf Gurugram ke gigs. Aapke aas-paas ke real kaam, koi generic listing nahi.
-              </p>
+        <!-- Poster panel -->
+        <div class="how-panel" id="howPoster">
+          <div class="steps-grid">
+            <div class="step-card">
+              <div class="step-num">1</div>
+              <div class="step-icon">📋</div>
+              <h3>Post Your Gig</h3>
+              <p>Kaam ka title, category, location, aur price set karo. 2 minutes mein live.</p>
             </div>
-            <div class="why-card card fade-up">
-              <span class="why-icon">⚡</span>
-              <h3>Instant Connect</h3>
-              <p>
-                Match hote hi direct WhatsApp ya call par baat karo. No long approval
-                processes.
-              </p>
+            <div class="step-card">
+              <div class="step-num">2</div>
+              <div class="step-icon">👀</div>
+              <h3>Workers Apply</h3>
+              <p>Nearby available workers turant dekhenge aur first-come-first-served basis pe accept karenge.</p>
             </div>
-            <div class="why-card card fade-up">
-              <span class="why-icon">🆓</span>
-              <h3>Bilkul Free</h3>
-              <p>
-                Workers aur clients dono ke liye registration aur listing completely
-                free hai.
-              </p>
+            <div class="step-card">
+              <div class="step-num">3</div>
+              <div class="step-icon">💬</div>
+              <h3>Chat & Confirm</h3>
+              <p>Worker se seedha chat karo, details confirm karo, aur kaam shuru ho jao.</p>
             </div>
-            <div class="why-card card fade-up">
-              <span class="why-icon">🗣️</span>
-              <h3>Hinglish First</h3>
-              <p>
-                Platform Hinglish mein hai, taaki koi bhi easily use kar sake — tech
-                savvy ho ya na ho.
-              </p>
-            </div>
-            <div class="why-card card fade-up">
-              <span class="why-icon">🔒</span>
-              <h3>Safe & Trusted</h3>
-              <p>
-                Har listing verified process se jaati hai. Reviews aur ratings se trust
-                build hota hai.
-              </p>
-            </div>
-            <div class="why-card card fade-up">
-              <span class="why-icon">📱</span>
-              <h3>Mobile Friendly</h3>
-              <p>
-                Phone se hi sab kuch karo — browse, apply, post. Koi app download ki
-                zaroorat nahi.
-              </p>
+            <div class="step-card">
+              <div class="step-num">4</div>
+              <div class="step-icon">💳</div>
+              <h3>Pay After Done</h3>
+              <p>Kaam complete hone ke baad hi payment — cash, UPI, ya GigLega wallet se.</p>
             </div>
           </div>
         </div>
-      </section>
 
-      <!-- ══════════════ TESTIMONIALS ══════════════ -->
-      <section class="testimonials-section" aria-label="Testimonials">
-        <div class="container">
-          <div class="section-label fade-up">
-            <span class="badge">Real Reviews</span>
-          </div>
-          <h2 class="section-title fade-up">Log kya bol rahe hain</h2>
-          <p class="section-sub fade-up">
-            GigLega Beta users ne apna honest experience share kiya hai.
-          </p>
+      </div>
+    </section>
 
-          <div class="testi-grid">
-            <article class="testi-card card fade-up">
-              <div class="testi-stars">★★★★★</div>
-              <p class="testi-text">
-                "GigLega se mujhe 2 din ke andar delivery gig mili. Bilkul local, koi
-                commission nahi. Ekdum badhiya platform hai!"
-              </p>
-              <div class="testi-author">
-                <div class="testi-avatar">RS</div>
-                <div class="testi-meta">
-                  <strong>Rahul Sharma</strong>
-                  <span>Gig Worker, Gurugram</span>
-                </div>
-              </div>
-            </article>
-
-            <article class="testi-card card fade-up">
-              <div class="testi-stars">★★★★★</div>
-              <p class="testi-text">
-                "Event ke liye last minute helper chahiye tha, GigLega par 3 ghante mein
-                3 applications aa gayi. Bahut fast response mili!"
-              </p>
-              <div class="testi-author">
-                <div class="testi-avatar">PG</div>
-                <div class="testi-meta">
-                  <strong>Priya Gupta</strong>
-                  <span>Small Business Owner</span>
-                </div>
-              </div>
-            </article>
-
-            <article class="testi-card card fade-up">
-              <div class="testi-stars">★★★★★</div>
-              <p class="testi-text">
-                "College ke time mein part-time kaam dhundh raha tha. GigLega ne content
-                editing gig dilwa di, paise bhi acche aur flexible bhi."
-              </p>
-              <div class="testi-author">
-                <div class="testi-avatar">AK</div>
-                <div class="testi-meta">
-                  <strong>Arjun Kumar</strong>
-                  <span>Student, DLF Phase 2</span>
-                </div>
-              </div>
-            </article>
+    <!-- ════════════════════════════
+         LIVE TICKER
+    ════════════════════════════ -->
+    <div class="section" style="padding:0 16px 32px">
+      <div class="section-inner">
+        <div class="gigs-ticker-wrap">
+          <span class="ticker-dot"></span>
+          <span class="ticker-label">Live Gigs</span>
+          <div class="ticker-scroll">
+            <div class="ticker-inner" id="tickerInner">
+              <!-- Populated by JS -->
+            </div>
           </div>
         </div>
-      </section>
+      </div>
+    </div>
 
-      <!-- ══════════════ FAQ ══════════════ -->
-      <section class="faq-section" aria-label="FAQ">
-        <div class="container">
-          <div class="section-label fade-up">
-            <span class="badge badge-amber">FAQ</span>
+    <!-- ════════════════════════════
+         CATEGORIES
+    ════════════════════════════ -->
+    <section class="section section-alt">
+      <div class="section-inner">
+        <div class="section-eyebrow">Categories</div>
+        <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:12px">
+          <div>
+            <h2 class="section-big-title">Koi bhi kaam,<br>GigLega pe milega</h2>
+            <p class="section-desc">15+ categories — hyperlocal se leke remote tak sab kuch.</p>
           </div>
-          <h2 class="section-title fade-up">Common questions</h2>
-          <p class="section-sub fade-up">
-            GigLega ke baare mein kuch sawaal hain? Yahan dekho.
-          </p>
+          <a href="browse.html" style="font-size:.85rem;font-weight:700;color:var(--teal);text-decoration:none">All Categories →</a>
+        </div>
 
-          <div class="accordion-section" style="max-width:720px; margin:0 auto;">
-            <div class="accordion-item card fade-up">
-              <button class="accordion-header" aria-expanded="false">
-                GigLega kya hai aur yeh kaise kaam karta hai?
-                <span class="accordion-icon">+</span>
-              </button>
-              <div class="accordion-body">
-                <p>
-                  GigLega Gurugram ka hyperlocal gig platform hai jahan workers local
-                  part-time ya freelance kaam dhundh sakte hain, aur businesses apna
-                  kaam post karke suitable workers se directly connect kar sakte hain.
-                  Poora process free aur simple hai.
-                </p>
+        <div class="cat-grid">
+          <a href="browse.html?cat=delivery" class="cat-card">
+            <span class="cat-icon">🛵</span>
+            <div class="cat-name">Delivery</div>
+            <div class="cat-count">Fast & Local</div>
+          </a>
+          <a href="browse.html?cat=cleaning" class="cat-card">
+            <span class="cat-icon">🧹</span>
+            <div class="cat-name">Cleaning</div>
+            <div class="cat-count">Home & Office</div>
+          </a>
+          <a href="browse.html?cat=moving" class="cat-card">
+            <span class="cat-icon">📦</span>
+            <div class="cat-name">Moving Help</div>
+            <div class="cat-count">Shifting & Packing</div>
+          </a>
+          <a href="browse.html?cat=tech" class="cat-card">
+            <span class="cat-icon">💻</span>
+            <div class="cat-name">Tech Support</div>
+            <div class="cat-count">Remote & On-site</div>
+          </a>
+          <a href="browse.html?cat=tutoring" class="cat-card">
+            <span class="cat-icon">📚</span>
+            <div class="cat-name">Tutoring</div>
+            <div class="cat-count">All Subjects</div>
+          </a>
+          <a href="browse.html?cat=cooking" class="cat-card">
+            <span class="cat-icon">🍳</span>
+            <div class="cat-name">Cooking</div>
+            <div class="cat-count">Home Chef</div>
+          </a>
+          <a href="browse.html?cat=design" class="cat-card">
+            <span class="cat-icon">🎨</span>
+            <div class="cat-name">Design</div>
+            <div class="cat-count">Graphic & UI</div>
+          </a>
+          <a href="browse.html?cat=photography" class="cat-card">
+            <span class="cat-icon">📸</span>
+            <div class="cat-name">Photography</div>
+            <div class="cat-count">Events & Products</div>
+          </a>
+          <a href="browse.html?cat=plumbing" class="cat-card">
+            <span class="cat-icon">🔧</span>
+            <div class="cat-name">Plumbing</div>
+            <div class="cat-count">Repairs & Fix</div>
+          </a>
+          <a href="browse.html?cat=electrical" class="cat-card">
+            <span class="cat-icon">⚡</span>
+            <div class="cat-name">Electrical</div>
+            <div class="cat-count">Wiring & Fitting</div>
+          </a>
+          <a href="browse.html?cat=data-entry" class="cat-card">
+            <span class="cat-icon">📊</span>
+            <div class="cat-name">Data Entry</div>
+            <div class="cat-count">Remote Work</div>
+          </a>
+          <a href="browse.html?cat=other" class="cat-card" style="border-style:dashed">
+            <span class="cat-icon">➕</span>
+            <div class="cat-name">More</div>
+            <div class="cat-count">Explore All</div>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════════════════════════
+         WHY GIGLEGA
+    ════════════════════════════ -->
+    <section class="section">
+      <div class="section-inner">
+        <div style="text-align:center;margin-bottom:8px">
+          <div class="section-eyebrow">Why GigLega</div>
+          <h2 class="section-big-title">Doosre platforms se alag kyun?</h2>
+          <p class="section-desc" style="margin:0 auto">GigLega sirf Gurugram ke liye banaya gaya hai — local needs, local solutions.</p>
+        </div>
+        <div class="why-grid">
+          <div class="why-card">
+            <div class="why-icon">📍</div>
+            <div class="why-content">
+              <h3>Hyperlocal First</h3>
+              <p>Apne area ke gigs pehle dikho. Sector-level filtering se nearest worker ya gig milta hai.</p>
+            </div>
+          </div>
+          <div class="why-card">
+            <div class="why-icon">⚡</div>
+            <div class="why-content">
+              <h3>Instant Matching</h3>
+              <p>Gig post karo aur minutes mein worker accept kar leta hai. No waiting for days.</p>
+            </div>
+          </div>
+          <div class="why-card">
+            <div class="why-icon">💸</div>
+            <div class="why-content">
+              <h3>Fair Pricing</h3>
+              <p>Sirf 6% support fee — aur woh bhi tab jab kaam complete ho. No upfront charges, ever.</p>
+            </div>
+          </div>
+          <div class="why-card">
+            <div class="why-icon">🔒</div>
+            <div class="why-content">
+              <h3>Safe Payments</h3>
+              <p>Cash, UPI, ya GigLega secure wallet — jo method comfortable lage, woh use karo.</p>
+            </div>
+          </div>
+          <div class="why-card">
+            <div class="why-icon">💬</div>
+            <div class="why-content">
+              <h3>Built-in Chat</h3>
+              <p>Har gig ke liye dedicated chat — no sharing phone numbers until you're comfortable.</p>
+            </div>
+          </div>
+          <div class="why-card">
+            <div class="why-icon">📱</div>
+            <div class="why-content">
+              <h3>WhatsApp Support</h3>
+              <p>Koi bhi problem ho, seedha WhatsApp karo. Hum 10AM–10PM available hain.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════════════════════════
+         TESTIMONIALS
+    ════════════════════════════ -->
+    <section class="section section-alt">
+      <div class="section-inner">
+        <div style="text-align:center;margin-bottom:8px">
+          <div class="section-eyebrow">Testimonials</div>
+          <h2 class="section-big-title">Log kya keh rahe hain</h2>
+          <p class="section-desc" style="margin:0 auto">Beta users ki real feedback — unhi ke shabd mein.</p>
+        </div>
+        <div class="testimonials-grid">
+          <div class="testi-card">
+            <div class="testi-stars">★★★★★</div>
+            <p class="testi-text">"GigLega se mujhe pehla gig ek ghante mein mila. Delivery ka kaam tha, aur payment bhi turant ho gaya. Ekdum smooth experience!"</p>
+            <div class="testi-author">
+              <div class="testi-avatar">RK</div>
+              <div>
+                <div class="testi-name">Rahul Kumar</div>
+                <div class="testi-role">Delivery Worker · Sector 45, Gurugram</div>
               </div>
             </div>
-
-            <div class="accordion-item card fade-up">
-              <button class="accordion-header" aria-expanded="false">
-                Kya GigLega use karna free hai?
-                <span class="accordion-icon">+</span>
-              </button>
-              <div class="accordion-body">
-                <p>
-                  Haan! GigLega workers aur clients dono ke liye completely free hai.
-                  Registration free, gig posting free, aur applying free. Koi hidden
-                  charges nahi hain.
-                </p>
+          </div>
+          <div class="testi-card">
+            <div class="testi-stars">★★★★★</div>
+            <p class="testi-text">"Maine ghar shifting ke liye help post ki — 20 minutes mein 2 workers ready the. Dono bahut kaam ke nikle. GigLega rocks!"</p>
+            <div class="testi-author">
+              <div class="testi-avatar" style="background:linear-gradient(135deg,var(--teal),var(--accent))">PS</div>
+              <div>
+                <div class="testi-name">Priya Sharma</div>
+                <div class="testi-role">Poster · DLF Phase 2, Gurugram</div>
               </div>
             </div>
-
-            <div class="accordion-item card fade-up">
-              <button class="accordion-header" aria-expanded="false">
-                Kya GigLega sirf Gurugram ke liye hai?
-                <span class="accordion-icon">+</span>
-              </button>
-              <div class="accordion-body">
-                <p>
-                  Abhi GigLega Gurugram mein focused hai, lekin jald hi Delhi, Noida,
-                  aur Faridabad mein bhi aayega. Gurugram waale pehle benefit uthao!
-                </p>
-              </div>
-            </div>
-
-            <div class="accordion-item card fade-up">
-              <button class="accordion-header" aria-expanded="false">
-                Mujhe koi problem hai, kaise contact karein?
-                <span class="accordion-icon">+</span>
-              </button>
-              <div class="accordion-body">
-                <p>
-                  Contact page par form fill karo ya directly WhatsApp par message karo:
-                  <a href="https://wa.me/919319635257" target="_blank" rel="noopener">
-                    +91 93196 35257
-                  </a>.
-                  Hum jaldi reply karte hain.
-                </p>
+          </div>
+          <div class="testi-card">
+            <div class="testi-stars">★★★★☆</div>
+            <p class="testi-text">"Student hoon aur part-time kaam chahiye tha. GigLega pe data entry gigs milte hain jo ghar se kar sakta hoon. Ek mahine mein ₹8,000 extra!"</p>
+            <div class="testi-author">
+              <div class="testi-avatar" style="background:linear-gradient(135deg,#7c3aed,#a78bfa)">AM</div>
+              <div>
+                <div class="testi-name">Aman Mehta</div>
+                <div class="testi-role">Remote Worker · Palam Vihar, Gurugram</div>
               </div>
             </div>
           </div>
         </div>
-      </section>
+      </div>
+    </section>
 
-      <!-- ══════════════ CTA BANNER ══════════════ -->
-      <section class="cta-banner" aria-label="Join GigLega">
-        <div class="container">
-          <div class="cta-inner fade-up">
-            <h2>Taiyar ho? Abhi shuru karo.</h2>
-            <p>
-              Gurugram mein kaam dhundh rahe ho ya hire karna chahte ho — GigLega par
-              register karo, free mein, aur apna pehla step lo.
-            </p>
-            <div class="cta-btns">
-              <a href="signup.html" class="btn-white">🚀 Free Mein Join Karo</a>
-              <a href="browse.html" class="btn-outline-white">🔍 Gigs Browse Karo</a>
+    <!-- ════════════════════════════
+         FAQ
+    ════════════════════════════ -->
+    <section class="section">
+      <div class="section-inner" style="max-width:760px">
+        <div style="text-align:center;margin-bottom:8px">
+          <div class="section-eyebrow">FAQ</div>
+          <h2 class="section-big-title">Common questions</h2>
+          <p class="section-desc" style="margin:0 auto">GigLega ke baare mein kuch sawaal hain? Yahan dekho.</p>
+        </div>
+
+        <div class="faq-list" id="faqList">
+
+          <div class="faq-item">
+            <button class="faq-q">
+              GigLega kya hai aur yeh kaise kaam karta hai?
+              <span class="faq-arrow">▼</span>
+            </button>
+            <div class="faq-a">
+              <div class="faq-a-inner">GigLega Gurugram ka hyperlocal gig platform hai jahan workers local part-time ya freelance kaam dhundh sakte hain, aur businesses apna kaam post karke suitable workers se directly connect kar sakte hain. Poora process free aur simple hai.</div>
             </div>
           </div>
+
+          <div class="faq-item">
+            <button class="faq-q">
+              Kya GigLega use karna free hai?
+              <span class="faq-arrow">▼</span>
+            </button>
+            <div class="faq-a">
+              <div class="faq-a-inner">Haan! GigLega workers aur clients dono ke liye completely free hai. Registration free, gig posting free, aur applying free. Sirf ek 6% support fee lagti hai jab kaam successfully complete ho jaata hai — aur woh bhi worker ki earning se kati hai.</div>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-q">
+              Kya GigLega sirf Gurugram ke liye hai?
+              <span class="faq-arrow">▼</span>
+            </button>
+            <div class="faq-a">
+              <div class="faq-a-inner">Abhi GigLega Gurugram mein focused hai, lekin jald hi Delhi, Noida, aur Faridabad mein bhi aayega. Gurugram waale pehle benefit uthao! Remote gigs ke liye koi location restriction nahi hai.</div>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-q">
+              Payment kaise hoti hai — safe hai kya?
+              <span class="faq-arrow">▼</span>
+            </button>
+            <div class="faq-a">
+              <div class="faq-a-inner">GigLega 3 payment options deta hai: (1) Pay After Completion — seedha worker ko kaam ke baad, (2) Secure Wallet — payment platform hold karta hai aur complete hone pe release hoti hai, (3) Cash — on-site cash payment. Sabse safe method hai GigLega Wallet jo escrow-style protection deta hai.</div>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-q">
+              Agar worker kaam complete na kare toh kya hoga?
+              <span class="faq-arrow">▼</span>
+            </button>
+            <div class="faq-a">
+              <div class="faq-a-inner">Agar Secure Wallet payment use kiya hai, toh payment automatic hold rehti hai — worker ko tabhi milti hai jab aap mark karo ki kaam complete hua. Problem hone pe Giglega.official@gmail.com ya WhatsApp +91 9319635257 pe contact karo. Hum mediate karne ki koshish karenge.</div>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-q">
+              Mujhe problem hai, kaise contact karein?
+              <span class="faq-arrow">▼</span>
+            </button>
+            <div class="faq-a">
+              <div class="faq-a-inner">Contact page par form fill karo ya directly WhatsApp par message karo: <a href="https://wa.me/919319635257" target="_blank" rel="noopener" style="color:var(--teal);font-weight:700">+91 93196 35257</a>. Hum jaldi reply karte hain — typically 1-2 ghante mein.</div>
+            </div>
+          </div>
+
         </div>
-      </section>
+      </div>
+    </section>
 
-    </main>
+    <!-- ════════════════════════════
+         CTA BANNER
+    ════════════════════════════ -->
+    <section class="section" style="padding-top:0">
+      <div class="section-inner">
+        <div class="cta-banner">
+          <h2>Taiyar ho? Abhi shuru karo.</h2>
+          <p>Gurugram mein kaam dhundh rahe ho ya hire karna chahte ho — GigLega par register karo, free mein, aur apna pehla step lo.</p>
+          <div class="cta-banner-actions">
+            <a href="login.html?tab=register" class="cta-btn-white">🚀 Free Mein Join Karo</a>
+            <a href="browse.html" class="cta-btn-outline-white">🔍 Gigs Browse Karo</a>
+          </div>
+        </div>
+      </div>
+    </section>
 
-    <footer id="footer"></footer>
+  </main>
 
-    <script>
-      document.addEventListener("DOMContentLoaded", function () {
-        document.querySelectorAll('[data-nav="home"]').forEach(function (el) {
-          el.classList.add("active");
-        });
+  <!-- ✅ Footer and toast anchors -->
+  <footer id="main-footer"></footer>
+  <div id="toast-container"></div>
+
+  <script>
+  (function () {
+
+    /* ── Live stats from localStorage ── */
+    function _getUser() {
+      try {
+        var u = JSON.parse(localStorage.getItem("gl_user") || "null");
+        return (u && u.id) ? u : null;
+      } catch(e) { return null; }
+    }
+
+    function animateCount(el, target, prefix, suffix) {
+      prefix = prefix || "";
+      suffix = suffix || "";
+      var start    = 0;
+      var duration = 1200;
+      var step     = 16;
+      var steps    = Math.ceil(duration / step);
+      var inc      = target / steps;
+      var current  = 0;
+      var timer    = setInterval(function () {
+        current += inc;
+        if (current >= target) {
+          current = target;
+          clearInterval(timer);
+        }
+        el.textContent = prefix + Math.floor(current) + suffix;
+      }, step);
+    }
+
+    function loadStats() {
+      var gigs  = JSON.parse(localStorage.getItem("gl_gigs")  || "[]");
+      var users = JSON.parse(localStorage.getItem("gl_users") || "[]");
+
+      /* Add demo floor counts so it doesn't look empty on first load */
+      var gigCount  = gigs.length  + 24;
+      var userCount = users.length + 87;
+
+      var gigEl  = document.getElementById("statGigs");
+      var userEl = document.getElementById("statUsers");
+      if (gigEl)  animateCount(gigEl,  gigCount);
+      if (userEl) animateCount(userEl, userCount);
+    }
+
+    /* ── Ticker ── */
+    function buildTicker() {
+      var gigs  = JSON.parse(localStorage.getItem("gl_gigs") || "[]");
+      var demos = [
+        "🛵 Delivery needed · Sector 56 · ₹250/hr",
+        "💻 Data entry · Remote · ₹200/hr",
+        "🧹 House cleaning · DLF Phase 1 · ₹300/hr",
+        "📚 Maths tutor · Palam Vihar · ₹350/hr",
+        "📦 Shifting help · Sohna Road · ₹400/hr",
+        "🎨 Logo design · Remote · ₹500/hr",
+        "🔧 Plumber needed · Sector 14 · ₹280/hr",
+        "📸 Event photographer · Golf Course Rd · ₹600/hr",
+        "🍳 Home chef · Unitech · ₹450/hr",
+        "⚡ Electrician · Sector 23 · ₹300/hr"
+      ];
+
+      var live = gigs.filter(function (g) {
+        return g.status === "open";
+      }).slice(0, 6).map(function (g) {
+        return "🟢 " + g.title + " · " + (g.city || "Gurugram") + " · ₹" + g.pricePerHr + "/hr";
       });
-    </script>
-  </body>
+
+      var items = live.length ? live.concat(demos) : demos;
+      /* Duplicate for seamless loop */
+      var all   = items.concat(items);
+
+      var wrap = document.getElementById("tickerInner");
+      if (wrap) {
+        wrap.innerHTML = all.map(function (t) {
+          return '<span class="ticker-item">' + escHtml(t) + ' &nbsp;&nbsp; ·</span>';
+        }).join("");
+      }
+    }
+
+    function escHtml(s) {
+      return String(s || "")
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;");
+    }
+
+    /* ── How It Works tab switcher ── */
+    document.querySelectorAll(".how-tab").forEach(function (tab) {
+      tab.addEventListener("click", function () {
+        document.querySelectorAll(".how-tab").forEach(function (t) { t.classList.remove("active"); });
+        document.querySelectorAll(".how-panel").forEach(function (p) { p.classList.remove("active"); });
+        tab.classList.add("active");
+        var target = tab.getAttribute("data-how") === "worker" ? "howWorker" : "howPoster";
+        document.getElementById(target).classList.add("active");
+      });
+    });
+
+    /* ── FAQ accordion ── */
+    document.querySelectorAll(".faq-q").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var answer  = btn.nextElementSibling;
+        var isOpen  = answer.classList.contains("open");
+
+        /* Close all */
+        document.querySelectorAll(".faq-q").forEach(function (b) { b.classList.remove("open"); });
+        document.querySelectorAll(".faq-a").forEach(function (a) { a.classList.remove("open"); });
+
+        /* Toggle clicked */
+        if (!isOpen) {
+          btn.classList.add("open");
+          answer.classList.add("open");
+        }
+      });
+    });
+
+    /* ── Redirect logged-in user away from hero CTAs ── */
+    var user = _getUser();
+    if (user) {
+      var joinBtn = document.querySelector('a[href="login.html?tab=register"]');
+      if (joinBtn) {
+        joinBtn.href        = "dashboard-worker.html";
+        joinBtn.textContent = "⚡ My Dashboard";
+      }
+    }
+
+    /* ── Init ── */
+    loadStats();
+    buildTicker();
+
+  })();
+  </script>
+
+</body>
 </html>
