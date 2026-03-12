@@ -1,964 +1,527 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Post a Gig — GigLega</title>
-    <meta
-      name="description"
-      content="GigLega par apna gig post karo. Gurugram ke local workers se turant connect ho jao. Bilkul free."
-    />
-    <link rel="stylesheet" href="styles.css" />
-    <script defer src="shared.js"></script>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Post a Gig — GigLega</title>
+  <meta name="description" content="GigLega par apna gig post karo. Gurugram ke local workers se turant connect ho jao. Bilkul free." />
+  <link rel="stylesheet" href="styles.css" />
+  <script defer src="shared.js"></script>
+  <style>
+    /* ── Page wrapper ── */
+    .pg-wrap{max-width:720px;margin:0 auto;padding:32px 16px 80px}
+    .pg-title{font-size:1.7rem;font-weight:800;color:var(--primary);margin-bottom:4px}
+    .pg-sub{color:var(--gray-500);font-size:.95rem;margin-bottom:32px}
 
-    <style>
-      /* ── Page layout ─────────────────────────────── */
-      .post-wrap {
-        padding: clamp(28px, 5vw, 52px) 0 clamp(48px, 8vw, 80px);
-      }
+    /* ── Card ── */
+    .form-card{background:var(--surface);border:1px solid var(--gray-200);border-radius:var(--radius);padding:28px 24px;margin-bottom:24px;box-shadow:var(--shadow-sm)}
+    .card-title{font-size:1.05rem;font-weight:700;color:var(--primary);margin-bottom:18px;display:flex;align-items:center;gap:8px}
 
-      .post-grid {
-        display: grid;
-        gap: 24px;
-        align-items: start;
-      }
+    /* ── Toggle pills (Hyperlocal / Remote) ── */
+    .type-toggle{display:flex;gap:10px;margin-bottom:24px;flex-wrap:wrap}
+    .type-btn{flex:1;min-width:140px;padding:12px 16px;border-radius:var(--radius-sm);border:2px solid var(--gray-200);background:var(--surface);color:var(--gray-600);font-weight:600;font-size:.92rem;cursor:pointer;transition:all .2s;text-align:center}
+    .type-btn.active{border-color:var(--teal);background:var(--teal);color:#fff}
+    .type-btn:hover:not(.active){border-color:var(--teal);color:var(--teal)}
 
-      /* ── Form card ───────────────────────────────── */
-      .form-card {
-        padding: clamp(24px, 4vw, 40px);
-        border: 1px solid var(--border);
-        border-radius: 24px;
-        background: #fff;
-      }
+    /* ── Form fields ── */
+    .field{margin-bottom:20px}
+    .field label{display:block;font-weight:600;font-size:.9rem;color:var(--gray-700);margin-bottom:6px}
+    .field label span.req{color:var(--danger)}
+    .field input,.field select,.field textarea{width:100%;padding:11px 14px;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);font-size:.93rem;background:var(--surface);color:var(--text);font-family:inherit;transition:border .2s;box-sizing:border-box}
+    .field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--teal)}
+    .field textarea{resize:vertical;min-height:100px}
+    .char-count{font-size:.78rem;color:var(--gray-400);text-align:right;margin-top:3px}
 
-      .form-card h2 {
-        margin: 0 0 6px;
-        font-size: 1.4rem;
-      }
+    /* ── Price section ── */
+    .price-suggest{background:var(--gray-50);border:1.5px solid var(--teal);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:16px}
+    .price-suggest .ps-label{font-size:.8rem;color:var(--teal);font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+    .price-suggest .ps-value{font-size:1.4rem;font-weight:800;color:var(--primary);margin:2px 0}
+    .price-suggest .ps-range{font-size:.82rem;color:var(--gray-500)}
+    .price-suggest .ps-popular{font-size:.8rem;color:var(--accent);font-weight:600;margin-top:3px}
 
-      .form-card > p {
-        margin: 0 0 28px;
-        color: var(--text-muted);
-        font-size: 0.95rem;
-      }
+    .price-options{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+    .price-chip{padding:8px 18px;border-radius:20px;border:1.5px solid var(--gray-200);background:var(--surface);color:var(--gray-600);font-weight:600;font-size:.88rem;cursor:pointer;transition:all .2s}
+    .price-chip.selected{border-color:var(--accent);background:var(--accent);color:#fff}
+    .price-chip:hover:not(.selected){border-color:var(--accent);color:var(--accent)}
 
-      /* ── Section dividers ────────────────────────── */
-      .form-section {
-        margin-bottom: 28px;
-      }
+    .custom-price-wrap{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+    .custom-price-wrap input{max-width:160px}
+    .custom-price-wrap span{font-weight:600;color:var(--gray-500);font-size:.9rem}
 
-      .form-section-title {
-        font-size: 0.8rem;
-        font-weight: 800;
-        text-transform: uppercase;
-        letter-spacing: 0.07em;
-        color: var(--text-muted);
-        margin: 0 0 16px;
-        padding-bottom: 10px;
-        border-bottom: 1px solid var(--border);
-      }
+    .price-warning{background:#fef2f2;border:1px solid #fecaca;border-radius:var(--radius-sm);padding:10px 14px;font-size:.85rem;color:#dc2626;display:none;margin-top:8px}
+    .price-warning.show{display:block}
 
-      /* ── Form groups ─────────────────────────────── */
-      .form-group {
-        margin-bottom: 18px;
-      }
+    /* ── Earnings preview ── */
+    .earnings-preview{background:linear-gradient(135deg,var(--primary) 0%,var(--teal) 100%);border-radius:var(--radius-sm);padding:14px 18px;color:#fff;margin-top:12px;display:none}
+    .earnings-preview.show{display:block}
+    .ep-row{display:flex;justify-content:space-between;font-size:.88rem;margin-bottom:4px;opacity:.85}
+    .ep-row.total{font-weight:800;font-size:1rem;opacity:1;margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,.3)}
 
-      .form-group label {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        font-weight: 700;
-        font-size: 0.93rem;
-        margin-bottom: 7px;
-      }
+    /* ── Payment toggle ── */
+    .pay-options{display:flex;flex-direction:column;gap:10px}
+    .pay-option{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;border:2px solid var(--gray-200);border-radius:var(--radius-sm);cursor:pointer;transition:all .2s}
+    .pay-option.selected{border-color:var(--teal);background:var(--teal-light, rgba(13,148,136,.06))}
+    .pay-option input[type=radio]{margin-top:2px;accent-color:var(--teal);width:16px;height:16px;flex-shrink:0}
+    .pay-option-body .pay-title{font-weight:700;font-size:.93rem;color:var(--text)}
+    .pay-option-body .pay-desc{font-size:.81rem;color:var(--gray-500);margin-top:2px;line-height:1.4}
+    .pay-badge{font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:10px;margin-left:6px;background:var(--teal);color:#fff;vertical-align:middle}
 
-      .form-group label .req {
-        color: #ef4444;
-        font-weight: 900;
-      }
+    .cash-note{background:rgba(245,158,11,.1);border:1px solid var(--accent);border-radius:var(--radius-sm);padding:10px 14px;font-size:.83rem;color:var(--gray-700);margin-top:10px;display:none;line-height:1.5}
+    .cash-note.show{display:block}
 
-      .form-group label .hint {
-        font-weight: 400;
-        color: var(--text-muted);
-        font-size: 0.85rem;
-      }
+    /* ── Location field ── */
+    #locationGroup{display:none}
+    #locationGroup.show{display:block}
 
-      .form-group input,
-      .form-group textarea,
-      .form-group select {
-        width: 100%;
-        padding: 12px 14px;
-        border: 1.5px solid var(--border);
-        border-radius: 13px;
-        font-size: 0.97rem;
-        font-family: inherit;
-        color: var(--text);
-        background: #fff;
-        outline: none;
-        transition: border-color 0.18s, box-shadow 0.18s;
-        resize: vertical;
-      }
+    /* ── Submit ── */
+    .submit-area{text-align:center;padding-top:8px}
+    .btn-post{background:linear-gradient(135deg,var(--primary) 0%,var(--teal) 100%);color:#fff;border:none;padding:15px 48px;border-radius:var(--radius-sm);font-size:1rem;font-weight:800;cursor:pointer;transition:transform .15s,box-shadow .15s;box-shadow:0 4px 14px rgba(13,148,136,.35)}
+    .btn-post:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(13,148,136,.45)}
+    .btn-post:disabled{opacity:.6;transform:none;cursor:not-allowed}
 
-      .form-group input:focus,
-      .form-group textarea:focus,
-      .form-group select:focus {
-        border-color: var(--teal);
-        box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
-      }
+    /* ── Dark mode patches ── */
+    [data-theme=dark] .price-suggest{background:var(--gray-800);border-color:var(--teal)}
+    [data-theme=dark] .price-chip{background:var(--gray-800);border-color:var(--gray-600);color:var(--gray-300)}
+    [data-theme=dark] .pay-option{border-color:var(--gray-600)}
+    [data-theme=dark] .pay-option.selected{background:rgba(13,148,136,.12);border-color:var(--teal)}
+    [data-theme=dark] .cash-note{background:rgba(245,158,11,.08);color:var(--gray-300)}
+    [data-theme=dark] .price-warning{background:rgba(239,68,68,.1);color:#f87171;border-color:rgba(239,68,68,.3)}
+    [data-theme=dark] .form-card{border-color:var(--gray-700)}
+    [data-theme=dark] .type-btn{border-color:var(--gray-600);color:var(--gray-300);background:var(--gray-800)}
+  </style>
+</head>
+<body>
+  <div id="announce-bar"></div>
+  <nav id="main-nav"></nav>
 
-      .form-group input.error,
-      .form-group textarea.error,
-      .form-group select.error {
-        border-color: #ef4444;
-      }
+  <main class="page-wrapper">
+    <div class="pg-wrap">
+      <h1 class="pg-title">📝 Kaam Post Karein!</h1>
+      <p class="pg-sub">Describe your task and get matched with a skilled worker near you.</p>
 
-      .form-group input.success,
-      .form-group textarea.success,
-      .form-group select.success {
-        border-color: #22c55e;
-      }
+      <!-- Breadcrumb -->
+      <nav id="breadcrumb" aria-label="breadcrumb"></nav>
 
-      .char-count {
-        display: block;
-        margin-top: 4px;
-        font-size: 0.8rem;
-        color: var(--text-muted);
-        text-align: right;
-      }
+      <form id="postGigForm" novalidate>
 
-      /* ── Row layout ──────────────────────────────── */
-      .form-row {
-        display: grid;
-        gap: 16px;
-      }
-
-      /* ── Category chips ──────────────────────────── */
-      .cat-chips {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-      }
-
-      .cat-chip {
-        padding: 8px 14px;
-        border: 1.5px solid var(--border);
-        border-radius: 40px;
-        background: #fff;
-        cursor: pointer;
-        font-size: 0.88rem;
-        font-weight: 600;
-        color: var(--text);
-        transition: border-color 0.15s, background 0.15s, color 0.15s;
-        user-select: none;
-      }
-
-      .cat-chip:hover {
-        border-color: var(--teal);
-        color: var(--teal);
-      }
-
-      .cat-chip.selected {
-        border-color: var(--teal);
-        background: rgba(13, 148, 136, 0.08);
-        color: var(--teal);
-        font-weight: 800;
-      }
-
-      /* ── Requirements dynamic list ───────────────── */
-      .req-list {
-        display: grid;
-        gap: 8px;
-        margin-bottom: 10px;
-      }
-
-      .req-item {
-        display: flex;
-        gap: 8px;
-        align-items: center;
-      }
-
-      .req-item input {
-        flex: 1;
-        padding: 9px 12px;
-        border: 1.5px solid var(--border);
-        border-radius: 10px;
-        font-size: 0.9rem;
-        font-family: inherit;
-        outline: none;
-        color: var(--text);
-        background: #fff;
-        transition: border-color 0.16s;
-      }
-
-      .req-item input:focus {
-        border-color: var(--teal);
-      }
-
-      .req-remove {
-        width: 32px;
-        height: 32px;
-        border-radius: 8px;
-        border: 1px solid var(--border);
-        background: #fff;
-        cursor: pointer;
-        font-size: 1rem;
-        color: #ef4444;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-        transition: background 0.14s;
-      }
-
-      .req-remove:hover {
-        background: #fef2f2;
-      }
-
-      /* ── Urgent toggle ───────────────────────────── */
-      .toggle-row {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 14px 16px;
-        border: 1.5px solid var(--border);
-        border-radius: 13px;
-        cursor: pointer;
-        transition: border-color 0.16s;
-      }
-
-      .toggle-row:hover {
-        border-color: var(--teal);
-      }
-
-      .toggle-row-text strong {
-        display: block;
-        font-size: 0.95rem;
-      }
-
-      .toggle-row-text span {
-        font-size: 0.83rem;
-        color: var(--text-muted);
-      }
-
-      .toggle-switch {
-        position: relative;
-        width: 44px;
-        height: 24px;
-        flex-shrink: 0;
-      }
-
-      .toggle-switch input {
-        opacity: 0;
-        width: 0;
-        height: 0;
-        position: absolute;
-      }
-
-      .toggle-track {
-        position: absolute;
-        inset: 0;
-        background: #d1d5db;
-        border-radius: 12px;
-        transition: background 0.22s;
-        cursor: pointer;
-      }
-
-      .toggle-track::before {
-        content: "";
-        position: absolute;
-        left: 3px;
-        top: 3px;
-        width: 18px;
-        height: 18px;
-        background: #fff;
-        border-radius: 50%;
-        transition: transform 0.22s;
-        box-shadow: 0 1px 4px rgba(0,0,0,.18);
-      }
-
-      .toggle-switch input:checked + .toggle-track {
-        background: var(--teal);
-      }
-
-      .toggle-switch input:checked + .toggle-track::before {
-        transform: translateX(20px);
-      }
-
-      /* ── Preview card ────────────────────────────── */
-      .preview-sidebar {
-        display: grid;
-        gap: 16px;
-        align-content: start;
-      }
-
-      .preview-card {
-        padding: 20px 18px;
-        border: 1px solid var(--border);
-        border-radius: 22px;
-        background: #fff;
-        display: grid;
-        gap: 12px;
-      }
-
-      .preview-card h4 {
-        margin: 0 0 2px;
-        font-size: 0.85rem;
-        font-weight: 800;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        color: var(--text-muted);
-      }
-
-      .preview-title {
-        font-size: 1.1rem;
-        font-weight: 800;
-        color: var(--text);
-        min-height: 1.4em;
-        word-break: break-word;
-      }
-
-      .preview-company {
-        font-size: 0.88rem;
-        color: var(--text-muted);
-      }
-
-      .preview-badges {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 6px;
-      }
-
-      .preview-meta {
-        display: grid;
-        gap: 5px;
-        font-size: 0.88rem;
-        color: var(--text-muted);
-      }
-
-      .preview-desc {
-        font-size: 0.88rem;
-        color: var(--text-muted);
-        line-height: 1.55;
-        min-height: 2em;
-        word-break: break-word;
-      }
-
-      /* ── Tips card ───────────────────────────────── */
-      .tips-card {
-        padding: 20px 18px;
-        border: 1px solid var(--border);
-        border-radius: 18px;
-        background: rgba(13, 148, 136, 0.03);
-      }
-
-      .tips-card h4 {
-        margin: 0 0 12px;
-        font-size: 0.95rem;
-        font-weight: 800;
-      }
-
-      .tips-card ul {
-        margin: 0;
-        padding-left: 16px;
-        display: grid;
-        gap: 7px;
-      }
-
-      .tips-card li {
-        font-size: 0.88rem;
-        color: var(--text-muted);
-        line-height: 1.5;
-      }
-
-      /* ── Submit area ─────────────────────────────── */
-      .submit-row {
-        display: flex;
-        gap: 12px;
-        flex-wrap: wrap;
-        align-items: center;
-        padding-top: 10px;
-        border-top: 1px solid var(--border);
-        margin-top: 8px;
-      }
-
-      /* ── Success screen ──────────────────────────── */
-      .success-screen {
-        padding: clamp(40px, 6vw, 72px) 0;
-        text-align: center;
-      }
-
-      .success-icon {
-        font-size: 3.5rem;
-        margin-bottom: 16px;
-      }
-
-      .success-screen h2 {
-        margin: 0 0 10px;
-        font-size: 1.8rem;
-      }
-
-      .success-screen p {
-        margin: 0 0 28px;
-        color: var(--text-muted);
-        max-width: 44ch;
-        margin-left: auto;
-        margin-right: auto;
-        line-height: 1.65;
-      }
-
-      .success-actions {
-        display: flex;
-        gap: 12px;
-        justify-content: center;
-        flex-wrap: wrap;
-      }
-
-      /* ── Responsive ──────────────────────────────── */
-      @media (min-width: 640px) {
-        .form-row {
-          grid-template-columns: repeat(2, 1fr);
-        }
-      }
-
-      @media (min-width: 1024px) {
-        .post-grid {
-          grid-template-columns: minmax(0, 1.4fr) 300px;
-        }
-
-        .preview-sidebar {
-          position: sticky;
-          top: 100px;
-        }
-      }
-    </style>
-  </head>
-
-  <body>
-    <div id="announce-bar"></div>
-    <div id="navbar"></div>
-
-    <main>
-      <div class="post-wrap">
-        <div class="container">
-
-          <!-- Breadcrumb -->
-          <div id="postBreadcrumb" class="fade-up" style="margin-bottom:18px;"></div>
-
-          <!-- Page heading -->
-          <div class="fade-up" style="margin-bottom:28px;">
-            <span class="badge badge-teal">🆓 Free to Post</span>
-            <h1 style="margin:10px 0 6px;font-size:clamp(1.7rem,3vw,2.4rem);letter-spacing:-0.03em;">
-              Post a Gig
-            </h1>
-            <p style="margin:0;color:var(--text-muted);max-width:52ch;">
-              Gurugram ke local workers tak pahuncho. Form bharo, gig live ho jayegi — bilkul free.
-            </p>
+        <!-- ── STEP 1: Gig Type Toggle ── -->
+        <div class="form-card">
+          <div class="card-title">🗂️ What kind of help do you need?</div>
+          <div class="type-toggle">
+            <button type="button" class="type-btn active" data-type="hyperlocal" id="btnHyperlocal">
+              📍 Hyperlocal <br><small style="font-weight:400;font-size:.78rem">On-site / In-person work</small>
+            </button>
+            <button type="button" class="type-btn" data-type="remote" id="btnRemote">
+              💻 Remote <br><small style="font-weight:400;font-size:.78rem">Online / Digital work</small>
+            </button>
           </div>
 
-          <!-- Main grid — form + sidebar -->
-          <div class="post-grid" id="postGrid">
-
-            <!-- ══ FORM ══ -->
-            <div class="form-card fade-up" id="gigFormWrap">
-              <h2>Gig Details</h2>
-              <p>Saari fields * se marked hain woh required hain.</p>
-
-              <form id="gigForm" novalidate autocomplete="off">
-
-                <!-- ── Section 1: Basic Info ── -->
-                <div class="form-section">
-                  <p class="form-section-title">📋 Basic Info</p>
-
-                  <div class="form-group">
-                    <label for="gigTitle">
-                      Gig Title <span class="req">*</span>
-                      <span class="hint">— Short aur clear</span>
-                    </label>
-                    <input
-                      type="text"
-                      id="gigTitle"
-                      placeholder="e.g. Delivery Boy Chahiye — Evening Shift"
-                      maxlength="80"
-                    />
-                    <span class="char-count" id="gigTitleCount"></span>
-                  </div>
-
-                  <div class="form-group">
-                    <label for="gigCompany">
-                      Your Name / Company <span class="req">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      id="gigCompany"
-                      placeholder="e.g. Rahul Sharma ya FreshBox Groceries"
-                      maxlength="80"
-                    />
-                  </div>
-
-                  <div class="form-group">
-                    <label>
-                      Category <span class="req">*</span>
-                    </label>
-                    <div class="cat-chips" id="catChips">
-                      <button type="button" class="cat-chip" data-cat="delivery">🚴 Delivery</button>
-                      <button type="button" class="cat-chip" data-cat="teaching">📚 Teaching</button>
-                      <button type="button" class="cat-chip" data-cat="tech">💻 Tech</button>
-                      <button type="button" class="cat-chip" data-cat="domestic">🏠 Domestic</button>
-                      <button type="button" class="cat-chip" data-cat="event">🎉 Events</button>
-                      <button type="button" class="cat-chip" data-cat="content">🎬 Content</button>
-                      <button type="button" class="cat-chip" data-cat="sales">📣 Sales</button>
-                      <button type="button" class="cat-chip" data-cat="general">💼 General</button>
-                    </div>
-                    <input type="hidden" id="gigCategory" />
-                    <div id="gigCategoryFeedback" style="font-size:0.85rem;margin-top:6px;"></div>
-                  </div>
-
-                  <div class="form-group">
-                    <label for="gigDesc">
-                      Description <span class="req">*</span>
-                      <span class="hint">— Kya kaam karna hai, clearly explain karo</span>
-                    </label>
-                    <textarea
-                      id="gigDesc"
-                      rows="4"
-                      placeholder="Batao kya kaam hai, kitne ghante, kab se start hoga, aur kya expectations hain..."
-                      maxlength="500"
-                    ></textarea>
-                    <span class="char-count" id="gigDescCount"></span>
-                  </div>
-                </div>
-
-                <!-- ── Section 2: Location & Pay ── -->
-                <div class="form-section">
-                  <p class="form-section-title">📍 Location & Pay</p>
-
-                  <div class="form-row">
-                    <div class="form-group">
-                      <label for="gigLocation">
-                        Location <span class="req">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        id="gigLocation"
-                        placeholder="e.g. Sector 29, Gurugram"
-                        maxlength="80"
-                      />
-                    </div>
-
-                    <div class="form-group">
-                      <label for="gigType">
-                        Gig Type <span class="req">*</span>
-                      </label>
-                      <select id="gigType">
-                        <option value="">— Select type —</option>
-                        <option value="Daily">Daily</option>
-                        <option value="Weekly">Weekly</option>
-                        <option value="Monthly">Monthly</option>
-                        <option value="Project">Project / One-time</option>
-                        <option value="One-day">One-day</option>
-                        <option value="Part-time">Part-time</option>
-                        <option value="Full-time">Full-time</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div class="form-row">
-                    <div class="form-group">
-                      <label for="gigBudget">
-                        Budget (₹) <span class="req">*</span>
-                        <span class="hint">— Numbers only</span>
-                      </label>
-                      <input
-                        type="number"
-                        id="gigBudget"
-                        placeholder="e.g. 600"
-                        min="0"
-                        max="999999"
-                      />
-                    </div>
-
-                    <div class="form-group">
-                      <label for="gigPhone">
-                        Your Phone <span class="req">*</span>
-                        <span class="hint">— Workers ko connect ke liye</span>
-                      </label>
-                      <input
-                        type="tel"
-                        id="gigPhone"
-                        placeholder="+91 98765 43210"
-                        data-phone
-                        maxlength="15"
-                        autocomplete="tel"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <!-- ── Section 3: Requirements ── -->
-                <div class="form-section">
-                  <p class="form-section-title">✅ Requirements <span style="font-weight:400;text-transform:none;letter-spacing:0;">(optional)</span></p>
-
-                  <div class="req-list" id="reqList"></div>
-
-                  <button type="button" class="btn btn-outline btn-sm" id="addReqBtn">
-                    + Add Requirement
-                  </button>
-                </div>
-
-                <!-- ── Section 4: Options ── -->
-                <div class="form-section">
-                  <p class="form-section-title">⚙️ Options</p>
-
-                  <label class="toggle-row" for="gigUrgent">
-                    <div class="toggle-row-text">
-                      <strong>🔥 Mark as Urgent</strong>
-                      <span>Urgent badge milega — zyada applications aati hain</span>
-                    </div>
-                    <div class="toggle-switch">
-                      <input type="checkbox" id="gigUrgent" />
-                      <span class="toggle-track"></span>
-                    </div>
-                  </label>
-                </div>
-
-                <!-- ── Submit ── -->
-                <div class="submit-row">
-                  <button type="submit" class="btn btn-primary" id="postSubmitBtn">
-                    🚀 Post Gig — Free Mein
-                  </button>
-                  <button type="button" class="btn btn-outline" id="resetFormBtn">
-                    Clear Form
-                  </button>
-                  <span style="font-size:0.83rem;color:var(--text-muted);">
-                    Posting free hai, koi charges nahi.
-                  </span>
-                </div>
-
-              </form>
-            </div>
-
-            <!-- ══ SIDEBAR ══ -->
-            <aside class="preview-sidebar">
-
-              <!-- Live preview -->
-              <div class="preview-card card fade-up" id="previewCard">
-                <h4>👁️ Live Preview</h4>
-                <div>
-                  <div class="preview-title" id="prevTitle">Gig title yahan dikhai dega...</div>
-                  <div class="preview-company" id="prevCompany">Company / Name</div>
-                </div>
-                <div class="preview-badges" id="prevBadges">
-                  <span class="badge">Category</span>
-                  <span class="badge badge-teal">Type</span>
-                </div>
-                <div class="preview-meta" id="prevMeta">
-                  <span>📍 Location</span>
-                  <span>💸 Budget</span>
-                </div>
-                <div class="preview-desc" id="prevDesc">
-                  Description yahan preview hogi...
-                </div>
-              </div>
-
-              <!-- Tips -->
-              <div class="tips-card fade-up">
-                <h4>💡 Better response ke liye tips</h4>
-                <ul>
-                  <li>Title clear rakho — job type + shift clearly likho</li>
-                  <li>Budget realistic rakho — unfair pay pe applications kam aati hain</li>
-                  <li>Location specific do — "Gurugram" nahi, "Sector 29" likho</li>
-                  <li>Requirements precisely likho taaki unqualified apply na karein</li>
-                  <li>Urgent mark karo agar aaj ya kal chahiye</li>
-                </ul>
-              </div>
-
-              <!-- Trust badges -->
-              <div class="preview-card fade-up" style="gap:10px;">
-                <h4>🛡️ GigLega Promise</h4>
-                <div style="display:grid;gap:8px;font-size:0.88rem;color:var(--text-muted);">
-                  <span>✅ Posting 100% free</span>
-                  <span>✅ Gig turant live ho jayegi</span>
-                  <span>✅ Direct worker connect</span>
-                  <span>✅ Koi middleman commission nahi</span>
-                </div>
-              </div>
-
-            </aside>
+          <!-- Category -->
+          <div class="field">
+            <label for="gigCategory">Category <span class="req">*</span></label>
+            <select id="gigCategory" required>
+              <option value="">— Select a category —</option>
+            </select>
           </div>
 
-          <!-- ══ SUCCESS SCREEN (hidden by default) ══ -->
-          <div id="successScreen" style="display:none;">
-            <div class="success-screen">
-              <div class="success-icon">🎉</div>
-              <h2>Gig Post Ho Gayi!</h2>
-              <p>
-                Teri gig ab Gurugram ke workers dekh sakte hain.
-                Applications aane shuru hongi — dashboard se track karo.
-              </p>
-              <div class="success-actions">
-                <a href="browse.html" class="btn btn-primary">Browse Live Gigs</a>
-                <a href="dashboard.html" class="btn btn-secondary">My Dashboard</a>
-                <button class="btn btn-outline" id="postAnotherBtn">Post Another Gig</button>
-              </div>
-            </div>
+          <!-- Gig Title -->
+          <div class="field">
+            <label for="gigTitle">Gig Title <span class="req">*</span></label>
+            <input type="text" id="gigTitle" maxlength="80" placeholder="e.g. Ghar ki safai chahiye | Logo design | Wifi setup" required />
+            <div class="char-count"><span id="titleCount">0</span>/80</div>
           </div>
 
+          <!-- Description -->
+          <div class="field">
+            <label for="gigDesc">Description <span class="req">*</span></label>
+            <textarea id="gigDesc" maxlength="500" placeholder="Describe exactly what needs to be done, tools/skills needed, and any special requirements..." required></textarea>
+            <div class="char-count"><span id="descCount">0</span>/500</div>
+          </div>
+
+          <!-- Location (Hyperlocal only) -->
+          <div class="field" id="locationGroup">
+            <label for="gigLocation">Your Location <span class="req">*</span></label>
+            <input type="text" id="gigLocation" placeholder="e.g. Sector 45, Gurugram" />
+          </div>
         </div>
-      </div>
-    </main>
 
-    <footer id="footer"></footer>
+        <!-- ── STEP 2: Pricing ── -->
+        <div class="form-card">
+          <div class="card-title">💰 Set Your Budget (per hour)</div>
 
-    <script>
-      /* ── Auth guard — redirect guests to signup ── */
-      document.addEventListener("DOMContentLoaded", function () {
-        if (!isLoggedIn()) {
-          requireAuth("post-gig.html");
-        }
+          <!-- Auto-suggest box -->
+          <div class="price-suggest" id="priceSuggestBox">
+            <div class="ps-label">✨ GigLega Suggested Price</div>
+            <div class="ps-value" id="suggestedPrice">₹300/hr</div>
+            <div class="ps-range" id="suggestedRange">Typical range: ₹250 – ₹400</div>
+            <div class="ps-popular" id="popularPrice">🔥 Most users in your area pay ₹280–₹320</div>
+          </div>
+
+          <!-- Price chips -->
+          <div style="font-size:.85rem;color:var(--gray-500);margin-bottom:10px">You can adjust this price:</div>
+          <div class="price-options" id="priceChips"></div>
+
+          <!-- Custom price input -->
+          <div class="custom-price-wrap">
+            <input type="number" id="customPrice" placeholder="Enter custom price" min="150" max="5000" />
+            <span>₹ / hour</span>
+          </div>
+          <div class="price-warning" id="priceWarning">
+            ⚠️ Minimum price for this gig type is <span id="minPriceLabel">₹150</span>/hr. Please increase your rate.
+          </div>
+
+          <!-- Earnings preview for POSTER -->
+          <div class="earnings-preview" id="earningsPreview">
+            <div class="ep-row"><span>Gig Price (1 hr)</span><span id="ep-gig">₹0</span></div>
+            <div class="ep-row"><span>GigLega Support Fee (6%)</span><span id="ep-fee">–₹0</span></div>
+            <div class="ep-row total"><span>Worker Receives</span><span id="ep-worker">₹0</span></div>
+          </div>
+        </div>
+
+        <!-- ── STEP 3: Payment ── -->
+        <div class="form-card">
+          <div class="card-title">💳 Payment Preference</div>
+          <div class="pay-options">
+
+            <label class="pay-option selected" id="payOptAfter">
+              <input type="radio" name="payType" value="after" checked />
+              <div class="pay-option-body">
+                <div class="pay-title">Pay After Completion <span class="pay-badge">Recommended</span></div>
+                <div class="pay-desc">Pay the worker once the gig is done. Safe and trusted by most users. <em>"Kaam ho jaaye, fir paise."</em></div>
+              </div>
+            </label>
+
+            <label class="pay-option" id="payOptNow">
+              <input type="radio" name="payType" value="now" />
+              <div class="pay-option-body">
+                <div class="pay-title">Pay Now (Secure Escrow) 🔒</div>
+                <div class="pay-desc">Money is held safely by GigLega and released to the worker only after you confirm completion. Best for new workers.</div>
+              </div>
+            </label>
+
+            <label class="pay-option" id="payOptCash">
+              <input type="radio" name="payType" value="cash" />
+              <div class="pay-option-body">
+                <div class="pay-title">Cash Payment 💵</div>
+                <div class="pay-desc">Pay the worker directly in cash. A small GigLega support fee will be collected digitally after the gig is completed.</div>
+              </div>
+            </label>
+
+          </div>
+
+          <!-- Cash note -->
+          <div class="cash-note" id="cashNote" aria-live="polite">
+            💡 <strong>Cash gig flow:</strong> You pay the worker in cash (e.g. ₹300). After completion, you'll receive a prompt to pay the GigLega support fee (<strong id="cashFeeLabel">₹18</strong>) via UPI/card. This keeps the platform running for everyone.
+          </div>
+        </div>
+
+        <!-- ── STEP 4: Contact ── -->
+        <div class="form-card">
+          <div class="card-title">📞 Your Contact Details</div>
+          <div class="field">
+            <label for="posterName">Your Name <span class="req">*</span></label>
+            <input type="text" id="posterName" placeholder="Enter your name" required />
+          </div>
+          <div class="field">
+            <label for="posterPhone">WhatsApp / Phone <span class="req">*</span></label>
+            <input type="tel" id="posterPhone" placeholder="+91 98765 43210" required />
+          </div>
+        </div>
+
+        <!-- ── Submit ── -->
+        <div class="submit-area">
+          <button type="submit" class="btn-post" id="submitBtn">🚀 Post Gig Abhi!</button>
+          <p style="font-size:.8rem;color:var(--gray-400);margin-top:12px">By posting, you agree to GigLega's <a href="terms.html" style="color:var(--teal)">Terms</a> & <a href="trust-safety.html" style="color:var(--teal)">Trust & Safety</a> guidelines.</p>
+        </div>
+
+      </form>
+    </div>
+  </main>
+
+  <footer id="main-footer"></footer>
+  <div id="toast-container"></div>
+
+  <script>
+  (function () {
+
+    /* ── Category data ── */
+    var CATEGORIES = {
+      hyperlocal: [
+        { value: "house-help",    label: "🧹 House Help (cleaning, organizing)", min: 150, suggested: 250, low: 200, high: 400, popular: "₹230–₹270" },
+        { value: "errands",       label: "🛒 Errands (grocery pickup, delivery)",  min: 150, suggested: 200, low: 150, high: 300, popular: "₹180–₹220" },
+        { value: "moving-help",   label: "📦 Lifting / Moving Help",               min: 300, suggested: 350, low: 300, high: 600, popular: "₹320–₹380" },
+        { value: "handyman",      label: "🔧 Handyman (basic repairs)",             min: 300, suggested: 400, low: 350, high: 700, popular: "₹370–₹430" },
+        { value: "tech-help",     label: "💻 Tech Help (phone setup, wifi)",        min: 300, suggested: 350, low: 300, high: 600, popular: "₹320–₹380" },
+        { value: "elderly-care",  label: "🧓 Elderly Assistance",                  min: 150, suggested: 300, low: 250, high: 450, popular: "₹270–₹330" },
+        { value: "pet-care",      label: "🐕 Pet Care / Dog Walking",              min: 150, suggested: 250, low: 200, high: 400, popular: "₹220–₹280" },
+        { value: "tutoring",      label: "📚 Study Help / Tutoring",               min: 300, suggested: 400, low: 300, high: 800, popular: "₹350–₹450" },
+        { value: "event-help",    label: "🎉 Event Help",                           min: 150, suggested: 300, low: 250, high: 500, popular: "₹270–₹330" },
+        { value: "gardening",     label: "🏡 Gardening",                            min: 150, suggested: 300, low: 250, high: 450, popular: "₹270–₹330" },
+        { value: "deep-cleaning", label: "🧼 Deep Cleaning",                       min: 300, suggested: 450, low: 400, high: 800, popular: "₹420–₹480" },
+        { value: "driver",        label: "🚗 Driver (short trips)",                min: 300, suggested: 400, low: 350, high: 700, popular: "₹370–₹430" }
+      ],
+      remote: [
+        { value: "logo-design",    label: "🎨 Logo Design",          min: 300, suggested: 600, low: 400, high: 1200, popular: "₹500–₹700" },
+        { value: "video-editing",  label: "🎬 Video Editing",         min: 300, suggested: 500, low: 350, high: 1000, popular: "₹400–₹600" },
+        { value: "web-dev",        label: "🌐 Web Development",       min: 300, suggested: 700, low: 500, high: 1500, popular: "₹600–₹800" },
+        { value: "content-writing",label: "✍️ Content Writing",       min: 150, suggested: 300, low: 200, high: 600,  popular: "₹250–₹350" },
+        { value: "social-media",   label: "📱 Social Media Management",min: 150, suggested: 400, low: 300, high: 800, popular: "₹350–₹450" },
+        { value: "data-entry",     label: "📊 Data Entry",            min: 150, suggested: 200, low: 150, high: 400,  popular: "₹180–₹220" },
+        { value: "graphic-design", label: "🖼️ Graphic Design",        min: 300, suggested: 500, low: 350, high: 1000, popular: "₹400–₹600" },
+        { value: "voiceover",      label: "🎙️ Voiceover",             min: 150, suggested: 400, low: 300, high: 800,  popular: "₹350–₹450" },
+        { value: "translation",    label: "🌍 Translation",           min: 150, suggested: 350, low: 250, high: 700,  popular: "₹300–₹400" },
+        { value: "customer-support",label:"🎧 Customer Support",      min: 150, suggested: 250, low: 200, high: 500,  popular: "₹220–₹280" }
+      ]
+    };
+
+    var PLATFORM_FEE = 0.06;
+    var currentType = "hyperlocal";
+    var currentCat  = null;
+    var selectedPrice = 0;
+
+    /* ── DOM refs ── */
+    var form         = document.getElementById("postGigForm");
+    var catSelect    = document.getElementById("gigCategory");
+    var titleInput   = document.getElementById("gigTitle");
+    var descInput    = document.getElementById("gigDesc");
+    var customInput  = document.getElementById("customPrice");
+    var locationGrp  = document.getElementById("locationGroup");
+    var priceChips   = document.getElementById("priceChips");
+    var suggestedPriceEl = document.getElementById("suggestedPrice");
+    var suggestedRangeEl = document.getElementById("suggestedRange");
+    var popularPriceEl   = document.getElementById("popularPrice");
+    var priceWarning = document.getElementById("priceWarning");
+    var minPriceLabel= document.getElementById("minPriceLabel");
+    var earningsPreview = document.getElementById("earningsPreview");
+    var cashNote     = document.getElementById("cashNote");
+    var cashFeeLabel = document.getElementById("cashFeeLabel");
+    var submitBtn    = document.getElementById("submitBtn");
+    var posterName   = document.getElementById("posterName");
+    var posterPhone  = document.getElementById("posterPhone");
+
+    /* ── Auto-fill from logged in user ── */
+    if (typeof getCurrentUser === "function") {
+      var u = getCurrentUser();
+      if (u) {
+        if (u.name)  posterName.value  = u.name;
+        if (u.phone) posterPhone.value = u.phone;
+      }
+    }
+
+    /* ── Breadcrumb ── */
+    if (typeof buildBreadcrumb === "function") {
+      buildBreadcrumb("breadcrumb", [
+        { label: "Home", href: "index.html" },
+        { label: "Post a Gig" }
+      ]);
+    }
+
+    /* ── Type toggle ── */
+    document.getElementById("btnHyperlocal").addEventListener("click", function () { setType("hyperlocal"); });
+    document.getElementById("btnRemote").addEventListener("click",     function () { setType("remote"); });
+
+    function setType(type) {
+      currentType = type;
+      currentCat  = null;
+      document.getElementById("btnHyperlocal").classList.toggle("active", type === "hyperlocal");
+      document.getElementById("btnRemote").classList.toggle("active",     type === "remote");
+      locationGrp.classList.toggle("show", type === "hyperlocal");
+      buildCategorySelect();
+      resetPricing();
+    }
+
+    /* ── Build category <select> ── */
+    function buildCategorySelect() {
+      var list = CATEGORIES[currentType];
+      catSelect.innerHTML = "<option value=''>— Select a category —</option>";
+      list.forEach(function (c, i) {
+        var opt = document.createElement("option");
+        opt.value = c.value;
+        opt.textContent = (i < 6 ? "" : "") + c.label;
+        catSelect.appendChild(opt);
+      });
+    }
+
+    catSelect.addEventListener("change", function () {
+      var list = CATEGORIES[currentType];
+      currentCat = list.find(function (c) { return c.value === catSelect.value; }) || null;
+      updatePricingUI();
+    });
+
+    /* ── Price UI ── */
+    function updatePricingUI() {
+      if (!currentCat) { resetPricing(); return; }
+      var c = currentCat;
+      suggestedPriceEl.textContent = "₹" + c.suggested + "/hr";
+      suggestedRangeEl.textContent = "Typical range: ₹" + c.low + " – ₹" + c.high;
+      popularPriceEl.textContent   = "🔥 Most users in your area pay " + c.popular;
+
+      // Build 3 chips: low, suggested, slightly above
+      var opts = [c.low, c.suggested, Math.min(c.high, c.suggested + Math.round(c.suggested * 0.2))];
+      priceChips.innerHTML = "";
+      opts.forEach(function (val) {
+        var chip = document.createElement("button");
+        chip.type = "button";
+        chip.className = "price-chip" + (val === c.suggested ? " selected" : "");
+        chip.textContent = "₹" + val + "/hr";
+        chip.dataset.val = val;
+        chip.addEventListener("click", function () {
+          document.querySelectorAll(".price-chip").forEach(function (ch) { ch.classList.remove("selected"); });
+          chip.classList.add("selected");
+          customInput.value = "";
+          setSelectedPrice(val);
+        });
+        priceChips.appendChild(chip);
       });
 
-      /* ── Live preview updater ─────────────────── */
-      var selectedCategory = "";
-      var reqCount = 0;
+      setSelectedPrice(c.suggested);
+      customInput.value = "";
+    }
 
-      function updatePreview() {
-        var title   = document.getElementById("gigTitle").value.trim();
-        var company = document.getElementById("gigCompany").value.trim();
-        var loc     = document.getElementById("gigLocation").value.trim();
-        var type    = document.getElementById("gigType").value;
-        var budget  = document.getElementById("gigBudget").value.trim();
-        var desc    = document.getElementById("gigDesc").value.trim();
-        var urgent  = document.getElementById("gigUrgent").checked;
+    function resetPricing() {
+      suggestedPriceEl.textContent = "₹—";
+      suggestedRangeEl.textContent = "Select a category to see pricing";
+      popularPriceEl.textContent   = "";
+      priceChips.innerHTML = "";
+      earningsPreview.classList.remove("show");
+      priceWarning.classList.remove("show");
+      selectedPrice = 0;
+    }
 
-        document.getElementById("prevTitle").textContent   = title   || "Gig title yahan dikhai dega...";
-        document.getElementById("prevCompany").textContent = company || "Company / Name";
-        document.getElementById("prevDesc").textContent    = desc    ? truncateText(desc, 120) : "Description yahan preview hogi...";
+    function setSelectedPrice(val) {
+      selectedPrice = val;
+      validatePrice();
+      updateEarningsPreview();
+      updateCashNote();
+    }
 
-        var badgesHtml =
-          '<span class="badge">' + (selectedCategory
-            ? selectedCategory.charAt(0).toUpperCase() + selectedCategory.slice(1)
-            : "Category") + '</span>' +
-          '<span class="badge badge-teal">' + (type || "Type") + '</span>' +
-          (urgent ? '<span class="badge badge-amber">🔥 Urgent</span>' : "");
-
-        document.getElementById("prevBadges").innerHTML = badgesHtml;
-
-        var budgetFormatted = budget && !isNaN(Number(budget))
-          ? formatCurrency(Number(budget))
-          : (budget || "Budget");
-
-        document.getElementById("prevMeta").innerHTML =
-          "<span>📍 " + (loc || "Location") + "</span>" +
-          "<span>💸 " + budgetFormatted + " / " + (type || "Type") + "</span>";
+    customInput.addEventListener("input", function () {
+      var val = parseInt(customInput.value, 10);
+      if (!isNaN(val) && val > 0) {
+        document.querySelectorAll(".price-chip").forEach(function (ch) { ch.classList.remove("selected"); });
+        setSelectedPrice(val);
       }
+    });
 
-      /* ── Char counters ────────────────────────── */
-      function wireCounter(inputId, countId, max) {
-        var input   = document.getElementById(inputId);
-        var counter = document.getElementById(countId);
-        if (!input || !counter) return;
-        function update() {
-          counter.textContent = input.value.length + " / " + max;
-        }
-        input.addEventListener("input", function () { update(); updatePreview(); });
-        update();
+    function validatePrice() {
+      if (!currentCat || !selectedPrice) return;
+      var minP = currentCat.min;
+      minPriceLabel.textContent = "₹" + minP;
+      if (selectedPrice < minP) {
+        priceWarning.classList.add("show");
+      } else {
+        priceWarning.classList.remove("show");
       }
+    }
 
-      /* ── Category chip selection ──────────────── */
-      document.getElementById("catChips").addEventListener("click", function (e) {
-        var chip = e.target.closest(".cat-chip");
-        if (!chip) return;
-        document.querySelectorAll(".cat-chip").forEach(function (c) {
-          c.classList.remove("selected");
-        });
-        chip.classList.add("selected");
-        selectedCategory = chip.getAttribute("data-cat");
-        document.getElementById("gigCategory").value = selectedCategory;
-        var fb = document.getElementById("gigCategoryFeedback");
-        fb.textContent = "";
-        updatePreview();
+    function updateEarningsPreview() {
+      if (!selectedPrice) { earningsPreview.classList.remove("show"); return; }
+      var fee    = Math.round(selectedPrice * PLATFORM_FEE);
+      var worker = selectedPrice - fee;
+      document.getElementById("ep-gig").textContent    = "₹" + selectedPrice;
+      document.getElementById("ep-fee").textContent    = "–₹" + fee;
+      document.getElementById("ep-worker").textContent = "₹" + worker;
+      earningsPreview.classList.add("show");
+    }
+
+    function updateCashNote() {
+      var radios = document.querySelectorAll('input[name="payType"]');
+      var payVal = "after";
+      radios.forEach(function (r) { if (r.checked) payVal = r.value; });
+      if (payVal === "cash" && selectedPrice) {
+        var fee = Math.round(selectedPrice * PLATFORM_FEE);
+        cashFeeLabel.textContent = "₹" + fee;
+        cashNote.classList.add("show");
+      } else {
+        cashNote.classList.remove("show");
+      }
+    }
+
+    /* ── Payment option styling ── */
+    document.querySelectorAll('.pay-option input[type=radio]').forEach(function (radio) {
+      radio.addEventListener("change", function () {
+        document.querySelectorAll(".pay-option").forEach(function (el) { el.classList.remove("selected"); });
+        radio.closest(".pay-option").classList.add("selected");
+        updateCashNote();
       });
+    });
 
-      /* ── Requirements builder ─────────────────── */
-      function addRequirement(value) {
-        reqCount++;
-        var list = document.getElementById("reqList");
-        var item = document.createElement("div");
-        item.className = "req-item";
-        item.dataset.reqId = reqCount;
-        item.innerHTML =
-          '<input type="text" placeholder="e.g. Apni bike honi chahiye" maxlength="100" value="' +
-          (value ? value.replace(/"/g, "&quot;") : "") + '" />' +
-          '<button type="button" class="req-remove" aria-label="Remove requirement">✕</button>';
+    /* ── Char counters ── */
+    titleInput.addEventListener("input", function () {
+      document.getElementById("titleCount").textContent = titleInput.value.length;
+    });
+    descInput.addEventListener("input", function () {
+      document.getElementById("descCount").textContent = descInput.value.length;
+    });
 
-        item.querySelector(".req-remove").addEventListener("click", function () {
-          item.remove();
-        });
+    /* ── Form submit ── */
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
 
-        list.appendChild(item);
-        item.querySelector("input").focus();
+      /* Basic validation */
+      if (!catSelect.value)   { showToast("Please select a category.", "error"); return; }
+      if (!titleInput.value.trim()) { showToast("Please enter a gig title.", "error"); return; }
+      if (!descInput.value.trim())  { showToast("Please add a description.", "error"); return; }
+      if (!selectedPrice || selectedPrice < (currentCat ? currentCat.min : 150)) {
+        showToast("Please set a valid price above the minimum.", "error"); return;
       }
-
-      document.getElementById("addReqBtn").addEventListener("click", function () {
-        addRequirement("");
-      });
-
-      /* ── Reset form ───────────────────────────── */
-      function resetForm() {
-        document.getElementById("gigForm").reset();
-        document.getElementById("gigCategory").value = "";
-        selectedCategory = "";
-        document.querySelectorAll(".cat-chip").forEach(function (c) {
-          c.classList.remove("selected");
-        });
-        document.getElementById("reqList").innerHTML = "";
-        document.getElementById("gigCategoryFeedback").textContent = "";
-        ["gigTitle","gigCompany","gigDesc","gigLocation","gigType","gigBudget","gigPhone"].forEach(function (id) {
-          clearFieldState(id);
-        });
-        updatePreview();
+      if (currentType === "hyperlocal" && !document.getElementById("gigLocation").value.trim()) {
+        showToast("Please enter your location for on-site gigs.", "error"); return;
       }
+      if (!posterName.value.trim())  { showToast("Please enter your name.", "error"); return; }
+      if (!posterPhone.value.trim()) { showToast("Please enter your phone number.", "error"); return; }
 
-      document.getElementById("resetFormBtn").addEventListener("click", function () {
-        if (confirm("Form clear karna chahte ho?")) resetForm();
-      });
+      /* Get payment type */
+      var payType = "after";
+      document.querySelectorAll('input[name="payType"]').forEach(function (r) { if (r.checked) payType = r.value; });
 
-      /* ── Form submit ──────────────────────────── */
-      document.getElementById("gigForm").addEventListener("submit", function (e) {
-        e.preventDefault();
+      var fee    = Math.round(selectedPrice * PLATFORM_FEE);
+      var worker = selectedPrice - fee;
 
-        /* Category manual check */
-        if (!selectedCategory) {
-          var fb = document.getElementById("gigCategoryFeedback");
-          fb.textContent = "❌ Category select karo";
-          fb.style.color = "#ef4444";
-          fb.style.fontWeight = "700";
-          document.getElementById("catChips").scrollIntoView({ behavior: "smooth", block: "center" });
-          return;
-        }
+      /* Build gig object */
+      var gig = {
+        id:          "gig_" + Date.now(),
+        postedAt:    new Date().toISOString(),
+        status:      "open",          // open | taken | completed
+        takenAt:     null,
+        takenBy:     null,
+        type:        currentType,
+        category:    catSelect.value,
+        categoryLabel: catSelect.options[catSelect.selectedIndex].text,
+        title:       titleInput.value.trim(),
+        description: descInput.value.trim(),
+        location:    currentType === "hyperlocal" ? document.getElementById("gigLocation").value.trim() : "Remote",
+        pricePerHr:  selectedPrice,
+        platformFee: fee,
+        workerPay:   worker,
+        payType:     payType,
+        posterName:  posterName.value.trim(),
+        posterPhone: posterPhone.value.trim(),
+        posterId:    (typeof getCurrentUser === "function" && getCurrentUser()) ? getCurrentUser().id : null
+      };
 
-        /* Shared validateForm */
-        var result = validateForm({
-          gigTitle: {
-            required: true, label: "Gig Title",
-            minLength: 5, maxLength: 80
-          },
-          gigCompany: {
-            required: true, label: "Name / Company",
-            minLength: 2, maxLength: 80
-          },
-          gigDesc: {
-            required: true, label: "Description",
-            minLength: 20, maxLength: 500
-          },
-          gigLocation: {
-            required: true, label: "Location",
-            minLength: 3, maxLength: 80
-          },
-          gigType: {
-            required: true, label: "Gig Type"
-          },
-          gigBudget: {
-            required: true, label: "Budget",
-            pattern: /^\d+(\.\d{1,2})?$/,
-            patternMsg: "Valid amount dalo (numbers only)"
-          },
-          gigPhone: {
-            required: true, label: "Phone",
-            pattern: /^[6-9]\d{9}$|^\+91\s?[6-9]\d{4}\s?\d{5}$/,
-            patternMsg: "Valid Indian mobile number dalo"
-          }
-        });
+      /* Save to localStorage */
+      var key  = (typeof GL !== "undefined" && GL.STORAGE_KEY_GIGS) ? GL.STORAGE_KEY_GIGS : "gl_gigs";
+      var gigs = JSON.parse(localStorage.getItem(key) || "[]");
+      gigs.unshift(gig);
+      localStorage.setItem(key, JSON.stringify(gigs));
 
-        if (!result.valid) {
-          var firstErr = document.querySelector(".error");
-          if (firstErr) firstErr.scrollIntoView({ behavior: "smooth", block: "center" });
-          return;
-        }
-
-        /* Collect requirements */
-        var requirements = [];
-        document.querySelectorAll("#reqList .req-item input").forEach(function (inp) {
-          var v = inp.value.trim();
-          if (v) requirements.push(v);
-        });
-
-        var btn  = document.getElementById("postSubmitBtn");
-        var user = getCurrentUser() || {};
-        setButtonLoading(btn, "Posting...");
-
+      /* Feedback */
+      setButtonLoading && setButtonLoading(submitBtn, true, "Posting...");
+      setTimeout(function () {
+        setButtonLoading && setButtonLoading(submitBtn, false);
+        showToast && showToast("🎉 Gig posted successfully!", "success");
         setTimeout(function () {
-          var entry = saveGig({
-            title:        document.getElementById("gigTitle").value.trim(),
-            company:      document.getElementById("gigCompany").value.trim(),
-            clientName:   document.getElementById("gigCompany").value.trim(),
-            description:  document.getElementById("gigDesc").value.trim(),
-            category:     selectedCategory,
-            location:     document.getElementById("gigLocation").value.trim(),
-            type:         document.getElementById("gigType").value,
-            budget:       Number(document.getElementById("gigBudget").value),
-            phone:        document.getElementById("gigPhone").value.trim(),
-            urgent:       document.getElementById("gigUrgent").checked,
-            requirements: requirements,
-            userId:       user.id    || "",
-            userEmail:    user.email || ""
-          });
+          window.location.href = "browse.html";
+        }, 1200);
+      }, 900);
+    });
 
-          resetButton(btn);
-          showSuccessScreen(entry);
-        }, 800);
-      });
+    /* ── Init ── */
+    buildCategorySelect();
+    setType("hyperlocal");
 
-      /* ── Success screen ───────────────────────── */
-      function showSuccessScreen(entry) {
-        document.getElementById("postGrid").style.display      = "none";
-        document.getElementById("successScreen").style.display = "block";
-        window.scrollTo({ top: 0, behavior: "smooth" });
-
-        /* Update title link if gig has id */
-        if (entry && entry.id) {
-          var browseBtn = document.querySelector(".success-actions a[href='browse.html']");
-          if (browseBtn) {
-            browseBtn.href = "gig-detail.html?id=" + encodeURIComponent(entry.id);
-            browseBtn.textContent = "View My Gig";
-          }
-        }
-      }
-
-      document.getElementById("postAnotherBtn").addEventListener("click", function () {
-        document.getElementById("postGrid").style.display      = "";
-        document.getElementById("successScreen").style.display = "none";
-        resetForm();
-        window.scrollTo({ top: 0, behavior: "smooth" });
-      });
-
-      /* ── Boot ─────────────────────────────────── */
-      document.addEventListener("DOMContentLoaded", function () {
-        buildBreadcrumb("postBreadcrumb", [
-          { label: "Home",      href: "index.html"  },
-          { label: "Post a Gig" }
-        ]);
-
-        wireCounter("gigTitle", "gigTitleCount", 80);
-        wireCounter("gigDesc",  "gigDescCount",  500);
-
-        /* Wire all non-counter inputs to update preview */
-        ["gigCompany","gigLocation","gigType","gigBudget","gigUrgent"].forEach(function (id) {
-          var el = document.getElementById(id);
-          if (el) {
-            el.addEventListener(el.tagName === "SELECT" ? "change" : "input", updatePreview);
-          }
-        });
-
-        document.getElementById("gigUrgent").addEventListener("change", updatePreview);
-
-        /* Pre-fill phone from logged-in user */
-        var user = getCurrentUser() || {};
-        if (user.phone) document.getElementById("gigPhone").value = user.phone;
-        if (user.name)  document.getElementById("gigCompany").value = user.name;
-
-        updatePreview();
-      });
-    </script>
-  </body>
+  })();
+  </script>
+</body>
 </html>
