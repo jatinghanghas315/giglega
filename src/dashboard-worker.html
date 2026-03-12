@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Worker Dashboard — GigLega</title>
+    <meta name="description" content="GigLega worker dashboard — apni applications track karo aur profile update karo." />
+    <link rel="stylesheet" href="styles.css" />
+    <script defer src="shared.js"></script>
+
+    <style>
+      /* ── Dashboard shell ─────────────────────── */
+      .dash-wrap { padding: clamp(24px,4vw,44px) 0 clamp(48px,8vw,80px); }
+
+      .dash-grid {
+        display: grid;
+        gap: 24px;
+      }
+
+      /* ── Sidebar ─────────────────────────────── */
+      .dash-sidebar {
+        display: grid;
+        gap: 12px;
+        align-content: start;
+      }
+
+      .user-card {
+        padding: 22px 18px;
+        border: 1px solid var(--border);
+        border-radius: 22px;
+        background: #fff;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        text-align: center;
+      }
+
+      .user-avatar-lg {
+        width: 64px; height: 64px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--teal), #0369a1);
+        color: #fff;
+        font-size: 1.5rem;
+        font-weight: 900;
+        display: flex; align-items: center; justify-content: center;
+        flex-shrink: 0;
+      }
+
+      .user-card h3 { margin: 0; font-size: 1.05rem; }
+      .user-card p  { margin: 0; font-size: 0.85rem; color: var(--text-muted); }
+
+      .profile-bar-wrap {
+        width: 100%;
+        background: #e5e7eb;
+        border-radius: 99px;
+        height: 8px;
+        overflow: hidden;
+      }
+
+      .profile-bar-fill {
+        height: 100%;
+        border-radius: 99px;
+        background: linear-gradient(90deg, var(--teal), #0ea5e9);
+        transition: width 0.6s ease;
+      }
+
+      .profile-bar-label {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        font-weight: 700;
+      }
+
+      .sidebar-nav {
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        overflow: hidden;
+      }
+
+      .sidebar-nav-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 13px 18px;
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: var(--text-muted);
+        cursor: pointer;
+        border: none;
+        background: none;
+        width: 100%;
+        text-align: left;
+        border-bottom: 1px solid var(--border);
+        transition: background 0.14s, color 0.14s;
+      }
+
+      .sidebar-nav-item:last-child { border-bottom: none; }
+
+      .sidebar-nav-item:hover { background: #f8fafc; color: var(--text); }
+
+      .sidebar-nav-item.active {
+        background: rgba(13,148,136,0.07);
+        color: var(--teal);
+        border-left: 3px solid var(--teal);
+      }
+
+      .sidebar-nav-item .nav-icon { font-size: 1.1rem; flex-shrink: 0; }
+
+      .sidebar-nav-item .nav-badge {
+        margin-left: auto;
+        background: var(--teal);
+        color: #fff;
+        font-size: 0.72rem;
+        font-weight: 800;
+        padding: 2px 7px;
+        border-radius: 99px;
+        min-width: 20px;
+        text-align: center;
+      }
+
+      /* ── Main content ────────────────────────── */
+      .dash-main { min-width: 0; }
+
+      .dashboard-panel { display: none; }
+      .dashboard-panel.active { display: block; }
+
+      .panel-header {
+        margin-bottom: 22px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+
+      .panel-header h2 { margin: 0; font-size: 1.35rem; }
+      .panel-header p  { margin: 4px 0 0; color: var(--text-muted); font-size: 0.9rem; }
+
+      /* ── Stat strip ──────────────────────────── */
+      .stat-strip {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        margin-bottom: 24px;
+      }
+
+      .stat-cell {
+        padding: 18px 16px;
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        background: #fff;
+      }
+
+      .stat-cell-label {
+        font-size: 0.78rem;
+        font-weight: 700;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        margin-bottom: 4px;
+      }
+
+      .stat-cell-value {
+        font-size: 1.8rem;
+        font-weight: 900;
+        letter-spacing: -0.04em;
+        color: var(--teal);
+        line-height: 1;
+      }
+
+      /* ── Application card ────────────────────── */
+      .app-card {
+        padding: 18px;
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        background: #fff;
+        display: grid;
+        gap: 10px;
+        margin-bottom: 12px;
+        transition: box-shadow 0.16s;
+      }
+
+      .app-card:hover { box-shadow: 0 4px 16px rgba(13,148,136,0.09); }
+
+      .app-card-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .app-card h4 { margin: 0; font-size: 1rem; }
+      .app-card-company { font-size: 0.85rem; color: var(--text-muted); }
+
+      .app-card-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        font-size: 0.83rem;
+        color: var(--text-muted);
+      }
+
+      .app-status-badge {
+        padding: 3px 10px;
+        border-radius: 99px;
+        font-size: 0.78rem;
+        font-weight: 800;
+        flex-shrink: 0;
+      }
+
+      .app-status-badge.applied   { background: #eff6ff; color: #2563eb; }
+      .app-status-badge.shortlisted { background: #f0fdf4; color: #16a34a; }
+      .app-status-badge.rejected  { background: #fef2f2; color: #dc2626; }
+
+      /* ── Empty state ─────────────────────────── */
+      .empty-state {
+        padding: 48px 24px;
+        text-align: center;
+        border: 1.5px dashed var(--border);
+        border-radius: 18px;
+        background: #fafafa;
+      }
+
+      .empty-state .empty-icon { font-size: 2.5rem; margin-bottom: 12px; }
+      .empty-state h3 { margin: 0 0 8px; font-size: 1.05rem; }
+      .empty-state p  { margin: 0 0 20px; color: var(--text-muted); font-size: 0.9rem; }
+
+      /* ── Profile form ────────────────────────── */
+      .profile-form-grid {
+        display: grid;
+        gap: 16px;
+      }
+
+      .form-group { margin-bottom: 0; }
+
+      .form-group label {
+        display: block;
+        font-weight: 700;
+        font-size: 0.9rem;
+        margin-bottom: 6px;
+      }
+
+      .form-group input,
+      .form-group select,
+      .form-group textarea {
+        width: 100%;
+        padding: 11px 14px;
+        border: 1.5px solid var(--border);
+        border-radius: 12px;
+        font-size: 0.95rem;
+        font-family: inherit;
+        color: var(--text);
+        background: #fff;
+        outline: none;
+        resize: vertical;
+        transition: border-color 0.18s, box-shadow 0.18s;
+      }
+
+      .form-group input:focus,
+      .form-group select:focus,
+      .form-group textarea:focus {
+        border-color: var(--teal);
+        box-shadow: 0 0 0 3px rgba(13,148,136,0.1);
+      }
+
+      /* ── Responsive ──────────────────────────── */
+      @media (min-width: 640px) {
+        .stat-strip { grid-template-columns: repeat(3, 1fr); }
+        .profile-form-grid { grid-template-columns: 1fr 1fr; }
+      }
+
+      @media (min-width: 1024px) {
+        .dash-grid { grid-template-columns: 240px minmax(0,1fr); }
+        .dash-sidebar { position: sticky; top: 100px; align-self: start; }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="announce-bar"></div>
+    <div id="navbar"></div>
+
+    <main>
+      <div class="dash-wrap">
+        <div class="container">
+          <div id="dashBreadcrumb" class="fade-up" style="margin-bottom:18px;"></div>
+
+          <div class="dash-grid" id="dashGrid">
+
+            <!-- ══ SIDEBAR ══ -->
+            <aside class="dash-sidebar">
+
+              <div class="user-card card fade-up" id="userCard">
+                <div class="user-avatar-lg" id="userAvatarLg">U</div>
+                <div>
+                  <h3 id="userCardName">Loading...</h3>
+                  <p id="userCardRole">Worker</p>
+                  <p id="userCardLocation" style="margin-top:2px;"></p>
+                </div>
+                <div style="width:100%;">
+                  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
+                    <span class="profile-bar-label">Profile Completion</span>
+                    <span class="profile-bar-label" id="profilePct">0%</span>
+                  </div>
+                  <div class="profile-bar-wrap">
+                    <div class="profile-bar-fill" id="profileBar" style="width:0%"></div>
+                  </div>
+                </div>
+              </div>
+
+              <nav class="sidebar-nav fade-up" aria-label="Dashboard navigation">
+                <button class="sidebar-nav-item" data-panel="overview">
+                  <span class="nav-icon">🏠</span> Overview
+                </button>
+                <button class="sidebar-nav-item" data-panel="applications">
+                  <span class="nav-icon">📋</span> My Applications
+                  <span class="nav-badge" id="appCountBadge">0</span>
+                </button>
+                <button class="sidebar-nav-item" data-panel="profile">
+                  <span class="nav-icon">👤</span> Edit Profile
+                </button>
+                <button class="sidebar-nav-item" data-panel="settings">
+                  <span class="nav-icon">⚙️</span> Settings
+                </button>
+              </nav>
+
+            </aside>
+
+            <!-- ══ MAIN PANELS ══ -->
+            <div class="dash-main">
+
+              <!-- ── Overview panel ── -->
+              <div class="dashboard-panel" id="overview">
+                <div class="panel-header fade-up">
+                  <div>
+                    <h2 id="greetingText">Namaste! 👋</h2>
+                    <p>Yahan dekho apna application status aur naye gigs explore karo.</p>
+                  </div>
+                  <a href="browse.html" class="btn btn-primary btn-sm">🔍 Browse Gigs</a>
+                </div>
+
+                <div class="stat-strip fade-up" id="workerStats"></div>
+
+                <div class="fade-up" style="margin-bottom:22px;">
+                  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+                    <h3 style="margin:0;font-size:1.05rem;">Recent Applications</h3>
+                    <button class="btn btn-outline btn-sm" data-panel-goto="applications">View All</button>
+                  </div>
+                  <div id="recentAppsOverview"></div>
+                </div>
+              </div>
+
+              <!-- ── Applications panel ── -->
+              <div class="dashboard-panel" id="applications">
+                <div class="panel-header fade-up">
+                  <div>
+                    <h2>My Applications</h2>
+                    <p>Tune jinpe apply kiya hai — saari yahan hain.</p>
+                  </div>
+                  <a href="browse.html" class="btn btn-primary btn-sm">+ Apply More</a>
+                </div>
+                <div id="allApplicationsList" class="fade-up"></div>
+              </div>
+
+              <!-- ── Profile panel ── -->
+              <div class="dashboard-panel" id="profile">
+                <div class="panel-header fade-up">
+                  <div>
+                    <h2>Edit Profile</h2>
+                    <p>Profile jitni complete hogi — utni zyada chances milenge.</p>
+                  </div>
+                </div>
+                <div class="card fade-up" style="padding:clamp(20px,3vw,32px);">
+                  <form id="profileForm" novalidate>
+                    <div class="profile-form-grid">
+                      <div class="form-group">
+                        <label for="pfName">Full Name *</label>
+                        <input type="text" id="pfName" maxlength="80" />
+                      </div>
+                      <div class="form-group">
+                        <label for="pfEmail">Email *</label>
+                        <input type="email" id="pfEmail" maxlength="100" readonly
+                          style="background:#f8fafc;cursor:not-allowed;" />
+                      </div>
+                      <div class="form-group">
+                        <label for="pfPhone">Phone *</label>
+                        <input type="tel" id="pfPhone" data-phone maxlength="15" />
+                      </div>
+                      <div class="form-group">
+                        <label for="pfLocation">Location</label>
+                        <input type="text" id="pfLocation" placeholder="e.g. Sector 29, Gurugram" maxlength="80" />
+                      </div>
+                      <div class="form-group" style="grid-column:1/-1;">
+                        <label for="pfBio">Bio / About</label>
+                        <textarea id="pfBio" rows="3" placeholder="Apne baare mein kuch batao — skills, experience, availability..." maxlength="300"></textarea>
+                      </div>
+                      <div class="form-group" style="grid-column:1/-1;">
+                        <label for="pfSkills">Skills <span style="font-weight:400;color:var(--text-muted);">(comma separated)</span></label>
+                        <input type="text" id="pfSkills" placeholder="e.g. Delivery, Driving, Teaching" maxlength="200" />
+                      </div>
+                    </div>
+                    <div style="margin-top:20px;display:flex;gap:10px;flex-wrap:wrap;">
+                      <button type="submit" class="btn btn-primary" id="saveProfileBtn">Save Profile</button>
+                      <button type="button" class="btn btn-outline" id="cancelProfileBtn">Cancel</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+
+              <!-- ── Settings panel ── -->
+              <div class="dashboard-panel" id="settings">
+                <div class="panel-header fade-up">
+                  <h2>Settings</h2>
+                </div>
+                <div class="card fade-up" style="padding:clamp(20px,3vw,32px);display:grid;gap:16px;">
+                  <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border);">
+                    <div>
+                      <strong style="display:block;">Dark Mode</strong>
+                      <span style="font-size:0.85rem;color:var(--text-muted);">Theme toggle karo</span>
+                    </div>
+                    <button class="btn btn-outline btn-sm" data-theme-toggle>Toggle</button>
+                  </div>
+                  <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border);">
+                    <div>
+                      <strong style="display:block;">Switch to Client</strong>
+                      <span style="font-size:0.85rem;color:var(--text-muted);">Gigs post karna chahte ho?</span>
+                    </div>
+                    <button class="btn btn-outline btn-sm" id="switchToClientBtn">Switch</button>
+                  </div>
+                  <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;">
+                    <div>
+                      <strong style="display:block;color:#ef4444;">Logout</strong>
+                      <span style="font-size:0.85rem;color:var(--text-muted);">Is device se log out karo</span>
+                    </div>
+                    <button class="btn btn-outline btn-sm" style="color:#ef4444;border-color:#ef4444;" id="dashLogoutBtn">Logout</button>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer id="footer"></footer>
+
+    <script>
+      /* ─────────────────────────────────────────────
+         HELPERS
+      ───────────────────────────────────────────── */
+      function escH(v) {
+        return String(v == null ? "" : v)
+          .replace(/&/g,"&amp;").replace(/</g,"&lt;")
+          .replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+      }
+
+      function safeS(v, fb) {
+        var s = String(v == null ? "" : v).trim();
+        return s || (fb || "");
+      }
+
+      /* ─────────────────────────────────────────────
+         RENDER HELPERS
+      ───────────────────────────────────────────── */
+      function appStatusBadge(status) {
+        var map = {
+          applied:     { cls: "applied",     label: "Applied" },
+          shortlisted: { cls: "shortlisted", label: "Shortlisted ✅" },
+          rejected:    { cls: "rejected",    label: "Rejected" }
+        };
+        var s = map[status] || map.applied;
+        return '<span class="app-status-badge ' + s.cls + '">' + s.label + '</span>';
+      }
+
+      function renderAppCard(app, compact) {
+        var title   = safeS(app.gigTitle,  "Gig");
+        var company = safeS(app.company,   "Client");
+        var loc     = safeS(app.location,  "Gurugram");
+        var budget  = typeof app.budget === "number"
+          ? formatCurrency(app.budget) : safeS(app.budget, "—");
+        var time    = app.appliedAt ? formatRelativeTime(app.appliedAt) : "—";
+
+        return '<div class="app-card">' +
+          '<div class="app-card-top">' +
+            '<div>' +
+              '<h4>' + escH(title) + '</h4>' +
+              '<div class="app-card-company">' + escH(company) + '</div>' +
+            '</div>' +
+            appStatusBadge(app.status || "applied") +
+          '</div>' +
+          '<div class="app-card-meta">' +
+            '<span>📍 ' + escH(loc) + '</span>' +
+            '<span>💸 ' + escH(String(budget)) + '</span>' +
+            '<span>🕒 ' + escH(time) + '</span>' +
+          '</div>' +
+          (!compact && app.message
+            ? '<p style="margin:0;font-size:0.87rem;color:var(--text-muted);font-style:italic;">"' + escH(truncateText(app.message, 100)) + '"</p>'
+            : '') +
+          '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
+            (app.gigId
+              ? '<a href="gig-detail.html?id=' + encodeURIComponent(app.gigId) + '" class="btn btn-outline btn-sm">View Gig</a>'
+              : '') +
+          '</div>' +
+        '</div>';
+      }
+
+      function renderEmptyState(icon, title, text, btnHtml) {
+        return '<div class="empty-state">' +
+          '<div class="empty-icon">' + icon + '</div>' +
+          '<h3>' + title + '</h3>' +
+          '<p>' + text + '</p>' +
+          (btnHtml || '') +
+          '</div>';
+      }
+
+      /* ─────────────────────────────────────────────
+         LOAD DASHBOARD DATA
+      ───────────────────────────────────────────── */
+      function loadDashboard() {
+        var user = getCurrentUser();
+        if (!user) return;
+
+        /* User card */
+        document.getElementById("userAvatarLg").textContent  = getInitials(user.name);
+        document.getElementById("userCardName").textContent  = safeS(user.name, "User");
+        document.getElementById("userCardRole").textContent  = "👷 Worker · GigLega Member";
+        document.getElementById("userCardLocation").textContent = safeS(user.location, "");
+        document.getElementById("greetingText").textContent  = "Namaste, " + safeS(user.name, "Bhai") + "! 👋";
+
+        /* Profile completion */
+        var pct = calcProfileCompletion(user);
+        document.getElementById("profilePct").textContent    = pct + "%";
+        document.getElementById("profileBar").style.width    = pct + "%";
+
+        /* Applications */
+        var apps = getUserApplications() || [];
+        document.getElementById("appCountBadge").textContent = apps.length;
+
+        /* Stats */
+        var pending     = apps.filter(function (a) { return (a.status || "applied") === "applied"; }).length;
+        var shortlisted = apps.filter(function (a) { return a.status === "shortlisted"; }).length;
+        document.getElementById("workerStats").innerHTML =
+          statCell("Total Applied",   apps.length,    "💼") +
+          statCell("Pending",         pending,        "⏳") +
+          statCell("Shortlisted",     shortlisted,    "✅");
+
+        /* Recent apps — overview */
+        var recentEl = document.getElementById("recentAppsOverview");
+        if (!apps.length) {
+          recentEl.innerHTML = renderEmptyState(
+            "📭", "Abhi tak koi application nahi",
+            "Browse karo aur apna pehla gig apply karo!",
+            '<a href="browse.html" class="btn btn-primary">Browse Gigs</a>'
+          );
+        } else {
+          recentEl.innerHTML = apps.slice(0, 3).map(function (a) {
+            return renderAppCard(a, true);
+          }).join("");
+        }
+
+        /* All applications */
+        var allEl = document.getElementById("allApplicationsList");
+        if (!apps.length) {
+          allEl.innerHTML = renderEmptyState(
+            "📭", "Koi application nahi mili",
+            "Gigs browse karo aur apply karo — bilkul free!",
+            '<a href="browse.html" class="btn btn-primary">Browse Gigs</a>'
+          );
+        } else {
+          allEl.innerHTML = apps.map(function (a) {
+            return renderAppCard(a, false);
+          }).join("");
+        }
+
+        /* Profile form pre-fill */
+        document.getElementById("pfName").value     = safeS(user.name);
+        document.getElementById("pfEmail").value    = safeS(user.email);
+        document.getElementById("pfPhone").value    = safeS(user.phone);
+        document.getElementById("pfLocation").value = safeS(user.location);
+        document.getElementById("pfBio").value      = safeS(user.bio);
+        document.getElementById("pfSkills").value   = safeS(user.skills);
+      }
+
+      function statCell(label, value, icon) {
+        return '<div class="stat-cell">' +
+          '<div class="stat-cell-label">' + icon + ' ' + label + '</div>' +
+          '<div class="stat-cell-value">' + value + '</div>' +
+          '</div>';
+      }
+
+      /* ─────────────────────────────────────────────
+         PROFILE SAVE
+      ───────────────────────────────────────────── */
+      document.getElementById("profileForm").addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        var result = validateForm({
+          pfName:  { required: true, label: "Name",  minLength: 2 },
+          pfPhone: {
+            required: true, label: "Phone",
+            pattern: /^[6-9]\d{9}$|^\+91\s?[6-9]\d{4}\s?\d{5}$/,
+            patternMsg: "Valid Indian mobile number dalo"
+          }
+        });
+
+        if (!result.valid) return;
+
+        var btn  = document.getElementById("saveProfileBtn");
+        var user = getCurrentUser() || {};
+        setButtonLoading(btn, "Saving...");
+
+        setTimeout(function () {
+          var updated = Object.assign({}, user, {
+            name:     document.getElementById("pfName").value.trim(),
+            phone:    document.getElementById("pfPhone").value.trim(),
+            location: document.getElementById("pfLocation").value.trim(),
+            bio:      document.getElementById("pfBio").value.trim(),
+            skills:   document.getElementById("pfSkills").value.trim()
+          });
+
+          lsSet(GL.STORAGE_KEY_USER, updated);
+
+          /* Also update in users array */
+          var users = lsGet(GL.STORAGE_KEY_USERS, []);
+          var idx = users.findIndex(function (u) { return u.id === updated.id || u.email === updated.email; });
+          if (idx > -1) { users[idx] = updated; lsSet(GL.STORAGE_KEY_USERS, users); }
+
+          resetButton(btn);
+          showToast("Profile save ho gayi! 🎉", "success");
+          loadDashboard();
+        }, 600);
+      });
+
+      document.getElementById("cancelProfileBtn").addEventListener("click", function () {
+        loadDashboard();
+      });
+
+      /* ─────────────────────────────────────────────
+         SETTINGS BUTTONS
+      ───────────────────────────────────────────── */
+      document.getElementById("dashLogoutBtn").addEventListener("click", function () { logout(); });
+
+      document.getElementById("switchToClientBtn").addEventListener("click", function () {
+        var user = getCurrentUser() || {};
+        var updated = Object.assign({}, user, { role: "client" });
+        lsSet(GL.STORAGE_KEY_USER, updated);
+        showToast("Role switch ho gaya! Client dashboard par ja raha hai...", "success");
+        setTimeout(function () { window.location.href = "dashboard-client.html"; }, 900);
+      });
+
+      /* Panel goto buttons (e.g. "View All" in overview) */
+      document.addEventListener("click", function (e) {
+        var btn = e.target.closest("[data-panel-goto]");
+        if (!btn) return;
+        var panelId = btn.getAttribute("data-panel-goto");
+        var navItem = document.querySelector('.sidebar-nav-item[data-panel="' + panelId + '"]');
+        if (navItem) navItem.click();
+      });
+
+      /* ─────────────────────────────────────────────
+         BOOT
+      ───────────────────────────────────────────── */
+      document.addEventListener("DOMContentLoaded", function () {
+        if (!requireAuth("dashboard-worker.html")) return;
+
+        buildBreadcrumb("dashBreadcrumb", [
+          { label: "Home",      href: "index.html"  },
+          { label: "Dashboard"  }
+        ]);
+
+        loadDashboard();
+        initFadeAnimations();
+      });
+    </script>
+  </body>
+</html>
