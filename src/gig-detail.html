@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Gig Detail — GigLega</title>
+    <meta name="description" content="GigLega gig detail page. Full gig info dekho aur apply karo." />
+    <link rel="stylesheet" href="styles.css" />
+    <script defer src="shared.js"></script>
+
+    <style>
+      /* ── Layout ──────────────────────────────────────── */
+      .detail-wrap {
+        padding: clamp(28px, 5vw, 52px) 0 clamp(48px, 8vw, 80px);
+      }
+
+      .detail-grid {
+        display: grid;
+        gap: 24px;
+      }
+
+      /* ── Main card ───────────────────────────────────── */
+      .detail-main {
+        display: grid;
+        gap: 0;
+      }
+
+      .detail-hero {
+        padding: clamp(24px, 4vw, 40px);
+        border: 1px solid var(--border);
+        border-radius: 24px 24px 0 0;
+        background: linear-gradient(135deg, #f0fdfa 0%, #fff 60%);
+        border-bottom: none;
+      }
+
+      .detail-hero-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 14px;
+        flex-wrap: wrap;
+      }
+
+      .detail-icon {
+        font-size: 3rem;
+        line-height: 1;
+        flex-shrink: 0;
+      }
+
+      .detail-title {
+        margin: 16px 0 6px;
+        font-size: clamp(1.5rem, 3vw, 2.2rem);
+        letter-spacing: -0.03em;
+        line-height: 1.15;
+      }
+
+      .detail-company {
+        margin: 0;
+        font-size: 1rem;
+        color: var(--text-muted);
+        font-weight: 600;
+      }
+
+      .detail-badge-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 14px;
+      }
+
+      /* ── Meta strip ──────────────────────────────────── */
+      .meta-strip {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1px;
+        background: var(--border);
+        border: 1px solid var(--border);
+        border-top: none;
+        border-bottom: none;
+      }
+
+      .meta-cell {
+        padding: 16px 20px;
+        background: #fff;
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+      }
+
+      .meta-cell-label {
+        font-size: 0.78rem;
+        font-weight: 700;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+
+      .meta-cell-value {
+        font-size: 1rem;
+        font-weight: 800;
+        color: var(--text);
+      }
+
+      .meta-cell-value.budget {
+        font-size: 1.25rem;
+        color: var(--teal);
+      }
+
+      /* ── Body sections ───────────────────────────────── */
+      .detail-body {
+        padding: clamp(22px, 4vw, 36px);
+        border: 1px solid var(--border);
+        border-top: none;
+        border-radius: 0 0 24px 24px;
+        background: #fff;
+        display: grid;
+        gap: 28px;
+      }
+
+      .body-section h3 {
+        margin: 0 0 12px;
+        font-size: 1.05rem;
+        font-weight: 800;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .body-section p,
+      .body-section ul {
+        margin: 0;
+        color: var(--text-muted);
+        line-height: 1.7;
+      }
+
+      .body-section ul {
+        padding-left: 18px;
+        display: grid;
+        gap: 6px;
+      }
+
+      .body-section ul li {
+        line-height: 1.55;
+      }
+
+      /* ── Apply CTA sidebar ───────────────────────────── */
+      .apply-sidebar {
+        display: grid;
+        gap: 16px;
+        align-content: start;
+      }
+
+      .apply-card {
+        padding: 24px 22px;
+        border: 1px solid var(--border);
+        border-radius: 22px;
+        background: #fff;
+        display: grid;
+        gap: 14px;
+      }
+
+      .apply-card h3 {
+        margin: 0;
+        font-size: 1.1rem;
+      }
+
+      .apply-price {
+        font-size: 2rem;
+        font-weight: 900;
+        letter-spacing: -0.04em;
+        color: var(--teal);
+      }
+
+      .apply-price span {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        letter-spacing: 0;
+      }
+
+      .apply-actions {
+        display: grid;
+        gap: 10px;
+      }
+
+      .already-applied-box {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 14px 16px;
+        border-radius: 14px;
+        background: rgba(13, 148, 136, 0.08);
+        border: 1px solid rgba(13, 148, 136, 0.25);
+        font-weight: 700;
+        color: var(--teal);
+        font-size: 0.97rem;
+      }
+
+      .info-card {
+        padding: 20px 18px;
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        background: #fff;
+        display: grid;
+        gap: 12px;
+      }
+
+      .info-card h4 {
+        margin: 0;
+        font-size: 0.95rem;
+        font-weight: 800;
+      }
+
+      .info-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        font-size: 0.9rem;
+        color: var(--text-muted);
+      }
+
+      .info-row-icon {
+        flex-shrink: 0;
+        font-size: 1rem;
+        margin-top: 1px;
+      }
+
+      /* ── Similar gigs ────────────────────────────────── */
+      .similar-section {
+        margin-top: 28px;
+      }
+
+      .similar-section h3 {
+        margin: 0 0 14px;
+        font-size: 1.1rem;
+        font-weight: 800;
+      }
+
+      .similar-list {
+        display: grid;
+        gap: 12px;
+      }
+
+      .similar-card {
+        padding: 16px 18px;
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        background: #fff;
+        text-decoration: none;
+        color: var(--text);
+        display: grid;
+        gap: 6px;
+        transition: box-shadow 0.16s, transform 0.16s;
+      }
+
+      .similar-card:hover {
+        box-shadow: 0 4px 16px rgba(13, 148, 136, 0.1);
+        transform: translateY(-1px);
+      }
+
+      .similar-card h4 {
+        margin: 0;
+        font-size: 0.97rem;
+      }
+
+      .similar-card p {
+        margin: 0;
+        font-size: 0.85rem;
+        color: var(--text-muted);
+      }
+
+      /* ── Not found state ─────────────────────────────── */
+      .not-found {
+        padding: clamp(48px, 8vw, 96px) 0;
+        text-align: center;
+      }
+
+      .not-found h2 {
+        margin: 0 0 12px;
+        font-size: 1.6rem;
+      }
+
+      .not-found p {
+        margin: 0 0 28px;
+        color: var(--text-muted);
+      }
+
+      /* ── Modal ───────────────────────────────────────── */
+      .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.55);
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.22s;
+      }
+
+      .modal-overlay.open {
+        opacity: 1;
+        pointer-events: all;
+      }
+
+      .modal-box {
+        background: #fff;
+        border-radius: 24px;
+        padding: clamp(24px, 4vw, 40px);
+        width: 100%;
+        max-width: 520px;
+        max-height: 90vh;
+        overflow-y: auto;
+        position: relative;
+        transform: translateY(24px);
+        transition: transform 0.22s;
+      }
+
+      .modal-overlay.open .modal-box {
+        transform: translateY(0);
+      }
+
+      .modal-close-btn {
+        position: absolute;
+        top: 16px;
+        right: 18px;
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: var(--text-muted);
+        line-height: 1;
+        padding: 4px 8px;
+        border-radius: 8px;
+        transition: background 0.14s;
+      }
+
+      .modal-close-btn:hover {
+        background: var(--border);
+      }
+
+      .modal-title {
+        margin: 0 0 4px;
+        font-size: 1.25rem;
+      }
+
+      .modal-sub {
+        margin: 0 0 22px;
+        color: var(--text-muted);
+        font-size: 0.9rem;
+      }
+
+      .form-group {
+        margin-bottom: 16px;
+      }
+
+      .form-group label {
+        display: block;
+        font-weight: 700;
+        margin-bottom: 6px;
+        font-size: 0.92rem;
+      }
+
+      .form-group input,
+      .form-group textarea {
+        width: 100%;
+        padding: 11px 14px;
+        border: 1.5px solid var(--border);
+        border-radius: 12px;
+        font-size: 0.97rem;
+        font-family: inherit;
+        color: var(--text);
+        background: #fff;
+        outline: none;
+        transition: border-color 0.18s, box-shadow 0.18s;
+        resize: vertical;
+      }
+
+      .form-group input:focus,
+      .form-group textarea:focus {
+        border-color: var(--teal);
+        box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
+      }
+
+      .modal-footer {
+        display: flex;
+        gap: 10px;
+        margin-top: 22px;
+        flex-wrap: wrap;
+      }
+
+      /* ── Skeleton ────────────────────────────────────── */
+      .detail-skeleton {
+        display: grid;
+        gap: 16px;
+      }
+
+      .sk-block {
+        border-radius: 16px;
+        background: #e5e7eb;
+        animation: sk-pulse 1.4s ease-in-out infinite;
+      }
+
+      @keyframes sk-pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.45; }
+      }
+
+      /* ── Responsive ──────────────────────────────────── */
+      @media (min-width: 640px) {
+        .meta-strip {
+          grid-template-columns: repeat(4, 1fr);
+        }
+      }
+
+      @media (min-width: 1024px) {
+        .detail-grid {
+          grid-template-columns: minmax(0, 1.4fr) 320px;
+          align-items: start;
+        }
+
+        .apply-sidebar {
+          position: sticky;
+          top: 100px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="announce-bar"></div>
+    <div id="navbar"></div>
+
+    <main>
+      <div class="detail-wrap">
+        <div class="container">
+          <div id="detailBreadcrumb" class="fade-up" style="margin-bottom:18px;"></div>
+          <div id="detailContent"></div>
+        </div>
+      </div>
+    </main>
+
+    <!-- ══ APPLY MODAL ══ -->
+    <div class="modal-overlay" id="applyModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="applyModalTitle">
+      <div class="modal-box">
+        <button class="modal-close-btn" aria-label="Close" data-modal-close>×</button>
+        <h2 class="modal-title" id="applyModalTitle">Apply karo</h2>
+        <p class="modal-sub" id="applyModalSub">Gig name yahan</p>
+
+        <form id="applyForm" novalidate>
+          <div class="form-group">
+            <label for="applyName">Full Name *</label>
+            <input type="text" id="applyName" placeholder="Apna pura naam" maxlength="80" autocomplete="name" />
+          </div>
+          <div class="form-group">
+            <label for="applyPhone">Phone Number *</label>
+            <input type="tel" id="applyPhone" placeholder="+91 98765 43210" data-phone maxlength="15" autocomplete="tel" />
+          </div>
+          <div class="form-group">
+            <label for="applyEmail">Email <span style="font-weight:400;color:var(--text-muted)">(optional)</span></label>
+            <input type="email" id="applyEmail" placeholder="aapka@email.com" maxlength="100" autocomplete="email" />
+          </div>
+          <div class="form-group">
+            <label for="applyMsg">Why should they pick you? <span style="font-weight:400;color:var(--text-muted)">(optional)</span></label>
+            <textarea
+              id="applyMsg"
+              rows="3"
+              placeholder="Experience, availability, ya koi skill mention karo..."
+              maxlength="300"
+              data-counter="applyMsgCount"
+            ></textarea>
+            <span id="applyMsgCount" style="font-size:0.8rem;color:var(--text-muted);"></span>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-primary" id="applySubmitBtn">Submit Application</button>
+            <button type="button" class="btn btn-outline" data-modal-close>Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <footer id="footer"></footer>
+
+    <script>
+      /* ─────────────────────────────────────────────────
+         SEED DATA (same as browse.html — matched by id)
+      ───────────────────────────────────────────────── */
+      var SEED_GIGS = [
+        { id:"seed-1", title:"Delivery Boy Chahiye — Evening Shift", company:"QuickDrop Logistics", location:"Sector 29, Gurugram", category:"delivery", budget:600, type:"Daily", description:"Evening 5 PM se 9 PM tak local parcel delivery karna hai. Bike honi chahiye. Petrol allowance milega. Daily cash payment guaranteed.", requirements:["Apni bike honi chahiye","18+ years","Gurugram area familiar hona chahiye","Smartphone hona chahiye"], postedAt:new Date(Date.now()-2*3600000).toISOString(), status:"active", urgent:true },
+        { id:"seed-2", title:"Math Tutor — Class 9 & 10", company:"Private Family", location:"DLF Phase 2, Gurugram", category:"teaching", budget:8000, type:"Monthly", description:"Ek student ke liye Math home tutor chahiye. Class 9 aur 10 CBSE syllabus. 1 ghanta daily, weekdays only.", requirements:["B.Sc/B.Tech (Math) preferred","Patience aur communication skills","Weekday availability 4 PM – 7 PM","CBSE syllabus knowledge"], postedAt:new Date(Date.now()-5*3600000).toISOString(), status:"active", urgent:false },
+        { id:"seed-3", title:"React Developer — Freelance Project", company:"StartupNest", location:"Cyber City, Gurugram", category:"tech", budget:25000, type:"Project", description:"2-3 week React.js project. Landing page + admin dashboard banana hai. Tailwind CSS preferred. GitHub experience required.", requirements:["React.js intermediate+","Tailwind CSS knowledge","Git/GitHub","Available 2-3 weeks, part-time okay"], postedAt:new Date(Date.now()-1*86400000).toISOString(), status:"active", urgent:false },
+        { id:"seed-4", title:"House Cleaning — Weekend Only", company:"Private Household", location:"Palam Vihar, Gurugram", category:"domestic", budget:1200, type:"Weekly", description:"2BHK flat ki weekend cleaning chahiye. Saturday ya Sunday, approx 3 ghante. Cleaning supplies already available. Neat kaam zaroori hai.", requirements:["3+ ghante available weekend par","Kaam ki samajh","References preferred"], postedAt:new Date(Date.now()-3*3600000).toISOString(), status:"active", urgent:false },
+        { id:"seed-5", title:"Event Helper — Wedding Setup", company:"Grand Celebrations", location:"Sector 14, Gurugram", category:"event", budget:1500, type:"One-day", description:"Ek din ke liye wedding venue setup mein help chahiye. Chairs, tables, decoration. Heavy lifting ho sakti hai. Dinner aur payment dono milenge.", requirements:["Physical fitness","1 din full availability","Team player hona chahiye"], postedAt:new Date(Date.now()-6*3600000).toISOString(), status:"active", urgent:true },
+        { id:"seed-6", title:"Instagram Reels Editor", company:"FoodieSpot Café", location:"MG Road, Gurugram", category:"content", budget:5000, type:"Monthly", description:"8-10 reels per month edit karne hain for our food café account. Raw footage hum denge. Trending transitions aur hooks pata hone chahiye.", requirements:["CapCut ya Premiere Pro experience","Trending reels knowledge","Portfolio required","Consistent availability"], postedAt:new Date(Date.now()-2*86400000).toISOString(), status:"active", urgent:false },
+        { id:"seed-7", title:"Flyer Distribution — New Store Launch", company:"TrendMart Retail", location:"Sector 56, Gurugram", category:"sales", budget:800, type:"One-day", description:"New store launch ke liye 2-3 ghante flyers distribute karne hain nearby areas mein. Incentive bonus milega targets par.", requirements:["Energetic aur friendly personality","Morning shift availability","Area knowledge helpful"], postedAt:new Date(Date.now()-4*3600000).toISOString(), status:"active", urgent:true },
+        { id:"seed-8", title:"Cook for Bachelors — Lunch Only", company:"3 Bachelors", location:"South City 1, Gurugram", category:"domestic", budget:4500, type:"Monthly", description:"Sirf lunch banana hai — 3 logon ke liye. Simple Indian khana. Monday to Saturday. 10 AM – 12 PM. Aana-jaana allowance bhi milega.", requirements:["Basic Indian cooking skills","Punctuality","Monday-Saturday 10-12 PM available"], postedAt:new Date(Date.now()-12*3600000).toISOString(), status:"active", urgent:false },
+        { id:"seed-9", title:"PHP + MySQL Developer — Small CRM", company:"LocalBiz Solutions", location:"Udyog Vihar, Gurugram", category:"tech", budget:15000, type:"Project", description:"Ek chhoti CRM system banana hai — customer records, follow-up notes, aur basic invoice generation. PHP + MySQL required. 2 week deadline.", requirements:["PHP + MySQL intermediate","Basic HTML/CSS","2 week availability","Version control knowledge"], postedAt:new Date(Date.now()-2*86400000).toISOString(), status:"active", urgent:false },
+        { id:"seed-10", title:"Delivery Partner — Morning Shift", company:"FreshBox Groceries", location:"Sohna Road, Gurugram", category:"delivery", budget:500, type:"Daily", description:"Morning 7 AM – 11 AM grocery delivery. 10-15 drops per shift. Cycle ya bike dono chalega. Daily cash payment milega.", requirements:["Gurugram area familiar hona chahiye","7 AM – 11 AM available","Smartphone with Google Maps","Bike ya cycle"], postedAt:new Date(Date.now()-8*3600000).toISOString(), status:"active", urgent:false },
+        { id:"seed-11", title:"English Speaking Tutor", company:"Private Client", location:"Sector 49, Gurugram", category:"teaching", budget:6000, type:"Monthly", description:"Working professional ke liye evening English speaking practice sessions chahiye. Conversation + grammar focus. 45 min, 3 days a week.", requirements:["Fluent English communication","Patience with beginners","Evening 7-9 PM available","Teaching experience preferred"], postedAt:new Date(Date.now()-3*86400000).toISOString(), status:"active", urgent:false },
+        { id:"seed-12", title:"YouTube Thumbnail Designer", company:"TechReview Channel", location:"Remote / Gurugram", category:"content", budget:3500, type:"Monthly", description:"10-12 thumbnails per month banana hain. High CTR focus. Photoshop ya Canva Pro tools available. Brief diya jayega har thumbnail ke liye.", requirements:["Photoshop ya Canva Pro knowledge","Understanding of YouTube CTR","Portfolio of 5+ thumbnails","Consistent turnaround time"], postedAt:new Date(Date.now()-5*86400000).toISOString(), status:"active", urgent:false }
+      ];
+
+      var CATEGORY_ICONS = {
+        delivery:"🚴", teaching:"📚", tech:"💻",
+        domestic:"🏠", event:"🎉", content:"🎬",
+        sales:"📣", general:"💼"
+      };
+
+      var currentGig = null;
+
+      /* ── Helpers ────────────────────────────────── */
+      function escHtml(v) {
+        return String(v == null ? "" : v)
+          .replace(/&/g,"&amp;").replace(/</g,"&lt;")
+          .replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+      }
+
+      function safeStr(v, fb) {
+        var s = String(v == null ? "" : v).trim();
+        return s || fb;
+      }
+
+      function getIcon(cat) {
+        return CATEGORY_ICONS[String(cat || "").toLowerCase()] || "💼";
+      }
+
+      /* ── Find gig from id ─────────────────────── */
+      function findGig(id) {
+        var live = getAllGigs() || [];
+        var found = null;
+        var i;
+        for (i = 0; i < live.length; i++) {
+          if (String(live[i].id) === String(id)) { found = live[i]; break; }
+        }
+        if (!found) {
+          for (i = 0; i < SEED_GIGS.length; i++) {
+            if (String(SEED_GIGS[i].id) === String(id)) { found = SEED_GIGS[i]; break; }
+          }
+        }
+        return found;
+      }
+
+      /* ── Similar gigs ─────────────────────────── */
+      function getSimilar(gig, limit) {
+        var all = getAllGigs() || [];
+        if (!all.length) all = SEED_GIGS;
+        return all.filter(function (g) {
+          return String(g.id) !== String(gig.id) &&
+            String(g.category || "").toLowerCase() === String(gig.category || "").toLowerCase() &&
+            safeStr(g.status, "active") === "active";
+        }).slice(0, limit || 3);
+      }
+
+      /* ── Check already applied ────────────────── */
+      function hasApplied(gig) {
+        var user = getCurrentUser();
+        if (!user) return false;
+        var apps = getUserApplications() || [];
+        return apps.some(function (a) {
+          return String(a.gigId) === String(gig.id) ||
+            (a.gigTitle && String(a.gigTitle).toLowerCase() === String(gig.title).toLowerCase());
+        });
+      }
+
+      /* ── Render full detail page ──────────────── */
+      function renderDetail(gig) {
+        document.title = safeStr(gig.title, "Gig") + " — GigLega";
+
+        var meta = document.querySelector('meta[name="description"]');
+        if (meta) meta.setAttribute("content", safeStr(gig.description, "").slice(0, 140));
+
+        var title    = safeStr(gig.title, "Local Gig");
+        var company  = safeStr(gig.company || gig.clientName, "Local Business");
+        var location = safeStr(gig.location, "Gurugram");
+        var category = safeStr(gig.category, "general");
+        var type     = safeStr(gig.type, "Gig");
+        var desc     = safeStr(gig.description, "Description available on connect.");
+        var icon     = getIcon(category);
+        var isUrgent = !!gig.urgent;
+        var applied  = hasApplied(gig);
+        var budget   = typeof gig.budget === "number"
+          ? formatCurrency(gig.budget)
+          : safeStr(gig.budget, "On connect");
+        var postedAt = gig.postedAt ? formatDate(gig.postedAt) : "—";
+        var relTime  = gig.postedAt ? formatRelativeTime(gig.postedAt) : "—";
+
+        var reqHtml = "";
+        if (Array.isArray(gig.requirements) && gig.requirements.length) {
+          reqHtml = '<div class="body-section fade-up">' +
+            '<h3>📋 Requirements</h3>' +
+            '<ul>' +
+            gig.requirements.map(function (r) {
+              return "<li>" + escHtml(r) + "</li>";
+            }).join("") +
+            "</ul>" +
+            "</div>";
+        }
+
+        var similar = getSimilar(gig, 3);
+        var similarHtml = "";
+        if (similar.length) {
+          similarHtml =
+            '<div class="similar-section fade-up">' +
+            '<h3>Similar Gigs</h3>' +
+            '<div class="similar-list">' +
+            similar.map(function (g) {
+              var sTitle  = safeStr(g.title, "Local Gig");
+              var sLoc    = safeStr(g.location, "Gurugram");
+              var sBudget = typeof g.budget === "number"
+                ? formatCurrency(g.budget) : safeStr(g.budget, "—");
+              return '<a href="gig-detail.html?id=' + encodeURIComponent(g.id) +
+                '" class="similar-card">' +
+                '<h4>' + escHtml(sTitle) + "</h4>" +
+                '<p>📍 ' + escHtml(sLoc) + ' · 💸 ' + escHtml(String(sBudget)) + "</p>" +
+                "</a>";
+            }).join("") +
+            "</div></div>";
+        }
+
+        var applyBtnHtml = applied
+          ? '<div class="already-applied-box">✅ Already applied — awaiting response</div>'
+          : '<button class="btn btn-primary" id="applyNowBtn" style="width:100%;">Apply Now</button>';
+
+        var html =
+          '<div class="detail-grid">' +
+
+            /* ── Main column ── */
+            '<div class="detail-main fade-up">' +
+
+              /* Hero */
+              '<div class="detail-hero">' +
+                '<div class="detail-hero-top">' +
+                  '<div>' +
+                    '<span class="detail-icon">' + icon + '</span>' +
+                    '<h1 class="detail-title">' + escHtml(title) + '</h1>' +
+                    '<p class="detail-company">' + escHtml(company) + '</p>' +
+                  '</div>' +
+                  '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">' +
+                    (isUrgent ? '<span class="badge badge-amber">🔥 Urgent</span>' : '') +
+                    '<span class="badge badge-teal">' + escHtml(type) + '</span>' +
+                  '</div>' +
+                '</div>' +
+                '<div class="detail-badge-row">' +
+                  '<span class="badge">' + escHtml(category.charAt(0).toUpperCase() + category.slice(1)) + '</span>' +
+                  '<span class="badge">📍 ' + escHtml(location) + '</span>' +
+                  '<span class="badge">🕒 ' + escHtml(relTime) + '</span>' +
+                '</div>' +
+              '</div>' +
+
+              /* Meta strip */
+              '<div class="meta-strip">' +
+                '<div class="meta-cell">' +
+                  '<span class="meta-cell-label">Budget</span>' +
+                  '<span class="meta-cell-value budget">' + escHtml(String(budget)) + '</span>' +
+                '</div>' +
+                '<div class="meta-cell">' +
+                  '<span class="meta-cell-label">Type</span>' +
+                  '<span class="meta-cell-value">' + escHtml(type) + '</span>' +
+                '</div>' +
+                '<div class="meta-cell">' +
+                  '<span class="meta-cell-label">Location</span>' +
+                  '<span class="meta-cell-value">' + escHtml(location) + '</span>' +
+                '</div>' +
+                '<div class="meta-cell">' +
+                  '<span class="meta-cell-label">Posted</span>' +
+                  '<span class="meta-cell-value">' + escHtml(postedAt) + '</span>' +
+                '</div>' +
+              '</div>' +
+
+              /* Body */
+              '<div class="detail-body">' +
+                '<div class="body-section fade-up">' +
+                  '<h3>📄 About this gig</h3>' +
+                  '<p>' + escHtml(desc) + '</p>' +
+                '</div>' +
+                reqHtml +
+                '<div class="body-section fade-up">' +
+                  '<h3>📍 Location</h3>' +
+                  '<p>' + escHtml(location) + ', Gurugram, Haryana</p>' +
+                '</div>' +
+              '</div>' +
+
+              similarHtml +
+            '</div>' +
+
+            /* ── Sidebar ── */
+            '<aside class="apply-sidebar">' +
+              '<div class="apply-card card fade-up">' +
+                '<h3>Interested? Apply karo</h3>' +
+                '<div>' +
+                  '<div class="apply-price">' + escHtml(String(budget)) +
+                    '<span> / ' + escHtml(type) + '</span>' +
+                  '</div>' +
+                '</div>' +
+                '<div class="apply-actions">' +
+                  applyBtnHtml +
+                  '<button class="btn btn-outline" id="waContactBtn" style="width:100%;">💬 WhatsApp on Connect</button>' +
+                  '<button class="btn btn-outline" id="shareGigBtn" style="width:100%;">🔗 Share Gig</button>' +
+                '</div>' +
+              '</div>' +
+
+              '<div class="info-card fade-up">' +
+                '<h4>📌 Quick Info</h4>' +
+                '<div class="info-row">' +
+                  '<span class="info-row-icon">🏢</span>' +
+                  '<span>' + escHtml(company) + '</span>' +
+                '</div>' +
+                '<div class="info-row">' +
+                  '<span class="info-row-icon">📍</span>' +
+                  '<span>' + escHtml(location) + '</span>' +
+                '</div>' +
+                '<div class="info-row">' +
+                  '<span class="info-row-icon">🗂️</span>' +
+                  '<span>' + escHtml(category.charAt(0).toUpperCase() + category.slice(1)) + ' · ' + escHtml(type) + '</span>' +
+                '</div>' +
+                '<div class="info-row">' +
+                  '<span class="info-row-icon">📅</span>' +
+                  '<span>Posted: ' + escHtml(postedAt) + '</span>' +
+                '</div>' +
+                (isUrgent
+                  ? '<div class="info-row" style="color:#b45309;font-weight:700;"><span class="info-row-icon">🔥</span><span>Urgent hiring — jaldi apply karo</span></div>'
+                  : '') +
+              '</div>' +
+
+              '<div class="info-card fade-up">' +
+                '<h4>🛡️ GigLega Trust</h4>' +
+                '<div class="info-row"><span class="info-row-icon">✅</span><span>Verified listing</span></div>' +
+                '<div class="info-row"><span class="info-row-icon">🔒</span><span>Contact shared after apply</span></div>' +
+                '<div class="info-row"><span class="info-row-icon">🆓</span><span>Applying is 100% free</span></div>' +
+              '</div>' +
+            '</aside>' +
+
+          '</div>';
+
+        document.getElementById("detailContent").innerHTML = html;
+
+        /* Wire buttons */
+        document.getElementById("applyNowBtn")?.addEventListener("click", function () {
+          openApplyModal(gig);
+        });
+
+        document.getElementById("waContactBtn").addEventListener("click", function () {
+          if (!isLoggedIn()) {
+            showToast("WhatsApp number apply karne ke baad milega 🔒", "info");
+            return;
+          }
+          openWhatsApp(buildGigWAMessage(gig));
+        });
+
+        document.getElementById("shareGigBtn").addEventListener("click", function () {
+          copyToClipboard(
+            buildGigWAMessage(gig),
+            "Gig share text copy ho gaya! WhatsApp par paste karo 📋"
+          );
+        });
+
+        initFadeAnimations();
+      }
+
+      /* ── Render not found ─────────────────────── */
+      function renderNotFound(id) {
+        document.getElementById("detailContent").innerHTML =
+          '<div class="not-found">' +
+          '<span style="font-size:3rem;">😕</span>' +
+          '<h2>Gig nahi mili</h2>' +
+          '<p>ID <strong>' + escHtml(String(id)) + '</strong> ki gig exist nahi karti ya remove ho gayi hai.</p>' +
+          '<div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">' +
+          '<a href="browse.html" class="btn btn-primary">Browse All Gigs</a>' +
+          '<a href="post-gig.html" class="btn btn-outline">Post a Gig</a>' +
+          '</div>' +
+          '</div>';
+      }
+
+      /* ── Apply modal ──────────────────────────── */
+      function openApplyModal(gig) {
+        if (!isLoggedIn()) {
+          showToast("Apply karne ke liye pehle login karo 👋", "info");
+          setTimeout(function () {
+            window.location.href = "signup.html?next=" + encodeURIComponent(window.location.href);
+          }, 1200);
+          return;
+        }
+
+        currentGig = gig;
+        document.getElementById("applyModalTitle").textContent =
+          "Apply — " + safeStr(gig.title, "Gig");
+        document.getElementById("applyModalSub").textContent =
+          safeStr(gig.company || gig.clientName, "Local Business") +
+          " · " + safeStr(gig.location, "Gurugram");
+
+        var user = getCurrentUser() || {};
+        document.getElementById("applyName").value  = safeStr(user.name, "");
+        document.getElementById("applyPhone").value = safeStr(user.phone, "");
+        document.getElementById("applyEmail").value = safeStr(user.email, "");
+        document.getElementById("applyMsg").value   = "";
+
+        ["applyName","applyPhone","applyEmail","applyMsg"].forEach(function (id) {
+          clearFieldState(id);
+        });
+
+        openModal("applyModal");
+      }
+
+      /* ── Apply form submit ────────────────────── */
+      document.getElementById("applyForm").addEventListener("submit", function (e) {
+        e.preventDefault();
+        if (!currentGig) return;
+
+        var result = validateForm({
+          applyName:  { required: true, label: "Name",  minLength: 2, maxLength: 80 },
+          applyPhone: {
+            required: true, label: "Phone",
+            pattern: /^[6-9]\d{9}$|^\+91\s?[6-9]\d{4}\s?\d{5}$/,
+            patternMsg: "Valid Indian mobile number dalo"
+          }
+        });
+
+        if (!result.valid) return;
+
+        var btn = document.getElementById("applySubmitBtn");
+        var user = getCurrentUser() || {};
+        setButtonLoading(btn, "Submitting...");
+
+        setTimeout(function () {
+          saveApplication({
+            gigId:     currentGig.id,
+            gigTitle:  currentGig.title,
+            company:   currentGig.company || currentGig.clientName,
+            location:  currentGig.location,
+            budget:    currentGig.budget,
+            category:  currentGig.category,
+            userId:    user.id    || "",
+            userEmail: user.email || document.getElementById("applyEmail").value.trim(),
+            name:      document.getElementById("applyName").value.trim(),
+            phone:     document.getElementById("applyPhone").value.trim(),
+            email:     document.getElementById("applyEmail").value.trim(),
+            message:   document.getElementById("applyMsg").value.trim()
+          });
+
+          resetButton(btn);
+          closeModal("applyModal");
+          showToast("Application submit ho gayi! 🎉 Client jald contact karega.", "success", 5000);
+
+          /* Refresh detail to show applied state */
+          renderDetail(currentGig);
+        }, 700);
+      });
+
+      /* ── Boot ─────────────────────────────────── */
+      document.addEventListener("DOMContentLoaded", function () {
+        var params = new URLSearchParams(window.location.search);
+        var gigId  = params.get("id");
+
+        buildBreadcrumb("detailBreadcrumb", [
+          { label: "Home",         href: "index.html"  },
+          { label: "Browse Gigs",  href: "browse.html" },
+          { label: "Gig Detail" }
+        ]);
+
+        if (!gigId) {
+          renderNotFound("(no id)");
+          return;
+        }
+
+        var gig = findGig(gigId);
+
+        if (!gig) {
+          renderNotFound(gigId);
+          return;
+        }
+
+        renderDetail(gig);
+      });
+    </script>
+  </body>
+</html>
