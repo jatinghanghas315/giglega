@@ -1,636 +1,207 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Privacy Policy — GigLega</title>
-    <meta
-      name="description"
-      content="GigLega Privacy Policy — hum kya data collect karte hain, kaise use karte hain aur aapke rights kya hain."
-    />
-    <link rel="stylesheet" href="styles.css" />
-    <script defer src="shared.js"></script>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Privacy Policy — GigLega</title>
+  <meta name="description" content="GigLega Privacy Policy — how we collect, use, and protect your data." />
+  <link rel="stylesheet" href="styles.css" />
+  <script defer src="shared.js"></script>
+  <style>
+    .legal-wrap{max-width:800px;margin:0 auto;padding:40px 16px 80px}
+    .legal-hero{background:linear-gradient(135deg,var(--teal) 0%,var(--primary) 100%);border-radius:var(--radius);padding:32px 28px;color:#fff;margin-bottom:32px}
+    .legal-hero h1{font-size:1.6rem;font-weight:800;margin-bottom:6px}
+    .legal-hero p{font-size:.88rem;opacity:.8}
+    .legal-card{background:var(--surface);border:1.5px solid var(--gray-200);border-radius:var(--radius);padding:28px;margin-bottom:20px;box-shadow:var(--shadow-sm)}
+    .legal-section-title{font-size:1rem;font-weight:800;color:var(--primary);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+    .legal-body{font-size:.9rem;color:var(--gray-700);line-height:1.8}
+    .legal-body p{margin-bottom:12px}
+    .legal-body ul{padding-left:20px;margin-bottom:12px}
+    .legal-body ul li{margin-bottom:6px}
+    .legal-body strong{color:var(--text)}
+    .legal-toc{background:var(--gray-50);border:1px solid var(--gray-200);border-radius:var(--radius-sm);padding:16px 20px;margin-bottom:24px}
+    .legal-toc h4{font-size:.85rem;font-weight:700;color:var(--primary);margin-bottom:10px}
+    .legal-toc ol{padding-left:18px;font-size:.83rem;color:var(--teal);line-height:1.8}
+    .legal-toc ol li a{color:var(--teal);text-decoration:none}
+    .legal-toc ol li a:hover{text-decoration:underline}
+    .highlight-box{background:rgba(13,148,136,.08);border-left:4px solid var(--teal);border-radius:0 var(--radius-sm) var(--radius-sm) 0;padding:12px 16px;margin:14px 0;font-size:.85rem;color:var(--gray-700);line-height:1.6}
+    .data-table{width:100%;border-collapse:collapse;font-size:.85rem;margin:12px 0}
+    .data-table th{background:var(--gray-50);padding:10px 14px;text-align:left;font-weight:700;color:var(--primary);border-bottom:2px solid var(--gray-200)}
+    .data-table td{padding:10px 14px;border-bottom:1px solid var(--gray-100);color:var(--gray-700);vertical-align:top}
+    .data-table tr:last-child td{border-bottom:none}
+    [data-theme=dark] .legal-card{border-color:var(--gray-700)}
+    [data-theme=dark] .legal-toc{background:var(--gray-800);border-color:var(--gray-700)}
+    [data-theme=dark] .legal-body{color:var(--gray-300)}
+    [data-theme=dark] .legal-body strong{color:var(--gray-100)}
+    [data-theme=dark] .highlight-box{background:rgba(13,148,136,.1);color:var(--gray-300)}
+    [data-theme=dark] .data-table th{background:var(--gray-800);border-color:var(--gray-700)}
+    [data-theme=dark] .data-table td{border-color:var(--gray-700);color:var(--gray-300)}
+  </style>
+</head>
+<body>
+  <div id="announce-bar"></div>
+  <nav id="main-nav"></nav>
 
-    <style>
-      .legal-wrap { padding: clamp(28px,5vw,52px) 0 clamp(56px,8vw,88px); }
+  <main class="page-wrapper">
+    <div class="legal-wrap">
+      <nav id="breadcrumb" aria-label="breadcrumb"></nav>
 
-      .legal-grid { display: grid; gap: 32px; align-items: start; }
+      <div class="legal-hero">
+        <h1>🔒 Privacy Policy</h1>
+        <p>Last updated: March 2026 &nbsp;|&nbsp; We take your privacy seriously.</p>
+      </div>
 
-      .legal-hero {
-        padding: clamp(28px,4vw,44px);
-        border-radius: 26px;
-        background: linear-gradient(135deg,#eff6ff 0%,#f0fdfa 100%);
-        border: 1px solid var(--border);
-        margin-bottom: 32px;
-      }
+      <div class="legal-toc">
+        <h4>📌 Table of Contents</h4>
+        <ol>
+          <li><a href="#intro">Introduction</a></li>
+          <li><a href="#collect">What We Collect</a></li>
+          <li><a href="#use">How We Use Your Data</a></li>
+          <li><a href="#storage">Data Storage</a></li>
+          <li><a href="#sharing">Data Sharing</a></li>
+          <li><a href="#rights">Your Rights</a></li>
+          <li><a href="#cookies">Cookies</a></li>
+          <li><a href="#children">Children's Privacy</a></li>
+          <li><a href="#contact">Contact Us</a></li>
+        </ol>
+      </div>
 
-      .legal-hero h1 {
-        margin: 10px 0 10px;
-        font-size: clamp(1.8rem,3.5vw,2.5rem);
-        letter-spacing: -0.04em;
-      }
-
-      .legal-hero p {
-        margin: 0;
-        color: var(--text-muted);
-        font-size: 0.93rem;
-        line-height: 1.65;
-        max-width: 56ch;
-      }
-
-      .legal-meta {
-        display: flex; flex-wrap: wrap; gap: 14px;
-        margin-top: 14px; font-size: 0.85rem;
-        color: var(--text-muted); font-weight: 600;
-      }
-
-      .legal-meta span { display: flex; align-items: center; gap: 5px; }
-
-      /* TOC */
-      .toc-card {
-        padding: 22px 20px;
-        border: 1px solid var(--border);
-        border-radius: 20px;
-        background: #fff;
-        position: sticky;
-        top: 100px;
-      }
-
-      .toc-card h3 {
-        margin: 0 0 14px; font-size: 0.95rem; font-weight: 800;
-        color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em;
-      }
-
-      .toc-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 4px; }
-
-      .toc-list li a {
-        display: flex; align-items: center; gap: 8px;
-        padding: 7px 10px; border-radius: 10px;
-        font-size: 0.88rem; font-weight: 600;
-        color: var(--text-muted); text-decoration: none;
-        transition: background 0.14s, color 0.14s; line-height: 1.4;
-      }
-
-      .toc-list li a:hover { background: rgba(13,148,136,0.07); color: var(--teal); }
-
-      .toc-num {
-        font-size: 0.75rem; font-weight: 800; color: var(--teal);
-        background: rgba(13,148,136,0.1); padding: 2px 7px;
-        border-radius: 99px; flex-shrink: 0;
-      }
-
-      /* Sections */
-      .legal-section {
-        padding: clamp(20px,3vw,32px);
-        border: 1px solid var(--border);
-        border-radius: 22px;
-        background: #fff;
-        margin-bottom: 16px;
-        scroll-margin-top: 100px;
-      }
-
-      .legal-section h2 {
-        margin: 0 0 14px; font-size: 1.15rem;
-        letter-spacing: -0.02em;
-        display: flex; align-items: center; gap: 10px;
-        padding-bottom: 12px; border-bottom: 1px solid var(--border);
-      }
-
-      .sec-num {
-        background: #0ea5e9; color: #fff;
-        font-size: 0.72rem; font-weight: 800;
-        padding: 3px 9px; border-radius: 99px; flex-shrink: 0;
-      }
-
-      .legal-section p {
-        margin: 0 0 12px; color: var(--text-muted);
-        line-height: 1.75; font-size: 0.93rem;
-      }
-
-      .legal-section p:last-child { margin-bottom: 0; }
-
-      .legal-section ul, .legal-section ol {
-        margin: 8px 0 12px 0; padding-left: 20px;
-        color: var(--text-muted); font-size: 0.93rem; line-height: 1.8;
-      }
-
-      .legal-section ul li, .legal-section ol li { margin-bottom: 4px; }
-      .legal-section strong { color: var(--text); font-weight: 700; }
-      .legal-section a { color: var(--teal); font-weight: 600; text-decoration: none; }
-      .legal-section a:hover { text-decoration: underline; }
-
-      /* Data table */
-      .data-table {
-        width: 100%; border-collapse: collapse;
-        font-size: 0.88rem; margin: 14px 0;
-        border-radius: 12px; overflow: hidden;
-        border: 1px solid var(--border);
-      }
-
-      .data-table th {
-        background: #f8fafc; padding: 10px 14px;
-        text-align: left; font-weight: 800;
-        color: var(--text); border-bottom: 1px solid var(--border);
-        font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.04em;
-      }
-
-      .data-table td {
-        padding: 10px 14px; border-bottom: 1px solid var(--border);
-        color: var(--text-muted); vertical-align: top;
-      }
-
-      .data-table tr:last-child td { border-bottom: none; }
-      .data-table tr:hover td { background: #fafafa; }
-
-      /* Boxes */
-      .highlight-box {
-        padding: 14px 16px; border-radius: 14px;
-        background: rgba(14,165,233,0.05);
-        border: 1px solid rgba(14,165,233,0.2);
-        font-size: 0.9rem; color: var(--text-muted);
-        line-height: 1.65; margin: 12px 0;
-      }
-
-      .highlight-box strong { color: #0369a1; }
-
-      .green-box {
-        padding: 14px 16px; border-radius: 14px;
-        background: rgba(13,148,136,0.05);
-        border: 1px solid rgba(13,148,136,0.2);
-        font-size: 0.9rem; color: var(--text-muted);
-        line-height: 1.65; margin: 12px 0;
-      }
-
-      .green-box strong { color: var(--teal); }
-
-      .warn-box {
-        padding: 14px 16px; border-radius: 14px;
-        background: #fefce8; border: 1px solid #fde047;
-        font-size: 0.88rem; color: #713f12;
-        line-height: 1.65; margin: 12px 0;
-      }
-
-      /* Rights grid */
-      .rights-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        gap: 12px;
-        margin: 14px 0;
-      }
-
-      .right-card {
-        padding: 14px 14px;
-        border: 1px solid var(--border);
-        border-radius: 14px;
-        background: #fafafa;
-      }
-
-      .right-card-icon { font-size: 1.4rem; margin-bottom: 6px; }
-      .right-card strong { display: block; font-size: 0.88rem; margin-bottom: 3px; color: var(--text); }
-      .right-card span { font-size: 0.8rem; color: var(--text-muted); line-height: 1.5; }
-
-      /* CTA */
-      .accept-card {
-        padding: clamp(24px,4vw,36px);
-        border-radius: 22px;
-        background: linear-gradient(135deg,#eff6ff 0%,#f0fdfa 100%);
-        border: 1px solid rgba(14,165,233,0.2);
-        text-align: center;
-        margin-top: 24px;
-      }
-
-      .accept-card h3 { margin: 0 0 8px; font-size: 1.15rem; }
-      .accept-card p  { margin: 0 0 20px; color: var(--text-muted); font-size: 0.9rem; line-height: 1.6; }
-
-      .accept-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
-
-      @media (min-width: 1024px) {
-        .legal-grid { grid-template-columns: 220px minmax(0,1fr); }
-      }
-    </style>
-  </head>
-
-  <body>
-    <div id="announce-bar"></div>
-    <div id="navbar"></div>
-
-    <main>
-      <div class="legal-wrap">
-        <div class="container">
-
-          <div id="legalBreadcrumb" class="fade-up" style="margin-bottom:18px;"></div>
-
-          <!-- Hero -->
-          <div class="legal-hero fade-up">
-            <span class="badge" style="background:rgba(14,165,233,0.1);color:#0369a1;border:1px solid rgba(14,165,233,0.2);">🔒 Privacy</span>
-            <h1>Privacy Policy</h1>
-            <p>
-              Aapki privacy humari zimmedari hai. Yeh policy clearly explain karti hai ki hum kya data collect karte hain,
-              kyun collect karte hain aur aapke paas kya rights hain.
-            </p>
-            <div class="legal-meta">
-              <span>📅 Last Updated: March 2026</span>
-              <span>🌐 GigLega Beta</span>
-              <span>⚖️ GDPR + IT Act 2000 Compliant</span>
-            </div>
-          </div>
-
-          <div class="legal-grid">
-
-            <!-- TOC -->
-            <aside class="fade-up">
-              <div class="toc-card">
-                <h3>Contents</h3>
-                <ul class="toc-list">
-                  <li><a href="#p1"><span class="toc-num">1</span> Overview</a></li>
-                  <li><a href="#p2"><span class="toc-num">2</span> Data We Collect</a></li>
-                  <li><a href="#p3"><span class="toc-num">3</span> How We Use It</a></li>
-                  <li><a href="#p4"><span class="toc-num">4</span> Data Storage</a></li>
-                  <li><a href="#p5"><span class="toc-num">5</span> Sharing</a></li>
-                  <li><a href="#p6"><span class="toc-num">6</span> Cookies</a></li>
-                  <li><a href="#p7"><span class="toc-num">7</span> Your Rights</a></li>
-                  <li><a href="#p8"><span class="toc-num">8</span> Children</a></li>
-                  <li><a href="#p9"><span class="toc-num">9</span> Security</a></li>
-                  <li><a href="#p10"><span class="toc-num">10</span> Third Parties</a></li>
-                  <li><a href="#p11"><span class="toc-num">11</span> Changes</a></li>
-                  <li><a href="#p12"><span class="toc-num">12</span> Contact</a></li>
-                </ul>
-              </div>
-            </aside>
-
-            <!-- Content -->
-            <div class="fade-up">
-
-              <!-- 1 -->
-              <div class="legal-section" id="p1">
-                <h2><span class="sec-num">1</span> Overview</h2>
-                <div class="green-box">
-                  <strong>Simple version:</strong> Hum sirf wahi data collect karte hain jo platform chalane ke liye zaroorat hai. Aapka data sell nahi karte. Aap kabhi bhi data delete karwa sakte ho.
-                </div>
-                <p>
-                  GigLega ("hum", "platform") ek hyperlocal gig marketplace hai jo Gurugram, Haryana se operate karta hai.
-                  Yeh Privacy Policy explain karti hai ki aap jab <strong>giglega.in</strong> use karte ho toh hum aapki
-                  information kaise handle karte hain.
-                </p>
-                <p>
-                  Platform use karte rahne se aap is Policy ko accept karte ho. Agar agree nahi karte toh
-                  platform use karna band karo aur humse data deletion request karo.
-                </p>
-              </div>
-
-              <!-- 2 -->
-              <div class="legal-section" id="p2">
-                <h2><span class="sec-num">2</span> Data We Collect</h2>
-
-                <p><strong>Aap directly jo dete ho:</strong></p>
-                <table class="data-table">
-                  <thead>
-                    <tr>
-                      <th>Data Type</th>
-                      <th>Example</th>
-                      <th>Reason</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td><strong>Name</strong></td>
-                      <td>Rahul Sharma</td>
-                      <td>Account identity</td>
-                    </tr>
-                    <tr>
-                      <td><strong>Email</strong></td>
-                      <td>rahul@gmail.com</td>
-                      <td>Login, notifications</td>
-                    </tr>
-                    <tr>
-                      <td><strong>Phone</strong></td>
-                      <td>+91 98765 43210</td>
-                      <td>Client/worker contact</td>
-                    </tr>
-                    <tr>
-                      <td><strong>Location</strong></td>
-                      <td>Sector 29, Gurugram</td>
-                      <td>Local gig matching</td>
-                    </tr>
-                    <tr>
-                      <td><strong>Role</strong></td>
-                      <td>Worker / Client</td>
-                      <td>Dashboard routing</td>
-                    </tr>
-                    <tr>
-                      <td><strong>Bio & Skills</strong></td>
-                      <td>Delivery, Driving</td>
-                      <td>Profile completeness</td>
-                    </tr>
-                    <tr>
-                      <td><strong>Gig Listings</strong></td>
-                      <td>Posted job details</td>
-                      <td>Platform functionality</td>
-                    </tr>
-                    <tr>
-                      <td><strong>Applications</strong></td>
-                      <td>Applied gig + message</td>
-                      <td>Job connection</td>
-                    </tr>
-                    <tr>
-                      <td><strong>Contact Form</strong></td>
-                      <td>Support messages</td>
-                      <td>Customer support</td>
-                    </tr>
-                  </tbody>
-                </table>
-
-                <p><strong>Automatically collected data:</strong></p>
-                <ul>
-                  <li>Browser type aur version</li>
-                  <li>Device type (mobile/desktop)</li>
-                  <li>Pages visited aur time spent</li>
-                  <li>Referral source (kahan se aaye)</li>
-                  <li>IP address (approximate location ke liye)</li>
-                </ul>
-                <div class="highlight-box">
-                  <strong>Note:</strong> Beta phase mein saara user data browser ke <strong>localStorage</strong> mein store hota hai — koi central server nahi hai abhi. Matlab data sirf aapke device par hai.
-                </div>
-              </div>
-
-              <!-- 3 -->
-              <div class="legal-section" id="p3">
-                <h2><span class="sec-num">3</span> How We Use Your Data</h2>
-                <p>Aapka data sirf in purposes ke liye use hota hai:</p>
-                <ul>
-                  <li>✅ Account create karna aur manage karna</li>
-                  <li>✅ Workers ko relevant gigs dikhana</li>
-                  <li>✅ Clients ko applications receive karna</li>
-                  <li>✅ Platform ka experience improve karna</li>
-                  <li>✅ Fraud aur abuse detect karna</li>
-                  <li>✅ Legal obligations fulfill karna</li>
-                  <li>✅ Customer support provide karna</li>
-                  <li>✅ Platform updates ke baare mein notify karna</li>
-                </ul>
-                <p><strong>Hum aapka data NAHI use karte:</strong></p>
-                <ul>
-                  <li>🚫 Third parties ko sell karne ke liye</li>
-                  <li>🚫 Targeted advertising ke liye (abhi)</li>
-                  <li>🚫 Profiling ya automated decision-making ke liye</li>
-                  <li>🚫 Aapki consent ke bina kisi aur se share karne ke liye</li>
-                </ul>
-              </div>
-
-              <!-- 4 -->
-              <div class="legal-section" id="p4">
-                <h2><span class="sec-num">4</span> Data Storage</h2>
-                <div class="highlight-box">
-                  <strong>Beta Phase:</strong> Abhi GigLega ek frontend-only platform hai. Saara data aapke browser ke <code style="background:#f1f5f9;padding:2px 6px;border-radius:6px;font-family:monospace;">localStorage</code> mein store hota hai.
-                </div>
-                <p>
-                  Iska matlab:
-                </p>
-                <ul>
-                  <li>Data sirf <strong>aapke device par</strong> save hota hai</li>
-                  <li>Browser clear karne se data delete ho sakta hai</li>
-                  <li>Dusre device par data nahi hoga (sync nahi hota)</li>
-                  <li>Hum remotely aapka data access nahi kar sakte (Beta mein)</li>
-                </ul>
-                <p>
-                  <strong>Future (Production phase) mein:</strong> Jab backend launch hoga toh data secure encrypted servers par store hoga — India mein hosted, data residency laws ke compliant.
-                </p>
-                <p>
-                  Data retention: Active accounts ka data tab tak rakha jaata hai jab tak account active hai.
-                  Inactive accounts (12+ months) ka data delete kiya ja sakta hai — advance notice ke saath.
-                </p>
-              </div>
-
-              <!-- 5 -->
-              <div class="legal-section" id="p5">
-                <h2><span class="sec-num">5</span> Data Sharing</h2>
-                <p>
-                  <strong>Hum aapka personal data sell nahi karte — kabhi nahi.</strong>
-                </p>
-                <p>Sirf inhi cases mein data share hota hai:</p>
-                <ul>
-                  <li>
-                    <strong>Platform functionality:</strong> Jab aap gig apply karte ho toh client ko aapka
-                    name, phone aur message dikhta hai — yeh platform ka core function hai
-                  </li>
-                  <li>
-                    <strong>Legal requirement:</strong> Court order ya government request par legally required
-                    information share karna pad sakta hai
-                  </li>
-                  <li>
-                    <strong>Safety:</strong> Fraud ya illegal activity rokne ke liye authorities ko report karna
-                  </li>
-                  <li>
-                    <strong>Business transfer:</strong> Agar GigLega acquire ya merge ho toh — users ko pehle notify kiya jayega
-                  </li>
-                </ul>
-                <div class="warn-box">
-                  ⚠️ Jab aap gig apply karte ho toh aapka contact info client ko visible hota hai — yeh intentional hai taaki wo aapko hire kar sakein. Isliye accurate info dalo.
-                </div>
-              </div>
-
-              <!-- 6 -->
-              <div class="legal-section" id="p6">
-                <h2><span class="sec-num">6</span> Cookies & Local Storage</h2>
-                <p>GigLega yeh storage technologies use karta hai:</p>
-                <table class="data-table">
-                  <thead>
-                    <tr><th>Type</th><th>Purpose</th><th>Duration</th></tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td><strong>localStorage</strong></td>
-                      <td>User data, gigs, applications save karna</td>
-                      <td>Jab tak manually clear na karo</td>
-                    </tr>
-                    <tr>
-                      <td><strong>sessionStorage</strong></td>
-                      <td>Announcement bar dismiss state</td>
-                      <td>Tab close hone tak</td>
-                    </tr>
-                    <tr>
-                      <td><strong>Theme cookie</strong></td>
-                      <td>Dark/light mode preference</td>
-                      <td>Persistent</td>
-                    </tr>
-                  </tbody>
-                </table>
-                <p>
-                  Hum abhi third-party tracking cookies (Google Analytics, Facebook Pixel etc.) use nahi karte Beta phase mein.
-                  Future mein agar use karein toh is policy mein update karenge.
-                </p>
-                <p>
-                  Browser settings se localStorage clear kar sakte ho — lekin isse aapka GigLega account data bhi delete ho jayega.
-                </p>
-              </div>
-
-              <!-- 7 -->
-              <div class="legal-section" id="p7">
-                <h2><span class="sec-num">7</span> Your Rights</h2>
-                <p>Aapke paas yeh rights hain:</p>
-                <div class="rights-grid">
-                  <div class="right-card">
-                    <div class="right-card-icon">👁️</div>
-                    <strong>Access</strong>
-                    <span>Apna stored data dekhne ka right</span>
-                  </div>
-                  <div class="right-card">
-                    <div class="right-card-icon">✏️</div>
-                    <strong>Correction</strong>
-                    <span>Galat data fix karne ka right</span>
-                  </div>
-                  <div class="right-card">
-                    <div class="right-card-icon">🗑️</div>
-                    <strong>Deletion</strong>
-                    <span>Apna data delete karwane ka right</span>
-                  </div>
-                  <div class="right-card">
-                    <div class="right-card-icon">📦</div>
-                    <strong>Portability</strong>
-                    <span>Data export karne ka right</span>
-                  </div>
-                  <div class="right-card">
-                    <div class="right-card-icon">🚫</div>
-                    <strong>Object</strong>
-                    <span>Data processing rokne ka right</span>
-                  </div>
-                  <div class="right-card">
-                    <div class="right-card-icon">⏸️</div>
-                    <strong>Restrict</strong>
-                    <span>Processing limit karne ka right</span>
-                  </div>
-                </div>
-                <p>
-                  In rights ko exercise karne ke liye email karo:
-                  <a href="mailto:Giglega.official@gmail.com">Giglega.official@gmail.com</a> —
-                  subject line mein <strong>"Privacy Request"</strong> likho.
-                  Hum <strong>30 days</strong> mein respond karenge.
-                </p>
-                <div class="green-box">
-                  <strong>Quick data delete:</strong> Abhi Beta mein — browser ka localStorage clear karo (<code style="font-family:monospace;font-size:0.85em;">DevTools → Application → LocalStorage → Clear All</code>) aur aapka saara GigLega data instantly delete ho jayega.
-                </div>
-              </div>
-
-              <!-- 8 -->
-              <div class="legal-section" id="p8">
-                <h2><span class="sec-num">8</span> Children's Privacy</h2>
-                <div class="warn-box">
-                  ⚠️ GigLega 18 saal se kam ke users ke liye nahi hai. Hum knowingly minors ka data collect nahi karte.
-                </div>
-                <p>
-                  Agar aapko pata chale ki koi minor ne account banaya hai toh turant humein report karo:
-                  <a href="mailto:Giglega.official@gmail.com">Giglega.official@gmail.com</a>
-                </p>
-                <p>
-                  Hum aise accounts turant delete kar denge aur associated data remove kar denge.
-                </p>
-              </div>
-
-              <!-- 9 -->
-              <div class="legal-section" id="p9">
-                <h2><span class="sec-num">9</span> Data Security</h2>
-                <p>Hum aapka data protect karne ke liye yeh measures lete hain:</p>
-                <ul>
-                  <li>HTTPS — saara platform encrypted connection par serve hota hai</li>
-                  <li>Passwords hashed store kiye jaate hain (future backend mein bcrypt)</li>
-                  <li>Session tokens expiry ke saath issue kiye jaate hain</li>
-                  <li>Suspicious activity monitor ki jaati hai</li>
-                  <li>Regular security reviews</li>
-                </ul>
-                <p>
-                  Lekin <strong>100% security guarantee possible nahi hai</strong> — internet par koi bhi system completely breach-proof nahi hota.
-                  Agar aapko koi security issue mile toh turant report karo.
-                </p>
-                <div class="highlight-box">
-                  <strong>Beta phase mein:</strong> Data localStorage mein hai — device lock rakhna, public computers par logout karna aapki responsibility hai.
-                </div>
-              </div>
-
-              <!-- 10 -->
-              <div class="legal-section" id="p10">
-                <h2><span class="sec-num">10</span> Third-Party Links</h2>
-                <p>
-                  GigLega mein kuch third-party links hain:
-                </p>
-                <ul>
-                  <li>💬 WhatsApp (wa.me) — contact ke liye</li>
-                  <li>📍 Google Maps — location ke liye</li>
-                  <li>🔗 Instagram, LinkedIn, YouTube — social links</li>
-                </ul>
-                <p>
-                  Jab aap inhe click karte ho toh un platforms ki apni privacy policies apply hoti hain.
-                  GigLega unke data practices ke liye responsible nahi hai.
-                </p>
-                <p>
-                  In links par click karna aapki choice hai — GigLega force nahi karta.
-                </p>
-              </div>
-
-              <!-- 11 -->
-              <div class="legal-section" id="p11">
-                <h2><span class="sec-num">11</span> Policy Changes</h2>
-                <p>
-                  Jab bhi Privacy Policy update hogi:
-                </p>
-                <ul>
-                  <li>Updated policy website par post ki jayegi naye "Last Updated" date ke saath</li>
-                  <li>Major changes ke liye registered users ko notify kiya jayega</li>
-                  <li>Changes ke baad platform use karna new policy accept karna maana jayega</li>
-                </ul>
-                <p>
-                  Hum recommend karte hain ki aap quarterly ek baar yeh page check karo.
-                </p>
-                <div class="green-box">
-                  <strong>Current version:</strong> March 2026 · GigLega Beta · v1.0
-                </div>
-              </div>
-
-              <!-- 12 -->
-              <div class="legal-section" id="p12">
-                <h2><span class="sec-num">12</span> Contact Us</h2>
-                <p>
-                  Privacy se related koi bhi sawaal, concern ya request ke liye:
-                </p>
-                <ul>
-                  <li>📧 <strong>Email:</strong> <a href="mailto:Giglega.official@gmail.com">Giglega.official@gmail.com</a></li>
-                  <li>💬 <strong>WhatsApp:</strong> <a href="https://wa.me/919319635257" target="_blank" rel="noopener">+91 93196 35257</a></li>
-                  <li>📍 <strong>Address:</strong> H.No 82, Om Vihar Phase 1, Palam Vihar Extn, Gurugram, Haryana 122017</li>
-                  <li>🌐 <strong>Contact Form:</strong> <a href="contact.html">giglega.in/contact.html</a></li>
-                </ul>
-                <p>
-                  Privacy requests ka response time: <strong>30 days</strong> (typically much faster).
-                  <br />Data deletion requests: <strong>7 business days</strong>.
-                </p>
-              </div>
-
-              <!-- CTA -->
-              <div class="accept-card fade-up">
-                <h3>🔒 Tumhari Privacy Safe Hai</h3>
-                <p>
-                  GigLega mein aapka data sirf aapka hai — hum iska misuse kabhi nahi karenge.
-                  Koi bhi sawaal ho toh seedha WhatsApp karo!
-                </p>
-                <div class="accept-btns">
-                  <a href="signup.html" class="btn btn-primary">Join GigLega Free 🚀</a>
-                  <a href="terms.html" class="btn btn-outline">Terms of Service →</a>
-                  <a href="contact.html" class="btn btn-outline">Contact Us →</a>
-                </div>
-              </div>
-
-            </div>
-          </div>
+      <div class="legal-card" id="intro">
+        <div class="legal-section-title">1. 👋 Introduction</div>
+        <div class="legal-body">
+          <p>GigLega ("we", "our", "us") is committed to protecting your personal information. This Privacy Policy explains how we collect, use, store, and protect data when you use the GigLega platform at <strong>giglega.vercel.app</strong>.</p>
+          <p>By using GigLega, you consent to the data practices described in this policy.</p>
+          <div class="highlight-box">🛡️ During Beta, all user data is stored locally in your browser (localStorage). No data is sent to external servers unless you explicitly interact with external services (e.g., WhatsApp).</div>
         </div>
       </div>
-    </main>
 
-    <footer id="footer"></footer>
+      <div class="legal-card" id="collect">
+        <div class="legal-section-title">2. 📋 What We Collect</div>
+        <div class="legal-body">
+          <p>We collect the following types of information:</p>
+          <table class="data-table">
+            <thead>
+              <tr><th>Data Type</th><th>Examples</th><th>Required?</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Account Info</strong></td><td>Name, phone number, email, password (hashed)</td><td>Yes</td></tr>
+              <tr><td><strong>Profile Info</strong></td><td>Bio, skills, city, pincode, profile photo</td><td>Optional</td></tr>
+              <tr><td><strong>Gig Data</strong></td><td>Gig titles, descriptions, locations, pricing</td><td>When posting</td></tr>
+              <tr><td><strong>Chat Messages</strong></td><td>Text messages and images sent in gig chats</td><td>When using chat</td></tr>
+              <tr><td><strong>Location Data</strong></td><td>GPS coordinates (only when you click "Fetch Location")</td><td>Optional</td></tr>
+              <tr><td><strong>Usage Data</strong></td><td>Pages visited, actions taken (future analytics)</td><td>Automatic</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
 
-    <script>
-      document.addEventListener("DOMContentLoaded", function () {
-        buildBreadcrumb("legalBreadcrumb", [
-          { label: "Home", href: "index.html" },
-          { label: "Privacy Policy" }
-        ]);
-      });
-    </script>
-  </body>
+      <div class="legal-card" id="use">
+        <div class="legal-section-title">3. 🎯 How We Use Your Data</div>
+        <div class="legal-body">
+          <p>Your data is used to:</p>
+          <ul>
+            <li>Create and manage your GigLega account.</li>
+            <li>Match Workers with Posters based on location and category.</li>
+            <li>Facilitate communication between Posters and Workers.</li>
+            <li>Process and track gig payments and platform fees.</li>
+            <li>Improve platform features and fix bugs.</li>
+            <li>Send important platform notifications (no spam).</li>
+            <li>Ensure platform safety and prevent fraud.</li>
+          </ul>
+          <p>We do <strong>not</strong> sell your personal data to third parties. Ever.</p>
+        </div>
+      </div>
+
+      <div class="legal-card" id="storage">
+        <div class="legal-section-title">4. 💾 Data Storage</div>
+        <div class="legal-body">
+          <p><strong>Current (Beta Phase):</strong> All data is stored in your browser's <code>localStorage</code>. This means:</p>
+          <ul>
+            <li>Data exists only on your device and browser.</li>
+            <li>Clearing your browser data will delete your GigLega data.</li>
+            <li>Data is not synced across devices.</li>
+          </ul>
+          <p><strong>Future (Post-Beta):</strong> Data will be migrated to <strong>Firebase (Google Cloud)</strong> servers with encryption at rest and in transit. Servers will be located in Mumbai, India (asia-south1 region) for compliance with Indian data laws.</p>
+          <div class="highlight-box">🔒 Profile photos are stored as base64 strings in localStorage. They are not uploaded to any server during Beta.</div>
+        </div>
+      </div>
+
+      <div class="legal-card" id="sharing">
+        <div class="legal-section-title">5. 🤝 Data Sharing</div>
+        <div class="legal-body">
+          <p>We share limited data only in these situations:</p>
+          <ul>
+            <li><strong>Between users:</strong> Your name, phone number, and gig details are shared with the other party after a gig is accepted.</li>
+            <li><strong>WhatsApp:</strong> If you click "Message on WhatsApp", you are redirected to WhatsApp with a pre-filled message. WhatsApp's own privacy policy applies.</li>
+            <li><strong>OpenStreetMap (Nominatim):</strong> If you use "Fetch Location", your GPS coordinates are sent to OpenStreetMap's Nominatim API for reverse-geocoding. No account data is shared.</li>
+            <li><strong>Legal requirements:</strong> We may disclose data if required by Indian law or court order.</li>
+          </ul>
+          <p>We do <strong>not</strong> share data with advertisers, data brokers, or any third-party marketing services.</p>
+        </div>
+      </div>
+
+      <div class="legal-card" id="rights">
+        <div class="legal-section-title">6. ✊ Your Rights</div>
+        <div class="legal-body">
+          <p>You have the following rights over your data:</p>
+          <ul>
+            <li><strong>Access:</strong> View all your data in your Profile page.</li>
+            <li><strong>Edit:</strong> Update your information at any time from Profile settings.</li>
+            <li><strong>Delete:</strong> Delete your account from Profile → Danger Zone → Delete Account.</li>
+            <li><strong>Export:</strong> Contact us to request a copy of your data.</li>
+            <li><strong>Withdraw Consent:</strong> Stop using the platform and delete your account at any time.</li>
+          </ul>
+          <p>For any data-related requests, email us at <strong>Giglega.official@gmail.com</strong>. We will respond within 7 business days.</p>
+        </div>
+      </div>
+
+      <div class="legal-card" id="cookies">
+        <div class="legal-section-title">7. 🍪 Cookies & Local Storage</div>
+        <div class="legal-body">
+          <p>GigLega currently uses <strong>browser localStorage</strong> (not cookies) to store:</p>
+          <ul>
+            <li>Your login session data.</li>
+            <li>Your profile and preferences.</li>
+            <li>Gig listings and chat history.</li>
+            <li>Dark mode preference.</li>
+          </ul>
+          <p>No third-party tracking cookies are used on GigLega during Beta. Post-launch, analytics tools (e.g., Firebase Analytics) may be added with appropriate consent mechanisms.</p>
+        </div>
+      </div>
+
+      <div class="legal-card" id="children">
+        <div class="legal-section-title">8. 👶 Children's Privacy</div>
+        <div class="legal-body">
+          <p>GigLega is intended for users <strong>18 years of age and older</strong>. We do not knowingly collect data from minors.</p>
+          <p>If you believe a minor has registered on our platform, please contact us immediately at <strong>Giglega.official@gmail.com</strong> and we will remove the account.</p>
+        </div>
+      </div>
+
+      <div class="legal-card" id="contact">
+        <div class="legal-section-title">9. 📞 Contact Us</div>
+        <div class="legal-body">
+          <p>For privacy-related questions or data requests, contact our team:</p>
+          <ul>
+            <li>📧 Email: <strong>Giglega.official@gmail.com</strong></li>
+            <li>📱 WhatsApp/Call: <strong>+91 9319635257</strong></li>
+            <li>📍 Address: H.no 82 Om Vihar Phase 1, Palam Vihar Extn, Opp Sec 23A HUDA Park, Gurugram — 122017, Haryana, India</li>
+            <li>⏰ Response time: Within 7 business days</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <footer id="main-footer"></footer>
+  <div id="toast-container"></div>
+  <script>
+    if (typeof buildBreadcrumb === "function") {
+      buildBreadcrumb("breadcrumb", [
+        { label: "Home", href: "index.html" },
+        { label: "Privacy Policy" }
+      ]);
+    }
+  </script>
+</body>
 </html>
