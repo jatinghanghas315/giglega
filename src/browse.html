@@ -1,932 +1,564 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Browse Gigs — GigLega Gurugram</title>
-    <meta
-      name="description"
-      content="Gurugram ke latest local gigs browse karo. Delivery, teaching, tech, events aur bahut kuch. Filter karo, apply karo, turant connect ho jao."
-    />
-    <link rel="stylesheet" href="styles.css" />
-    <script defer src="shared.js"></script>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Browse Gigs — GigLega</title>
+  <meta name="description" content="Gurugram ke best gigs browse karo. Hyperlocal aur remote dono available. Abhi apply karo." />
+  <link rel="stylesheet" href="styles.css" />
+  <script defer src="shared.js"></script>
+  <style>
+    /* ── Page layout ── */
+    .browse-wrap{max-width:1100px;margin:0 auto;padding:32px 16px 80px}
+    .browse-hero{margin-bottom:28px}
+    .browse-hero h1{font-size:1.7rem;font-weight:800;color:var(--primary);margin-bottom:4px}
+    .browse-hero p{color:var(--gray-500);font-size:.95rem}
 
-    <style>
-      /* ── Page layout ───────────────────────────────────── */
-      .browse-hero {
-        padding: clamp(28px, 5vw, 52px) 0 20px;
-      }
+    /* ── Filter bar ── */
+    .filter-bar{background:var(--surface);border:1px solid var(--gray-200);border-radius:var(--radius);padding:18px 20px;margin-bottom:24px;box-shadow:var(--shadow-sm)}
+    .filter-row{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+    .filter-row:last-child{margin-bottom:0}
 
-      .browse-title {
-        margin: 0 0 6px;
-        font-size: clamp(1.8rem, 3.5vw, 2.8rem);
-        letter-spacing: -0.03em;
-      }
+    /* Search */
+    .search-wrap{position:relative;flex:1;min-width:220px}
+    .search-wrap input{width:100%;padding:10px 14px 10px 38px;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);font-size:.93rem;background:var(--surface);color:var(--text);font-family:inherit;transition:border .2s;box-sizing:border-box}
+    .search-wrap input:focus{outline:none;border-color:var(--teal)}
+    .search-wrap .search-icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:1rem;pointer-events:none}
 
-      .browse-sub {
-        margin: 0;
-        color: var(--text-muted);
-        max-width: 52ch;
-      }
+    /* Type toggle */
+    .type-toggle{display:flex;gap:8px}
+    .type-pill{padding:9px 20px;border-radius:20px;border:1.5px solid var(--gray-200);background:var(--surface);color:var(--gray-600);font-weight:600;font-size:.87rem;cursor:pointer;transition:all .2s;white-space:nowrap}
+    .type-pill.active{border-color:var(--teal);background:var(--teal);color:#fff}
+    .type-pill:hover:not(.active){border-color:var(--teal);color:var(--teal)}
 
-      /* ── Search bar ────────────────────────────────────── */
-      .search-wrap {
-        margin: 20px 0 0;
-        display: flex;
-        gap: 10px;
-        align-items: center;
-        flex-wrap: wrap;
-      }
+    /* Category chips */
+    .cat-chips{display:flex;gap:8px;flex-wrap:wrap}
+    .cat-chip{padding:7px 16px;border-radius:20px;border:1.5px solid var(--gray-200);background:var(--surface);color:var(--gray-600);font-size:.82rem;font-weight:600;cursor:pointer;transition:all .2s;white-space:nowrap}
+    .cat-chip.active{border-color:var(--primary);background:var(--primary);color:#fff}
+    .cat-chip:hover:not(.active){border-color:var(--primary);color:var(--primary)}
 
-      .search-field {
-        position: relative;
-        flex: 1 1 260px;
-      }
+    /* Results count */
+    .results-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px}
+    .results-count{font-size:.88rem;color:var(--gray-500)}
+    .results-count strong{color:var(--primary)}
 
-      .search-field input {
-        width: 100%;
-        padding: 13px 44px 13px 18px;
-        border: 1.5px solid var(--border);
-        border-radius: 14px;
-        font-size: 1rem;
-        background: #fff;
-        color: var(--text);
-        outline: none;
-        transition: border-color 0.18s, box-shadow 0.18s;
-      }
+    /* ── Gig Grid ── */
+    .gig-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px}
 
-      .search-field input:focus {
-        border-color: var(--teal);
-        box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.12);
-      }
+    /* ── Gig Card ── */
+    .gig-card{background:var(--surface);border:1.5px solid var(--gray-200);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow-sm);transition:transform .2s,box-shadow .2s,opacity .3s;position:relative;display:flex;flex-direction:column}
+    .gig-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-md)}
+    .gig-card.taken{opacity:.55;pointer-events:none}
+    .gig-card.taken-flash{border-color:var(--danger)!important}
 
-      .search-clear {
-        position: absolute;
-        right: 12px;
-        top: 50%;
-        transform: translateY(-50%);
-        background: none;
-        border: none;
-        cursor: pointer;
-        font-size: 1.1rem;
-        color: var(--text-muted);
-        padding: 4px;
-        line-height: 1;
-        display: none;
-      }
+    /* Status badge */
+    .gig-status-badge{position:absolute;top:14px;right:14px;padding:4px 10px;border-radius:12px;font-size:.72rem;font-weight:700;letter-spacing:.3px}
+    .badge-open{background:rgba(16,185,129,.12);color:#059669}
+    .badge-taken{background:rgba(239,68,68,.12);color:#dc2626}
 
-      .search-field input:not(:placeholder-shown) ~ .search-clear {
-        display: block;
-      }
+    /* Type tag */
+    .gig-type-tag{display:inline-block;font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:10px;margin-bottom:10px}
+    .tag-hyperlocal{background:rgba(245,158,11,.12);color:#b45309}
+    .tag-remote{background:rgba(99,102,241,.12);color:#4338ca}
 
-      /* ── Chip bar ──────────────────────────────────────── */
-      .chip-bar {
-        margin: 16px 0 0;
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-        align-items: center;
-      }
+    /* Card body */
+    .gig-cat{font-size:.78rem;color:var(--gray-400);margin-bottom:4px}
+    .gig-title{font-size:1rem;font-weight:700;color:var(--text);margin-bottom:8px;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+    .gig-desc{font-size:.82rem;color:var(--gray-500);line-height:1.5;margin-bottom:12px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 
-      .chip-bar-label {
-        font-size: 0.85rem;
-        font-weight: 700;
-        color: var(--text-muted);
-        margin-right: 4px;
-      }
+    .gig-meta{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+    .gig-meta-item{display:flex;align-items:center;gap:4px;font-size:.78rem;color:var(--gray-500)}
 
-      /* ── Results bar ───────────────────────────────────── */
-      .results-bar {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        flex-wrap: wrap;
-        gap: 10px;
-        margin: 22px 0 16px;
-      }
+    /* Price row */
+    .gig-price-row{display:flex;align-items:baseline;gap:8px;margin-bottom:6px}
+    .gig-price{font-size:1.2rem;font-weight:800;color:var(--primary)}
+    .gig-price-unit{font-size:.78rem;color:var(--gray-400)}
 
-      .results-count {
-        font-weight: 700;
-        color: var(--text-muted);
-        font-size: 0.95rem;
-      }
+    /* Earnings strip */
+    .gig-earn-strip{background:linear-gradient(90deg,rgba(13,148,136,.08) 0%,rgba(26,60,94,.06) 100%);border:1px solid rgba(13,148,136,.2);border-radius:8px;padding:8px 12px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center}
+    .gig-earn-label{font-size:.75rem;color:var(--gray-500)}
+    .gig-earn-val{font-size:.9rem;font-weight:800;color:var(--teal)}
 
-      .sort-wrap {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-      }
+    /* Taken countdown */
+    .taken-bar{height:3px;background:var(--danger);border-radius:2px;margin-bottom:10px;display:none}
+    .taken-bar.show{display:block}
+    .taken-bar-inner{height:100%;background:var(--danger);border-radius:2px;width:100%;transition:width linear}
 
-      .sort-wrap label {
-        font-size: 0.88rem;
-        color: var(--text-muted);
-        font-weight: 600;
-      }
+    /* Action button */
+    .btn-accept{width:100%;padding:11px;background:linear-gradient(135deg,var(--primary) 0%,var(--teal) 100%);color:#fff;border:none;border-radius:var(--radius-sm);font-weight:700;font-size:.9rem;cursor:pointer;transition:opacity .2s,transform .15s;margin-top:auto}
+    .btn-accept:hover{opacity:.9;transform:translateY(-1px)}
+    .btn-accept:disabled{opacity:.5;cursor:not-allowed;transform:none}
+    .btn-taken{width:100%;padding:11px;background:var(--gray-200);color:var(--gray-500);border:none;border-radius:var(--radius-sm);font-weight:700;font-size:.9rem;cursor:not-allowed;margin-top:auto}
 
-      .sort-wrap select {
-        padding: 7px 12px;
-        border: 1.5px solid var(--border);
-        border-radius: 10px;
-        font-size: 0.9rem;
-        background: #fff;
-        color: var(--text);
-        cursor: pointer;
-        outline: none;
-      }
+    /* Empty state */
+    .empty-state{text-align:center;padding:64px 24px;color:var(--gray-400)}
+    .empty-state .empty-icon{font-size:3.5rem;margin-bottom:16px}
+    .empty-state h3{font-size:1.1rem;font-weight:700;color:var(--gray-600);margin-bottom:8px}
+    .empty-state p{font-size:.88rem;line-height:1.6}
 
-      /* ── Gig grid ──────────────────────────────────────── */
-      .gig-grid {
-        display: grid;
-        gap: 16px;
-      }
+    /* Loading skeleton */
+    .skeleton-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px}
+    .skeleton-card{background:var(--surface);border:1.5px solid var(--gray-200);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow-sm)}
+    .skel{background:var(--gray-100);border-radius:6px;animation:skel-pulse 1.4s ease-in-out infinite}
+    .skel-title{height:18px;width:70%;margin-bottom:10px}
+    .skel-line{height:12px;width:100%;margin-bottom:8px}
+    .skel-line.w60{width:60%}
+    .skel-btn{height:40px;width:100%;margin-top:16px;border-radius:var(--radius-sm)}
+    @keyframes skel-pulse{0%,100%{opacity:1}50%{opacity:.45}}
 
-      .gig-card {
-        padding: 22px 20px;
-        border: 1px solid var(--border);
-        border-radius: 22px;
-        background: #fff;
-        display: flex;
-        flex-direction: column;
-        gap: 0;
-        transition: box-shadow 0.18s, transform 0.18s;
-      }
+    /* Dark mode */
+    [data-theme=dark] .filter-bar{border-color:var(--gray-700)}
+    [data-theme=dark] .gig-card{border-color:var(--gray-700)}
+    [data-theme=dark] .type-pill{border-color:var(--gray-600);color:var(--gray-300);background:var(--gray-800)}
+    [data-theme=dark] .cat-chip{border-color:var(--gray-600);color:var(--gray-300);background:var(--gray-800)}
+    [data-theme=dark] .cat-chip.active{background:var(--primary);border-color:var(--primary);color:#fff}
+    [data-theme=dark] .search-wrap input{border-color:var(--gray-600);background:var(--gray-800)}
+    [data-theme=dark] .btn-taken{background:var(--gray-700);color:var(--gray-500)}
+    [data-theme=dark] .skel{background:var(--gray-700)}
+    [data-theme=dark] .skeleton-card{border-color:var(--gray-700)}
+    [data-theme=dark] .gig-earn-strip{background:rgba(13,148,136,.1);border-color:rgba(13,148,136,.25)}
+  </style>
+</head>
+<body>
+  <div id="announce-bar"></div>
+  <nav id="main-nav"></nav>
 
-      .gig-card:hover {
-        box-shadow: 0 8px 28px rgba(13, 148, 136, 0.1);
-        transform: translateY(-2px);
-      }
+  <main class="page-wrapper">
+    <div class="browse-wrap">
 
-      .gig-top {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        gap: 12px;
-      }
-
-      .gig-title {
-        margin: 0 0 4px;
-        font-size: 1.07rem;
-        line-height: 1.35;
-      }
-
-      .gig-company {
-        margin: 0;
-        font-size: 0.88rem;
-        color: var(--text-muted);
-      }
-
-      .gig-badges {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 6px;
-        margin-top: 12px;
-      }
-
-      .gig-meta {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        margin-top: 12px;
-        font-size: 0.9rem;
-        color: var(--text-muted);
-      }
-
-      .gig-desc {
-        margin: 12px 0 0;
-        font-size: 0.93rem;
-        color: var(--text-muted);
-        line-height: 1.58;
-      }
-
-      .gig-actions {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        margin-top: 16px;
-        align-items: center;
-      }
-
-      /* ── Empty / No results ────────────────────────────── */
-      .empty-results {
-        grid-column: 1 / -1;
-        text-align: center;
-        padding: 48px 24px;
-        border: 1px dashed var(--border);
-        border-radius: 22px;
-        background: rgba(13, 148, 136, 0.03);
-      }
-
-      .empty-results p {
-        margin: 12px 0 24px;
-        color: var(--text-muted);
-      }
-
-      /* ── Apply modal ───────────────────────────────────── */
-      .modal-overlay {
-        position: fixed;
-        inset: 0;
-        background: rgba(15, 23, 42, 0.55);
-        z-index: 1000;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 16px;
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity 0.22s;
-      }
-
-      .modal-overlay.open {
-        opacity: 1;
-        pointer-events: all;
-      }
-
-      .modal-box {
-        background: #fff;
-        border-radius: 24px;
-        padding: clamp(24px, 4vw, 40px);
-        width: 100%;
-        max-width: 520px;
-        max-height: 90vh;
-        overflow-y: auto;
-        position: relative;
-        transform: translateY(24px);
-        transition: transform 0.22s;
-      }
-
-      .modal-overlay.open .modal-box {
-        transform: translateY(0);
-      }
-
-      .modal-close {
-        position: absolute;
-        top: 16px;
-        right: 18px;
-        background: none;
-        border: none;
-        font-size: 1.5rem;
-        cursor: pointer;
-        color: var(--text-muted);
-        line-height: 1;
-        padding: 4px 8px;
-        border-radius: 8px;
-        transition: background 0.14s;
-      }
-
-      .modal-close:hover {
-        background: var(--border);
-      }
-
-      .modal-title {
-        margin: 0 0 6px;
-        font-size: 1.3rem;
-      }
-
-      .modal-gig-ref {
-        margin: 0 0 22px;
-        color: var(--text-muted);
-        font-size: 0.92rem;
-      }
-
-      .form-group {
-        margin-bottom: 16px;
-      }
-
-      .form-group label {
-        display: block;
-        font-weight: 700;
-        margin-bottom: 6px;
-        font-size: 0.92rem;
-      }
-
-      .form-group input,
-      .form-group textarea,
-      .form-group select {
-        width: 100%;
-        padding: 11px 14px;
-        border: 1.5px solid var(--border);
-        border-radius: 12px;
-        font-size: 0.97rem;
-        font-family: inherit;
-        color: var(--text);
-        background: #fff;
-        outline: none;
-        transition: border-color 0.18s, box-shadow 0.18s;
-        resize: vertical;
-      }
-
-      .form-group input:focus,
-      .form-group textarea:focus,
-      .form-group select:focus {
-        border-color: var(--teal);
-        box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
-      }
-
-      .modal-actions {
-        display: flex;
-        gap: 10px;
-        margin-top: 22px;
-        flex-wrap: wrap;
-      }
-
-      /* ── Pagination ────────────────────────────────────── */
-      #paginationWrap {
-        margin-top: 28px;
-      }
-
-      /* ── Seed banner ───────────────────────────────────── */
-      .seed-banner {
-        padding: 18px 20px;
-        border: 1px dashed var(--border);
-        border-radius: 18px;
-        background: rgba(13, 148, 136, 0.04);
-        margin-bottom: 20px;
-        display: flex;
-        gap: 14px;
-        align-items: center;
-        flex-wrap: wrap;
-      }
-
-      .seed-banner p {
-        margin: 0;
-        flex: 1;
-        color: var(--text-muted);
-        font-size: 0.92rem;
-      }
-
-      /* ── Responsive ────────────────────────────────────── */
-      @media (min-width: 640px) {
-        .gig-grid {
-          grid-template-columns: repeat(2, 1fr);
-        }
-      }
-
-      @media (min-width: 1100px) {
-        .gig-grid {
-          grid-template-columns: repeat(3, 1fr);
-        }
-      }
-    </style>
-  </head>
-
-  <body>
-    <div id="announce-bar"></div>
-    <div id="navbar"></div>
-
-    <main>
-      <!-- ══ HERO ══ -->
-      <section class="browse-hero">
-        <div class="container">
-          <div id="browseBreadcrumb" class="fade-up"></div>
-
-          <div class="fade-up" style="margin-top: 10px;">
-            <span class="badge badge-teal">📍 Gurugram Gigs</span>
-          </div>
-
-          <h1 class="browse-title fade-up">Browse Local Gigs</h1>
-          <p class="browse-sub fade-up">
-            Gurugram ke real, hyperlocal kaam. Filter karo, apply karo, turant connect ho jao.
-          </p>
-
-          <!-- Search -->
-          <div class="search-wrap fade-up">
-            <div class="search-field">
-              <input
-                type="search"
-                id="gigSearch"
-                placeholder="Gig dhundo — delivery, teaching, tech..."
-                data-search
-                data-search-clear="gigSearchClear"
-                autocomplete="off"
-                aria-label="Search gigs"
-              />
-              <button id="gigSearchClear" class="search-clear" aria-label="Clear search">✕</button>
-            </div>
-            <a href="post-gig.html" class="btn btn-primary">+ Post a Gig</a>
-          </div>
-
-          <!-- Category chips -->
-          <div class="chip-bar fade-up" data-chip-group="single" id="categoryChipBar">
-            <span class="chip-bar-label">Filter:</span>
-            <button class="chip active" data-filter="category" data-value="all">All</button>
-            <button class="chip" data-filter="category" data-value="delivery">🚴 Delivery</button>
-            <button class="chip" data-filter="category" data-value="teaching">📚 Teaching</button>
-            <button class="chip" data-filter="category" data-value="tech">💻 Tech</button>
-            <button class="chip" data-filter="category" data-value="domestic">🏠 Domestic</button>
-            <button class="chip" data-filter="category" data-value="event">🎉 Events</button>
-            <button class="chip" data-filter="category" data-value="content">🎬 Content</button>
-            <button class="chip" data-filter="category" data-value="sales">📣 Sales</button>
-          </div>
-        </div>
-      </section>
-
-      <!-- ══ RESULTS ══ -->
-      <section style="padding-bottom: clamp(40px, 6vw, 72px);">
-        <div class="container">
-
-          <!-- Results bar -->
-          <div class="results-bar">
-            <span class="results-count" id="resultsCount">Loading...</span>
-            <div class="sort-wrap">
-              <label for="sortSelect">Sort:</label>
-              <select id="sortSelect" aria-label="Sort gigs">
-                <option value="newest">Newest First</option>
-                <option value="budget-high">Budget: High to Low</option>
-                <option value="budget-low">Budget: Low to High</option>
-              </select>
-            </div>
-          </div>
-
-          <!-- Seed banner — shown only when no gigs exist -->
-          <div class="seed-banner" id="seedBanner" style="display:none;">
-            <span style="font-size:1.6rem;">🌱</span>
-            <p>
-              Abhi koi live gig nahi hai — yeh demo gigs hain taaki browse flow dikhaye.
-              Pehle real gig post karo aur woh yahan live ho jayega!
-            </p>
-            <a href="post-gig.html" class="btn btn-primary btn-sm">Post First Gig</a>
-          </div>
-
-          <!-- Gig grid -->
-          <div class="gig-grid" id="gigGrid" aria-live="polite"></div>
-
-          <!-- Pagination -->
-          <div id="paginationWrap"></div>
-        </div>
-      </section>
-    </main>
-
-    <!-- ══ APPLY MODAL ══ -->
-    <div class="modal-overlay" id="applyModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="applyModalTitle">
-      <div class="modal-box">
-        <button class="modal-close modal-close" aria-label="Close modal" data-modal-close>×</button>
-        <h2 class="modal-title" id="applyModalTitle">Apply for Gig</h2>
-        <p class="modal-gig-ref" id="applyGigRef">Gig name yahan</p>
-
-        <form id="applyForm" novalidate>
-          <div class="form-group">
-            <label for="applyName">Full Name *</label>
-            <input type="text" id="applyName" placeholder="Apna pura naam" maxlength="80" autocomplete="name" />
-          </div>
-
-          <div class="form-group">
-            <label for="applyPhone">Phone Number *</label>
-            <input type="tel" id="applyPhone" placeholder="+91 98765 43210" data-phone maxlength="15" autocomplete="tel" />
-          </div>
-
-          <div class="form-group">
-            <label for="applyEmail">Email</label>
-            <input type="email" id="applyEmail" placeholder="aapka@email.com" maxlength="100" autocomplete="email" />
-          </div>
-
-          <div class="form-group">
-            <label for="applyMsg">Why should they pick you? <span style="font-weight:400;color:var(--text-muted)">(optional)</span></label>
-            <textarea
-              id="applyMsg"
-              rows="3"
-              placeholder="Kuch interesting likho — experience, availability, ya koi special skill..."
-              maxlength="300"
-              data-counter="applyMsgCount"
-            ></textarea>
-            <span id="applyMsgCount" style="font-size:0.8rem;color:var(--text-muted);"></span>
-          </div>
-
-          <div class="modal-actions">
-            <button type="submit" class="btn btn-primary" id="applySubmitBtn">Submit Application</button>
-            <button type="button" class="btn btn-outline" data-modal-close>Cancel</button>
-          </div>
-        </form>
+      <div class="browse-hero">
+        <h1>🔍 Browse Gigs</h1>
+        <p>Find work near you — accept a gig and start earning today.</p>
       </div>
+
+      <nav id="breadcrumb" aria-label="breadcrumb"></nav>
+
+      <!-- Filter Bar -->
+      <div class="filter-bar">
+        <div class="filter-row">
+          <!-- Search -->
+          <div class="search-wrap">
+            <span class="search-icon">🔎</span>
+            <input type="text" id="searchInput" placeholder="Search gigs, skills, locations..." />
+          </div>
+          <!-- Type toggle -->
+          <div class="type-toggle">
+            <button type="button" class="type-pill active" id="pillAll">All</button>
+            <button type="button" class="type-pill" id="pillHyperlocal">📍 Hyperlocal</button>
+            <button type="button" class="type-pill" id="pillRemote">💻 Remote</button>
+          </div>
+        </div>
+        <!-- Category chips -->
+        <div class="filter-row">
+          <div class="cat-chips" id="catChips"></div>
+        </div>
+      </div>
+
+      <!-- Results meta -->
+      <div class="results-meta">
+        <div class="results-count" id="resultsCount"></div>
+        <div style="font-size:.78rem;color:var(--gray-400)">
+          Gigs disappear once a worker accepts them
+        </div>
+      </div>
+
+      <!-- Gig Grid -->
+      <div id="gigGrid"></div>
+
     </div>
+  </main>
 
-    <footer id="footer"></footer>
+  <footer id="main-footer"></footer>
+  <div id="toast-container"></div>
 
-    <script>
-      /* ─────────────────────────────────────────────────────
-         SEED DATA — shown only when localStorage has no gigs
-      ───────────────────────────────────────────────────── */
-      var SEED_GIGS = [
-        {
-          id: "seed-1", title: "Delivery Boy Chahiye — Evening Shift",
-          company: "QuickDrop Logistics", location: "Sector 29, Gurugram",
-          category: "delivery", budget: 600, type: "Daily",
-          description: "Evening 5 PM se 9 PM tak local parcel delivery. Bike honi chahiye. Daily payment.",
-          postedAt: new Date(Date.now() - 2 * 3600000).toISOString(), status: "active", urgent: true
-        },
-        {
-          id: "seed-2", title: "Math Tutor — Class 9 & 10",
-          company: "Private Family", location: "DLF Phase 2, Gurugram",
-          category: "teaching", budget: 8000, type: "Monthly",
-          description: "Ek student ke liye math home tutor chahiye. 1 hour daily, weekdays. Good communication skills required.",
-          postedAt: new Date(Date.now() - 5 * 3600000).toISOString(), status: "active", urgent: false
-        },
-        {
-          id: "seed-3", title: "React Developer — Freelance Project",
-          company: "StartupNest", location: "Cyber City, Gurugram",
-          category: "tech", budget: 25000, type: "Project",
-          description: "2-3 week React.js project. Landing page + dashboard. Experience with Tailwind preferred.",
-          postedAt: new Date(Date.now() - 1 * 86400000).toISOString(), status: "active", urgent: false
-        },
-        {
-          id: "seed-4", title: "House Cleaning — Weekend Only",
-          company: "Private Household", location: "Palam Vihar, Gurugram",
-          category: "domestic", budget: 1200, type: "Weekly",
-          description: "2BHK flat ki weekend cleaning. Saturday ya Sunday, approx 3 hours. Cleaning supplies available.",
-          postedAt: new Date(Date.now() - 3 * 3600000).toISOString(), status: "active", urgent: false
-        },
-        {
-          id: "seed-5", title: "Event Helper — Wedding Setup",
-          company: "Grand Celebrations", location: "Sector 14, Gurugram",
-          category: "event", budget: 1500, type: "One-day",
-          description: "Ek din ke liye wedding venue setup mein help chahiye. Heavy lifting ho sakti hai. Meal + payment included.",
-          postedAt: new Date(Date.now() - 6 * 3600000).toISOString(), status: "active", urgent: true
-        },
-        {
-          id: "seed-6", title: "Instagram Reels Editor",
-          company: "FoodieSpot Café", location: "MG Road, Gurugram",
-          category: "content", budget: 5000, type: "Monthly",
-          description: "8-10 reels per month edit karne hain. Raw footage provide hoga. CapCut ya Premiere Pro experience chahiye.",
-          postedAt: new Date(Date.now() - 2 * 86400000).toISOString(), status: "active", urgent: false
-        },
-        {
-          id: "seed-7", title: "Flyer Distribution — New Store Launch",
-          company: "TrendMart Retail", location: "Sector 56, Gurugram",
-          category: "sales", budget: 800, type: "One-day",
-          description: "Store launch ke liye 2-3 ghante flyer distribution. Morning shift. Incentive bonus bhi milega.",
-          postedAt: new Date(Date.now() - 4 * 3600000).toISOString(), status: "active", urgent: true
-        },
-        {
-          id: "seed-8", title: "Cook for Bachelors — Lunch Only",
-          company: "3 Bachelors", location: "South City 1, Gurugram",
-          category: "domestic", budget: 4500, type: "Monthly",
-          description: "Sirf lunch banana hai — 3 log. Simple Indian khana. Monday to Saturday. 10 AM – 12 PM.",
-          postedAt: new Date(Date.now() - 12 * 3600000).toISOString(), status: "active", urgent: false
-        },
-        {
-          id: "seed-9", title: "PHP + MySQL Developer — Small CRM",
-          company: "LocalBiz Solutions", location: "Udyog Vihar, Gurugram",
-          category: "tech", budget: 15000, type: "Project",
-          description: "Chhoti si CRM system banana hai — customer records + invoice. PHP + MySQL. 2 week deadline.",
-          postedAt: new Date(Date.now() - 2 * 86400000).toISOString(), status: "active", urgent: false
-        },
-        {
-          id: "seed-10", title: "Delivery Partner — Morning Shift",
-          company: "FreshBox Groceries", location: "Sohna Road, Gurugram",
-          category: "delivery", budget: 500, type: "Daily",
-          description: "Morning 7 AM – 11 AM grocery delivery. Cycle ya bike dono chalega. Daily cash payment.",
-          postedAt: new Date(Date.now() - 8 * 3600000).toISOString(), status: "active", urgent: false
-        },
-        {
-          id: "seed-11", title: "English Speaking Tutor",
-          company: "Private Client", location: "Sector 49, Gurugram",
-          category: "teaching", budget: 6000, type: "Monthly",
-          description: "Working professional ke liye evening English speaking sessions. 45 min, 3 days a week.",
-          postedAt: new Date(Date.now() - 3 * 86400000).toISOString(), status: "active", urgent: false
-        },
-        {
-          id: "seed-12", title: "YouTube Thumbnail Designer",
-          company: "TechReview Channel", location: "Remote / Gurugram",
-          category: "content", budget: 3500, type: "Monthly",
-          description: "10-12 thumbnails per month banana hain. Photoshop ya Canva Pro use hoga. Attractive CTR-focused design.",
-          postedAt: new Date(Date.now() - 5 * 86400000).toISOString(), status: "active", urgent: false
+  <script>
+  (function () {
+
+    var CATS = {
+      hyperlocal: [
+        { value:"house-help",    label:"🧹 House Help" },
+        { value:"errands",       label:"🛒 Errands" },
+        { value:"moving-help",   label:"📦 Moving Help" },
+        { value:"handyman",      label:"🔧 Handyman" },
+        { value:"tech-help",     label:"💻 Tech Help" },
+        { value:"elderly-care",  label:"🧓 Elderly Care" },
+        { value:"pet-care",      label:"🐕 Pet Care" },
+        { value:"tutoring",      label:"📚 Tutoring" },
+        { value:"event-help",    label:"🎉 Event Help" },
+        { value:"gardening",     label:"🏡 Gardening" },
+        { value:"deep-cleaning", label:"🧼 Deep Cleaning" },
+        { value:"driver",        label:"🚗 Driver" }
+      ],
+      remote: [
+        { value:"logo-design",     label:"🎨 Logo Design" },
+        { value:"video-editing",   label:"🎬 Video Editing" },
+        { value:"web-dev",         label:"🌐 Web Dev" },
+        { value:"content-writing", label:"✍️ Content Writing" },
+        { value:"social-media",    label:"📱 Social Media" },
+        { value:"data-entry",      label:"📊 Data Entry" },
+        { value:"graphic-design",  label:"🖼️ Graphic Design" },
+        { value:"voiceover",       label:"🎙️ Voiceover" },
+        { value:"translation",     label:"🌍 Translation" },
+        { value:"customer-support",label:"🎧 Customer Support" }
+      ]
+    };
+
+    var FEE_RATE   = 0.06;
+    var TAKEN_SHOW = 30000; // 30 seconds before card vanishes
+    var GIG_KEY    = (typeof GL !== "undefined" && GL.STORAGE_KEY_GIGS) ? GL.STORAGE_KEY_GIGS : "gl_gigs";
+
+    var currentType = "all";
+    var currentCat  = "all";
+    var searchQuery = "";
+    var takenTimers = {};
+
+    /* ── DOM refs ── */
+    var gigGrid    = document.getElementById("gigGrid");
+    var searchInput= document.getElementById("searchInput");
+    var catChipsEl = document.getElementById("catChips");
+    var resultsCount = document.getElementById("resultsCount");
+
+    /* ── Breadcrumb ── */
+    if (typeof buildBreadcrumb === "function") {
+      buildBreadcrumb("breadcrumb", [
+        { label: "Home", href: "index.html" },
+        { label: "Browse Gigs" }
+      ]);
+    }
+
+    /* ═══════════════════════════════════════
+       TYPE TOGGLE
+    ═══════════════════════════════════════ */
+    document.getElementById("pillAll").addEventListener("click", function () { setType("all"); });
+    document.getElementById("pillHyperlocal").addEventListener("click", function () { setType("hyperlocal"); });
+    document.getElementById("pillRemote").addEventListener("click", function () { setType("remote"); });
+
+    function setType(type) {
+      currentType = type;
+      currentCat  = "all";
+      document.getElementById("pillAll").classList.toggle("active", type === "all");
+      document.getElementById("pillHyperlocal").classList.toggle("active", type === "hyperlocal");
+      document.getElementById("pillRemote").classList.toggle("active", type === "remote");
+      buildCatChips();
+      render();
+    }
+
+    /* ═══════════════════════════════════════
+       CATEGORY CHIPS
+    ═══════════════════════════════════════ */
+    function buildCatChips() {
+      catChipsEl.innerHTML = "";
+
+      var allChip = document.createElement("button");
+      allChip.type = "button";
+      allChip.className = "cat-chip" + (currentCat === "all" ? " active" : "");
+      allChip.textContent = "All";
+      allChip.addEventListener("click", function () { setCat("all"); });
+      catChipsEl.appendChild(allChip);
+
+      var list = currentType === "all"
+        ? CATS.hyperlocal.concat(CATS.remote)
+        : (CATS[currentType] || []);
+
+      list.forEach(function (c) {
+        var chip = document.createElement("button");
+        chip.type = "button";
+        chip.className = "cat-chip" + (currentCat === c.value ? " active" : "");
+        chip.textContent = c.label;
+        chip.addEventListener("click", function () { setCat(c.value); });
+        catChipsEl.appendChild(chip);
+      });
+    }
+
+    function setCat(val) {
+      currentCat = val;
+      document.querySelectorAll(".cat-chip").forEach(function (ch) {
+        ch.classList.toggle("active", ch.textContent.trim() === (val === "all" ? "All" : getCatLabel(val)));
+      });
+      render();
+    }
+
+    function getCatLabel(val) {
+      var all = CATS.hyperlocal.concat(CATS.remote);
+      var found = all.find(function (c) { return c.value === val; });
+      return found ? found.label : val;
+    }
+
+    /* ═══════════════════════════════════════
+       SEARCH
+    ═══════════════════════════════════════ */
+    searchInput.addEventListener("input", function () {
+      searchQuery = searchInput.value.trim().toLowerCase();
+      render();
+    });
+
+    /* ═══════════════════════════════════════
+       DATA
+    ═══════════════════════════════════════ */
+    function getGigs() {
+      return JSON.parse(localStorage.getItem(GIG_KEY) || "[]");
+    }
+
+    function saveGigs(gigs) {
+      localStorage.setItem(GIG_KEY, JSON.stringify(gigs));
+    }
+
+    function getFilteredGigs() {
+      var gigs = getGigs();
+
+      // Exclude fully vanished (taken + past 30s window)
+      var now = Date.now();
+      gigs = gigs.filter(function (g) {
+        if (g.status === "taken" && g.takenAt) {
+          var elapsed = now - new Date(g.takenAt).getTime();
+          return elapsed < TAKEN_SHOW;
         }
-      ];
-
-      var CATEGORY_ICONS = {
-        delivery: "🚴", teaching: "📚", tech: "💻",
-        domestic: "🏠", event: "🎉", content: "🎬",
-        sales: "📣", general: "💼"
-      };
-
-      var PER_PAGE = 9;
-      var state = { query: "", category: "all", sort: "newest", page: 1 };
-      var allGigsCache = [];
-      var activeGigForApply = null;
-
-      /* ── Helpers ─────────────────────────────────────── */
-      function escHtml(v) {
-        return String(v == null ? "" : v)
-          .replace(/&/g, "&amp;").replace(/</g, "&lt;")
-          .replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
-      }
-
-      function safeStr(v, fb) {
-        var s = String(v == null ? "" : v).trim();
-        return s || fb;
-      }
-
-      function getCategoryIcon(cat) {
-        return CATEGORY_ICONS[String(cat).toLowerCase()] || "💼";
-      }
-
-      /* ── Load gigs from localStorage + seed fallback ─── */
-      function loadGigs() {
-        var stored = getAllGigs() || [];
-        var live = stored.filter(function (g) {
-          return safeStr(g.status, "active") === "active";
-        });
-
-        if (!live.length) {
-          document.getElementById("seedBanner").style.display = "flex";
-          return SEED_GIGS.slice();
-        }
-
-        document.getElementById("seedBanner").style.display = "none";
-        return live;
-      }
-
-      /* ── Filter + sort pipeline ──────────────────────── */
-      function filterAndSort(gigs) {
-        var q = state.query.toLowerCase().trim();
-        var cat = state.category;
-
-        var filtered = gigs.filter(function (g) {
-          var matchCat = cat === "all" ||
-            String(g.category || "").toLowerCase() === cat;
-
-          var matchQ = !q ||
-            String(g.title || "").toLowerCase().includes(q) ||
-            String(g.description || "").toLowerCase().includes(q) ||
-            String(g.company || "").toLowerCase().includes(q) ||
-            String(g.location || "").toLowerCase().includes(q) ||
-            String(g.category || "").toLowerCase().includes(q);
-
-          return matchCat && matchQ;
-        });
-
-        if (state.sort === "budget-high") {
-          filtered.sort(function (a, b) {
-            return (Number(b.budget) || 0) - (Number(a.budget) || 0);
-          });
-        } else if (state.sort === "budget-low") {
-          filtered.sort(function (a, b) {
-            return (Number(a.budget) || 0) - (Number(b.budget) || 0);
-          });
-        } else {
-          filtered.sort(function (a, b) {
-            return new Date(b.postedAt || 0) - new Date(a.postedAt || 0);
-          });
-        }
-
-        return filtered;
-      }
-
-      /* ── Render one gig card ─────────────────────────── */
-      function renderGigCard(gig) {
-        var title = safeStr(gig.title, "Local Gig");
-        var company = safeStr(gig.company || gig.clientName, "Local Business");
-        var location = safeStr(gig.location, "Gurugram");
-        var category = safeStr(gig.category, "general");
-        var type = safeStr(gig.type, "Gig");
-        var desc = safeStr(gig.description, "");
-        var icon = getCategoryIcon(category);
-        var isUrgent = !!gig.urgent;
-
-        var budget = typeof gig.budget === "number"
-          ? formatCurrency(gig.budget)
-          : safeStr(gig.budget, "Budget shared on connect");
-
-        var when = gig.postedAt
-          ? formatRelativeTime(gig.postedAt)
-          : "Abhi";
-
-        var userApplied = false;
-        var user = getCurrentUser();
-        if (user) {
-          var myApps = getUserApplications() || [];
-          userApplied = myApps.some(function (a) {
-            return a.gigId === gig.id ||
-              (a.gigTitle && String(a.gigTitle).toLowerCase() === String(title).toLowerCase());
-          });
-        }
-
-        return '<article class="gig-card card fade-up" data-gig-id="' + escHtml(String(gig.id || "")) + '">' +
-          '<div class="gig-top">' +
-            '<div>' +
-              '<h3 class="gig-title">' + escHtml(title) + '</h3>' +
-              '<p class="gig-company">' + escHtml(company) + '</p>' +
-            '</div>' +
-            '<span style="font-size:1.7rem;flex-shrink:0;">' + icon + '</span>' +
-          '</div>' +
-          '<div class="gig-badges">' +
-            '<span class="badge">' + escHtml(category.charAt(0).toUpperCase() + category.slice(1)) + '</span>' +
-            '<span class="badge badge-teal">' + escHtml(type) + '</span>' +
-            (isUrgent ? '<span class="badge badge-amber">🔥 Urgent</span>' : '') +
-          '</div>' +
-          '<div class="gig-meta">' +
-            '<span>📍 ' + escHtml(location) + '</span>' +
-            '<span>💸 ' + escHtml(String(budget)) + '</span>' +
-            '<span>🕒 ' + escHtml(when) + '</span>' +
-          '</div>' +
-          (desc ? '<p class="gig-desc">' + escHtml(truncateText(desc, 110)) + '</p>' : '') +
-          '<div class="gig-actions">' +
-  (userApplied
-    ? '<span class="badge badge-teal" style="padding:10px 16px;">✅ Applied</span>'
-    : '<button class="btn btn-primary apply-btn" data-gig-id="' + escHtml(String(gig.id || "")) + '">Apply Now</button>'
-  ) +
-  '<a href="gig-detail.html?id=' + encodeURIComponent(String(gig.id || "")) + '" class="btn btn-outline">View Details</a>' +
-  '<button class="btn btn-outline share-btn" data-gig-id="' + escHtml(String(gig.id || "")) + '">Share</button>' +
-'</div>' +
-        '</article>';
-      }
-
-      /* ── Render gig grid ─────────────────────────────── */
-      function render() {
-        var grid = document.getElementById("gigGrid");
-        var filtered = filterAndSort(allGigsCache);
-        var total = filtered.length;
-        var totalPages = Math.ceil(total / PER_PAGE) || 1;
-
-        if (state.page > totalPages) state.page = 1;
-
-        var start = (state.page - 1) * PER_PAGE;
-        var page = filtered.slice(start, start + PER_PAGE);
-
-        document.getElementById("resultsCount").textContent =
-          total + " gig" + (total !== 1 ? "s" : "") + " mili" + (state.query || state.category !== "all" ? " (filtered)" : "");
-
-        if (!total) {
-          grid.innerHTML =
-            '<div class="empty-results">' +
-            '<strong style="font-size:1.15rem;">Koi gig nahi mili 😕</strong>' +
-            '<p>Try karo — filter clear karo ya dusri category dekho.</p>' +
-            '<button class="btn btn-outline" id="clearFiltersBtn">Clear Filters</button>' +
-            '</div>';
-
-          document.getElementById("clearFiltersBtn")?.addEventListener("click", function () {
-            resetFilters();
-          });
-
-          document.getElementById("paginationWrap").innerHTML = "";
-          return;
-        }
-
-        grid.innerHTML = page.map(renderGigCard).join("");
-
-        renderPagination("paginationWrap", total, PER_PAGE, state.page, function (p) {
-          state.page = p;
-          render();
-        });
-
-        wireCardButtons();
-        initFadeAnimations();
-      }
-
-      /* ── Wire apply + share buttons ──────────────────── */
-      function wireCardButtons() {
-        document.querySelectorAll(".apply-btn").forEach(function (btn) {
-          btn.addEventListener("click", function () {
-            var gigId = btn.getAttribute("data-gig-id");
-            var gig = allGigsCache.find(function (g) { return String(g.id) === String(gigId); });
-            if (gig) openApplyModal(gig);
-          });
-        });
-
-        document.querySelectorAll(".share-btn").forEach(function (btn) {
-          btn.addEventListener("click", function () {
-            var gigId = btn.getAttribute("data-gig-id");
-            var gig = allGigsCache.find(function (g) { return String(g.id) === String(gigId); });
-            if (gig) copyToClipboard(buildGigWAMessage(gig), "Share text copy ho gaya! WhatsApp par paste karo 📋");
-          });
-        });
-      }
-
-      /* ── Apply modal ─────────────────────────────────── */
-      function openApplyModal(gig) {
-        if (!isLoggedIn()) {
-          showToast("Apply karne ke liye pehle login karo 👋", "info");
-          setTimeout(function () {
-            window.location.href = "signup.html?next=" + encodeURIComponent("browse.html");
-          }, 1200);
-          return;
-        }
-
-        activeGigForApply = gig;
-        document.getElementById("applyModalTitle").textContent = "Apply — " + safeStr(gig.title, "Gig");
-        document.getElementById("applyGigRef").textContent =
-          safeStr(gig.company || gig.clientName, "Local Business") + " · " + safeStr(gig.location, "Gurugram");
-
-        var user = getCurrentUser() || {};
-        document.getElementById("applyName").value = safeStr(user.name, "");
-        document.getElementById("applyPhone").value = safeStr(user.phone, "");
-        document.getElementById("applyEmail").value = safeStr(user.email, "");
-        document.getElementById("applyMsg").value = "";
-
-        clearFieldState("applyName");
-        clearFieldState("applyPhone");
-        clearFieldState("applyEmail");
-        clearFieldState("applyMsg");
-
-        openModal("applyModal");
-      }
-
-      /* ── Handle apply form submit ────────────────────── */
-      document.getElementById("applyForm").addEventListener("submit", function (e) {
-        e.preventDefault();
-
-        var result = validateForm({
-          applyName: { required: true, label: "Name", minLength: 2, maxLength: 80 },
-          applyPhone: {
-            required: true, label: "Phone",
-            pattern: /^[6-9]\d{9}$|^\+91\s?[6-9]\d{4}\s?\d{5}$/,
-            patternMsg: "Valid Indian mobile number dalo"
-          }
-        });
-
-        if (!result.valid) return;
-
-        var user = getCurrentUser() || {};
-        var btn = document.getElementById("applySubmitBtn");
-        setButtonLoading(btn, "Submitting...");
-
-        setTimeout(function () {
-          saveApplication({
-            gigId: activeGigForApply.id,
-            gigTitle: activeGigForApply.title,
-            company: activeGigForApply.company || activeGigForApply.clientName,
-            location: activeGigForApply.location,
-            budget: activeGigForApply.budget,
-            userId: user.id || "",
-            userEmail: user.email || document.getElementById("applyEmail").value.trim(),
-            name: document.getElementById("applyName").value.trim(),
-            phone: document.getElementById("applyPhone").value.trim(),
-            email: document.getElementById("applyEmail").value.trim(),
-            message: document.getElementById("applyMsg").value.trim(),
-            category: activeGigForApply.category
-          });
-
-          resetButton(btn);
-          closeModal("applyModal");
-          showToast("Application submit ho gayi! 🎉 Client jald contact karega.", "success", 5000);
-
-          allGigsCache = loadGigs();
-          render();
-        }, 700);
+        if (g.status === "completed") return false;
+        return true;
       });
 
-      /* ── Filter helpers ──────────────────────────────── */
-      function resetFilters() {
-        state.query = "";
-        state.category = "all";
-        state.page = 1;
-        document.getElementById("gigSearch").value = "";
-        document.querySelectorAll("#categoryChipBar .chip").forEach(function (c) {
-          c.classList.toggle("active", c.getAttribute("data-value") === "all");
+      // Type filter
+      if (currentType !== "all") {
+        gigs = gigs.filter(function (g) { return g.type === currentType; });
+      }
+      // Category filter
+      if (currentCat !== "all") {
+        gigs = gigs.filter(function (g) { return g.category === currentCat; });
+      }
+      // Search
+      if (searchQuery) {
+        gigs = gigs.filter(function (g) {
+          return (
+            g.title.toLowerCase().includes(searchQuery) ||
+            (g.description || "").toLowerCase().includes(searchQuery) ||
+            (g.location || "").toLowerCase().includes(searchQuery) ||
+            (g.categoryLabel || "").toLowerCase().includes(searchQuery)
+          );
         });
-        render();
+      }
+      return gigs;
+    }
+
+    /* ═══════════════════════════════════════
+       TIME AGO
+    ═══════════════════════════════════════ */
+    function timeAgo(isoStr) {
+      var diff = Math.floor((Date.now() - new Date(isoStr).getTime()) / 1000);
+      if (diff < 60)  return diff + "s ago";
+      if (diff < 3600) return Math.floor(diff / 60) + "m ago";
+      if (diff < 86400) return Math.floor(diff / 3600) + "h ago";
+      return Math.floor(diff / 86400) + "d ago";
+    }
+
+    /* ═══════════════════════════════════════
+       RENDER
+    ═══════════════════════════════════════ */
+    function render() {
+      var gigs = getFilteredGigs();
+
+      // Update count
+      var openCount = gigs.filter(function (g) { return g.status === "open"; }).length;
+      resultsCount.innerHTML = "<strong>" + gigs.length + "</strong> gig" + (gigs.length !== 1 ? "s" : "") + " found" +
+        (openCount < gigs.length ? " (<span style='color:var(--teal)'>" + openCount + " open</span>)" : "");
+
+      if (gigs.length === 0) {
+        gigGrid.innerHTML = '<div class="empty-state">' +
+          '<div class="empty-icon">🔍</div>' +
+          '<h3>Koi gig nahi mila!</h3>' +
+          '<p>No gigs match your filters right now.<br>Try changing the category or check back soon.</p>' +
+          '<a href="post-gig.html" class="btn btn-primary" style="margin-top:16px;display:inline-block">+ Post a Gig</a>' +
+          '</div>';
+        return;
       }
 
-      /* ── URL param pre-filter (from index.html category cards) ── */
-      function applyURLParams() {
-        var params = new URLSearchParams(window.location.search);
-        var cat = params.get("category");
-        if (cat) {
-          state.category = cat.toLowerCase();
-          document.querySelectorAll("#categoryChipBar .chip").forEach(function (chip) {
-            var isMatch = chip.getAttribute("data-value") === state.category;
-            chip.classList.toggle("active", isMatch);
-          });
+      gigGrid.className = "gig-grid";
+      gigGrid.innerHTML = "";
+      gigs.forEach(function (gig) { gigGrid.appendChild(buildCard(gig)); });
+    }
+
+    /* ═══════════════════════════════════════
+       BUILD CARD
+    ═══════════════════════════════════════ */
+    function buildCard(gig) {
+      var isTaken = gig.status === "taken";
+      var fee     = Math.round(gig.pricePerHr * FEE_RATE);
+      var earn    = gig.pricePerHr - fee;
+      var payIcon = gig.payType === "cash" ? "💵" : gig.payType === "wallet" ? "🔒" : "✅";
+
+      var card = document.createElement("div");
+      card.className = "gig-card" + (isTaken ? " taken taken-flash" : "");
+      card.dataset.gigId = gig.id;
+
+      // Countdown bar (only for taken)
+      var barHtml = "";
+      if (isTaken) {
+        barHtml = '<div class="taken-bar show" id="bar_' + gig.id + '">' +
+                  '<div class="taken-bar-inner" id="barInner_' + gig.id + '"></div></div>';
+      }
+
+      var typeTag = gig.type === "hyperlocal"
+        ? '<span class="gig-type-tag tag-hyperlocal">📍 Hyperlocal</span>'
+        : '<span class="gig-type-tag tag-remote">💻 Remote</span>';
+
+      var statusBadge = isTaken
+        ? '<span class="gig-status-badge badge-taken">🔒 Taken</span>'
+        : '<span class="gig-status-badge badge-open">🟢 Open</span>';
+
+      var actionBtn = isTaken
+        ? '<button class="btn-taken" disabled>🔒 Already Taken</button>'
+        : '<button class="btn-accept" data-id="' + gig.id + '">⚡ Accept Gig</button>';
+
+      card.innerHTML =
+        barHtml +
+        statusBadge +
+        typeTag +
+        '<div class="gig-cat">' + (gig.categoryLabel || gig.category) + '</div>' +
+        '<div class="gig-title">' + escHtml(gig.title) + '</div>' +
+        '<div class="gig-desc">' + escHtml(gig.description || "") + '</div>' +
+        '<div class="gig-meta">' +
+          (gig.location ? '<span class="gig-meta-item">📍 ' + escHtml(gig.location) + '</span>' : '') +
+          '<span class="gig-meta-item">🕒 ' + timeAgo(gig.postedAt) + '</span>' +
+          '<span class="gig-meta-item">' + payIcon + ' ' + payLabel(gig.payType) + '</span>' +
+        '</div>' +
+        '<div class="gig-price-row">' +
+          '<span class="gig-price">₹' + gig.pricePerHr + '</span>' +
+          '<span class="gig-price-unit">/ hour</span>' +
+        '</div>' +
+        '<div class="gig-earn-strip">' +
+          '<span class="gig-earn-label">You receive (after 6% support fee)</span>' +
+          '<span class="gig-earn-val">₹' + earn + '/hr</span>' +
+        '</div>' +
+        actionBtn;
+
+      // Accept handler
+      if (!isTaken) {
+        card.querySelector(".btn-accept").addEventListener("click", function () {
+          acceptGig(gig.id, card);
+        });
+      }
+
+      // Start countdown animation if taken
+      if (isTaken && gig.takenAt) {
+        var elapsed = Date.now() - new Date(gig.takenAt).getTime();
+        var remaining = Math.max(0, TAKEN_SHOW - elapsed);
+        startCountdownBar(gig.id, remaining);
+      }
+
+      return card;
+    }
+
+    function payLabel(type) {
+      if (type === "cash")   return "Cash";
+      if (type === "wallet") return "Secure Wallet";
+      return "Pay After";
+    }
+
+    function escHtml(str) {
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    /* ═══════════════════════════════════════
+       ACCEPT GIG
+    ═══════════════════════════════════════ */
+    function acceptGig(gigId, card) {
+      // Auth check
+      var user = typeof getCurrentUser === "function" ? getCurrentUser() : null;
+      if (!user) {
+        if (typeof showToast === "function") showToast("Please log in to accept a gig.", "error");
+        setTimeout(function () { window.location.href = "login.html?redirect=browse.html"; }, 1200);
+        return;
+      }
+
+      // Prevent poster accepting their own gig
+      var gigs = getGigs();
+      var gig  = gigs.find(function (g) { return g.id === gigId; });
+      if (!gig) return;
+      if (gig.posterId && user.id && gig.posterId === user.id) {
+        if (typeof showToast === "function") showToast("You can't accept your own gig!", "error");
+        return;
+      }
+      if (gig.status !== "open") {
+        if (typeof showToast === "function") showToast("This gig was just taken by someone else!", "error");
+        render();
+        return;
+      }
+
+      // Lock gig
+      gig.status  = "taken";
+      gig.takenAt = new Date().toISOString();
+      gig.takenBy = user.id || user.name || "worker";
+      saveGigs(gigs);
+
+      // Update card UI immediately
+      card.classList.add("taken", "taken-flash");
+      var acceptBtn = card.querySelector(".btn-accept");
+      if (acceptBtn) {
+        acceptBtn.outerHTML = '<button class="btn-taken" disabled>🔒 Already Taken</button>';
+      }
+      var badge = card.querySelector(".gig-status-badge");
+      if (badge) { badge.className = "gig-status-badge badge-taken"; badge.textContent = "🔒 Taken"; }
+
+      // Add countdown bar
+      var bar = document.createElement("div");
+      bar.className = "taken-bar show";
+      bar.id = "bar_" + gigId;
+      bar.innerHTML = '<div class="taken-bar-inner" id="barInner_' + gigId + '"></div>';
+      card.insertBefore(bar, card.firstChild);
+
+      if (typeof showToast === "function") showToast("✅ Gig accepted! Check your dashboard.", "success");
+
+      // Redirect worker to chat/dashboard
+      setTimeout(function () {
+        window.location.href = "dashboard-worker.html?gigId=" + gigId;
+      }, 1800);
+
+      // Start 30s countdown then remove card
+      startCountdownBar(gigId, TAKEN_SHOW);
+      takenTimers[gigId] = setTimeout(function () {
+        var el = document.querySelector('[data-gig-id="' + gigId + '"]');
+        if (el) {
+          el.style.transition = "opacity .5s, transform .5s";
+          el.style.opacity = "0";
+          el.style.transform = "scale(.95)";
+          setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 500);
         }
-      }
-
-      /* ── Boot ────────────────────────────────────────── */
-      document.addEventListener("DOMContentLoaded", function () {
-        document.querySelectorAll('[data-nav="browse"]').forEach(function (el) {
-          el.classList.add("active");
-        });
-
-        buildBreadcrumb("browseBreadcrumb", [
-          { label: "Home", href: "index.html" },
-          { label: "Browse Gigs" }
-        ]);
-
-        allGigsCache = loadGigs();
-        applyURLParams();
-
-        /* Search input event */
-        document.getElementById("gigSearch").addEventListener("searchquery", function (e) {
-          state.query = e.detail.query || "";
-          state.page = 1;
-          render();
-        });
-
-        /* Category chip events */
-        document.getElementById("categoryChipBar").addEventListener("chipchange", function (e) {
-          state.category = e.detail.value || "all";
-          state.page = 1;
-          render();
-        });
-
-        /* Sort change */
-        document.getElementById("sortSelect").addEventListener("change", function () {
-          state.sort = this.value;
-          state.page = 1;
-          render();
-        });
-
         render();
-      });
-    </script>
-  </body>
+      }, TAKEN_SHOW);
+    }
+
+    /* ═══════════════════════════════════════
+       COUNTDOWN BAR ANIMATION
+    ═══════════════════════════════════════ */
+    function startCountdownBar(gigId, duration) {
+      setTimeout(function () {
+        var inner = document.getElementById("barInner_" + gigId);
+        if (!inner) return;
+        inner.style.transition = "width " + (duration / 1000) + "s linear";
+        inner.style.width = "0%";
+      }, 50);
+    }
+
+    /* ═══════════════════════════════════════
+       AUTO REFRESH every 15s
+    ═══════════════════════════════════════ */
+    setInterval(function () { render(); }, 15000);
+
+    /* ── Storage change (multi-tab sync) ── */
+    window.addEventListener("storage", function (e) {
+      if (e.key === GIG_KEY) render();
+    });
+
+    /* ═══════════════════════════════════════
+       INIT
+    ═══════════════════════════════════════ */
+    buildCatChips();
+    render();
+
+  })();
+  </script>
+</body>
 </html>
-
