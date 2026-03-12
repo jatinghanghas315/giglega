@@ -1,491 +1,2031 @@
-/* GigLega Beta - Vastu/Numerology Aligned Color System */
-:root {
-  --color-primary: #0d2157;
-  --color-secondary: #00b4a6;
-  --color-accent: #f5a623;
-  --color-bg: #f7f9fc;
-  --color-white: #ffffff;
-  --color-dark-text: #0d1b2a;
-  --color-card-hyperlocal: #fff8ec;
-  --color-card-remote: #ebf9f8;
-  --color-gradient: linear-gradient(135deg, #0d2157 0%, #00b4a6 100%);
-}
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: "Poppins", sans-serif;
-  color: var(--color-dark-text);
-  background: var(--color-bg);
-  line-height: 1.6;
-}
-
-a {
-  text-decoration: none;
-  color: inherit;
-}
-
-ul {
-  list-style: none;
-}
-
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 24px;
-}
-
-/* Beta Banner */
-.beta-banner {
-  background: var(--color-accent);
-  color: var(--color-dark-text);
-  text-align: center;
-  padding: 12px 20px;
-  font-size: 15px;
-  font-weight: 600;
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-}
-
-/* Navbar */
-.navbar {
-  background: var(--color-white);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  padding: 16px 0;
-  position: sticky;
-  top: 42px;
-  z-index: 999;
-}
-
-.navbar .container {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 32px;
-}
-
-.logo-container {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.logo-icon {
-  width: 44px;
-  height: 44px;
-  flex-shrink: 0;
-}
-
-.logo-text {
-  font-size: 26px;
-  font-weight: 800;
-  line-height: 1;
-}
-
-.logo-text .gig {
-  color: var(--color-secondary);
-}
-
-.logo-text .lega {
-  color: var(--color-accent);
-}
-
-.beta-tag {
-  font-size: 11px;
-  color: var(--color-accent);
-  font-weight: 700;
-  margin-left: 2px;
-}
-
-.badge-pill {
-  font-size: 12px;
-  padding: 6px 12px;
-  border-radius: 50px;
-  font-weight: 600;
-}
-
-.badge-location {
-  background: var(--color-card-remote);
-  color: var(--color-secondary);
-  border: 1px solid var(--color-secondary);
-}
-
-.nav-links {
-  display: flex;
-  align-items: center;
-  gap: 28px;
-  flex: 1;
-  justify-content: center;
-}
-
-.nav-links a {
-  font-size: 15px;
-  font-weight: 500;
-  color: var(--color-dark-text);
-  transition: color 0.2s;
-}
-
-.nav-links a:hover,
-.nav-links a.active {
-  color: var(--color-secondary);
-}
-
-.auth-buttons {
-  display: flex;
-  gap: 12px;
-}
-
-.btn {
-  padding: 11px 24px;
-  border-radius: 8px;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s;
-  border: none;
-  display: inline-block;
-}
-
-.btn-outline {
-  background: transparent;
-  color: var(--color-secondary);
-  border: 2px solid var(--color-secondary);
-}
-
-.btn-outline:hover {
-  background: var(--color-secondary);
-  color: white;
-}
-
-.btn-primary {
-  background: var(--color-accent);
-  color: var(--color-dark-text);
-  border: 2px solid var(--color-accent);
-}
-
-.btn-primary:hover {
-  background: #d88f1a;
-  border-color: #d88f1a;
-  transform: translateY(-2px);
-}
-
-/* Hero Section */
-.hero {
-  background: var(--color-gradient);
-  color: white;
-  padding: 100px 0;
-  text-align: center;
-}
-
-.hero-content {
-  max-width: 900px;
-  margin: 0 auto;
-}
-
-.hero-h1 {
-  font-size: 64px;
-  font-weight: 800;
-  line-height: 1.1;
-  margin-bottom: 16px;
-}
-
-.hero-h2 {
-  font-size: 48px;
-  font-weight: 800;
-  color: var(--color-accent);
-  margin-bottom: 24px;
-}
-
-.hero-p {
-  font-size: 20px;
-  line-height: 1.6;
-  opacity: 0.95;
-  margin-bottom: 36px;
-}
-
-.hero-buttons {
-  display: flex;
-  gap: 16px;
-  justify-content: center;
-  margin-bottom: 32px;
-}
-
-.btn-white {
-  background: white;
-  color: var(--color-primary);
-  border: 2px solid white;
-}
-
-.btn-white:hover {
-  background: var(--color-bg);
-  transform: scale(1.05);
-}
-
-.btn-gold {
-  background: var(--color-accent);
-  color: var(--color-dark-text);
-  border: 2px solid var(--color-accent);
-}
-
-.btn-gold:hover {
-  background: #d88f1a;
-  transform: scale(1.05);
-}
-
-.hero-stats {
-  font-size: 16px;
-  opacity: 0.9;
-  font-weight: 500;
-}
-
-/* Section Styles */
-.section {
-  padding: 80px 0;
-}
-
-.section-dark {
-  background: var(--color-primary);
-  color: white;
-}
-
-.section-title {
-  font-size: 42px;
-  font-weight: 800;
-  text-align: center;
-  margin-bottom: 16px;
-}
-
-.section-subtitle {
-  font-size: 18px;
-  text-align: center;
-  opacity: 0.8;
-  margin-bottom: 48px;
-}
-
-/* Category Grid */
-.category-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 24px;
-}
-
-.category-card {
-  background: white;
-  padding: 32px 24px;
-  border-radius: 14px;
-  text-align: center;
-  transition: all 0.3s;
-  cursor: pointer;
-  border-left: 5px solid transparent;
-}
-
-.category-card.hyperlocal {
-  background: var(--color-card-hyperlocal);
-  border-left-color: var(--color-accent);
-}
-
-.category-card.remote {
-  background: var(--color-card-remote);
-  border-left-color: var(--color-secondary);
-}
-
-.category-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
-}
-
-.category-icon {
-  font-size: 48px;
-  margin-bottom: 16px;
-}
-
-.category-card h3 {
-  font-size: 20px;
-  font-weight: 700;
-  margin-bottom: 8px;
-  color: var(--color-primary);
-}
-
-.category-card p {
-  font-size: 14px;
-  opacity: 0.75;
-  color: var(--color-dark-text);
-}
-
-/* How It Works */
-.how-it-works-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-  gap: 32px;
-}
-
-.how-card {
-  background: rgba(255, 255, 255, 0.1);
-  padding: 40px 32px;
-  border-radius: 14px;
-  border: 2px solid rgba(255, 255, 255, 0.2);
-}
-
-.how-card h3 {
-  font-size: 24px;
-  font-weight: 700;
-  margin-bottom: 24px;
-  color: var(--color-accent);
-}
-
-.step {
-  font-size: 16px;
-  margin-bottom: 16px;
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-}
-
-.step-num {
-  background: var(--color-accent);
-  color: var(--color-primary);
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  flex-shrink: 0;
-}
-
-/* Trust Grid */
-.trust-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 24px;
-}
-
-.trust-card {
-  background: white;
-  padding: 32px 24px;
-  border-radius: 14px;
-  text-align: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-}
-
-.trust-icon {
-  font-size: 48px;
-  margin-bottom: 16px;
-}
-
-.trust-card h3 {
-  font-size: 18px;
-  font-weight: 700;
-  margin-bottom: 8px;
-  color: var(--color-primary);
-}
-
-.trust-card p {
-  font-size: 14px;
-  opacity: 0.75;
-}
-
-/* Footer */
-.footer {
-  background: var(--color-primary);
-  color: white;
-  padding: 60px 0 24px;
-}
-
-.footer-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 32px;
-  margin-bottom: 32px;
-}
-
-.footer-logo {
-  font-size: 28px;
-  font-weight: 800;
-  margin-bottom: 12px;
-}
-
-.footer-logo .gig {
-  color: var(--color-secondary);
-}
-
-.footer-logo .lega {
-  color: var(--color-accent);
-}
-
-.footer-col h4 {
-  font-size: 16px;
-  font-weight: 700;
-  margin-bottom: 16px;
-  color: var(--color-accent);
-}
-
-.footer-col ul {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.footer-col a {
-  font-size: 14px;
-  opacity: 0.85;
-  transition: opacity 0.2s;
-}
-
-.footer-col a:hover {
-  opacity: 1;
-}
-
-.footer-bottom {
-  text-align: center;
-  padding-top: 24px;
-  border-top: 1px solid rgba(255, 255, 255, 0.15);
-  font-size: 14px;
-  opacity: 0.75;
-}
-
-/* Mobile Responsive */
-@media (max-width: 768px) {
-  .navbar .container {
-    flex-wrap: wrap;
-  }
-
-  .nav-links {
-    order: 3;
-    width: 100%;
-    justify-content: space-around;
-    gap: 12px;
-    margin-top: 12px;
-  }
-
-  .nav-links a {
-    font-size: 13px;
-  }
-
-  .hero-h1 {
-    font-size: 42px;
-  }
-
-  .hero-h2 {
-    font-size: 32px;
-  }
-
-  .hero-buttons {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .category-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .how-it-works-grid {
-    grid-template-columns: 1fr;
-  }
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
+  <meta
+    name="description"
+    content="GigLega gig detail page for Gurugram hyperlocal gigs. Browse full gig info, requirements, reviews, and apply instantly."
+  />
+  <title>Gig Detail | GigLega</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+
+  <link rel="stylesheet" href="shared.css" />
+  <script defer src="shared.js"></script>
+
+  <style>
+    .gig-detail-page {
+      background:
+        radial-gradient(circle at top right, rgba(13, 148, 136, 0.08), transparent 30%),
+        linear-gradient(180deg, #f8fafc 0%, #ffffff 40%, #f8fafc 100%);
+      min-height: 100vh;
+    }
+
+    .detail-navbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+    }
+
+    .detail-container {
+      width: min(1200px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .detail-nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      min-height: 72px;
+    }
+
+    .brand-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: #1a3c5e;
+      font-weight: 800;
+      font-size: 1.1rem;
+    }
+
+    .brand-logo {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #1a3c5e, #0d9488);
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-weight: 800;
+      box-shadow: 0 10px 20px rgba(26, 60, 94, 0.18);
+    }
+
+    .detail-nav-links {
+      display: none;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .detail-nav-links a {
+      color: #334155;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .detail-nav-links a:hover,
+    .detail-nav-links a.active {
+      color: #1a3c5e;
+    }
+
+    .detail-nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .mobile-menu-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      border: 1px solid rgba(15, 23, 42, 0.1);
+      background: #fff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: #1a3c5e;
+    }
+
+    .detail-mobile-menu {
+      display: none;
+      padding: 8px 0 18px;
+      border-top: 1px solid rgba(15, 23, 42, 0.08);
+    }
+
+    .detail-mobile-menu.open {
+      display: block;
+    }
+
+    .detail-mobile-menu a {
+      display: block;
+      padding: 14px 0;
+      text-decoration: none;
+      color: #334155;
+      font-weight: 600;
+      border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+    }
+
+    .page-btn {
+      border: none;
+      border-radius: 14px;
+      padding: 12px 18px;
+      font-weight: 700;
+      font-size: 0.94rem;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    }
+
+    .page-btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .page-btn-primary {
+      background: linear-gradient(135deg, #1a3c5e, #0d9488);
+      color: #fff;
+      box-shadow: 0 12px 24px rgba(13, 148, 136, 0.22);
+    }
+
+    .page-btn-amber {
+      background: #f59e0b;
+      color: #1f2937;
+      box-shadow: 0 12px 22px rgba(245, 158, 11, 0.25);
+    }
+
+    .page-btn-outline {
+      background: #fff;
+      color: #1a3c5e;
+      border: 1px solid rgba(26, 60, 94, 0.12);
+    }
+
+    .page-btn-ghost {
+      background: rgba(255, 255, 255, 0.72);
+      color: #1a3c5e;
+      border: 1px solid rgba(15, 23, 42, 0.08);
+    }
+
+    .detail-breadcrumb-wrap {
+      padding: 18px 0 8px;
+    }
+
+    .detail-breadcrumb {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      font-size: 0.9rem;
+      color: #64748b;
+    }
+
+    .detail-breadcrumb a {
+      color: #1a3c5e;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .hero-card {
+      background: linear-gradient(135deg, rgba(26, 60, 94, 0.98), rgba(13, 148, 136, 0.95));
+      color: #fff;
+      border-radius: 24px;
+      padding: 24px 18px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 24px 50px rgba(15, 23, 42, 0.16);
+    }
+
+    .hero-card::before {
+      content: "";
+      position: absolute;
+      inset: auto -80px -80px auto;
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .hero-topline {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.14);
+      color: #fff;
+      font-size: 0.82rem;
+      font-weight: 700;
+      backdrop-filter: blur(4px);
+    }
+
+    .hero-title {
+      margin: 0;
+      font-size: 1.85rem;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      max-width: 760px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-meta {
+      display: grid;
+      gap: 10px;
+      margin-top: 18px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-meta-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: rgba(255, 255, 255, 0.92);
+      font-weight: 500;
+      font-size: 0.95rem;
+    }
+
+    .detail-main-wrap {
+      padding: 20px 0 60px;
+    }
+
+    .detail-grid {
+      display: grid;
+      gap: 22px;
+    }
+
+    .detail-left,
+    .detail-right {
+      min-width: 0;
+    }
+
+    .detail-section,
+    .sidebar-card {
+      background: #fff;
+      border: 1px solid rgba(15, 23, 42, 0.08);
+      border-radius: 22px;
+      padding: 18px;
+      box-shadow: 0 12px 28px rgba(15, 23, 42, 0.06);
+    }
+
+    .detail-section + .detail-section,
+    .sidebar-card + .sidebar-card {
+      margin-top: 18px;
+    }
+
+    .section-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .section-heading h2 {
+      margin: 0;
+      color: #0f172a;
+      font-size: 1.16rem;
+      line-height: 1.2;
+    }
+
+    .section-subtext {
+      margin: 6px 0 0;
+      color: #64748b;
+      font-size: 0.92rem;
+    }
+
+    .gallery-main {
+      width: 100%;
+      aspect-ratio: 16 / 10;
+      border-radius: 20px;
+      overflow: hidden;
+      background: #e2e8f0;
+      border: 1px solid rgba(15, 23, 42, 0.08);
+    }
+
+    .gallery-main img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .gallery-thumbs {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .thumb-btn {
+      padding: 0;
+      border: 2px solid transparent;
+      border-radius: 16px;
+      overflow: hidden;
+      background: #fff;
+      cursor: pointer;
+      aspect-ratio: 1.15 / 1;
+      transition: border-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .thumb-btn.active {
+      border-color: #0d9488;
+      transform: translateY(-1px);
+    }
+
+    .thumb-btn img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+    }
+
+    .description-box p {
+      margin: 0 0 14px;
+      color: #334155;
+      line-height: 1.75;
+      font-size: 0.97rem;
+    }
+
+    .description-box h3 {
+      margin: 20px 0 10px;
+      color: #1a3c5e;
+      font-size: 1rem;
+    }
+
+    .detail-list {
+      display: grid;
+      gap: 12px;
+      padding: 0;
+      list-style: none;
+      margin: 0;
+    }
+
+    .detail-list li {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      color: #334155;
+      line-height: 1.6;
+      font-size: 0.96rem;
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: #f8fafc;
+      border: 1px solid rgba(15, 23, 42, 0.06);
+    }
+
+    .list-icon {
+      flex: 0 0 28px;
+      width: 28px;
+      height: 28px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      font-size: 0.82rem;
+      background: rgba(13, 148, 136, 0.12);
+      color: #0d9488;
+      font-weight: 800;
+      margin-top: 2px;
+    }
+
+    .schedule-grid,
+    .location-grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .info-pill-card {
+      border: 1px solid rgba(15, 23, 42, 0.08);
+      background: linear-gradient(180deg, #ffffff, #f8fafc);
+      border-radius: 18px;
+      padding: 16px;
+    }
+
+    .info-label {
+      display: block;
+      color: #64748b;
+      font-size: 0.82rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 6px;
+    }
+
+    .info-value {
+      color: #0f172a;
+      font-size: 1rem;
+      font-weight: 700;
+      line-height: 1.5;
+    }
+
+    .map-placeholder {
+      min-height: 250px;
+      border-radius: 20px;
+      border: 1px solid rgba(15, 23, 42, 0.08);
+      background:
+        linear-gradient(135deg, rgba(26, 60, 94, 0.08), rgba(13, 148, 136, 0.12)),
+        repeating-linear-gradient(
+          45deg,
+          rgba(255, 255, 255, 0.8),
+          rgba(255, 255, 255, 0.8) 14px,
+          rgba(226, 232, 240, 0.75) 14px,
+          rgba(226, 232, 240, 0.75) 28px
+        );
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 18px;
+    }
+
+    .map-placeholder-inner {
+      max-width: 340px;
+    }
+
+    .map-pin {
+      width: 68px;
+      height: 68px;
+      margin: 0 auto 12px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #f59e0b, #0d9488);
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-size: 1.5rem;
+      box-shadow: 0 12px 22px rgba(15, 23, 42, 0.14);
+    }
+
+    .map-address {
+      margin: 0;
+      color: #334155;
+      line-height: 1.7;
+    }
+
+    .reviews-overview {
+      display: grid;
+      gap: 18px;
+      margin-bottom: 20px;
+    }
+
+    .rating-summary {
+      border-radius: 20px;
+      padding: 20px;
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.14), rgba(13, 148, 136, 0.1));
+      border: 1px solid rgba(15, 23, 42, 0.08);
+    }
+
+    .rating-big {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .rating-big strong {
+      font-size: 2.8rem;
+      color: #0f172a;
+      line-height: 1;
+    }
+
+    .stars-text {
+      color: #f59e0b;
+      letter-spacing: 1px;
+      font-size: 1rem;
+    }
+
+    .rating-note {
+      color: #475569;
+      margin: 0;
+      line-height: 1.6;
+      font-size: 0.95rem;
+    }
+
+    .rating-bars {
+      display: grid;
+      gap: 12px;
+    }
+
+    .bar-row {
+      display: grid;
+      grid-template-columns: 58px 1fr 36px;
+      gap: 10px;
+      align-items: center;
+      font-size: 0.92rem;
+      color: #334155;
+    }
+
+    .bar-track {
+      height: 10px;
+      border-radius: 999px;
+      background: #e2e8f0;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #f59e0b, #0d9488);
+    }
+
+    .review-cards {
+      display: grid;
+      gap: 14px;
+    }
+
+    .review-card {
+      border: 1px solid rgba(15, 23, 42, 0.07);
+      border-radius: 18px;
+      padding: 16px;
+      background: #fff;
+    }
+
+    .review-head {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .avatar-circle {
+      width: 46px;
+      height: 46px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, #1a3c5e, #0d9488);
+      color: #fff;
+      font-weight: 800;
+      font-size: 0.95rem;
+    }
+
+    .review-head h4 {
+      margin: 0 0 4px;
+      color: #0f172a;
+      font-size: 0.98rem;
+    }
+
+    .review-head p {
+      margin: 0;
+      color: #64748b;
+      font-size: 0.84rem;
+    }
+
+    .review-stars {
+      color: #f59e0b;
+      margin-bottom: 10px;
+      font-size: 0.92rem;
+    }
+
+    .review-text {
+      margin: 0;
+      color: #334155;
+      line-height: 1.7;
+      font-size: 0.95rem;
+    }
+
+    .similar-scroll {
+      display: grid;
+      grid-auto-flow: column;
+      grid-auto-columns: minmax(260px, 82%);
+      gap: 14px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      scroll-snap-type: x proximity;
+    }
+
+    .similar-scroll::-webkit-scrollbar {
+      height: 8px;
+    }
+
+    .similar-scroll::-webkit-scrollbar-thumb {
+      background: rgba(26, 60, 94, 0.22);
+      border-radius: 999px;
+    }
+
+    .similar-card {
+      scroll-snap-align: start;
+      border-radius: 20px;
+      background: #fff;
+      border: 1px solid rgba(15, 23, 42, 0.08);
+      overflow: hidden;
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+    }
+
+    .similar-card img {
+      width: 100%;
+      height: 164px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .similar-body {
+      padding: 16px;
+    }
+
+    .mini-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .mini-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: #f1f5f9;
+      color: #0f172a;
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+
+    .similar-title {
+      margin: 0 0 10px;
+      color: #0f172a;
+      font-size: 1rem;
+      line-height: 1.45;
+    }
+
+    .similar-meta {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 0.88rem;
+      color: #64748b;
+      margin-bottom: 14px;
+    }
+
+    .similar-footer {
+      display: flex;
+      gap: 10px;
+    }
+
+    .sidebar-stack {
+      position: sticky;
+      top: 92px;
+    }
+
+    .price-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .price-main {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .price-amount {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #0f172a;
+      line-height: 1;
+    }
+
+    .price-caption {
+      color: #64748b;
+      font-size: 0.9rem;
+    }
+
+    .pay-type-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 12px;
+      border-radius: 999px;
+      background: rgba(245, 158, 11, 0.14);
+      color: #92400e;
+      font-size: 0.82rem;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .apply-points {
+      display: grid;
+      gap: 10px;
+      margin: 16px 0 18px;
+      padding-top: 14px;
+      border-top: 1px dashed rgba(15, 23, 42, 0.1);
+    }
+
+    .apply-point {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      color: #334155;
+      font-size: 0.94rem;
+      line-height: 1.5;
+    }
+
+    .apply-actions {
+      display: grid;
+      gap: 10px;
+    }
+
+    .save-btn.saved {
+      background: rgba(13, 148, 136, 0.12);
+      color: #0f766e;
+      border-color: rgba(13, 148, 136, 0.2);
+    }
+
+    .poster-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .poster-avatar {
+      width: 56px;
+      height: 56px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, #1a3c5e, #0d9488);
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-size: 1.1rem;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    .poster-meta h3 {
+      margin: 0 0 4px;
+      color: #0f172a;
+      font-size: 1rem;
+    }
+
+    .poster-meta p {
+      margin: 0;
+      color: #64748b;
+      font-size: 0.88rem;
+    }
+
+    .poster-stats {
+      display: grid;
+      gap: 10px;
+      margin: 16px 0;
+    }
+
+    .poster-stat {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      color: #334155;
+      font-size: 0.94rem;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+    }
+
+    .poster-stat:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .poster-stat strong {
+      color: #0f172a;
+    }
+
+    .share-grid {
+      display: grid;
+      gap: 10px;
+    }
+
+    .share-note {
+      margin: 0 0 12px;
+      color: #64748b;
+      line-height: 1.6;
+      font-size: 0.92rem;
+    }
+
+    .site-footer {
+      background: #0f172a;
+      color: rgba(255, 255, 255, 0.82);
+      margin-top: 40px;
+      padding: 48px 0 24px;
+    }
+
+    .footer-grid {
+      display: grid;
+      gap: 26px;
+    }
+
+    .footer-brand p,
+    .footer-col p {
+      margin: 12px 0 0;
+      color: rgba(255, 255, 255, 0.72);
+      line-height: 1.75;
+      font-size: 0.95rem;
+    }
+
+    .footer-title {
+      margin: 0 0 14px;
+      color: #fff;
+      font-size: 1rem;
+    }
+
+    .footer-links {
+      display: grid;
+      gap: 10px;
+    }
+
+    .footer-links a {
+      color: rgba(255, 255, 255, 0.78);
+      text-decoration: none;
+      font-size: 0.94rem;
+    }
+
+    .footer-links a:hover {
+      color: #fff;
+    }
+
+    .social-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .social-chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 44px;
+      height: 44px;
+      padding: 0 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 0.9rem;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .footer-bottom {
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      margin-top: 26px;
+      padding-top: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      font-size: 0.9rem;
+      color: rgba(255, 255, 255, 0.65);
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.62);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      z-index: 100;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .apply-modal {
+      width: min(100%, 560px);
+      background: #fff;
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 28px 60px rgba(15, 23, 42, 0.28);
+      animation: modalPop 0.22s ease;
+    }
+
+    @keyframes modalPop {
+      from {
+        opacity: 0;
+        transform: translateY(12px) scale(0.98);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .modal-head {
+      padding: 20px 20px 12px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+    }
+
+    .modal-head h3 {
+      margin: 0 0 6px;
+      color: #0f172a;
+      font-size: 1.18rem;
+    }
+
+    .modal-head p {
+      margin: 0;
+      color: #64748b;
+      line-height: 1.6;
+      font-size: 0.92rem;
+    }
+
+    .modal-close {
+      width: 42px;
+      height: 42px;
+      border: none;
+      border-radius: 12px;
+      background: #f8fafc;
+      color: #1a3c5e;
+      cursor: pointer;
+      flex-shrink: 0;
+      font-size: 1.1rem;
+    }
+
+    .apply-form {
+      padding: 18px 20px 20px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .field-group {
+      display: grid;
+      gap: 8px;
+    }
+
+    .field-group label {
+      color: #334155;
+      font-size: 0.92rem;
+      font-weight: 700;
+    }
+
+    .field-input,
+    .field-textarea {
+      width: 100%;
+      border: 1px solid rgba(15, 23, 42, 0.12);
+      border-radius: 14px;
+      padding: 13px 14px;
+      font: inherit;
+      color: #0f172a;
+      background: #fff;
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .field-input:focus,
+    .field-textarea:focus {
+      border-color: #0d9488;
+      box-shadow: 0 0 0 4px rgba(13, 148, 136, 0.12);
+    }
+
+    .field-textarea {
+      resize: vertical;
+      min-height: 130px;
+    }
+
+    .phone-field {
+      display: grid;
+      grid-template-columns: 74px 1fr;
+      gap: 10px;
+    }
+
+    .country-code {
+      border: 1px solid rgba(15, 23, 42, 0.12);
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      background: #f8fafc;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .modal-footnote {
+      margin: 4px 0 0;
+      color: #64748b;
+      font-size: 0.85rem;
+      line-height: 1.6;
+    }
+
+    .floating-toast {
+      position: fixed;
+      left: 50%;
+      bottom: 18px;
+      transform: translateX(-50%) translateY(20px);
+      background: #0f172a;
+      color: #fff;
+      padding: 14px 18px;
+      border-radius: 14px;
+      box-shadow: 0 18px 34px rgba(15, 23, 42, 0.22);
+      font-size: 0.92rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.22s ease, transform 0.22s ease;
+      z-index: 120;
+      width: calc(100% - 32px);
+      max-width: 420px;
+      text-align: center;
+    }
+
+    .floating-toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @media (min-width: 640px) {
+      .hero-card {
+        padding: 28px;
+      }
+
+      .hero-title {
+        font-size: 2.35rem;
+      }
+
+      .reviews-overview {
+        grid-template-columns: 0.95fr 1.05fr;
+      }
+
+      .schedule-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .location-grid {
+        grid-template-columns: 1.15fr 0.85fr;
+      }
+
+      .footer-grid {
+        grid-template-columns: 1.3fr 1fr 1fr;
+      }
+
+      .footer-bottom {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .similar-scroll {
+        grid-auto-columns: minmax(280px, 46%);
+      }
+    }
+
+    @media (min-width: 900px) {
+      .detail-nav-links {
+        display: flex;
+      }
+
+      .mobile-menu-btn {
+        display: none;
+      }
+
+      .detail-grid {
+        grid-template-columns: minmax(0, 1.85fr) minmax(320px, 1fr);
+        align-items: start;
+      }
+
+      .detail-section,
+      .sidebar-card {
+        padding: 22px;
+      }
+
+      .hero-meta {
+        grid-template-columns: repeat(4, max-content);
+        gap: 18px;
+      }
+
+      .similar-scroll {
+        grid-auto-columns: minmax(280px, 1fr);
+      }
+    }
+
+    @media (max-width: 899px) {
+      .detail-nav-actions .desktop-login {
+        display: none;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .detail-container {
+        width: min(100% - 24px, 1200px);
+      }
+
+      .hero-title {
+        font-size: 1.6rem;
+      }
+
+      .price-amount {
+        font-size: 1.72rem;
+      }
+
+      .gallery-thumbs {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+      }
+
+      .phone-field {
+        grid-template-columns: 68px 1fr;
+      }
+    }
+  </style>
+</head>
+<body class="gig-detail-page">
+  <header class="detail-navbar">
+    <div class="detail-container">
+      <div class="detail-nav-inner">
+        <a class="brand-link" href="index.html" aria-label="GigLega home">
+          <span class="brand-logo">GL</span>
+          <span>GigLega</span>
+        </a>
+
+        <nav class="detail-nav-links" aria-label="Primary">
+          <a href="browse-gigs.html" class="active">Browse Gigs</a>
+          <a href="post-gig.html">Post a Gig</a>
+          <a href="index.html#how-it-works">How it Works</a>
+          <a href="login.html">Login</a>
+        </nav>
+
+        <div class="detail-nav-actions">
+          <a href="login.html" class="page-btn page-btn-outline desktop-login">Login</a>
+          <button
+            class="mobile-menu-btn"
+            id="mobileMenuBtn"
+            aria-label="Open menu"
+            aria-expanded="false"
+            aria-controls="mobileMenu"
+            type="button"
+          >
+            ☰
+          </button>
+        </div>
+      </div>
+
+      <div class="detail-mobile-menu" id="mobileMenu">
+        <a href="browse-gigs.html">Browse Gigs</a>
+        <a href="post-gig.html">Post a Gig</a>
+        <a href="index.html#how-it-works">How it Works</a>
+        <a href="login.html">Login</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="detail-breadcrumb-wrap">
+      <div class="detail-container">
+        <nav class="detail-breadcrumb" aria-label="Breadcrumb">
+          <a href="index.html">Home</a>
+          <span>›</span>
+          <a href="browse-gigs.html">Browse Gigs</a>
+          <span>›</span>
+          <span aria-current="page">Part-time Café Helper for Weekend Rush</span>
+        </nav>
+      </div>
+    </section>
+
+    <section>
+      <div class="detail-container">
+        <div class="hero-card">
+          <div class="hero-topline">
+            <span class="hero-badge">☕ Hospitality</span>
+            <span class="hero-badge">₹1,200 / day</span>
+            <span class="hero-badge">✅ Verified Gig</span>
+          </div>
+
+          <h1 class="hero-title">Part-time Café Helper for Weekend Rush in Sector 14</h1>
+
+          <div class="hero-meta">
+            <div class="hero-meta-item">📍 Sector 14, Gurugram</div>
+            <div class="hero-meta-item">🕒 Posted 2 din pehle</div>
+            <div class="hero-meta-item">👥 18 applicants</div>
+            <div class="hero-meta-item">⭐ 4.8 poster rating</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="detail-main-wrap">
+      <div class="detail-container">
+        <div class="detail-grid">
+          <div class="detail-left">
+            <section class="detail-section" aria-labelledby="gig-gallery-title">
+              <div class="section-heading">
+                <div>
+                  <h2 id="gig-gallery-title">Gig Photos</h2>
+                  <p class="section-subtext">Kaam ka setup, counter area aur rush-hour environment dekh lo.</p>
+                </div>
+              </div>
+
+              <div class="gallery-main">
+                <img
+                  id="mainGigImage"
+                  src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 800'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop stop-color='%231a3c5e'/><stop offset='1' stop-color='%230d9488'/></linearGradient></defs><rect width='1200' height='800' fill='url(%23g)'/><circle cx='1000' cy='130' r='120' fill='rgba(255,255,255,0.14)'/><rect x='110' y='140' width='980' height='520' rx='32' fill='rgba(255,255,255,0.12)'/><rect x='170' y='210' width='280' height='260' rx='24' fill='%23f59e0b'/><rect x='490' y='210' width='420' height='90' rx='18' fill='rgba(255,255,255,0.86)'/><rect x='490' y='330' width='320' height='28' rx='14' fill='rgba(255,255,255,0.52)'/><rect x='490' y='380' width='260' height='28' rx='14' fill='rgba(255,255,255,0.38)'/><rect x='490' y='470' width='170' height='58' rx='16' fill='%23f59e0b'/><text x='212' y='357' font-size='82' fill='white' font-family='Arial'>Cafe</text><text x='490' y='270' font-size='44' fill='%231a3c5e' font-family='Arial' font-weight='700'>Weekend Helper Gig</text><text x='490' y='508' font-size='28' fill='%231a3c5e' font-family='Arial' font-weight='700'>Sector 14, Gurugram</text></svg>"
+                  alt="Gig preview image"
+                />
+              </div>
+
+              <div class="gallery-thumbs">
+                <button
+                  class="thumb-btn active"
+                  type="button"
+                  data-image="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 800'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop stop-color='%231a3c5e'/><stop offset='1' stop-color='%230d9488'/></linearGradient></defs><rect width='1200' height='800' fill='url(%23g)'/><circle cx='1000' cy='130' r='120' fill='rgba(255,255,255,0.14)'/><rect x='110' y='140' width='980' height='520' rx='32' fill='rgba(255,255,255,0.12)'/><rect x='170' y='210' width='280' height='260' rx='24' fill='%23f59e0b'/><rect x='490' y='210' width='420' height='90' rx='18' fill='rgba(255,255,255,0.86)'/><rect x='490' y='330' width='320' height='28' rx='14' fill='rgba(255,255,255,0.52)'/><rect x='490' y='380' width='260' height='28' rx='14' fill='rgba(255,255,255,0.38)'/><rect x='490' y='470' width='170' height='58' rx='16' fill='%23f59e0b'/><text x='212' y='357' font-size='82' fill='white' font-family='Arial'>Cafe</text><text x='490' y='270' font-size='44' fill='%231a3c5e' font-family='Arial' font-weight='700'>Weekend Helper Gig</text><text x='490' y='508' font-size='28' fill='%231a3c5e' font-family='Arial' font-weight='700'>Sector 14, Gurugram</text></svg>"
+                  aria-label="Show gig image 1"
+                >
+                  <img
+                    src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 520'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop stop-color='%231a3c5e'/><stop offset='1' stop-color='%230d9488'/></linearGradient></defs><rect width='600' height='520' fill='url(%23g)'/><rect x='64' y='74' width='472' height='372' rx='28' fill='rgba(255,255,255,0.12)'/><rect x='110' y='130' width='134' height='170' rx='22' fill='%23f59e0b'/><rect x='276' y='136' width='184' height='52' rx='16' fill='rgba(255,255,255,0.86)'/><rect x='276' y='214' width='148' height='18' rx='9' fill='rgba(255,255,255,0.52)'/><rect x='276' y='248' width='122' height='18' rx='9' fill='rgba(255,255,255,0.4)'/><text x='126' y='228' font-size='44' fill='white' font-family='Arial'>GL</text></svg>"
+                    alt="Gig thumbnail 1"
+                  />
+                </button>
+
+                <button
+                  class="thumb-btn"
+                  type="button"
+                  data-image="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 800'><defs><linearGradient id='g2' x1='0' y1='0' x2='1' y2='1'><stop stop-color='%230d9488'/><stop offset='1' stop-color='%231a3c5e'/></linearGradient></defs><rect width='1200' height='800' fill='url(%23g2)'/><rect x='90' y='120' width='1020' height='560' rx='34' fill='rgba(255,255,255,0.1)'/><circle cx='290' cy='310' r='122' fill='%23f59e0b'/><rect x='470' y='200' width='420' height='80' rx='16' fill='rgba(255,255,255,0.9)'/><rect x='470' y='312' width='300' height='24' rx='12' fill='rgba(255,255,255,0.56)'/><rect x='470' y='356' width='260' height='24' rx='12' fill='rgba(255,255,255,0.42)'/><rect x='470' y='430' width='200' height='64' rx='18' fill='%23f59e0b'/><text x='190' y='330' font-size='70' fill='white' font-family='Arial'>Rush</text><text x='470' y='253' font-size='42' fill='%231a3c5e' font-family='Arial' font-weight='700'>Counter & Billing Area</text></svg>"
+                  aria-label="Show gig image 2"
+                >
+                  <img
+                    src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 520'><defs><linearGradient id='g2' x1='0' y1='0' x2='1' y2='1'><stop stop-color='%230d9488'/><stop offset='1' stop-color='%231a3c5e'/></linearGradient></defs><rect width='600' height='520' fill='url(%23g2)'/><circle cx='172' cy='228' r='92' fill='%23f59e0b'/><rect x='286' y='146' width='188' height='50' rx='14' fill='rgba(255,255,255,0.9)'/><rect x='286' y='220' width='150' height='18' rx='9' fill='rgba(255,255,255,0.52)'/><rect x='286' y='252' width='126' height='18' rx='9' fill='rgba(255,255,255,0.4)'/></svg>"
+                    alt="Gig thumbnail 2"
+                  />
+                </button>
+
+                <button
+                  class="thumb-btn"
+                  type="button"
+                  data-image="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 800'><defs><linearGradient id='g3' x1='0' y1='1' x2='1' y2='0'><stop stop-color='%231a3c5e'/><stop offset='1' stop-color='%23f59e0b'/></linearGradient></defs><rect width='1200' height='800' fill='url(%23g3)'/><rect x='80' y='120' width='1040' height='560' rx='36' fill='rgba(255,255,255,0.12)'/><rect x='160' y='190' width='340' height='300' rx='28' fill='rgba(255,255,255,0.16)'/><rect x='560' y='200' width='430' height='84' rx='18' fill='rgba(255,255,255,0.9)'/><rect x='560' y='326' width='280' height='24' rx='12' fill='rgba(255,255,255,0.58)'/><rect x='560' y='372' width='240' height='24' rx='12' fill='rgba(255,255,255,0.42)'/><text x='212' y='366' font-size='64' fill='white' font-family='Arial'>Shift</text><text x='560' y='255' font-size='42' fill='%231a3c5e' font-family='Arial' font-weight='700'>Work Zone & Prep Counter</text></svg>"
+                  aria-label="Show gig image 3"
+                >
+                  <img
+                    src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 520'><defs><linearGradient id='g3' x1='0' y1='1' x2='1' y2='0'><stop stop-color='%231a3c5e'/><stop offset='1' stop-color='%23f59e0b'/></linearGradient></defs><rect width='600' height='520' fill='url(%23g3)'/><rect x='78' y='104' width='182' height='240' rx='22' fill='rgba(255,255,255,0.16)'/><rect x='302' y='142' width='190' height='54' rx='14' fill='rgba(255,255,255,0.9)'/><rect x='302' y='224' width='140' height='18' rx='9' fill='rgba(255,255,255,0.52)'/></svg>"
+                    alt="Gig thumbnail 3"
+                  />
+                </button>
+
+                <button
+                  class="thumb-btn"
+                  type="button"
+                  data-image="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 800'><defs><linearGradient id='g4' x1='0' y1='0' x2='1' y2='1'><stop stop-color='%23f59e0b'/><stop offset='1' stop-color='%230d9488'/></linearGradient></defs><rect width='1200' height='800' fill='url(%23g4)'/><rect x='98' y='132' width='1004' height='536' rx='34' fill='rgba(255,255,255,0.12)'/><circle cx='930' cy='250' r='100' fill='rgba(255,255,255,0.18)'/><rect x='170' y='210' width='420' height='84' rx='18' fill='rgba(255,255,255,0.9)'/><rect x='170' y='328' width='320' height='24' rx='12' fill='rgba(255,255,255,0.56)'/><rect x='170' y='374' width='280' height='24' rx='12' fill='rgba(255,255,255,0.42)'/><rect x='170' y='456' width='210' height='60' rx='18' fill='%231a3c5e'/><text x='170' y='266' font-size='42' fill='%231a3c5e' font-family='Arial' font-weight='700'>Customer Service Corner</text></svg>"
+                  aria-label="Show gig image 4"
+                >
+                  <img
+                    src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 520'><defs><linearGradient id='g4' x1='0' y1='0' x2='1' y2='1'><stop stop-color='%23f59e0b'/><stop offset='1' stop-color='%230d9488'/></linearGradient></defs><rect width='600' height='520' fill='url(%23g4)'/><rect x='82' y='130' width='206' height='58' rx='16' fill='rgba(255,255,255,0.9)'/><rect x='82' y='214' width='170' height='18' rx='9' fill='rgba(255,255,255,0.56)'/><circle cx='442' cy='184' r='72' fill='rgba(255,255,255,0.18)'/></svg>"
+                    alt="Gig thumbnail 4"
+                  />
+                </button>
+              </div>
+            </section>
+
+            <section class="detail-section" aria-labelledby="gig-description-title">
+              <div class="section-heading">
+                <div>
+                  <h2 id="gig-description-title">Gig Description</h2>
+                  <p class="section-subtext">Kaam ka scope, expected vibe aur role clarity ek jagah.</p>
+                </div>
+              </div>
+
+              <div class="description-box">
+                <p>
+                  Hum Sector 14 ke ek busy neighborhood café ke liye energetic aur responsible weekend helper dhoondh rahe hain. Agar tum student ho, part-time earning chahte ho, ya hospitality mein hands-on experience lena chahte ho, yeh gig tumhare liye perfect ho sakta hai.
+                </p>
+
+                <h3>Kaam kya hoga?</h3>
+                <p>
+                  Tumhara main role counter support, order packing, table reset, basic customer handling aur rush hours mein team ko support karna hoga. Kaam simple hai, lekin speed, politeness aur cleanliness ka dhyaan rakhna zaroori hoga.
+                </p>
+
+                <h3>Kisko preference milegi?</h3>
+                <p>
+                  Jo log punctual hain, thoda customer-facing confidence rakhte hain, aur weekend shifts genuinely commit kar sakte hain unko priority milegi. Prior café ya retail experience bonus hai, lekin mandatory nahi hai.
+                </p>
+
+                <h3>GigLega note</h3>
+                <p>
+                  Client verified hai, payment clear hai, aur location central Gurugram mein hai. Apply karne ke baad short call ya WhatsApp screening ho sakti hai before final confirmation.
+                </p>
+              </div>
+            </section>
+
+            <section class="detail-section" aria-labelledby="requirements-title">
+              <div class="section-heading">
+                <div>
+                  <h2 id="requirements-title">Requirements</h2>
+                  <p class="section-subtext">Apply karne se pehle yeh points zaroor check kar lo.</p>
+                </div>
+              </div>
+
+              <ul class="detail-list">
+                <li>
+                  <span class="list-icon">✓</span>
+                  <span>Age 18+ ho aur weekend shifts ke liye available ho, specially Saturday aur Sunday.</span>
+                </li>
+                <li>
+                  <span class="list-icon">✓</span>
+                  <span>Basic Hindi + simple English communication honi chahiye taaki customers ko handle kar sako.</span>
+                </li>
+                <li>
+                  <span class="list-icon">✓</span>
+                  <span>Neat appearance, hygiene aur time pe pahunchna mandatory hai.</span>
+                </li>
+                <li>
+                  <span class="list-icon">✓</span>
+                  <span>Fast-paced environment mein calmly kaam karne ka attitude hona chahiye.</span>
+                </li>
+                <li>
+                  <span class="list-icon">✓</span>
+                  <span>Local commute manage kar pao, kyunki reporting Sector 14 Gurugram mein hogi.</span>
+                </li>
+              </ul>
+            </section>
+
+            <section class="detail-section" aria-labelledby="deliverables-title">
+              <div class="section-heading">
+                <div>
+                  <h2 id="deliverables-title">What You Get</h2>
+                  <p class="section-subtext">Is gig ke through tumhe kya milega.</p>
+                </div>
+              </div>
+
+              <ul class="detail-list">
+                <li>
+                  <span class="list-icon">₹</span>
+                  <span>₹1,200 per day clear payout, same-day ya next-day payment confirmation ke saath.</span>
+                </li>
+                <li>
+                  <span class="list-icon">☕</span>
+                  <span>Shift ke dauraan meal / beverages support client side se available ho sakta hai.</span>
+                </li>
+                <li>
+                  <span class="list-icon">⭐</span>
+                  <span>Strong review milne par repeat weekend gigs ya future permanent part-time opportunity mil sakti hai.</span>
+                </li>
+                <li>
+                  <span class="list-icon">📈</span>
+                  <span>Hospitality, customer service aur real on-ground work exposure jo resume aur profile dono ke liye useful hoga.</span>
+                </li>
+              </ul>
+            </section>
+
+            <section class="detail-section" aria-labelledby="schedule-title">
+              <div class="section-heading">
+                <div>
+                  <h2 id="schedule-title">Schedule</h2>
+                  <p class="section-subtext">Timing, duration aur shift expectation yahan diya gaya hai.</p>
+                </div>
+              </div>
+
+              <div class="schedule-grid">
+                <div class="info-pill-card">
+                  <span class="info-label">Shift Timing</span>
+                  <div class="info-value">11:00 AM – 8:00 PM</div>
+                </div>
+
+                <div class="info-pill-card">
+                  <span class="info-label">Days</span>
+                  <div class="info-value">Saturday + Sunday</div>
+                </div>
+
+                <div class="info-pill-card">
+                  <span class="info-label">Duration</span>
+                  <div class="info-value">2 weekends minimum</div>
+                </div>
+              </div>
+            </section>
+
+            <section class="detail-section" aria-labelledby="location-title">
+              <div class="section-heading">
+                <div>
+                  <h2 id="location-title">Location</h2>
+                  <p class="section-subtext">Reporting point aur nearby area info.</p>
+                </div>
+              </div>
+
+              <div class="location-grid">
+                <div class="map-placeholder" aria-hidden="true">
+                  <div class="map-placeholder-inner">
+                    <div class="map-pin">📍</div>
+                    <h3 style="margin:0 0 8px; color:#0f172a;">Map Preview Placeholder</h3>
+                    <p class="map-address">
+                      Sector 14 Market ke paas reporting hogi. Exact café location shortlisted applicants ko WhatsApp pe share ki jayegi.
+                    </p>
+                  </div>
+                </div>
+
+                <div class="info-pill-card">
+                  <span class="info-label">Address</span>
+                  <div class="info-value">
+                    Sector 14, Near Main Market,<br />
+                    Gurugram, Haryana
+                  </div>
+                  <p class="section-subtext" style="margin-top:10px;">
+                    Metro/auto se reachable area. Shortlisted candidates ko live pin bheja jayega.
+                  </p>
+                </div>
+              </div>
+            </section>
+
+            <section class="detail-section" aria-labelledby="reviews-title">
+              <div class="section-heading">
+                <div>
+                  <h2 id="reviews-title">Reviews</h2>
+                  <p class="section-subtext">Pichhle workers ka real experience aur rating breakdown.</p>
+                </div>
+              </div>
+
+              <div class="reviews-overview">
+                <div class="rating-summary">
+                  <div class="rating-big">
+                    <strong>4.8</strong>
+                    <span class="stars-text">★★★★★</span>
+                  </div>
+                  <p class="rating-note">
+                    32 verified reviews ke basis par yeh client fast response, clear payment aur respectful behaviour ke liye high rated hai.
+                  </p>
+                </div>
+
+                <div class="rating-bars">
+                  <div class="bar-row">
+                    <span>5 star</span>
+                    <div class="bar-track"><div class="bar-fill" style="width: 82%;"></div></div>
+                    <span>82%</span>
+                  </div>
+                  <div class="bar-row">
+                    <span>4 star</span>
+                    <div class="bar-track"><div class="bar-fill" style="width: 12%;"></div></div>
+                    <span>12%</span>
+                  </div>
+                  <div class="bar-row">
+                    <span>3 star</span>
+                    <div class="bar-track"><div class="bar-fill" style="width: 4%;"></div></div>
+                    <span>4%</span>
+                  </div>
+                  <div class="bar-row">
+                    <span>2 star</span>
+                    <div class="bar-track"><div class="bar-fill" style="width: 1%;"></div></div>
+                    <span>1%</span>
+                  </div>
+                  <div class="bar-row">
+                    <span>1 star</span>
+                    <div class="bar-track"><div class="bar-fill" style="width: 1%;"></div></div>
+                    <span>1%</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="review-cards">
+                <article class="review-card">
+                  <div class="review-head">
+                    <div class="avatar-circle">RK</div>
+                    <div>
+                      <h4>Rohit Kumar</h4>
+                      <p>2 hafte pehle • Weekend helper</p>
+                    </div>
+                  </div>
+                  <div class="review-stars">★★★★★</div>
+                  <p class="review-text">
+                    Client kaafi genuine tha. Payment time pe mil gayi aur instructions clear thi. Rush zyada tha, lekin team supportive thi aur kaam ka environment achha laga.
+                  </p>
+                </article>
+
+                <article class="review-card">
+                  <div class="review-head">
+                    <div class="avatar-circle">AS</div>
+                    <div>
+                      <h4>Anjali Sharma</h4>
+                      <p>1 mahina pehle • Counter support</p>
+                    </div>
+                  </div>
+                  <div class="review-stars">★★★★★</div>
+                  <p class="review-text">
+                    Students ke liye badiya side-income gig hai. Café owner respectful hai aur break bhi mil jata hai. Agar tum punctual ho toh repeat shifts bhi mil sakti hain.
+                  </p>
+                </article>
+
+                <article class="review-card">
+                  <div class="review-head">
+                    <div class="avatar-circle">MN</div>
+                    <div>
+                      <h4>Mohit Nagar</h4>
+                      <p>6 din pehle • Service assistant</p>
+                    </div>
+                  </div>
+                  <div class="review-stars">★★★★☆</div>
+                  <p class="review-text">
+                    Kaam easy tha but rush-hour mein pace maintain karna padta hai. Location convenient hai aur communication smooth raha. Overall solid gig for part-time workers.
+                  </p>
+                </article>
+              </div>
+            </section>
+
+            <section class="detail-section" aria-labelledby="similar-gigs-title">
+              <div class="section-heading">
+                <div>
+                  <h2 id="similar-gigs-title">Similar Gigs</h2>
+                  <p class="section-subtext">Aise aur gigs jo tumhare liye relevant ho sakte hain.</p>
+                </div>
+              </div>
+
+              <div class="similar-scroll">
+                <article class="similar-card">
+                  <img
+                    src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 520'><defs><linearGradient id='a1' x1='0' y1='0' x2='1' y2='1'><stop stop-color='%231a3c5e'/><stop offset='1' stop-color='%230d9488'/></linearGradient></defs><rect width='800' height='520' fill='url(%23a1)'/><rect x='70' y='74' width='660' height='372' rx='28' fill='rgba(255,255,255,0.12)'/><text x='120' y='274' font-size='54' fill='white' font-family='Arial'>Retail Store Assistant</text></svg>"
+                    alt="Retail store assistant gig"
+                  />
+                  <div class="similar-body">
+                    <div class="mini-badges">
+                      <span class="mini-badge">Retail</span>
+                      <span class="mini-badge">₹900/day</span>
+                    </div>
+                    <h3 class="similar-title">Weekend Retail Store Assistant - Galleria Market</h3>
+                    <div class="similar-meta">
+                      <span>📍 DLF Phase 4</span>
+                      <span>Posted 1 day ago</span>
+                    </div>
+                    <div class="similar-footer">
+                      <a href="#" class="page-btn page-btn-outline" style="flex:1;">View Gig</a>
+                    </div>
+                  </div>
+                </article>
+
+                <article class="similar-card">
+                  <img
+                    src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 520'><defs><linearGradient id='a2' x1='0' y1='0' x2='1' y2='1'><stop stop-color='%230d9488'/><stop offset='1' stop-color='%23f59e0b'/></linearGradient></defs><rect width='800' height='520' fill='url(%23a2)'/><rect x='76' y='84' width='648' height='352' rx='26' fill='rgba(255,255,255,0.12)'/><text x='134' y='268' font-size='52' fill='white' font-family='Arial'>Event Crew</text></svg>"
+                    alt="Event crew gig"
+                  />
+                  <div class="similar-body">
+                    <div class="mini-badges">
+                      <span class="mini-badge">Events</span>
+                      <span class="mini-badge">₹1,500/day</span>
+                    </div>
+                    <h3 class="similar-title">College Fest Event Crew Needed - Cyber City</h3>
+                    <div class="similar-meta">
+                      <span>📍 Cyber City</span>
+                      <span>Posted 3 days ago</span>
+                    </div>
+                    <div class="similar-footer">
+                      <a href="#" class="page-btn page-btn-outline" style="flex:1;">View Gig</a>
+                    </div>
+                  </div>
+                </article>
+
+                <article class="similar-card">
+                  <img
+                    src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 520'><defs><linearGradient id='a3' x1='0' y1='1' x2='1' y2='0'><stop stop-color='%231a3c5e'/><stop offset='1' stop-color='%23f59e0b'/></linearGradient></defs><rect width='800' height='520' fill='url(%23a3)'/><rect x='80' y='86' width='640' height='348' rx='24' fill='rgba(255,255,255,0.12)'/><text x='118' y='268' font-size='50' fill='white' font-family='Arial'>Delivery Support</text></svg>"
+                    alt="Delivery support gig"
+                  />
+                  <div class="similar-body">
+                    <div class="mini-badges">
+                      <span class="mini-badge">Delivery</span>
+                      <span class="mini-badge">₹800/day + tips</span>
+                    </div>
+                    <h3 class="similar-title">Food Pickup & Delivery Support - Sector 31</h3>
+                    <div class="similar-meta">
+                      <span>📍 Sector 31</span>
+                      <span>Posted today</span>
+                    </div>
+                    <div class="similar-footer">
+                      <a href="#" class="page-btn page-btn-outline" style="flex:1;">View Gig</a>
+                    </div>
+                  </div>
+                </article>
+
+                <article class="similar-card">
+                  <img
+                    src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 520'><defs><linearGradient id='a4' x1='0' y1='0' x2='1' y2='1'><stop stop-color='%23f59e0b'/><stop offset='1' stop-color='%231a3c5e'/></linearGradient></defs><rect width='800' height='520' fill='url(%23a4)'/><rect x='72' y='82' width='656' height='356' rx='26' fill='rgba(255,255,255,0.12)'/><text x='120' y='268' font-size='52' fill='white' font-family='Arial'>Reception Help</text></svg>"
+                    alt="Reception help gig"
+                  />
+                  <div class="similar-body">
+                    <div class="mini-badges">
+                      <span class="mini-badge">Office</span>
+                      <span class="mini-badge">₹1,000/day</span>
+                    </div>
+                    <h3 class="similar-title">Front Desk / Reception Help - Udyog Vihar</h3>
+                    <div class="similar-meta">
+                      <span>📍 Udyog Vihar</span>
+                      <span>Posted 2 days ago</span>
+                    </div>
+                    <div class="similar-footer">
+                      <a href="#" class="page-btn page-btn-outline" style="flex:1;">View Gig</a>
+                    </div>
+                  </div>
+                </article>
+              </div>
+            </section>
+          </div>
+
+          <aside class="detail-right">
+            <div class="sidebar-stack">
+              <section class="sidebar-card" aria-labelledby="apply-card-title">
+                <div class="section-heading">
+                  <div>
+                    <h2 id="apply-card-title">Apply Now</h2>
+                    <p class="section-subtext">Quick apply karo aur client tak fast pahocho.</p>
+                  </div>
+                </div>
+
+                <div class="price-row">
+                  <div class="price-main">
+                    <div class="price-amount">₹1,200</div>
+                    <div class="price-caption">Per day payout</div>
+                  </div>
+                  <span class="pay-type-badge">Daily Pay</span>
+                </div>
+
+                <div class="apply-points">
+                  <div class="apply-point">✅ Verified client aur clear role expectation</div>
+                  <div class="apply-point">📍 Local Gurugram reporting, easy commute</div>
+                  <div class="apply-point">⚡ Fast response expected within same day</div>
+                </div>
+
+                <div class="apply-actions">
+                  <button id="applyNowBtn" type="button" class="page-btn page-btn-primary" style="width:100%;">
+                    Abhi Apply Karo
+                  </button>
+
+                  <a
+                    href="https://wa.me/919319635257?text=Hi%20GigLega%2C%20mujhe%20Part-time%20Caf%C3%A9%20Helper%20gig%20mein%20interest%20hai."
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="page-btn page-btn-amber"
+                    style="width:100%;"
+                  >
+                    WhatsApp Karo
+                  </a>
+
+                  <button id="saveGigBtn" type="button" class="page-btn page-btn-outline save-btn" style="width:100%;">
+                    🤍 Save / Bookmark
+                  </button>
+                </div>
+              </section>
+
+              <section class="sidebar-card" aria-labelledby="poster-info-title">
+                <div class="section-heading">
+                  <div>
+                    <h2 id="poster-info-title">Poster Info</h2>
+                    <p class="section-subtext">Gig post karne wale client ki basic profile.</p>
+                  </div>
+                </div>
+
+                <div class="poster-header">
+                  <div class="poster-avatar">SK</div>
+                  <div class="poster-meta">
+                    <h3>Sunita Khanna</h3>
+                    <p>Verified business poster</p>
+                  </div>
+                </div>
+
+                <div class="poster-stats">
+                  <div class="poster-stat">
+                    <span>Rating</span>
+                    <strong>4.8 / 5</strong>
+                  </div>
+                  <div class="poster-stat">
+                    <span>Gigs posted</span>
+                    <strong>19</strong>
+                  </div>
+                  <div class="poster-stat">
+                    <span>Member since</span>
+                    <strong>Jan 2025</strong>
+                  </div>
+                  <div class="poster-stat">
+                    <span>Status</span>
+                    <strong>✅ Verified</strong>
+                  </div>
+                </div>
+
+                <a href="profile.html" class="page-btn page-btn-outline" style="width:100%;">Profile Dekho</a>
+              </section>
+
+              <section class="sidebar-card" aria-labelledby="share-title">
+                <div class="section-heading">
+                  <div>
+                    <h2 id="share-title">Share</h2>
+                    <p class="section-subtext">Friend ko forward karo ya apne group mein share karo.</p>
+                  </div>
+                </div>
+
+                <p class="share-note">
+                  Is gig ko WhatsApp, social groups ya direct copy link ke through share kar sakte ho.
+                </p>
+
+                <div class="share-grid">
+                  <button id="copyLinkBtn" type="button" class="page-btn page-btn-outline" style="width:100%;">
+                    🔗 Copy Link
+                  </button>
+
+                  <a
+                    id="whatsAppShareBtn"
+                    href="https://wa.me/?text=GigLega%20pe%20yeh%20gig%20dekho%20-%20Part-time%20Caf%C3%A9%20Helper%20for%20Weekend%20Rush"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="page-btn page-btn-amber"
+                    style="width:100%;"
+                  >
+                    📲 WhatsApp Share
+                  </a>
+                </div>
+              </section>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="detail-container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a class="brand-link" href="index.html" style="color:#fff;">
+            <span class="brand-logo" style="box-shadow:none;">GL</span>
+            <span>GigLega</span>
+          </a>
+          <p>
+            Gurugram ke liye hyperlocal gig platform — jahan workers aur clients dono fast, simple aur trust ke saath connect karte hain.
+          </p>
+          <div class="social-row">
+            <a class="social-chip" href="#" aria-label="Instagram">IG</a>
+            <a class="social-chip" href="#" aria-label="Facebook">FB</a>
+            <a class="social-chip" href="#" aria-label="LinkedIn">IN</a>
+            <a class="social-chip" href="mailto:Giglega.official@gmail.com" aria-label="Email">Mail</a>
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <h3 class="footer-title">Quick Links</h3>
+          <div class="footer-links">
+            <a href="index.html">Home</a>
+            <a href="browse-gigs.html">Browse Gigs</a>
+            <a href="post-gig.html">Post a Gig</a>
+            <a href="login.html">Login</a>
+            <a href="register.html">Register</a>
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <h3 class="footer-title">Support</h3>
+          <div class="footer-links">
+            <a href="profile.html">Profile</a>
+            <a href="index.html#how-it-works">How it Works</a>
+            <a href="mailto:Giglega.official@gmail.com">Giglega.official@gmail.com</a>
+            <a href="tel:+919319635257">+91 93196 35257</a>
+          </div>
+          <p>Built for hustlers, students, bachelors aur local businesses in Gurugram.</p>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <span>© 2026 GigLega. All rights reserved.</span>
+        <span>Kaam Dhundo. Kaam Do. Saath Badhte Hain.</span>
+      </div>
+    </div>
+  </footer>
+
+  <div class="modal-backdrop" id="applyModal" aria-hidden="true">
+    <div class="apply-modal" role="dialog" aria-modal="true" aria-labelledby="applyModalTitle">
+      <div class="modal-head">
+        <div>
+          <h3 id="applyModalTitle">Is Gig ke liye Apply Karo</h3>
+          <p>
+            Apni details fill karo. Shortlisted hone par client ya GigLega team tumse WhatsApp ya call pe connect karegi.
+          </p>
+        </div>
+        <button class="modal-close" id="closeApplyModalBtn" type="button" aria-label="Close modal">✕</button>
+      </div>
+
+      <form class="apply-form" id="applyForm">
+        <div class="field-group">
+          <label for="applicantName">Full Name</label>
+          <input
+            class="field-input"
+            id="applicantName"
+            name="applicantName"
+            type="text"
+            placeholder="Apna poora naam likho"
+            required
+          />
+        </div>
+
+        <div class="field-group">
+          <label for="applicantPhone">Phone Number</label>
+          <div class="phone-field">
+            <div class="country-code">+91</div>
+            <input
+              class="field-input"
+              id="applicantPhone"
+              name="applicantPhone"
+              type="tel"
+              inputmode="numeric"
+              pattern="[0-9]{10}"
+              maxlength="10"
+              placeholder="10 digit mobile number"
+              required
+            />
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label for="coverMessage">Cover Message</label>
+          <textarea
+            class="field-textarea"
+            id="coverMessage"
+            name="coverMessage"
+            placeholder="Short mein batao tum is gig ke liye kyun fit ho, weekend availability kya hai, aur koi relevant experience ho toh woh bhi mention karo."
+            required
+          ></textarea>
+        </div>
+
+        <button type="submit" class="page-btn page-btn-primary" style="width:100%;">
+          Submit Application
+        </button>
+
+        <p class="modal-footnote">
+          Note: Fake ya incomplete details dene par application reject ho sakti hai.
+        </p>
+      </form>
+    </div>
+  </div>
+
+  <div class="floating-toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    (function () {
+      const mobileMenuBtn = document.getElementById("mobileMenuBtn");
+      const mobileMenu = document.getElementById("mobileMenu");
+      const applyModal = document.getElementById("applyModal");
+      const applyNowBtn = document.getElementById("applyNowBtn");
+      const closeApplyModalBtn = document.getElementById("closeApplyModalBtn");
+      const applyForm = document.getElementById("applyForm");
+      const copyLinkBtn = document.getElementById("copyLinkBtn");
+      const whatsAppShareBtn = document.getElementById("whatsAppShareBtn");
+      const saveGigBtn = document.getElementById("saveGigBtn");
+      const toast = document.getElementById("toast");
+      const mainGigImage = document.getElementById("mainGigImage");
+      const thumbButtons = document.querySelectorAll(".thumb-btn");
+
+      const pageUrl = window.location.href;
+      const gigTitle = "Part-time Café Helper for Weekend Rush in Sector 14";
+      const storageKey = "giglega_saved_gig_sector14_cafe_helper";
+
+      function showToast(message) {
+        toast.textContent = message;
+        toast.classList.add("show");
+        clearTimeout(showToast._timer);
+        showToast._timer = setTimeout(() => {
+          toast.classList.remove("show");
+        }, 2400);
+      }
+
+      function openModal() {
+        applyModal.classList.add("open");
+        applyModal.setAttribute("aria-hidden", "false");
+        document.body.style.overflow = "hidden";
+        const firstField = document.getElementById("applicantName");
+        if (firstField) firstField.focus();
+      }
+
+      function closeModal() {
+        applyModal.classList.remove("open");
+        applyModal.setAttribute("aria-hidden", "true");
+        document.body.style.overflow = "";
+      }
+
+      function updateSavedState() {
+        const isSaved = localStorage.getItem(storageKey) === "true";
+        saveGigBtn.classList.toggle("saved", isSaved);
+        saveGigBtn.innerHTML = isSaved ? "💚 Saved" : "🤍 Save / Bookmark";
+      }
+
+      if (mobileMenuBtn) {
+        mobileMenuBtn.addEventListener("click", function () {
+          const isOpen = mobileMenu.classList.toggle("open");
+          mobileMenuBtn.setAttribute("aria-expanded", String(isOpen));
+          mobileMenuBtn.textContent = isOpen ? "✕" : "☰";
+        });
+      }
+
+      if (applyNowBtn) {
+        applyNowBtn.addEventListener("click", openModal);
+      }
+
+      if (closeApplyModalBtn) {
+        closeApplyModalBtn.addEventListener("click", closeModal);
+      }
+
+      if (applyModal) {
+        applyModal.addEventListener("click", function (event) {
+          if (event.target === applyModal) {
+            closeModal();
+          }
+        });
+      }
+
+      document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape" && applyModal.classList.contains("open")) {
+          closeModal();
+        }
+      });
+
+      if (applyForm) {
+        applyForm.addEventListener("submit", function (event) {
+          event.preventDefault();
+
+          const name = document.getElementById("applicantName").value.trim();
+          const phone = document.getElementById("applicantPhone").value.trim();
+          const message = document.getElementById("coverMessage").value.trim();
+
+          if (!name || !phone || !message) {
+            showToast("Please saari details fill karo.");
+            return;
+          }
+
+          if (!/^[0-9]{10}$/.test(phone)) {
+            showToast("Valid 10 digit phone number daalo.");
+            return;
+          }
+
+          const draftApplication = {
+            gigTitle,
+            name,
+            phone,
+            message,
+            submittedAt: new Date().toISOString()
+          };
+
+          localStorage.setItem("giglega_last_application", JSON.stringify(draftApplication));
+          applyForm.reset();
+          closeModal();
+          showToast("Application submit ho gayi! Jaldi contact aayega.");
+        });
+      }
+
+      if (copyLinkBtn) {
+        copyLinkBtn.addEventListener("click", async function () {
+          try {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+              await navigator.clipboard.writeText(pageUrl);
+            } else {
+              const tempInput = document.createElement("input");
+              tempInput.value = pageUrl;
+              document.body.appendChild(tempInput);
+              tempInput.select();
+              document.execCommand("copy");
+              document.body.removeChild(tempInput);
+            }
+            showToast("Gig link copy ho gaya.");
+          } catch (error) {
+            showToast("Link copy nahi hua, dubara try karo.");
+          }
+        });
+      }
+
+      if (whatsAppShareBtn) {
+        const shareText = encodeURIComponent(
+          "GigLega pe yeh gig dekho: " + gigTitle + " - " + pageUrl
+        );
+        whatsAppShareBtn.href = "https://wa.me/?text=" + shareText;
+      }
+
+      if (saveGigBtn) {
+        saveGigBtn.addEventListener("click", function () {
+          const isSaved = localStorage.getItem(storageKey) === "true";
+          localStorage.setItem(storageKey, String(!isSaved));
+          updateSavedState();
+          showToast(!isSaved ? "Gig saved ho gayi." : "Gig unsaved ho gayi.");
+        });
+      }
+
+      if (thumbButtons.length) {
+        thumbButtons.forEach(function (button) {
+          button.addEventListener("click", function () {
+            const selectedImage = button.getAttribute("data-image");
+            if (selectedImage) {
+              mainGigImage.src = selectedImage;
+            }
+
+            thumbButtons.forEach(function (btn) {
+              btn.classList.remove("active");
+            });
+
+            button.classList.add("active");
+          });
+        });
+      }
+
+      updateSavedState();
+    })();
+  </script>
+</body>
+</html>
