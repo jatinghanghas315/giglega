@@ -1479,3 +1479,71 @@ Object.assign(window, {
   formatIndianPhone,
   isValidIndianPhone
 });
+/* =========================================================
+   Avatar Upload — BUG #6 FIX
+   ========================================================= */
+
+function renderAvatar(el, user) {
+  if (!el || !user) return;
+  if (user.avatar) {
+    el.style.padding = "0";
+    el.style.overflow = "hidden";
+    el.innerHTML = '<img src="' + user.avatar + '" ' +
+      'style="width:100%;height:100%;object-fit:cover;border-radius:50%;" ' +
+      'alt="Profile photo" />';
+  } else {
+    el.style.padding = "";
+    el.style.overflow = "";
+    el.textContent = getInitials(user.name || "U");
+  }
+}
+
+function initAvatarUpload(wrapId, avatarElId, inputId) {
+  var wrap     = document.getElementById(wrapId);
+  var avatarEl = document.getElementById(avatarElId);
+  var input    = document.getElementById(inputId);
+  if (!wrap || !avatarEl || !input) return;
+
+  /* Render existing photo on load */
+  var user = getCurrentUser();
+  if (user) renderAvatar(avatarEl, user);
+
+  /* Click wrapper → trigger file picker */
+  wrap.addEventListener("click", function () { input.click(); });
+
+  input.addEventListener("change", function () {
+    var file = input.files && input.files[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      showToast("Sirf image file select karo! (JPG, PNG, WebP)", "error");
+      input.value = "";
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      showToast("Photo 2MB se chhoti honi chahiye!", "error");
+      input.value = "";
+      return;
+    }
+
+    var reader = new FileReader();
+    reader.onload = function (e) {
+      var dataUrl = e.target.result;
+      var updated = Object.assign({}, getCurrentUser() || {}, { avatar: dataUrl });
+      lsSet(GL.STORAGE_KEY_USER, updated);
+
+      var users = lsGet(GL.STORAGE_KEY_USERS, []);
+      var idx = users.findIndex(function (u) {
+        return u.id === updated.id || u.email === updated.email;
+      });
+      if (idx > -1) { users[idx] = updated; lsSet(GL.STORAGE_KEY_USERS, users); }
+
+      renderAvatar(avatarEl, updated);
+      showToast("Profile photo update ho gayi! 📸", "success");
+    };
+    reader.onerror = function () {
+      showToast("Photo load nahi ho saki. Dobara try karo.", "error");
+    };
+    reader.readAsDataURL(file);
+  });
+}
