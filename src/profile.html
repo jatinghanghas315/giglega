@@ -1,613 +1,493 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Profile — GigLega</title>
-    <meta name="description" content="GigLega user profile page." />
-    <link rel="stylesheet" href="styles.css" />
-    <script defer src="shared.js"></script>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Profile — GigLega</title>
+  <meta name="description" content="GigLega user profile — apni details update karo." />
+  <link rel="stylesheet" href="styles.css" />
+  <script defer src="shared.js"></script>
+  <style>
+    .profile-wrap{max-width:800px;margin:0 auto;padding:32px 16px 80px}
 
-    <style>
-      .profile-wrap {
-        padding: clamp(28px, 5vw, 52px) 0 clamp(56px, 8vw, 88px);
-      }
+    /* ── Hero card ── */
+    .hero-card{background:linear-gradient(135deg,var(--primary) 0%,var(--teal) 100%);border-radius:var(--radius);padding:32px 28px;color:#fff;margin-bottom:24px;display:flex;align-items:center;gap:24px;flex-wrap:wrap}
+    .avatar-wrap{position:relative;flex-shrink:0;cursor:pointer}
+    .avatar-circle{width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,.2);border:3px solid rgba(255,255,255,.4);display:flex;align-items:center;justify-content:center;font-size:1.6rem;font-weight:800;color:#fff;overflow:hidden;transition:filter .2s}
+    .avatar-circle img{width:100%;height:100%;object-fit:cover}
+    .avatar-overlay{position:absolute;inset:0;border-radius:50%;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;font-size:1.1rem;opacity:0;transition:opacity .2s;pointer-events:none}
+    .avatar-wrap:hover .avatar-overlay{opacity:1}
+    .avatar-wrap:hover .avatar-circle{filter:brightness(.75)}
+    input#avatarInput{display:none}
 
-      .profile-grid {
-        display: grid;
-        gap: 24px;
-        align-items: start;
-      }
+    .hero-info{flex:1;min-width:200px}
+    .hero-name{font-size:1.4rem;font-weight:800;margin-bottom:4px}
+    .hero-role{font-size:.83rem;opacity:.75;margin-bottom:10px}
+    .hero-chips{display:flex;flex-wrap:wrap;gap:8px}
+    .hero-chip{font-size:.75rem;background:rgba(255,255,255,.15);padding:4px 12px;border-radius:10px}
 
-      /* ── Hero card ───────────────────────────────────────────────
-         🔴 BUG #4 ROOT CAUSE FIX:
-         Old: background: linear-gradient(135deg, #f0fdfa 0%, #fff 55%)
-         This is hardcoded light — stays white in dark mode.
-         In dark mode var(--text) = #f8fafc (near-white),
-         so .profile-name becomes white-on-white = invisible.
-         Fix: use var(--surface) base + teal tint via rgba so it
-         adapts to both light and dark themes.                      */
-      .hero-card {
-        padding: clamp(24px, 4vw, 40px);
-        border: 1px solid var(--border);
-        border-radius: 26px;
-        background: var(--surface);
-        background-image: linear-gradient(135deg, rgba(13, 148, 136, 0.06) 0%, transparent 55%);
-        display: flex;
-        gap: 22px;
-        align-items: flex-start;
-        flex-wrap: wrap;
-      }
+    /* ── Form card ── */
+    .form-card{background:var(--surface);border:1.5px solid var(--gray-200);border-radius:var(--radius);padding:24px;margin-bottom:20px;box-shadow:var(--shadow-sm)}
+    .card-title{font-size:1rem;font-weight:700;color:var(--primary);margin-bottom:18px;display:flex;align-items:center;gap:8px}
 
-      .profile-avatar {
-        width: 80px;
-        height: 80px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, var(--teal), #0369a1);
-        color: #fff;
-        font-size: 2rem;
-        font-weight: 900;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-        box-shadow: 0 4px 16px rgba(13, 148, 136, 0.25);
-      }
+    .field{margin-bottom:18px}
+    .field label{display:block;font-weight:600;font-size:.88rem;color:var(--gray-700);margin-bottom:6px}
+    .field input,.field select,.field textarea{width:100%;padding:11px 14px;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);font-size:.93rem;background:var(--surface);color:var(--text);font-family:inherit;transition:border .2s;box-sizing:border-box}
+    .field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--teal)}
+    .field textarea{resize:vertical;min-height:90px}
+    .field-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    @media(max-width:560px){.field-row{grid-template-columns:1fr}}
 
-      .profile-info { flex: 1; min-width: 0; }
+    /* ── Completion bar ── */
+    .completion-card{background:var(--surface);border:1.5px solid var(--gray-200);border-radius:var(--radius);padding:20px 24px;margin-bottom:20px;box-shadow:var(--shadow-sm)}
+    .completion-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+    .completion-title{font-size:.9rem;font-weight:700;color:var(--primary)}
+    .completion-pct{font-size:1.1rem;font-weight:800;color:var(--teal)}
+    .completion-bar-track{height:8px;background:var(--gray-200);border-radius:4px;overflow:hidden;margin-bottom:12px}
+    .completion-bar-fill{height:100%;background:linear-gradient(90deg,var(--primary),var(--teal));border-radius:4px;transition:width .5s ease}
+    .completion-tips{display:flex;flex-direction:column;gap:6px}
+    .completion-tip{display:flex;align-items:center;gap:8px;font-size:.8rem}
+    .completion-tip.done{color:var(--success)}
+    .completion-tip.missing{color:var(--gray-400)}
 
-      /* 🔴 BUG #4 FIX — explicit color so it never inherits broken value */
-      .profile-name {
-        margin: 0 0 4px;
-        font-size: clamp(1.4rem, 3vw, 1.9rem);
-        letter-spacing: -0.03em;
-        color: var(--text);
-      }
+    /* ── Skills tags ── */
+    .skills-input-wrap{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+    .skill-tag{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;background:rgba(13,148,136,.1);border:1px solid var(--teal);border-radius:14px;font-size:.8rem;color:var(--teal);font-weight:600}
+    .skill-tag button{background:none;border:none;cursor:pointer;color:var(--teal);font-size:.85rem;line-height:1;padding:0}
+    .skill-add-row{display:flex;gap:8px}
+    .skill-add-row input{flex:1;padding:9px 12px;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);font-size:.88rem;background:var(--surface);color:var(--text);font-family:inherit}
+    .skill-add-row input:focus{outline:none;border-color:var(--teal)}
+    .btn-add-skill{padding:9px 16px;background:var(--teal);color:#fff;border:none;border-radius:var(--radius-sm);font-weight:700;font-size:.85rem;cursor:pointer}
 
-      .profile-role-row {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-        align-items: center;
-        margin-bottom: 10px;
-      }
+    /* ── Stats mini ── */
+    .stats-mini{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;margin-bottom:20px}
+    .stat-mini{background:var(--surface);border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);padding:14px;text-align:center;box-shadow:var(--shadow-sm)}
+    .stat-mini-val{font-size:1.3rem;font-weight:800;color:var(--primary)}
+    .stat-mini-lbl{font-size:.72rem;color:var(--gray-400);margin-top:3px}
 
-      .profile-meta-row {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 14px;
-        font-size: 0.88rem;
-        color: var(--text-muted);
-        margin-bottom: 14px;
-      }
+    /* ── Save button ── */
+    .save-row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+    .btn-save{padding:12px 32px;background:linear-gradient(135deg,var(--primary) 0%,var(--teal) 100%);color:#fff;border:none;border-radius:var(--radius-sm);font-weight:800;font-size:.92rem;cursor:pointer;transition:transform .15s,box-shadow .15s;box-shadow:0 3px 12px rgba(13,148,136,.3)}
+    .btn-save:hover{transform:translateY(-2px);box-shadow:0 5px 18px rgba(13,148,136,.4)}
+    .btn-save:disabled{opacity:.5;transform:none;cursor:not-allowed}
+    .save-status{font-size:.82rem;color:var(--success);display:none;font-weight:600}
+    .save-status.show{display:block}
 
-      .profile-meta-row span {
-        display: flex;
-        align-items: center;
-        gap: 5px;
-      }
+    /* ── Danger zone ── */
+    .danger-zone{background:rgba(239,68,68,.04);border:1.5px solid rgba(239,68,68,.2);border-radius:var(--radius);padding:20px 24px;margin-top:8px}
+    .danger-zone h4{font-size:.9rem;font-weight:700;color:var(--danger);margin-bottom:8px}
+    .danger-zone p{font-size:.82rem;color:var(--gray-500);margin-bottom:14px;line-height:1.5}
+    .btn-danger-action{padding:10px 20px;background:transparent;border:1.5px solid var(--danger);color:var(--danger);border-radius:var(--radius-sm);font-weight:700;font-size:.82rem;cursor:pointer;transition:all .2s}
+    .btn-danger-action:hover{background:var(--danger);color:#fff}
 
-      .profile-bio {
-        margin: 0;
-        color: var(--text-muted);
-        line-height: 1.65;
-        font-size: 0.95rem;
-        max-width: 56ch;
-      }
+    /* Dark mode */
+    [data-theme=dark] .form-card{border-color:var(--gray-700)}
+    [data-theme=dark] .completion-card{border-color:var(--gray-700)}
+    [data-theme=dark] .stat-mini{border-color:var(--gray-700);background:var(--gray-800)}
+    [data-theme=dark] .completion-bar-track{background:var(--gray-700)}
+    [data-theme=dark] .skill-tag{background:rgba(13,148,136,.15);border-color:var(--teal)}
+    [data-theme=dark] .skill-add-row input{border-color:var(--gray-600);background:var(--gray-800)}
+    [data-theme=dark] .danger-zone{background:rgba(239,68,68,.07);border-color:rgba(239,68,68,.3)}
+    [data-theme=dark] .field label{color:var(--gray-300)}
+  </style>
+</head>
+<body>
+  <div id="announce-bar"></div>
+  <nav id="main-nav"></nav>
 
-      .profile-actions {
-        display: flex;
-        gap: 10px;
-        flex-wrap: wrap;
-        margin-top: 18px;
-      }
+  <main class="page-wrapper">
+    <div class="profile-wrap">
+      <nav id="breadcrumb" aria-label="breadcrumb"></nav>
 
-      /* 🔴 BUG #2 CARRY-OVER FIX — background:#fff → var(--surface) */
-      .completion-card {
-        padding: 18px 20px;
-        border: 1px solid var(--border);
-        border-radius: 18px;
-        background: var(--surface);
-      }
-
-      .completion-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 10px;
-      }
-
-      .completion-header h4 { margin: 0; font-size: 0.95rem; }
-
-      .completion-pct {
-        font-size: 1.1rem;
-        font-weight: 900;
-        color: var(--teal);
-      }
-
-      /* 🔴 BUG #2 CARRY-OVER FIX — background:#e5e7eb → var(--gray-200) */
-      .bar-wrap {
-        background: var(--gray-200);
-        border-radius: 99px;
-        height: 10px;
-        overflow: hidden;
-        margin-bottom: 10px;
-      }
-
-      .bar-fill {
-        height: 100%;
-        border-radius: 99px;
-        background: linear-gradient(90deg, var(--teal), #0ea5e9);
-        transition: width 0.7s ease;
-      }
-
-      .completion-tips {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 6px;
-        margin-top: 4px;
-      }
-
-      .completion-tip {
-        font-size: 0.78rem;
-        padding: 3px 10px;
-        border-radius: 99px;
-        font-weight: 700;
-      }
-
-      .completion-tip.done {
-        background: rgba(13, 148, 136, 0.08);
-        color: var(--teal);
-      }
-
-      /* 🔴 BUG #2 CARRY-OVER FIX — hardcoded red bg → CSS var */
-      .completion-tip.missing {
-        background: rgba(239, 68, 68, 0.1);
-        color: #ef4444;
-      }
-
-      /* 🔴 BUG #2 CARRY-OVER FIX — background:#fff → var(--surface) */
-      .skills-card {
-        padding: 20px;
-        border: 1px solid var(--border);
-        border-radius: 18px;
-        background: var(--surface);
-      }
-
-      .skills-card h4 { margin: 0 0 12px; font-size: 0.95rem; font-weight: 800; }
-
-      .skills-list {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-      }
-
-      .skill-tag {
-        padding: 5px 14px;
-        border-radius: 99px;
-        background: rgba(13, 148, 136, 0.07);
-        border: 1px solid rgba(13, 148, 136, 0.2);
-        color: var(--teal);
-        font-size: 0.85rem;
-        font-weight: 700;
-      }
-
-      .stats-row {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 12px;
-      }
-
-      /* 🔴 BUG #2 CARRY-OVER FIX — background:#fff → var(--surface) */
-      .stat-mini {
-        padding: 14px 12px;
-        border: 1px solid var(--border);
-        border-radius: 16px;
-        background: var(--surface);
-        text-align: center;
-      }
-
-      .stat-mini-val {
-        font-size: 1.6rem;
-        font-weight: 900;
-        color: var(--teal);
-        letter-spacing: -0.04em;
-        line-height: 1;
-        margin-bottom: 4px;
-      }
-
-      .stat-mini-label {
-        font-size: 0.75rem;
-        font-weight: 700;
-        color: var(--text-muted);
-        text-transform: uppercase;
-        letter-spacing: 0.04em;
-      }
-
-      /* 🔴 BUG #2 CARRY-OVER FIX — background:#fff → var(--surface) */
-      .section-card {
-        padding: clamp(20px, 3vw, 30px);
-        border: 1px solid var(--border);
-        border-radius: 22px;
-        background: var(--surface);
-      }
-
-      .section-card h3 {
-        margin: 0 0 16px;
-        font-size: 1.05rem;
-        font-weight: 800;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-      }
-
-      .mini-gig {
-        padding: 14px 16px;
-        border: 1px solid var(--border);
-        border-radius: 14px;
-        display: block;
-        gap: 6px;
-        margin-bottom: 10px;
-        text-decoration: none;
-        color: var(--text);
-        transition: box-shadow 0.16s, transform 0.16s;
-      }
-
-      .mini-gig:hover {
-        box-shadow: 0 4px 14px rgba(13, 148, 136, 0.1);
-        transform: translateY(-1px);
-      }
-
-      .mini-gig h4 { margin: 0 0 4px; font-size: 0.97rem; }
-
-      .mini-gig-meta {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-        font-size: 0.82rem;
-        color: var(--text-muted);
-      }
-
-      .own-banner {
-        padding: 14px 18px;
-        border-radius: 14px;
-        background: rgba(13, 148, 136, 0.06);
-        border: 1px solid rgba(13, 148, 136, 0.2);
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 12px;
-        flex-wrap: wrap;
-        margin-bottom: 22px;
-        font-size: 0.9rem;
-        font-weight: 600;
-        color: var(--text);
-      }
-
-      .not-found {
-        padding: clamp(48px, 8vw, 88px) 0;
-        text-align: center;
-      }
-
-      .not-found h2 { margin: 0 0 10px; font-size: 1.6rem; }
-      .not-found p  { margin: 0 0 24px; color: var(--text-muted); }
-
-      @media (min-width: 1024px) {
-        .profile-grid {
-          grid-template-columns: minmax(0, 1.5fr) 290px;
-        }
-      }
-    </style>
-  </head>
-
-  <body>
-    <div id="announce-bar"></div>
-    <div id="navbar"></div>
-
-    <main>
-      <div class="profile-wrap">
-        <div class="container">
-          <div id="profileBreadcrumb" class="fade-up" style="margin-bottom:18px;"></div>
-          <div id="ownBanner"></div>
-          <div id="profileContent"></div>
+      <!-- Hero -->
+      <div class="hero-card">
+        <div class="avatar-wrap" id="avatarWrap" title="Click to change photo">
+          <div class="avatar-circle" id="avatarCircle">JG</div>
+          <div class="avatar-overlay">📷</div>
+          <input type="file" id="avatarInput" accept="image/*" />
+        </div>
+        <div class="hero-info">
+          <div class="hero-name" id="heroName">Your Name</div>
+          <div class="hero-role" id="heroRole">Member since today</div>
+          <div class="hero-chips" id="heroChips"></div>
         </div>
       </div>
-    </main>
 
-    <footer id="footer"></footer>
+      <!-- Stats mini -->
+      <div class="stats-mini" id="statsMini">
+        <div class="stat-mini"><div class="stat-mini-val" id="smGigsPosted">0</div><div class="stat-mini-lbl">Gigs Posted</div></div>
+        <div class="stat-mini"><div class="stat-mini-val" id="smGigsDone">0</div><div class="stat-mini-lbl">Gigs Completed</div></div>
+        <div class="stat-mini"><div class="stat-mini-val" id="smEarned">₹0</div><div class="stat-mini-lbl">Total Earned</div></div>
+        <div class="stat-mini"><div class="stat-mini-val" id="smSpent">₹0</div><div class="stat-mini-lbl">Total Spent</div></div>
+      </div>
 
-    <script>
-      function escH(v) {
-        return String(v == null ? "" : v)
-          .replace(/&/g,"&amp;").replace(/</g,"&lt;")
-          .replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+      <!-- Profile completion -->
+      <div class="completion-card">
+        <div class="completion-header">
+          <div class="completion-title">🎯 Profile Completion</div>
+          <div class="completion-pct" id="completionPct">0%</div>
+        </div>
+        <div class="completion-bar-track">
+          <div class="completion-bar-fill" id="completionFill" style="width:0%"></div>
+        </div>
+        <div class="completion-tips" id="completionTips"></div>
+      </div>
+
+      <!-- Basic info -->
+      <div class="form-card">
+        <div class="card-title">👤 Basic Information</div>
+        <div class="field-row">
+          <div class="field">
+            <label>Full Name</label>
+            <input type="text" id="fieldName" placeholder="Your full name" />
+          </div>
+          <div class="field">
+            <label>Phone / WhatsApp</label>
+            <input type="tel" id="fieldPhone" placeholder="+91 98765 43210" />
+          </div>
+        </div>
+        <div class="field">
+          <label>Email Address</label>
+          <input type="email" id="fieldEmail" placeholder="you@email.com" />
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>City / Area</label>
+            <input type="text" id="fieldCity" placeholder="e.g. Gurugram, Sector 45" />
+          </div>
+          <div class="field">
+            <label>Pincode</label>
+            <input type="text" id="fieldPincode" placeholder="e.g. 122001" maxlength="6" />
+          </div>
+        </div>
+      </div>
+
+      <!-- About -->
+      <div class="form-card">
+        <div class="card-title">📝 About You</div>
+        <div class="field">
+          <label>Bio</label>
+          <textarea id="fieldBio" maxlength="300" placeholder="Tell posters and workers a bit about yourself — your skills, experience, or what kind of gigs you prefer..."></textarea>
+        </div>
+        <div class="field">
+          <label>Preferred Work Type</label>
+          <select id="fieldWorkType">
+            <option value="">— Select —</option>
+            <option value="hyperlocal">📍 Hyperlocal (On-site work)</option>
+            <option value="remote">💻 Remote (Online work)</option>
+            <option value="both">Both</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Skills -->
+      <div class="form-card">
+        <div class="card-title">🛠️ Your Skills</div>
+        <div class="skills-input-wrap" id="skillTags"></div>
+        <div class="skill-add-row">
+          <input type="text" id="skillInput" placeholder="Add a skill (e.g. Plumbing, Graphic Design)" maxlength="40" />
+          <button class="btn-add-skill" id="btnAddSkill">+ Add</button>
+        </div>
+      </div>
+
+      <!-- Save -->
+      <div class="save-row">
+        <button class="btn-save" id="btnSave">💾 Save Profile</button>
+        <span class="save-status" id="saveStatus">✅ Profile saved!</span>
+      </div>
+
+      <!-- Danger zone -->
+      <div class="danger-zone" style="margin-top:32px">
+        <h4>⚠️ Danger Zone</h4>
+        <p>These actions are irreversible. Please be absolutely sure before proceeding.</p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn-danger-action" id="btnLogout">🚪 Log Out</button>
+          <button class="btn-danger-action" id="btnDeleteAccount">🗑️ Delete Account</button>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <footer id="main-footer"></footer>
+  <div id="toast-container"></div>
+
+  <script>
+  (function () {
+
+    var GIG_KEY  = (typeof GL !== "undefined" && GL.STORAGE_KEY_GIGS)  ? GL.STORAGE_KEY_GIGS  : "gl_gigs";
+    var USER_KEY = (typeof GL !== "undefined" && GL.STORAGE_KEY_USER)   ? GL.STORAGE_KEY_USER  : "gl_user";
+    var FEE_RATE = 0.06;
+
+    /* ── Auth guard ── */
+    var user = typeof getCurrentUser === "function" ? getCurrentUser() : null;
+    if (!user) {
+      window.location.href = "login.html?redirect=profile.html";
+      return;
+    }
+
+    /* ── Breadcrumb ── */
+    if (typeof buildBreadcrumb === "function") {
+      buildBreadcrumb("breadcrumb", [
+        { label: "Home", href: "index.html" },
+        { label: "Profile" }
+      ]);
+    }
+
+    var skills = user.skills ? user.skills.slice() : [];
+
+    /* ═══════════════════════════════════════
+       INIT FIELDS
+    ═══════════════════════════════════════ */
+    function initFields() {
+      setVal("fieldName",     user.name     || "");
+      setVal("fieldPhone",    user.phone    || "");
+      setVal("fieldEmail",    user.email    || "");
+      setVal("fieldCity",     user.city     || "");
+      setVal("fieldPincode",  user.pincode  || "");
+      setVal("fieldBio",      user.bio      || "");
+      setVal("fieldWorkType", user.workType || "");
+    }
+
+    function setVal(id, val) {
+      var el = document.getElementById(id);
+      if (el) el.value = val;
+    }
+
+    /* ═══════════════════════════════════════
+       HERO
+    ═══════════════════════════════════════ */
+    function renderHero() {
+      var nameEl = document.getElementById("heroName");
+      var roleEl = document.getElementById("heroRole");
+      var avatarEl = document.getElementById("avatarCircle");
+
+      nameEl.textContent = user.name || "Your Name";
+
+      var joined = user.createdAt
+        ? new Date(user.createdAt).toLocaleDateString("en-IN", { month: "long", year: "numeric" })
+        : "Recently joined";
+      roleEl.textContent = "Member since " + joined;
+
+      /* Avatar */
+      if (user.avatar) {
+        avatarEl.innerHTML = '<img src="' + user.avatar + '" alt="avatar" />';
+      } else {
+        var initials = (user.name || "GL").split(" ").map(function (w) { return w[0]; }).join("").slice(0,2).toUpperCase();
+        avatarEl.textContent = initials;
       }
 
-      function safeS(v, fb) {
-        var s = String(v == null ? "" : v).trim();
-        return s || (fb || "");
-      }
+      /* Chips */
+      var chips = [];
+      if (user.workType === "hyperlocal") chips.push("📍 Hyperlocal Worker");
+      else if (user.workType === "remote") chips.push("💻 Remote Worker");
+      else if (user.workType === "both")   chips.push("⚡ Hyperlocal & Remote");
+      if (user.city) chips.push("📍 " + user.city);
+      document.getElementById("heroChips").innerHTML = chips.map(function (c) {
+        return '<span class="hero-chip">' + c + '</span>';
+      }).join("");
+    }
 
-      function findUser(id) {
-        var me = getCurrentUser();
-        if (me && (String(me.id) === String(id) || !id)) return me;
-        var users = lsGet(GL.STORAGE_KEY_USERS, []);
-        return users.find(function (u) {
-          return String(u.id) === String(id);
-        }) || null;
-      }
+    /* ═══════════════════════════════════════
+       STATS MINI
+    ═══════════════════════════════════════ */
+    function renderStats() {
+      var gigs = JSON.parse(localStorage.getItem(GIG_KEY) || "[]");
 
-      function getGigsForUser(user) {
-        var all = getAllGigs() || [];
-        return all.filter(function (g) {
-          return String(g.userId || "") === String(user.id || "") ||
-            String(g.userEmail || "").toLowerCase() === String(user.email || "").toLowerCase();
-        });
-      }
-
-      function completionTips(user) {
-        var fields = [
-          { key: "name",     label: "Name"     },
-          { key: "email",    label: "Email"    },
-          { key: "phone",    label: "Phone"    },
-          { key: "role",     label: "Role"     },
-          { key: "location", label: "Location" },
-          { key: "bio",      label: "Bio"      },
-          { key: "skills",   label: "Skills"   }
-        ];
-        return fields.map(function (f) {
-          var filled = user[f.key] && String(user[f.key]).trim().length > 0;
-          return '<span class="completion-tip ' + (filled ? "done" : "missing") + '">' +
-            (filled ? "✅" : "❌") + " " + escH(f.label) + "</span>";
-        }).join("");
-      }
-
-      function renderProfile(user, isOwn) {
-        document.title = safeS(user.name, "User") + " — GigLega Profile";
-
-        var name     = safeS(user.name, "GigLega User");
-        var role     = safeS(user.role, "worker");
-        var location = safeS(user.location, "");
-        var bio      = safeS(user.bio, "");
-        var skills   = safeS(user.skills, "");
-        var joined   = user.joinedAt ? formatDate(user.joinedAt) : "—";
-        var pct      = calcProfileCompletion(user);
-
-        var roleLabel = role === "client" ? "🏢 Client" : "💼 Worker";
-        var roleClass = role === "client" ? "badge-teal" : "badge";
-
-        var postedGigs = getGigsForUser(user);
-        var activeGigs = postedGigs.filter(function (g) {
-          return safeS(g.status, "active") === "active";
-        });
-
-        var appCount = 0;
-        if (isOwn) {
-          var me = getCurrentUser();
-          if (me) {
-            var apps = lsGet(GL.STORAGE_KEY_APPS, []);
-            appCount = apps.filter(function (a) {
-              return String(a.userId || "") === String(me.id || "") ||
-                String(a.userEmail || "").toLowerCase() === String(me.email || "").toLowerCase();
-            }).length;
-          }
-        }
-
-        var skillsHtml = "";
-        if (skills) {
-          skillsHtml = skills.split(",").map(function (s) {
-            var t = s.trim();
-            return t ? '<span class="skill-tag">' + escH(t) + "</span>" : "";
-          }).join("");
-        }
-
-        var gigsHtml = "";
-        if (postedGigs.length) {
-          gigsHtml = postedGigs.slice(0, 6).map(function (g) {
-            var gTitle  = safeS(g.title, "Gig");
-            var gLoc    = safeS(g.location, "Gurugram");
-            var gBudget = typeof g.budget === "number"
-              ? formatCurrency(g.budget) : safeS(g.budget, "—");
-            var gType   = safeS(g.type, "");
-            var gStatus = safeS(g.status, "active");
-            return '<a href="gig-detail.html?id=' + encodeURIComponent(g.id) + '" class="mini-gig">' +
-              '<h4>' + escH(gTitle) + '</h4>' +
-              '<div class="mini-gig-meta">' +
-                '<span>📍 ' + escH(gLoc) + '</span>' +
-                '<span>💸 ' + escH(String(gBudget)) + (gType ? " / " + escH(gType) : "") + '</span>' +
-                '<span class="badge ' + (gStatus === "active" ? "badge-teal" : "") + '" style="font-size:.75rem;">' +
-                  (gStatus === "active" ? "🟢 Active" : "⚫ Closed") +
-                '</span>' +
-              '</div>' +
-            '</a>';
-          }).join("");
-        } else {
-          gigsHtml = '<p style="color:var(--text-muted);font-size:.9rem;margin:0;">' +
-            (isOwn
-              ? 'Abhi tak koi gig post nahi ki. <a href="post-gig.html" style="color:var(--teal);font-weight:700;">Post karo →</a>'
-              : "Koi active gig nahi hai.") +
-            '</p>';
-        }
-
-        var mainHtml =
-          '<div class="hero-card card fade-up">' +
-            '<div class="profile-avatar" id="profileAvatar">' + escH(getInitials(name)) + '</div>' +
-            '<div class="profile-info">' +
-              '<h1 class="profile-name">' + escH(name) + '</h1>' +
-              '<div class="profile-role-row">' +
-                '<span class="badge ' + roleClass + '">' + roleLabel + '</span>' +
-                '<span class="badge">GigLega Member</span>' +
-                (isOwn ? '<span class="badge badge-amber">⭐ You</span>' : '') +
-              '</div>' +
-              '<div class="profile-meta-row">' +
-                (location ? '<span>📍 ' + escH(location) + '</span>' : '') +
-                '<span>📅 Joined ' + escH(joined) + '</span>' +
-                (isOwn && user.email ? '<span>✉️ ' + escH(user.email) + '</span>' : '') +
-                (isOwn && user.phone ? '<span>📞 ' + escH(user.phone) + '</span>' : '') +
-              '</div>' +
-              (bio
-                ? '<p class="profile-bio">' + escH(bio) + '</p>'
-                : '<p class="profile-bio" style="font-style:italic;">Bio add nahi ki abhi tak.</p>') +
-              '<div class="profile-actions">' +
-                (isOwn
-                  ? '<a href="dashboard.html#profile" class="btn btn-primary">✏️ Edit Profile</a>' +
-                    '<a href="post-gig.html" class="btn btn-outline">+ Post Gig</a>'
-                  : '<button class="btn btn-primary" id="waContactProfileBtn">💬 WhatsApp</button>' +
-                    '<button class="btn btn-outline" id="shareProfileBtn">🔗 Share Profile</button>') +
-              '</div>' +
-            '</div>' +
-          '</div>' +
-
-          '<div class="stats-row fade-up">' +
-            '<div class="stat-mini">' +
-              '<div class="stat-mini-val">' + postedGigs.length + '</div>' +
-              '<div class="stat-mini-label">Gigs Posted</div>' +
-            '</div>' +
-            '<div class="stat-mini">' +
-              '<div class="stat-mini-val">' + activeGigs.length + '</div>' +
-              '<div class="stat-mini-label">Active Gigs</div>' +
-            '</div>' +
-            '<div class="stat-mini">' +
-              '<div class="stat-mini-val">' + (isOwn ? appCount : "—") + '</div>' +
-              '<div class="stat-mini-label">' + (isOwn ? "Applied" : "Rating") + '</div>' +
-            '</div>' +
-          '</div>' +
-
-          '<div class="section-card fade-up">' +
-            '<h3>📌 Posted Gigs</h3>' +
-            gigsHtml +
-            (postedGigs.length > 6
-              ? '<a href="browse.html" class="btn btn-outline btn-sm" style="margin-top:10px;">View All on Browse</a>'
-              : '') +
-          '</div>';
-
-        var sideHtml =
-          (isOwn
-            ? '<div class="completion-card card fade-up">' +
-                '<div class="completion-header">' +
-                  '<h4>📊 Profile Completion</h4>' +
-                  '<span class="completion-pct" id="completionPct">' + pct + '%</span>' +
-                '</div>' +
-                '<div class="bar-wrap">' +
-                  '<div class="bar-fill" id="completionBar" style="width:' + pct + '%"></div>' +
-                '</div>' +
-                '<div class="completion-tips">' + completionTips(user) + '</div>' +
-                '<a href="dashboard.html#profile" class="btn btn-primary btn-sm" style="margin-top:14px;width:100%;">Complete Profile</a>' +
-              '</div>'
-            : '') +
-
-          (skillsHtml
-            ? '<div class="skills-card card fade-up">' +
-                '<h4>🛠️ Skills</h4>' +
-                '<div class="skills-list">' + skillsHtml + '</div>' +
-              '</div>'
-            : '') +
-
-          '<div class="skills-card card fade-up">' +
-            '<h4>ℹ️ About</h4>' +
-            '<div style="display:grid;gap:9px;font-size:.88rem;color:var(--text-muted);">' +
-              '<span>🎭 ' + escH(roleLabel) + '</span>' +
-              (location ? '<span>📍 ' + escH(location) + '</span>' : '') +
-              '<span>📅 Member since ' + escH(joined) + '</span>' +
-              '<span>🆓 GigLega ' + escH(GL.VERSION) + '</span>' +
-            '</div>' +
-          '</div>' +
-
-          '<div class="skills-card card fade-up">' +
-            '<h4>🛡️ GigLega Trust</h4>' +
-            '<div style="display:grid;gap:7px;font-size:.86rem;color:var(--text-muted);">' +
-              '<span>✅ Verified account</span>' +
-              '<span>🔒 Contact via platform</span>' +
-              '<span>🆓 Free to connect</span>' +
-            '</div>' +
-          '</div>';
-
-        document.getElementById("profileContent").innerHTML =
-          '<div class="profile-grid">' +
-            '<div style="display:grid;gap:20px;">' + mainHtml + '</div>' +
-            '<aside style="display:grid;gap:16px;align-content:start;">' + sideHtml + '</aside>' +
-          '</div>';
-
-        document.getElementById("waContactProfileBtn")?.addEventListener("click", function () {
-          if (!isLoggedIn()) {
-            showToast("Contact ke liye login karo pehle 🔒", "info");
-            setTimeout(function () {
-              window.location.href = "signup.html?next=" + encodeURIComponent(window.location.href);
-            }, 1200);
-            return;
-          }
-          openWhatsApp(
-            "Hi! GigLega par tumhara profile dekha — connect karna tha.\nProfile: " +
-            window.location.href
-          );
-        });
-
-        document.getElementById("shareProfileBtn")?.addEventListener("click", function () {
-          copyToClipboard(
-            name + " ka GigLega profile dekho:\n" + window.location.href,
-            "Profile link copy ho gaya! 🔗"
-          );
-        });
-
-        initFadeAnimations();
-      }
-
-      function renderNotFound(id) {
-        document.getElementById("profileContent").innerHTML =
-          '<div class="not-found">' +
-          '<span style="font-size:3rem;">👤</span>' +
-          '<h2>Profile nahi mili</h2>' +
-          '<p>ID <strong>' + escH(String(id)) + '</strong> ka user exist nahi karta.</p>' +
-          '<div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">' +
-          '<a href="index.html" class="btn btn-primary">Home</a>' +
-          '<a href="browse.html" class="btn btn-outline">Browse Gigs</a>' +
-          '</div>' +
-          '</div>';
-      }
-
-      function showOwnBanner() {
-        document.getElementById("ownBanner").innerHTML =
-          '<div class="own-banner fade-up">' +
-          '👋 Yeh tumhara apna profile hai — doosre log bhi isko dekh sakte hain.' +
-          '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
-          '<a href="dashboard.html" class="btn btn-outline btn-sm">Dashboard</a>' +
-          '<a href="dashboard.html#profile" class="btn btn-primary btn-sm">Edit Profile</a>' +
-          '</div>' +
-          '</div>';
-      }
-
-      document.addEventListener("DOMContentLoaded", function () {
-        var params = new URLSearchParams(window.location.search);
-        var userId = params.get("id");
-
-        if (!userId && !isLoggedIn()) {
-          requireAuth("profile.html");
-          return;
-        }
-
-        var me   = getCurrentUser();
-        var user = userId ? findUser(userId) : me;
-
-        buildBreadcrumb("profileBreadcrumb", [
-          { label: "Home",    href: "index.html" },
-          { label: "Profile"                      }
-        ]);
-
-        if (!user) {
-          renderNotFound(userId || "—");
-          return;
-        }
-
-        var isOwn = me && (String(user.id) === String(me.id) || user.email === me.email);
-
-        if (isOwn) showOwnBanner();
-
-        document.title = safeS(user.name, "User") + " — GigLega Profile";
-        document.querySelector('meta[name="description"]')
-          ?.setAttribute("content", safeS(user.name,"User") + " ka GigLega profile. " + safeS(user.bio,"").slice(0,80));
-
-        renderProfile(user, !!isOwn);
+      var posted    = gigs.filter(function (g) { return g.posterId === user.id; }).length;
+      var completed = gigs.filter(function (g) {
+        return (g.takenBy === user.id || g.takenBy === user.name) && g.status === "completed";
       });
-    </script>
-  </body>
+      var postedCompleted = gigs.filter(function (g) {
+        return g.posterId === user.id && g.status === "completed";
+      });
+
+      var earned = 0;
+      completed.forEach(function (g) { earned += g.pricePerHr - Math.round(g.pricePerHr * FEE_RATE); });
+
+      var spent = 0;
+      postedCompleted.forEach(function (g) { spent += g.pricePerHr || 0; });
+
+      document.getElementById("smGigsPosted").textContent = posted;
+      document.getElementById("smGigsDone").textContent   = completed.length;
+      document.getElementById("smEarned").textContent     = "₹" + earned;
+      document.getElementById("smSpent").textContent      = "₹" + spent;
+    }
+
+    /* ═══════════════════════════════════════
+       COMPLETION BAR
+    ═══════════════════════════════════════ */
+    var COMPLETION_FIELDS = [
+      { key: "name",     label: "Full name",        check: function () { return !!user.name; } },
+      { key: "phone",    label: "Phone number",     check: function () { return !!user.phone; } },
+      { key: "email",    label: "Email address",    check: function () { return !!user.email; } },
+      { key: "city",     label: "City / Area",      check: function () { return !!user.city; } },
+      { key: "bio",      label: "Bio",              check: function () { return !!(user.bio && user.bio.length > 20); } },
+      { key: "skills",   label: "At least 1 skill", check: function () { return skills.length > 0; } },
+      { key: "workType", label: "Work preference",  check: function () { return !!user.workType; } },
+      { key: "avatar",   label: "Profile photo",    check: function () { return !!user.avatar; } }
+    ];
+
+    function renderCompletion() {
+      var done  = COMPLETION_FIELDS.filter(function (f) { return f.check(); }).length;
+      var total = COMPLETION_FIELDS.length;
+      var pct   = Math.round((done / total) * 100);
+
+      document.getElementById("completionPct").textContent = pct + "%";
+      document.getElementById("completionFill").style.width = pct + "%";
+
+      document.getElementById("completionTips").innerHTML = COMPLETION_FIELDS.map(function (f) {
+        var isDone = f.check();
+        return '<div class="completion-tip ' + (isDone ? "done" : "missing") + '">' +
+          (isDone ? "✅" : "⬜") + " " + f.label +
+        '</div>';
+      }).join("");
+    }
+
+    /* ═══════════════════════════════════════
+       SKILLS
+    ═══════════════════════════════════════ */
+    function renderSkills() {
+      var wrap = document.getElementById("skillTags");
+      wrap.innerHTML = skills.map(function (s, i) {
+        return '<span class="skill-tag">' + escHtml(s) +
+          '<button data-i="' + i + '" title="Remove">✕</button></span>';
+      }).join("");
+      wrap.querySelectorAll("button[data-i]").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          skills.splice(parseInt(btn.getAttribute("data-i"), 10), 1);
+          renderSkills();
+          renderCompletion();
+        });
+      });
+    }
+
+    document.getElementById("btnAddSkill").addEventListener("click", addSkill);
+    document.getElementById("skillInput").addEventListener("keydown", function (e) {
+      if (e.key === "Enter") { e.preventDefault(); addSkill(); }
+    });
+
+    function addSkill() {
+      var val = document.getElementById("skillInput").value.trim();
+      if (!val) return;
+      if (skills.includes(val)) {
+        if (typeof showToast === "function") showToast("Skill already added.", "error");
+        return;
+      }
+      if (skills.length >= 15) {
+        if (typeof showToast === "function") showToast("Max 15 skills allowed.", "error");
+        return;
+      }
+      skills.push(val);
+      document.getElementById("skillInput").value = "";
+      renderSkills();
+      renderCompletion();
+    }
+
+    /* ═══════════════════════════════════════
+       AVATAR UPLOAD
+    ═══════════════════════════════════════ */
+    document.getElementById("avatarWrap").addEventListener("click", function () {
+      document.getElementById("avatarInput").click();
+    });
+
+    document.getElementById("avatarInput").addEventListener("change", function () {
+      var file = this.files[0];
+      if (!file) return;
+      if (file.size > 2 * 1024 * 1024) {
+        if (typeof showToast === "function") showToast("Image must be under 2MB.", "error");
+        this.value = "";
+        return;
+      }
+      var reader = new FileReader();
+      reader.onload = function (e) {
+        user.avatar = e.target.result;
+        var avatarEl = document.getElementById("avatarCircle");
+        avatarEl.innerHTML = '<img src="' + user.avatar + '" alt="avatar" />';
+        renderCompletion();
+        if (typeof showToast === "function") showToast("📷 Photo updated! Save to keep it.", "success");
+      };
+      reader.readAsDataURL(file);
+      this.value = "";
+    });
+
+    /* ═══════════════════════════════════════
+       SAVE
+    ═══════════════════════════════════════ */
+    document.getElementById("btnSave").addEventListener("click", function () {
+      var btn = this;
+      btn.disabled    = true;
+      btn.textContent = "⏳ Saving...";
+
+      user.name     = document.getElementById("fieldName").value.trim();
+      user.phone    = document.getElementById("fieldPhone").value.trim();
+      user.email    = document.getElementById("fieldEmail").value.trim();
+      user.city     = document.getElementById("fieldCity").value.trim();
+      user.pincode  = document.getElementById("fieldPincode").value.trim();
+      user.bio      = document.getElementById("fieldBio").value.trim();
+      user.workType = document.getElementById("fieldWorkType").value;
+      user.skills   = skills;
+
+      /* Persist to localStorage */
+      localStorage.setItem(USER_KEY, JSON.stringify(user));
+
+      /* Also update in users array if it exists */
+      var USERS_KEY = (typeof GL !== "undefined" && GL.STORAGE_KEY_USERS) ? GL.STORAGE_KEY_USERS : "gl_users";
+      var users = JSON.parse(localStorage.getItem(USERS_KEY) || "[]");
+      var idx   = users.findIndex(function (u) { return u.id === user.id; });
+      if (idx > -1) { users[idx] = user; localStorage.setItem(USERS_KEY, JSON.stringify(users)); }
+
+      setTimeout(function () {
+        btn.disabled    = false;
+        btn.textContent = "💾 Save Profile";
+        var statusEl = document.getElementById("saveStatus");
+        statusEl.classList.add("show");
+        setTimeout(function () { statusEl.classList.remove("show"); }, 3000);
+        renderHero();
+        renderCompletion();
+        if (typeof showToast === "function") showToast("✅ Profile saved successfully!", "success");
+      }, 700);
+    });
+
+    /* ═══════════════════════════════════════
+       DANGER ZONE
+    ═══════════════════════════════════════ */
+    document.getElementById("btnLogout").addEventListener("click", function () {
+      if (confirm("Are you sure you want to log out?")) {
+        if (typeof safeLogout === "function") { safeLogout(); }
+        else {
+          localStorage.removeItem(USER_KEY);
+          window.location.href = "index.html";
+        }
+      }
+    });
+
+    document.getElementById("btnDeleteAccount").addEventListener("click", function () {
+      if (!confirm("⚠️ This will permanently delete your account and all your data. Are you absolutely sure?")) return;
+      if (!confirm("Last chance — this CANNOT be undone. Delete account?")) return;
+
+      var USERS_KEY = (typeof GL !== "undefined" && GL.STORAGE_KEY_USERS) ? GL.STORAGE_KEY_USERS : "gl_users";
+      var users = JSON.parse(localStorage.getItem(USERS_KEY) || "[]");
+      users = users.filter(function (u) { return u.id !== user.id; });
+      localStorage.setItem(USERS_KEY, JSON.stringify(users));
+      localStorage.removeItem(USER_KEY);
+
+      if (typeof showToast === "function") showToast("Account deleted.", "success");
+      setTimeout(function () { window.location.href = "index.html"; }, 1200);
+    });
+
+    function escHtml(s) {
+      return String(s || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+    }
+
+    /* ── Init ── */
+    initFields();
+    renderHero();
+    renderStats();
+    renderSkills();
+    renderCompletion();
+
+  })();
+  </script>
+</body>
 </html>
