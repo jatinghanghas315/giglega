@@ -1,111 +1,630 @@
 <!DOCTYPE html>
-<html lang="hi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Terms & Conditions - GigLega</title>
-    <link rel="stylesheet" href="./styles.css" />
-        <link rel="icon" type="image/png" href="./logo.png">
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Terms of Service — GigLega</title>
+    <meta
+      name="description"
+      content="GigLega ke Terms of Service padho — platform use karne ke rules, rights aur responsibilities."
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <script defer src="shared.js"></script>
+
     <style>
-        .terms-container { max-width: 900px; margin: 40px auto; padding: 20px; }
-        h1 { color: #001F54; text-align: center; margin-bottom: 30px; }
-        h2 { color: #FF9800; margin-top: 30px; }
-        p { line-height: 1.8; color: #333; margin: 15px 0; }
-        ul { margin: 15px 0 15px 30px; }
-        li { margin: 10px 0; line-height: 1.6; }
+      /* ── Page ────────────────────────────────────── */
+      .legal-wrap {
+        padding: clamp(28px, 5vw, 52px) 0 clamp(56px, 8vw, 88px);
+      }
+
+      /* ── Layout grid ─────────────────────────────── */
+      .legal-grid {
+        display: grid;
+        gap: 32px;
+        align-items: start;
+      }
+
+      /* ── Hero ────────────────────────────────────── */
+      .legal-hero {
+        padding: clamp(28px, 4vw, 44px);
+        border-radius: 26px;
+        background: linear-gradient(135deg, #f0fdfa 0%, #eff6ff 100%);
+        border: 1px solid var(--border);
+        margin-bottom: 32px;
+      }
+
+      .legal-hero h1 {
+        margin: 10px 0 10px;
+        font-size: clamp(1.8rem, 3.5vw, 2.5rem);
+        letter-spacing: -0.04em;
+      }
+
+      .legal-hero p {
+        margin: 0;
+        color: var(--text-muted);
+        font-size: 0.93rem;
+        line-height: 1.65;
+        max-width: 56ch;
+      }
+
+      .legal-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+        margin-top: 14px;
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        font-weight: 600;
+      }
+
+      .legal-meta span {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+
+      /* ── Table of contents ───────────────────────── */
+      .toc-card {
+        padding: 22px 20px;
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        background: #fff;
+        position: sticky;
+        top: 100px;
+      }
+
+      .toc-card h3 {
+        margin: 0 0 14px;
+        font-size: 0.95rem;
+        font-weight: 800;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+      }
+
+      .toc-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: grid;
+        gap: 4px;
+      }
+
+      .toc-list li a {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 7px 10px;
+        border-radius: 10px;
+        font-size: 0.88rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        text-decoration: none;
+        transition: background 0.14s, color 0.14s;
+        line-height: 1.4;
+      }
+
+      .toc-list li a:hover {
+        background: rgba(13, 148, 136, 0.07);
+        color: var(--teal);
+      }
+
+      .toc-list li a .toc-num {
+        font-size: 0.75rem;
+        font-weight: 800;
+        color: var(--teal);
+        background: rgba(13, 148, 136, 0.1);
+        padding: 2px 7px;
+        border-radius: 99px;
+        flex-shrink: 0;
+      }
+
+      /* ── Main content ────────────────────────────── */
+      .legal-main {}
+
+      .legal-section {
+        padding: clamp(20px, 3vw, 32px);
+        border: 1px solid var(--border);
+        border-radius: 22px;
+        background: #fff;
+        margin-bottom: 16px;
+        scroll-margin-top: 100px;
+      }
+
+      .legal-section h2 {
+        margin: 0 0 14px;
+        font-size: 1.15rem;
+        letter-spacing: -0.02em;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .legal-section h2 .sec-num {
+        background: var(--teal);
+        color: #fff;
+        font-size: 0.72rem;
+        font-weight: 800;
+        padding: 3px 9px;
+        border-radius: 99px;
+        flex-shrink: 0;
+      }
+
+      .legal-section p {
+        margin: 0 0 12px;
+        color: var(--text-muted);
+        line-height: 1.75;
+        font-size: 0.93rem;
+      }
+
+      .legal-section p:last-child { margin-bottom: 0; }
+
+      .legal-section ul,
+      .legal-section ol {
+        margin: 8px 0 12px 0;
+        padding-left: 20px;
+        color: var(--text-muted);
+        font-size: 0.93rem;
+        line-height: 1.8;
+      }
+
+      .legal-section ul li,
+      .legal-section ol li {
+        margin-bottom: 4px;
+      }
+
+      .legal-section strong {
+        color: var(--text);
+        font-weight: 700;
+      }
+
+      .legal-section a {
+        color: var(--teal);
+        font-weight: 600;
+        text-decoration: none;
+      }
+
+      .legal-section a:hover { text-decoration: underline; }
+
+      /* ── Highlight box ───────────────────────────── */
+      .highlight-box {
+        padding: 14px 16px;
+        border-radius: 14px;
+        background: rgba(13, 148, 136, 0.05);
+        border: 1px solid rgba(13, 148, 136, 0.2);
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        line-height: 1.65;
+        margin: 12px 0;
+      }
+
+      .highlight-box strong { color: var(--teal); }
+
+      .warn-box {
+        padding: 14px 16px;
+        border-radius: 14px;
+        background: #fefce8;
+        border: 1px solid #fde047;
+        font-size: 0.88rem;
+        color: #713f12;
+        line-height: 1.65;
+        margin: 12px 0;
+      }
+
+      /* ── Accept card ─────────────────────────────── */
+      .accept-card {
+        padding: clamp(24px, 4vw, 36px);
+        border-radius: 22px;
+        background: linear-gradient(135deg, #f0fdfa 0%, #eff6ff 100%);
+        border: 1px solid rgba(13, 148, 136, 0.2);
+        text-align: center;
+        margin-top: 24px;
+      }
+
+      .accept-card h3 { margin: 0 0 8px; font-size: 1.15rem; }
+      .accept-card p  { margin: 0 0 20px; color: var(--text-muted); font-size: 0.9rem; line-height: 1.6; }
+
+      .accept-btns {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+
+      /* ── Responsive ──────────────────────────────── */
+      @media (min-width: 1024px) {
+        .legal-grid {
+          grid-template-columns: 220px minmax(0, 1fr);
+        }
+      }
     </style>
-</head>
-<body>
-    <nav>
-                <a href="./index.html"><img src="./logo.png" alt="GigLega Logo" style="height:45px;border-radius:50%;object-fit:cover;"></a>
-        <span><strong>Gig</strong><strong style="color:#FF9800">Lega</strong><sup style="font-size:0.6em">Beta</sup></span>
-        <a href="/" style="margin-left:auto">Home</a>
-        <a href="/help-center.html">Help</a>
-        <a href="/contact.html">Contact</a>
-    </nav>
-    
-    <div class="terms-container">
-        <h1>Terms & Conditions</h1>
-        <p><strong>Last Updated:</strong> March 10, 2026</p>
-        
-        <h2>1. Acceptance of Terms</h2>
-        <p>GigLega platform ko use karke, aap in terms aur conditions ko accept karte hain. Agar aap in terms se agree nahi hain, toh please platform use na karein.</p>
-        
-        <h2>2. Platform Usage</h2>
-        <p>GigLega ek Beta platform hai jo Gurugram mein hyperlocal aur freelance gig services provide karta hai. Aap platform ko sirf legal purposes ke liye use kar sakte hain.</p>
-        <ul>
-            <li>Aap 18 saal ya usse zyada age ke hone chahiye</li>
-            <li>Account banate waqt accurate information provide karni hogi</li>
-            <li>Aap apne account ki security ke liye responsible hain</li>
-            <li>Multiple accounts banane ki permission nahi hai</li>
-        </ul>
-        
-        <h2>3. User Roles</h2>
-        <p><strong>Freelancers:</strong> Remote digital work provide karte hain<br>
-        <strong>Gig Workers:</strong> Local, hyperlocal physical services provide karte hain<br>
-        <strong>Clients:</strong> Services hire karte hain</p>
-        
-        <h2>4. Gig Posting Rules</h2>
-        <ul>
-            <li>Sirf legal aur legitimate gigs post kar sakte hain</li>
-            <li>Accurate job description aur fair pricing honi chahiye</li>
-            <li>Misleading ya false information post karna prohibited hai</li>
-            <li>Adult content, illegal activities, scams post karna strictly prohibited hai</li>
-        </ul>
-        
-        <h2>5. Payments & Fees</h2>
-        <p>Beta phase mein GigLega koi platform fee nahi charge karta. Payment directly client aur worker ke beech hoti hai. Future mein fees structure introduce ho sakta hai.</p>
-        
-        <h2>6. Prohibited Activities</h2>
-        <ul>
-            <li>Platform ko misuse karna (spam, harassment, fraud)</li>
-            <li>Dusre users ki personal information collect karna</li>
-            <li>Automated bots ya scripts use karna</li>
-            <li>Platform ko hack ya disrupt karne ki koshish karna</li>
-        </ul>
-        
-        <h2>7. Content Ownership</h2>
-        <p>Aapke dwara post ki gayi content (gig descriptions, profiles) aapki property hai, lekin aap GigLega ko isko platform par display karne ka right dete hain.</p>
-        
-        <h2>8. Dispute Resolution</h2>
-        <p>Users ke beech koi dispute ho, toh pehle aapas mein solve karne ki koshish karein. Agar problem resolve nahi hoti, GigLega support team se contact karein.</p>
-        
-        <h2>9. Termination</h2>
-        <p>GigLega kisi bhi user ka account suspend ya terminate kar sakta hai agar terms violate hote hain.</p>
-        
-        <h2>10. Liability Limitation</h2>
-        <p>GigLega platform "as is" provide karta hai. Hum users ke beech hui transactions ya interactions ke liye responsible nahi hain. Safety apni zimmedari hai.</p>
-        
-        <h2>11. Changes to Terms</h2>
-        <p>Hum in terms ko kabhi bhi update kar sakte hain. Important changes ki notification di jayegi.</p>
-        
-        <h2>12. Governing Law</h2>
-        <p>Ye terms Indian laws ke under governed hain. Jurisdiction Gurugram, Haryana courts ki hogi.</p>
-        
-        <h2>Contact Us</h2>
-        <p>Terms ke baare mein questions? Contact karein:<br>
-Email: Giglega.official@gmail.com<br>
-Phone: 9319635257<br>
-Address: H.no 82 Om Vihar Phase 1, Palam Vihar Extn, Gurugram - 122017</p>
-    </div>
-    
-    <footer style="margin-top:60px">
-        <div>
-            <h3>GigLega</h3>
-            <p>Gurugram ka apna hyperlocal gig platform</p>
+  </head>
+
+  <body>
+    <div id="announce-bar"></div>
+    <div id="navbar"></div>
+
+    <main>
+      <div class="legal-wrap">
+        <div class="container">
+
+          <!-- Breadcrumb -->
+          <div id="legalBreadcrumb" class="fade-up" style="margin-bottom:18px;"></div>
+
+          <!-- Hero -->
+          <div class="legal-hero fade-up">
+            <span class="badge badge-teal">📋 Legal</span>
+            <h1>Terms of Service</h1>
+            <p>
+              GigLega use karne se pehle yeh terms padho. Yeh platform ke rules,
+              tumhare rights aur humari responsibilities define karte hain.
+            </p>
+            <div class="legal-meta">
+              <span>📅 Last Updated: March 2026</span>
+              <span>🌐 Language: Hinglish / English</span>
+              <span>⚖️ Jurisdiction: Gurugram, Haryana, India</span>
+            </div>
+          </div>
+
+          <!-- Grid: TOC + Content -->
+          <div class="legal-grid">
+
+            <!-- ══ TABLE OF CONTENTS ══ -->
+            <aside class="fade-up">
+              <div class="toc-card">
+                <h3>Contents</h3>
+                <ul class="toc-list">
+                  <li><a href="#sec1"><span class="toc-num">1</span> Acceptance</a></li>
+                  <li><a href="#sec2"><span class="toc-num">2</span> Who Can Use</a></li>
+                  <li><a href="#sec3"><span class="toc-num">3</span> Accounts</a></li>
+                  <li><a href="#sec4"><span class="toc-num">4</span> Workers</a></li>
+                  <li><a href="#sec5"><span class="toc-num">5</span> Clients</a></li>
+                  <li><a href="#sec6"><span class="toc-num">6</span> Payments</a></li>
+                  <li><a href="#sec7"><span class="toc-num">7</span> Prohibited Use</a></li>
+                  <li><a href="#sec8"><span class="toc-num">8</span> Content Rules</a></li>
+                  <li><a href="#sec9"><span class="toc-num">9</span> Privacy</a></li>
+                  <li><a href="#sec10"><span class="toc-num">10</span> Disclaimer</a></li>
+                  <li><a href="#sec11"><span class="toc-num">11</span> Limitation</a></li>
+                  <li><a href="#sec12"><span class="toc-num">12</span> Termination</a></li>
+                  <li><a href="#sec13"><span class="toc-num">13</span> Changes</a></li>
+                  <li><a href="#sec14"><span class="toc-num">14</span> Contact</a></li>
+                </ul>
+              </div>
+            </aside>
+
+            <!-- ══ MAIN SECTIONS ══ -->
+            <div class="legal-main fade-up">
+
+              <!-- 1. Acceptance -->
+              <div class="legal-section" id="sec1">
+                <h2><span class="sec-num">1</span> Acceptance of Terms</h2>
+                <div class="highlight-box">
+                  <strong>Simple baat:</strong> GigLega use karte ho toh yeh terms automatically apply hote hain. Disagree karte ho toh platform use mat karo.
+                </div>
+                <p>
+                  GigLega ("Platform," "we," "us," "our") ki website (<strong>giglega.in</strong>) aur related services access karne se ya use karne se aap ("User," "you") inhe Terms of Service se agree karte ho.
+                </p>
+                <p>
+                  Yeh Terms ek legally binding agreement hai aap aur GigLega ke beech.
+                  Agar aap in terms se agree nahi karte toh platform use karna band karo.
+                </p>
+                <p>
+                  Platform register karne ya gig post/apply karne se aap confirm karte ho ki aapne yeh terms padh liye hain aur inhe accept kiya hai.
+                </p>
+              </div>
+
+              <!-- 2. Eligibility -->
+              <div class="legal-section" id="sec2">
+                <h2><span class="sec-num">2</span> Who Can Use GigLega</h2>
+                <p>GigLega use karne ke liye aapko:</p>
+                <ul>
+                  <li>Kam se kam <strong>18 saal ka</strong> hona chahiye (ya legal guardian ki permission honi chahiye)</li>
+                  <li>India mein legally kaam karne ki eligibility honi chahiye</li>
+                  <li>Ek valid phone number ya email address hona chahiye</li>
+                  <li>Pehle GigLega se permanently banned na ho</li>
+                </ul>
+                <div class="warn-box">
+                  ⚠️ Agar tum 18 saal se kam ho toh koi bhi account create nahi kar sakte. Minor ke liye account create karna bhi prohibited hai.
+                </div>
+                <p>
+                  Abhi Beta phase mein GigLega primarily <strong>Gurugram, Haryana</strong> area ke users ke liye available hai.
+                  Baaki cities jald launch ho rahe hain.
+                </p>
+              </div>
+
+              <!-- 3. Accounts -->
+              <div class="legal-section" id="sec3">
+                <h2><span class="sec-num">3</span> User Accounts</h2>
+                <p>
+                  Account create karte waqt aap accurate, complete aur up-to-date information dene ke liye responsible ho.
+                  Fake ya misleading information dena account termination ka reason ban sakta hai.
+                </p>
+                <p>
+                  <strong>Account security tumhari responsibility hai.</strong>
+                  Apna password kisi ke saath share mat karo. Agar account compromise ho toh turant humein contact karo.
+                </p>
+                <ul>
+                  <li>Ek person sirf ek account rakh sakta hai</li>
+                  <li>Dusre ki identity se account banana prohibited hai</li>
+                  <li>Account transfer ya sell nahi kiya ja sakta</li>
+                  <li>Aap apne account ke through hone wali saari activity ke liye responsible ho</li>
+                </ul>
+                <p>
+                  GigLega ke paas kisi bhi account ko bina notice ke suspend ya terminate karne ka right reserved hai agar Terms ka violation ho.
+                </p>
+              </div>
+
+              <!-- 4. Workers -->
+              <div class="legal-section" id="sec4">
+                <h2><span class="sec-num">4</span> Workers / Freelancers</h2>
+                <div class="highlight-box">
+                  <strong>Workers ke liye:</strong> Platform pe apply karna aur profile banana 100% free hai — koi commission nahi.
+                </div>
+                <p>
+                  Worker role mein aap available gigs browse karte ho aur apply karte ho. Apply karne se:
+                </p>
+                <ul>
+                  <li>Aap confirm karte ho ki aap genuine interest rakhte ho</li>
+                  <li>Diya hua contact information accurate hai</li>
+                  <li>Aap professionally respond karoge agar client contact kare</li>
+                  <li>Fake applications dena — spam hai aur account ban ho sakta hai</li>
+                </ul>
+                <p>
+                  GigLega ek <strong>connection platform</strong> hai — hum employment guarantee nahi dete.
+                  Kaam milna client aur worker ke beech directly negotiate hota hai.
+                </p>
+                <p>
+                  Workers independent contractors hain — GigLega ke employee nahi. Tax, insurance ya koi legal compliance worker ki apni responsibility hai.
+                </p>
+              </div>
+
+              <!-- 5. Clients -->
+              <div class="legal-section" id="sec5">
+                <h2><span class="sec-num">5</span> Clients / Employers</h2>
+                <div class="highlight-box">
+                  <strong>Clients ke liye:</strong> Gig post karna Beta phase mein free hai. Aap seedha workers ko hire karte ho.
+                </div>
+                <p>
+                  Gig post karte waqt client ki responsibilities:
+                </p>
+                <ul>
+                  <li>Gig title, description aur budget <strong>accurate aur honest</strong> hona chahiye</li>
+                  <li>Budget clearly mention karo — hidden charges ya misleading pay prohibited hai</li>
+                  <li>Job scope clearly define karo — workers ko mislead mat karo</li>
+                  <li>Apply karne wale workers ka professionally respect karo</li>
+                  <li>Gig complete hone par agreed payment time par karo</li>
+                </ul>
+                <div class="warn-box">
+                  ⚠️ Fraudulent gigs post karna, workers ka paise ke saath dhoka karna ya platform ko spam karna strictly prohibited hai aur legal action ka subject ban sakta hai.
+                </div>
+                <p>
+                  Client ka worker se contract directly hota hai — GigLega uss contract ka party nahi hai.
+                  Disputes mein GigLega mediator ki role play kar sakta hai lekin binding decision nahi de sakta.
+                </p>
+              </div>
+
+              <!-- 6. Payments -->
+              <div class="legal-section" id="sec6">
+                <h2><span class="sec-num">6</span> Payments & Fees</h2>
+                <p>
+                  <strong>GigLega abhi koi payment process nahi karta.</strong>
+                  Saari payments directly client aur worker ke beech hoti hain — cash, UPI, bank transfer — jo bhi unke beech agree ho.
+                </p>
+                <ul>
+                  <li>Workers ke liye platform use: <strong>Free</strong></li>
+                  <li>Clients ke liye gig posting: <strong>Free</strong> (Beta phase)</li>
+                  <li>GigLega koi commission, service fee ya cut nahi leta abhi</li>
+                </ul>
+                <div class="highlight-box">
+                  <strong>Future mein:</strong> Premium features ya paid plans introduce kiye ja sakte hain. Changes ke baare mein users ko advance notice diya jayega.
+                </div>
+                <p>
+                  Payment disputes ke liye GigLega responsible nahi hai. Kaam start karne se pehle payment terms clearly agree kar lo.
+                </p>
+              </div>
+
+              <!-- 7. Prohibited -->
+              <div class="legal-section" id="sec7">
+                <h2><span class="sec-num">7</span> Prohibited Activities</h2>
+                <p>Yeh cheezein GigLega par strictly banned hain:</p>
+                <ul>
+                  <li>🚫 Fake identity se account banana ya impersonation</li>
+                  <li>🚫 Fraudulent gig post karna ya workers ko cheat karna</li>
+                  <li>🚫 Spam — multiple fake applications ya listings</li>
+                  <li>🚫 Illegal kaam ke liye platform use karna</li>
+                  <li>🚫 Harassment, abuse ya threatening behavior</li>
+                  <li>🚫 Misleading ya false information post karna</li>
+                  <li>🚫 Platform ke technical systems ko hack ya manipulate karna</li>
+                  <li>🚫 Minors ko hire karna ya exploit karna</li>
+                  <li>🚫 Adult content, drugs, gambling se related gigs</li>
+                  <li>🚫 Doosre users ka personal data collect karna bina permission ke</li>
+                  <li>🚫 Automated bots ya scrapers se data extract karna</li>
+                </ul>
+                <div class="warn-box">
+                  ⚠️ Prohibited activities mein involve hone par account permanently ban ho sakta hai aur legal action bhi liya ja sakta hai.
+                </div>
+              </div>
+
+              <!-- 8. Content -->
+              <div class="legal-section" id="sec8">
+                <h2><span class="sec-num">8</span> Content Rules</h2>
+                <p>
+                  Aap jo bhi content post karte ho — gig listings, applications, messages, profile info — uske liye aap khud responsible ho.
+                </p>
+                <p>
+                  Content post karte waqt aap grant karte ho GigLega ko ek <strong>non-exclusive, royalty-free license</strong> us content ko platform par display, distribute aur promote karne ka.
+                </p>
+                <p>Allowed content:</p>
+                <ul>
+                  <li>Genuine job opportunities aur work applications</li>
+                  <li>Accurate personal aur professional information</li>
+                  <li>Respectful aur professional communication</li>
+                </ul>
+                <p>Banned content:</p>
+                <ul>
+                  <li>Offensive, hateful ya discriminatory content</li>
+                  <li>Adult, violent ya illegal material</li>
+                  <li>Copyright-infringing content</li>
+                  <li>Spam ya promotional content without permission</li>
+                </ul>
+                <p>
+                  GigLega kisi bhi content ko bina notice ke remove karne ka right rakhta hai jo in guidelines ko violate kare.
+                </p>
+              </div>
+
+              <!-- 9. Privacy -->
+              <div class="legal-section" id="sec9">
+                <h2><span class="sec-num">9</span> Privacy & Data</h2>
+                <p>
+                  Aapki privacy humari priority hai. Hum kya data collect karte hain aur kaise use karte hain — yeh humari
+                  <a href="privacy-policy.html">Privacy Policy</a> mein detail mein explain kiya gaya hai.
+                </p>
+                <ul>
+                  <li>Account data securely store kiya jata hai</li>
+                  <li>Data third parties ko sell nahi kiya jaata</li>
+                  <li>Beta phase mein data primarily localStorage mein store hota hai</li>
+                  <li>Aap kabhi bhi apna account aur data delete karne ka request kar sakte ho</li>
+                </ul>
+                <p>
+                  Kisi bhi privacy concern ke liye humein email karo:
+                  <a href="mailto:Giglega.official@gmail.com">Giglega.official@gmail.com</a>
+                </p>
+              </div>
+
+              <!-- 10. Disclaimer -->
+              <div class="legal-section" id="sec10">
+                <h2><span class="sec-num">10</span> Disclaimer of Warranties</h2>
+                <p>
+                  GigLega platform <strong>"as is"</strong> aur <strong>"as available"</strong> basis par provide kiya jaata hai.
+                  Hum koi guarantee nahi dete:
+                </p>
+                <ul>
+                  <li>Platform hamesha available hoga ya error-free hoga</li>
+                  <li>Listed gigs genuine, legal ya fair hain</li>
+                  <li>Workers qualified ya reliable hain</li>
+                  <li>Clients payment karenge</li>
+                  <li>Platform se kaam zaroor milega</li>
+                </ul>
+                <div class="warn-box">
+                  ⚠️ Platform ek marketplace hai — hum parties ke beech hone wale agreements ya transactions ke responsible nahi hain.
+                </div>
+                <p>
+                  Users apni due diligence khud karo — doosri party se milne se pehle verify karo, public jagah milo, aur suspicious cheezein report karo.
+                </p>
+              </div>
+
+              <!-- 11. Limitation -->
+              <div class="legal-section" id="sec11">
+                <h2><span class="sec-num">11</span> Limitation of Liability</h2>
+                <p>
+                  Applicable law ke maximum extent tak, GigLega aur uske founders, team members ya affiliates liable nahi honge kisi bhi:
+                </p>
+                <ul>
+                  <li>Indirect, incidental ya consequential damages ke liye</li>
+                  <li>Lost profits ya earnings ke liye</li>
+                  <li>User-to-user disputes ya transactions ke liye</li>
+                  <li>Third-party actions ya content ke liye</li>
+                  <li>Data loss ya security breaches ke liye jo reasonable precautions ke bawajood ho</li>
+                </ul>
+                <p>
+                  GigLega ki total liability (agar koi ho) user ko ek month ke bheetar platform par actually paid amount se zyada nahi hogi — Beta phase mein yeh ₹0 hai.
+                </p>
+              </div>
+
+              <!-- 12. Termination -->
+              <div class="legal-section" id="sec12">
+                <h2><span class="sec-num">12</span> Termination</h2>
+                <p>
+                  <strong>Aap kisi bhi waqt</strong> apna account delete kar sakte ho ya platform use karna band kar sakte ho.
+                </p>
+                <p>
+                  <strong>GigLega bhi kisi bhi waqt</strong> kisi bhi account ko suspend ya terminate kar sakta hai agar:
+                </p>
+                <ul>
+                  <li>Terms of Service ka violation ho</li>
+                  <li>Fraudulent ya suspicious activity detect ho</li>
+                  <li>Legal requirement aisa kare</li>
+                  <li>Platform ke doosre users ko protect karna ho</li>
+                </ul>
+                <p>
+                  Termination ke baad aapka account data delete ho sakta hai. Important data ka backup pehle se rakh lo.
+                </p>
+                <p>
+                  Termination ke baad bhi sections 7, 8, 10, 11 aur 14 (jo applicable ho) survive karte hain.
+                </p>
+              </div>
+
+              <!-- 13. Changes -->
+              <div class="legal-section" id="sec13">
+                <h2><span class="sec-num">13</span> Changes to Terms</h2>
+                <p>
+                  GigLega in Terms of Service ko kisi bhi waqt update kar sakta hai. Changes hone par:
+                </p>
+                <ul>
+                  <li>Updated terms website par post kiye jayenge with new "Last Updated" date</li>
+                  <li>Major changes ke liye registered users ko email ya WhatsApp notification di jayegi</li>
+                  <li>Changes ke baad platform use karna new terms accept karna maana jayega</li>
+                </ul>
+                <p>
+                  Regular basis par yeh page check karte raho — khaas kar agar aap platform frequently use karte ho.
+                </p>
+                <div class="highlight-box">
+                  <strong>Current version:</strong> March 2026 · GigLega Beta
+                </div>
+              </div>
+
+              <!-- 14. Contact -->
+              <div class="legal-section" id="sec14">
+                <h2><span class="sec-num">14</span> Contact & Governing Law</h2>
+                <p>
+                  Yeh Terms of Service <strong>Gurugram, Haryana, India</strong> ke laws ke under govern hoti hai.
+                  Koi bhi dispute Gurugram ke courts mein resolve kiya jayega.
+                </p>
+                <p>
+                  Koi bhi legal question, concern ya complaint ke liye:
+                </p>
+                <ul>
+                  <li>📧 Email: <a href="mailto:Giglega.official@gmail.com">Giglega.official@gmail.com</a></li>
+                  <li>💬 WhatsApp: <a href="https://wa.me/919319635257" target="_blank" rel="noopener">+91 93196 35257</a></li>
+                  <li>📍 Address: H.No 82, Om Vihar Phase 1, Palam Vihar Extn, Gurugram, Haryana</li>
+                  <li>🌐 Contact Form: <a href="contact.html">giglega.in/contact.html</a></li>
+                </ul>
+                <p>
+                  Hum typically <strong>5–7 business days</strong> mein legal queries ka response dete hain.
+                </p>
+              </div>
+
+              <!-- ── Accept card ── -->
+              <div class="accept-card fade-up">
+                <h3>✅ Terms samajh liye?</h3>
+                <p>
+                  GigLega join karo — Gurugram ka sabse trusted hyperlocal gig platform.
+                  Kaam dhundo ya kaam do — bilkul free!
+                </p>
+                <div class="accept-btns">
+                  <a href="signup.html" class="btn btn-primary">Join GigLega Free 🚀</a>
+                  <a href="privacy-policy.html" class="btn btn-outline">Privacy Policy →</a>
+                  <a href="contact.html" class="btn btn-outline">Sawaal Pucho →</a>
+                </div>
+              </div>
+
+            </div>
+          </div>
         </div>
-        <div>
-            <h4>Legal</h4>
-            <a href="/terms.html">Terms & Conditions</a>
-            <a href="/privacy-policy.html">Privacy Policy</a>
-            <a href="/trust-safety.html">Trust & Safety</a>
-        </div>
-        <div>
-            <h4>Support</h4>
-            <a href="/help-center.html">Help Center</a>
-            <a href="/contact.html">Contact Us</a>
-        </div>
-        <p>&copy; 2026 GigLega Beta. Made with ❤️ for Gurugram.</p>
-    </footer>
-</body>
+      </div>
+    </main>
+
+    <footer id="footer"></footer>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        buildBreadcrumb("legalBreadcrumb", [
+          { label: "Home",  href: "index.html" },
+          { label: "Terms of Service" }
+        ]);
+      });
+    </script>
+  </body>
 </html>
