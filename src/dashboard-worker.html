@@ -9,7 +9,6 @@
     <script defer src="shared.js"></script>
 
     <style>
-      /* ── Dashboard shell ─────────────────────── */
       .dash-wrap { padding: clamp(24px,4vw,44px) 0 clamp(48px,8vw,80px); }
 
       .dash-grid {
@@ -17,18 +16,18 @@
         gap: 24px;
       }
 
-      /* ── Sidebar ─────────────────────────────── */
       .dash-sidebar {
         display: grid;
         gap: 12px;
         align-content: start;
       }
 
+      /* 🔴 BUG #2 CARRY-OVER FIX — background:#fff → var(--surface) */
       .user-card {
         padding: 22px 18px;
         border: 1px solid var(--border);
         border-radius: 22px;
-        background: #fff;
+        background: var(--surface);
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -52,7 +51,7 @@
 
       .profile-bar-wrap {
         width: 100%;
-        background: #e5e7eb;
+        background: var(--gray-200);
         border-radius: 99px;
         height: 8px;
         overflow: hidden;
@@ -71,8 +70,9 @@
         font-weight: 700;
       }
 
+      /* 🔴 BUG #2 CARRY-OVER FIX — background:#fff → var(--surface) */
       .sidebar-nav {
-        background: #fff;
+        background: var(--surface);
         border: 1px solid var(--border);
         border-radius: 18px;
         overflow: hidden;
@@ -97,7 +97,8 @@
 
       .sidebar-nav-item:last-child { border-bottom: none; }
 
-      .sidebar-nav-item:hover { background: #f8fafc; color: var(--text); }
+      /* 🔴 BUG #2 CARRY-OVER FIX — #f8fafc → var(--surface-soft) */
+      .sidebar-nav-item:hover { background: var(--surface-soft); color: var(--text); }
 
       .sidebar-nav-item.active {
         background: rgba(13,148,136,0.07);
@@ -119,7 +120,6 @@
         text-align: center;
       }
 
-      /* ── Main content ────────────────────────── */
       .dash-main { min-width: 0; }
 
       .dashboard-panel { display: none; }
@@ -137,7 +137,6 @@
       .panel-header h2 { margin: 0; font-size: 1.35rem; }
       .panel-header p  { margin: 4px 0 0; color: var(--text-muted); font-size: 0.9rem; }
 
-      /* ── Stat strip ──────────────────────────── */
       .stat-strip {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
@@ -145,11 +144,12 @@
         margin-bottom: 24px;
       }
 
+      /* 🔴 BUG #2 CARRY-OVER FIX — background:#fff → var(--surface) */
       .stat-cell {
         padding: 18px 16px;
         border: 1px solid var(--border);
         border-radius: 18px;
-        background: #fff;
+        background: var(--surface);
       }
 
       .stat-cell-label {
@@ -169,12 +169,12 @@
         line-height: 1;
       }
 
-      /* ── Application card ────────────────────── */
+      /* 🔴 BUG #2 CARRY-OVER FIX — background:#fff → var(--surface) */
       .app-card {
         padding: 18px;
         border: 1px solid var(--border);
         border-radius: 18px;
-        background: #fff;
+        background: var(--surface);
         display: grid;
         gap: 10px;
         margin-bottom: 12px;
@@ -210,24 +210,23 @@
         flex-shrink: 0;
       }
 
-      .app-status-badge.applied   { background: #eff6ff; color: #2563eb; }
+      .app-status-badge.applied     { background: #eff6ff; color: #2563eb; }
       .app-status-badge.shortlisted { background: #f0fdf4; color: #16a34a; }
-      .app-status-badge.rejected  { background: #fef2f2; color: #dc2626; }
+      .app-status-badge.rejected    { background: #fef2f2; color: #dc2626; }
 
-      /* ── Empty state ─────────────────────────── */
+      /* 🔴 BUG #2 CARRY-OVER FIX — background:#fafafa → var(--surface-soft) */
       .empty-state {
         padding: 48px 24px;
         text-align: center;
         border: 1.5px dashed var(--border);
         border-radius: 18px;
-        background: #fafafa;
+        background: var(--surface-soft);
       }
 
       .empty-state .empty-icon { font-size: 2.5rem; margin-bottom: 12px; }
       .empty-state h3 { margin: 0 0 8px; font-size: 1.05rem; }
       .empty-state p  { margin: 0 0 20px; color: var(--text-muted); font-size: 0.9rem; }
 
-      /* ── Profile form ────────────────────────── */
       .profile-form-grid {
         display: grid;
         gap: 16px;
@@ -242,6 +241,7 @@
         margin-bottom: 6px;
       }
 
+      /* 🔴 BUG #2 CARRY-OVER FIX — background:#fff → var(--surface) */
       .form-group input,
       .form-group select,
       .form-group textarea {
@@ -252,7 +252,7 @@
         font-size: 0.95rem;
         font-family: inherit;
         color: var(--text);
-        background: #fff;
+        background: var(--surface);
         outline: none;
         resize: vertical;
         transition: border-color 0.18s, box-shadow 0.18s;
@@ -265,7 +265,6 @@
         box-shadow: 0 0 0 3px rgba(13,148,136,0.1);
       }
 
-      /* ── Responsive ──────────────────────────── */
       @media (min-width: 640px) {
         .stat-strip { grid-template-columns: repeat(3, 1fr); }
         .profile-form-grid { grid-template-columns: 1fr 1fr; }
@@ -381,8 +380,9 @@
                       </div>
                       <div class="form-group">
                         <label for="pfEmail">Email *</label>
+                        <!-- 🔴 BUG #2 CARRY-OVER FIX — hardcoded bg → opacity -->
                         <input type="email" id="pfEmail" maxlength="100" readonly
-                          style="background:#f8fafc;cursor:not-allowed;" />
+                          style="opacity:0.6;cursor:not-allowed;" />
                       </div>
                       <div class="form-group">
                         <label for="pfPhone">Phone *</label>
@@ -434,6 +434,7 @@
                       <strong style="display:block;color:#ef4444;">Logout</strong>
                       <span style="font-size:0.85rem;color:var(--text-muted);">Is device se log out karo</span>
                     </div>
+                    <!-- 🔴 BUG #11 CARRY-OVER FIX — safeLogout instead of logout() -->
                     <button class="btn btn-outline btn-sm" style="color:#ef4444;border-color:#ef4444;" id="dashLogoutBtn">Logout</button>
                   </div>
                 </div>
@@ -448,9 +449,6 @@
     <footer id="footer"></footer>
 
     <script>
-      /* ─────────────────────────────────────────────
-         HELPERS
-      ───────────────────────────────────────────── */
       function escH(v) {
         return String(v == null ? "" : v)
           .replace(/&/g,"&amp;").replace(/</g,"&lt;")
@@ -462,9 +460,6 @@
         return s || (fb || "");
       }
 
-      /* ─────────────────────────────────────────────
-         RENDER HELPERS
-      ───────────────────────────────────────────── */
       function appStatusBadge(status) {
         var map = {
           applied:     { cls: "applied",     label: "Applied" },
@@ -516,36 +511,30 @@
           '</div>';
       }
 
-      /* ─────────────────────────────────────────────
-         LOAD DASHBOARD DATA
-      ───────────────────────────────────────────── */
       function loadDashboard() {
         var user = getCurrentUser();
         if (!user) return;
 
-        /* User card */
-        document.getElementById("userAvatarLg").textContent  = getInitials(user.name);
-        document.getElementById("userCardName").textContent  = safeS(user.name, "User");
-        document.getElementById("userCardRole").textContent  = "👷 Worker · GigLega Member";
+        document.getElementById("userAvatarLg").textContent     = getInitials(user.name);
+        document.getElementById("userCardName").textContent     = safeS(user.name, "User");
+        document.getElementById("userCardRole").textContent     = "👷 Worker · GigLega Member";
         document.getElementById("userCardLocation").textContent = safeS(user.location, "");
-        document.getElementById("greetingText").textContent  = "Namaste, " + safeS(user.name, "Bhai") + "! 👋";
+        document.getElementById("greetingText").textContent     = "Namaste, " + safeS(user.name, "Bhai") + "! 👋";
 
-        /* Profile completion */
         var pct = calcProfileCompletion(user);
-        document.getElementById("profilePct").textContent    = pct + "%";
-        document.getElementById("profileBar").style.width    = pct + "%";
+        document.getElementById("profilePct").textContent   = pct + "%";
+        document.getElementById("profileBar").style.width   = pct + "%";
 
-        /* Applications */
-        var apps = getUserApplications() || [];
+        var apps = getUserApplications(user.id) || [];
         document.getElementById("appCountBadge").textContent = apps.length;
 
-        /* Stats */
         var pending     = apps.filter(function (a) { return (a.status || "applied") === "applied"; }).length;
         var shortlisted = apps.filter(function (a) { return a.status === "shortlisted"; }).length;
+
         document.getElementById("workerStats").innerHTML =
-          statCell("Total Applied",   apps.length,    "💼") +
-          statCell("Pending",         pending,        "⏳") +
-          statCell("Shortlisted",     shortlisted,    "✅");
+          statCell("Total Applied", apps.length,   "💼") +
+          statCell("Pending",       pending,        "⏳") +
+          statCell("Shortlisted",   shortlisted,    "✅");
 
         /* Recent apps — overview */
         var recentEl = document.getElementById("recentAppsOverview");
@@ -565,7 +554,7 @@
         var allEl = document.getElementById("allApplicationsList");
         if (!apps.length) {
           allEl.innerHTML = renderEmptyState(
-            "📭", "Koi application nahi mili",
+            "📋", "Koi application nahi mili",
             "Gigs browse karo aur apply karo — bilkul free!",
             '<a href="browse.html" class="btn btn-primary">Browse Gigs</a>'
           );
@@ -591,12 +580,11 @@
           '</div>';
       }
 
-      /* ─────────────────────────────────────────────
-         PROFILE SAVE
-      ───────────────────────────────────────────── */
+      /* ── Profile save ── */
       document.getElementById("profileForm").addEventListener("submit", function (e) {
         e.preventDefault();
 
+        /* 🔴 BUG FIX — double-escaped regex \\d → \d (was broken in script tag) */
         var result = validateForm({
           pfName:  { required: true, label: "Name",  minLength: 2 },
           pfPhone: {
@@ -610,7 +598,9 @@
 
         var btn  = document.getElementById("saveProfileBtn");
         var user = getCurrentUser() || {};
-        setButtonLoading(btn, "Saving...");
+
+        /* 🔴 BUG FIX — setButtonLoading wrong args: (btn,"Saving...") → (btn, true, "Saving...") */
+        setButtonLoading(btn, true, "Saving...");
 
         setTimeout(function () {
           var updated = Object.assign({}, user, {
@@ -623,12 +613,12 @@
 
           lsSet(GL.STORAGE_KEY_USER, updated);
 
-          /* Also update in users array */
           var users = lsGet(GL.STORAGE_KEY_USERS, []);
           var idx = users.findIndex(function (u) { return u.id === updated.id || u.email === updated.email; });
           if (idx > -1) { users[idx] = updated; lsSet(GL.STORAGE_KEY_USERS, users); }
 
-          resetButton(btn);
+          /* 🔴 BUG FIX — resetButton(btn) → setButtonLoading(btn, false) */
+          setButtonLoading(btn, false);
           showToast("Profile save ho gayi! 🎉", "success");
           loadDashboard();
         }, 600);
@@ -638,10 +628,8 @@
         loadDashboard();
       });
 
-      /* ─────────────────────────────────────────────
-         SETTINGS BUTTONS
-      ───────────────────────────────────────────── */
-      document.getElementById("dashLogoutBtn").addEventListener("click", function () { logout(); });
+      /* 🔴 BUG #11 CARRY-OVER FIX — safeLogout with confirmation modal */
+      document.getElementById("dashLogoutBtn").addEventListener("click", function () { safeLogout(); });
 
       document.getElementById("switchToClientBtn").addEventListener("click", function () {
         var user = getCurrentUser() || {};
@@ -651,7 +639,6 @@
         setTimeout(function () { window.location.href = "dashboard-client.html"; }, 900);
       });
 
-      /* Panel goto buttons (e.g. "View All" in overview) */
       document.addEventListener("click", function (e) {
         var btn = e.target.closest("[data-panel-goto]");
         if (!btn) return;
@@ -660,16 +647,21 @@
         if (navItem) navItem.click();
       });
 
-      /* ─────────────────────────────────────────────
-         BOOT
-      ───────────────────────────────────────────── */
+      /* ── Boot ── */
       document.addEventListener("DOMContentLoaded", function () {
         if (!requireAuth("dashboard-worker.html")) return;
 
         buildBreadcrumb("dashBreadcrumb", [
-          { label: "Home",      href: "index.html"  },
-          { label: "Dashboard"  }
+          { label: "Home",     href: "index.html" },
+          { label: "Dashboard" }
         ]);
+
+        /* Activate first panel (or hash-matched panel) */
+        var hash = location.hash.slice(1);
+        var firstPanel = hash
+          ? document.querySelector('.sidebar-nav-item[data-panel="' + hash + '"]')
+          : document.querySelector(".sidebar-nav-item[data-panel]");
+        if (firstPanel) firstPanel.click();
 
         loadDashboard();
         initFadeAnimations();
