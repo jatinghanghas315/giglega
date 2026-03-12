@@ -1,779 +1,797 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Join GigLega — Free Signup & Login</title>
-    <meta
-      name="description"
-      content="GigLega par free mein register karo ya login karo. Gurugram ke local gigs browse karo ya post karo."
-    />
-    <link rel="stylesheet" href="styles.css" />
-    <script defer src="shared.js"></script>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login — GigLega</title>
+  <meta name="description" content="GigLega mein login karo ya naya account banao. Gig economy ka sabse smart platform." />
+  <link rel="stylesheet" href="styles.css" />
+  <script defer src="shared.js"></script>
+  <style>
+    /* ── Page layout ── */
+    .auth-page{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px 16px;background:linear-gradient(135deg,rgba(26,60,94,.04) 0%,rgba(13,148,136,.06) 100%)}
 
-    <style>
-      /* ── Page wrapper ────────────────────────────── */
-      .auth-page {
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        padding: clamp(32px, 6vw, 64px) 0;
-        background: linear-gradient(160deg, #f0fdfa 0%, #f8fafc 60%, #eff6ff 100%);
-      }
+    /* ── Card ── */
+    .auth-card{background:var(--surface);border:1.5px solid var(--gray-200);border-radius:var(--radius);box-shadow:0 8px 40px rgba(26,60,94,.12);width:100%;max-width:460px;overflow:hidden}
 
-      .auth-center {
-        width: 100%;
-        max-width: 480px;
-        margin: 0 auto;
-        padding: 0 16px;
-      }
+    /* ── Brand header ── */
+    .auth-brand{background:linear-gradient(135deg,var(--primary) 0%,var(--teal) 100%);padding:28px 32px 24px;text-align:center;color:#fff}
+    .auth-logo{font-size:1.8rem;font-weight:900;letter-spacing:-1px;margin-bottom:4px}
+    .auth-logo span{opacity:.8}
+    .auth-tagline{font-size:.82rem;opacity:.75}
 
-      /* ── Logo bar ────────────────────────────────── */
-      .auth-logo {
-        text-align: center;
-        margin-bottom: 28px;
-      }
+    /* ── Tab switch ── */
+    .auth-tabs{display:grid;grid-template-columns:1fr 1fr;border-bottom:2px solid var(--gray-200)}
+    .auth-tab{padding:14px;border:none;background:transparent;font-weight:700;font-size:.9rem;color:var(--gray-500);cursor:pointer;border-bottom:2.5px solid transparent;margin-bottom:-2px;transition:all .2s}
+    .auth-tab.active{color:var(--primary);border-bottom-color:var(--primary);background:rgba(26,60,94,.03)}
+    .auth-tab:hover:not(.active){color:var(--gray-700);background:var(--gray-50)}
 
-      .auth-logo a {
-        text-decoration: none;
-        font-size: 2rem;
-        font-weight: 900;
-        letter-spacing: -0.05em;
-      }
+    /* ── Form body ── */
+    .auth-body{padding:28px 32px 32px}
+    @media(max-width:480px){.auth-body{padding:20px 20px 24px}}
 
-      .auth-logo .gig  { color: var(--teal); }
-      .auth-logo .lega { color: var(--navy, #1a3c5e); }
+    /* ── Panel visibility ── */
+    .auth-panel{display:none}
+    .auth-panel.active{display:block}
 
-      .auth-logo sup {
-        font-size: 0.6rem;
-        font-weight: 700;
-        color: var(--text-muted);
-        vertical-align: super;
-        letter-spacing: 0;
-      }
+    /* ── Field ── */
+    .field{margin-bottom:18px;position:relative}
+    .field label{display:block;font-weight:600;font-size:.86rem;color:var(--gray-700);margin-bottom:6px}
+    .field-input-wrap{position:relative}
+    .field input{width:100%;padding:12px 14px;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);font-size:.93rem;background:var(--surface);color:var(--text);font-family:inherit;transition:border .2s,box-shadow .2s;box-sizing:border-box}
+    .field input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(13,148,136,.1)}
+    .field input.error{border-color:var(--danger)}
+    .field input.success{border-color:var(--success)}
+    .field-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:1rem;pointer-events:none}
+    .field input.has-icon{padding-left:38px}
+    .field-error{font-size:.76rem;color:var(--danger);margin-top:5px;display:none;font-weight:600}
+    .field-error.show{display:block}
 
-      .auth-logo p {
-        margin: 6px 0 0;
-        color: var(--text-muted);
-        font-size: 0.92rem;
-      }
+    /* Password toggle */
+    .btn-eye{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1rem;color:var(--gray-400);padding:4px;line-height:1}
+    .btn-eye:hover{color:var(--gray-700)}
 
-      /* ── Card ────────────────────────────────────── */
-      .auth-card {
-        background: #fff;
-        border: 1px solid var(--border);
-        border-radius: 26px;
-        padding: clamp(24px, 5vw, 42px);
-        box-shadow: 0 8px 40px rgba(13, 148, 136, 0.07), 0 2px 12px rgba(26, 60, 94, 0.06);
-      }
+    /* ── Password strength ── */
+    .pw-strength{margin-top:8px;display:none}
+    .pw-strength.show{display:block}
+    .pw-bars{display:flex;gap:4px;margin-bottom:4px}
+    .pw-bar{flex:1;height:4px;border-radius:2px;background:var(--gray-200);transition:background .3s}
+    .pw-label{font-size:.74rem;color:var(--gray-500);font-weight:600}
+    .pw-label.weak{color:var(--danger)}
+    .pw-label.fair{color:var(--accent)}
+    .pw-label.good{color:#16a34a}
+    .pw-label.strong{color:var(--teal)}
 
-      /* ── Tab switcher ────────────────────────────── */
-      .auth-tabs {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 4px;
-        background: var(--bg-subtle, #f1f5f9);
-        border-radius: 14px;
-        padding: 4px;
-        margin-bottom: 28px;
-      }
+    /* ── Checkbox row ── */
+    .check-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:8px}
+    .check-label{display:flex;align-items:center;gap:8px;font-size:.83rem;color:var(--gray-600);cursor:pointer;user-select:none}
+    .check-label input[type=checkbox]{width:16px;height:16px;accent-color:var(--teal);cursor:pointer}
+    .btn-forgot{background:none;border:none;color:var(--teal);font-size:.83rem;font-weight:600;cursor:pointer;padding:0}
+    .btn-forgot:hover{text-decoration:underline}
 
-      .auth-tab-btn {
-        padding: 10px;
-        border: none;
-        border-radius: 11px;
-        background: transparent;
-        font-size: 0.95rem;
-        font-weight: 700;
-        color: var(--text-muted);
-        cursor: pointer;
-        transition: background 0.18s, color 0.18s, box-shadow 0.18s;
-      }
+    /* ── Submit button ── */
+    .btn-submit{width:100%;padding:13px;background:linear-gradient(135deg,var(--primary) 0%,var(--teal) 100%);color:#fff;border:none;border-radius:var(--radius-sm);font-weight:800;font-size:.95rem;cursor:pointer;transition:transform .15s,box-shadow .15s,opacity .2s;box-shadow:0 4px 14px rgba(13,148,136,.35);margin-bottom:16px}
+    .btn-submit:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(13,148,136,.45)}
+    .btn-submit:disabled{opacity:.55;transform:none;cursor:not-allowed;box-shadow:none}
+    .btn-submit .spinner{display:none;width:16px;height:16px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;margin:0 auto}
+    .btn-submit.loading .btn-text{display:none}
+    .btn-submit.loading .spinner{display:inline-block}
+    @keyframes spin{to{transform:rotate(360deg)}}
 
-      .auth-tab-btn.active {
-        background: #fff;
-        color: var(--teal);
-        box-shadow: 0 2px 8px rgba(13, 148, 136, 0.12);
-      }
+    /* ── Divider ── */
+    .auth-divider{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+    .auth-divider span{font-size:.78rem;color:var(--gray-400);white-space:nowrap}
+    .auth-divider::before,.auth-divider::after{content:"";flex:1;height:1px;background:var(--gray-200)}
 
-      /* ── Tab panels ──────────────────────────────── */
-      .auth-panel {
-        display: none;
-      }
+    /* ── Social login (demo) ── */
+    .btn-social{width:100%;padding:11px;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);background:var(--surface);color:var(--gray-700);font-weight:600;font-size:.88rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:border .2s,background .2s;margin-bottom:10px}
+    .btn-social:hover{border-color:var(--teal);background:rgba(13,148,136,.04)}
 
-      .auth-panel.active {
-        display: block;
-      }
+    /* ── Switch text ── */
+    .auth-switch{text-align:center;font-size:.83rem;color:var(--gray-500)}
+    .auth-switch button{background:none;border:none;color:var(--teal);font-weight:700;cursor:pointer;font-size:.83rem;padding:0}
+    .auth-switch button:hover{text-decoration:underline}
 
-      .auth-panel h2 {
-        margin: 0 0 6px;
-        font-size: 1.35rem;
-      }
+    /* ── Terms note ── */
+    .terms-note{font-size:.74rem;color:var(--gray-400);text-align:center;line-height:1.6;margin-top:12px}
+    .terms-note a{color:var(--teal);text-decoration:none}
+    .terms-note a:hover{text-decoration:underline}
 
-      .auth-panel > p {
-        margin: 0 0 24px;
-        color: var(--text-muted);
-        font-size: 0.92rem;
-        line-height: 1.55;
-      }
+    /* ── OTP / Forgot password panel ── */
+    .forgot-panel{display:none;padding:28px 32px 32px}
+    .forgot-panel.active{display:block}
+    @media(max-width:480px){.forgot-panel{padding:20px 20px 24px}}
+    .forgot-back{background:none;border:none;color:var(--teal);font-weight:700;font-size:.84rem;cursor:pointer;padding:0;margin-bottom:18px;display:flex;align-items:center;gap:5px}
+    .forgot-back:hover{text-decoration:underline}
+    .forgot-title{font-size:1.1rem;font-weight:800;color:var(--primary);margin-bottom:6px}
+    .forgot-sub{font-size:.84rem;color:var(--gray-500);margin-bottom:22px;line-height:1.5}
+    .otp-input-row{display:flex;gap:10px;justify-content:center;margin-bottom:18px}
+    .otp-digit{width:52px;height:56px;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);text-align:center;font-size:1.3rem;font-weight:700;color:var(--text);background:var(--surface);font-family:inherit;transition:border .2s}
+    .otp-digit:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(13,148,136,.1)}
+    .otp-timer{text-align:center;font-size:.8rem;color:var(--gray-400);margin-bottom:16px}
+    .otp-timer strong{color:var(--primary)}
+    .btn-resend{background:none;border:none;color:var(--teal);font-weight:700;font-size:.82rem;cursor:pointer;padding:0}
+    .btn-resend:disabled{opacity:.5;cursor:not-allowed}
 
-      /* ── Form groups ─────────────────────────────── */
-      .form-group {
-        margin-bottom: 16px;
-      }
+    /* Success state */
+    .auth-success{text-align:center;padding:32px 20px;display:none}
+    .auth-success.show{display:block}
+    .auth-success .success-icon{font-size:3rem;margin-bottom:14px}
+    .auth-success h3{font-size:1.1rem;font-weight:800;color:var(--success);margin-bottom:8px}
+    .auth-success p{font-size:.85rem;color:var(--gray-500);line-height:1.6}
 
-      .form-group label {
-        display: block;
-        font-weight: 700;
-        font-size: 0.9rem;
-        margin-bottom: 6px;
-        color: var(--text);
-      }
+    /* Dark mode */
+    [data-theme=dark] .auth-card{border-color:var(--gray-700);background:var(--gray-900)}
+    [data-theme=dark] .auth-tabs{border-color:var(--gray-700)}
+    [data-theme=dark] .auth-tab.active{background:rgba(13,148,136,.08)}
+    [data-theme=dark] .auth-tab:hover:not(.active){background:var(--gray-800)}
+    [data-theme=dark] .field input{border-color:var(--gray-600);background:var(--gray-800)}
+    [data-theme=dark] .field label{color:var(--gray-300)}
+    [data-theme=dark] .btn-social{border-color:var(--gray-600);color:var(--gray-300);background:var(--gray-800)}
+    [data-theme=dark] .btn-social:hover{border-color:var(--teal)}
+    [data-theme=dark] .otp-digit{border-color:var(--gray-600);background:var(--gray-800)}
+    [data-theme=dark] .auth-divider::before,[data-theme=dark] .auth-divider::after{background:var(--gray-700)}
+    [data-theme=dark] .pw-bar{background:var(--gray-700)}
+    [data-theme=dark] .check-label{color:var(--gray-400)}
+  </style>
+</head>
+<body>
+  <div id="announce-bar"></div>
+  <nav id="main-nav"></nav>
 
-      .form-group input,
-      .form-group select {
-        width: 100%;
-        padding: 12px 14px;
-        border: 1.5px solid var(--border);
-        border-radius: 13px;
-        font-size: 0.97rem;
-        font-family: inherit;
-        color: var(--text);
-        background: #fff;
-        outline: none;
-        transition: border-color 0.18s, box-shadow 0.18s;
-      }
+  <main>
+    <div class="auth-page">
+      <div class="auth-card">
 
-      .form-group input:focus,
-      .form-group select:focus {
-        border-color: var(--teal);
-        box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
-      }
+        <!-- Brand -->
+        <div class="auth-brand">
+          <div class="auth-logo">Gig<span>Lega</span></div>
+          <div class="auth-tagline">Gurugram ka #1 Gig Platform — Karo Kaam, Kamao Daam</div>
+        </div>
 
-      /* ── Password wrap ───────────────────────────── */
-      .pw-wrap {
-        position: relative;
-      }
+        <!-- Tabs -->
+        <div class="auth-tabs" id="authTabs">
+          <button class="auth-tab active" data-tab="login">🔑 Login</button>
+          <button class="auth-tab" data-tab="register">✨ Register</button>
+        </div>
 
-      .pw-wrap input {
-        padding-right: 52px;
-      }
+        <!-- ════════════════════════
+             LOGIN PANEL
+        ════════════════════════ -->
+        <div class="auth-panel active" id="panelLogin">
+          <div class="auth-body">
 
-      .pw-toggle {
-        position: absolute;
-        right: 12px;
-        top: 50%;
-        transform: translateY(-50%);
-        background: none;
-        border: none;
-        cursor: pointer;
-        font-size: 0.82rem;
-        font-weight: 700;
-        color: var(--teal);
-        padding: 4px 6px;
-        border-radius: 6px;
-      }
-
-      /* ── Role cards ──────────────────────────────── */
-      .role-cards {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 10px;
-        margin-bottom: 18px;
-      }
-
-      .role-card {
-        padding: 16px 14px;
-        border: 2px solid var(--border);
-        border-radius: 16px;
-        cursor: pointer;
-        text-align: center;
-        transition: border-color 0.16s, background 0.16s;
-        user-select: none;
-      }
-
-      .role-card:hover {
-        border-color: var(--teal);
-      }
-
-      .role-card.selected {
-        border-color: var(--teal);
-        background: rgba(13, 148, 136, 0.06);
-      }
-
-      .role-card-icon {
-        font-size: 1.8rem;
-        margin-bottom: 6px;
-        display: block;
-      }
-
-      .role-card strong {
-        display: block;
-        font-size: 0.95rem;
-        color: var(--text);
-      }
-
-      .role-card span {
-        font-size: 0.78rem;
-        color: var(--text-muted);
-        line-height: 1.4;
-      }
-
-      /* ── Submit button ───────────────────────────── */
-      .auth-submit {
-        width: 100%;
-        padding: 14px;
-        font-size: 1rem;
-        font-weight: 800;
-        border-radius: 14px;
-        margin-top: 6px;
-      }
-
-      /* ── Divider ─────────────────────────────────── */
-      .auth-divider {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        margin: 18px 0;
-        color: var(--text-muted);
-        font-size: 0.82rem;
-      }
-
-      .auth-divider::before,
-      .auth-divider::after {
-        content: "";
-        flex: 1;
-        height: 1px;
-        background: var(--border);
-      }
-
-      /* ── Footer links ────────────────────────────── */
-      .auth-foot {
-        margin-top: 18px;
-        text-align: center;
-        font-size: 0.88rem;
-        color: var(--text-muted);
-      }
-
-      .auth-foot a {
-        color: var(--teal);
-        font-weight: 700;
-        text-decoration: none;
-      }
-
-      .auth-foot a:hover {
-        text-decoration: underline;
-      }
-
-      /* ── Terms note ──────────────────────────────── */
-      .terms-note {
-        margin-top: 14px;
-        text-align: center;
-        font-size: 0.78rem;
-        color: var(--text-muted);
-        line-height: 1.5;
-      }
-
-      .terms-note a {
-        color: var(--teal);
-        text-decoration: none;
-      }
-
-      /* ── Trust strip ─────────────────────────────── */
-      .auth-trust {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        justify-content: center;
-        margin-top: 22px;
-        font-size: 0.82rem;
-        color: var(--text-muted);
-      }
-
-      .auth-trust span {
-        display: flex;
-        align-items: center;
-        gap: 4px;
-        font-weight: 600;
-      }
-
-      /* ── Already logged in banner ────────────────── */
-      .already-in-banner {
-        padding: 20px 22px;
-        border-radius: 18px;
-        background: rgba(13, 148, 136, 0.06);
-        border: 1px solid rgba(13, 148, 136, 0.22);
-        text-align: center;
-        margin-bottom: 20px;
-      }
-
-      .already-in-banner strong {
-        display: block;
-        font-size: 1rem;
-        margin-bottom: 6px;
-      }
-
-      .already-in-banner p {
-        margin: 0 0 14px;
-        font-size: 0.88rem;
-        color: var(--text-muted);
-      }
-    </style>
-  </head>
-
-  <body style="background:transparent;">
-    <div id="announce-bar"></div>
-    <div id="navbar"></div>
-
-    <main>
-      <div class="auth-page">
-        <div class="auth-center">
-
-          <!-- Logo -->
-          <div class="auth-logo fade-up">
-            <a href="index.html">
-              <span class="gig">Gig</span><span class="lega">Lega</span><sup>Beta</sup>
-            </a>
-            <p>Gurugram ka #1 hyperlocal gig platform</p>
-          </div>
-
-          <!-- Already logged in banner -->
-          <div id="alreadyInBanner" class="already-in-banner fade-up" style="display:none;">
-            <strong>✅ Aap already logged in hain!</strong>
-            <p>Agar dusre account se login karna chahte ho toh pehle logout karo.</p>
-            <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
-              <a href="dashboard.html" class="btn btn-primary btn-sm">Go to Dashboard</a>
-              <button class="btn btn-outline btn-sm" id="logoutSwitchBtn">Logout & Switch</button>
-            </div>
-          </div>
-
-          <!-- Auth card -->
-          <div class="auth-card fade-up" id="authCard">
-
-            <!-- Tab buttons -->
-            <div class="auth-tabs" role="tablist" aria-label="Auth tabs">
-              <button
-                class="auth-tab-btn active"
-                id="tabSignup"
-                role="tab"
-                aria-selected="true"
-                aria-controls="panelSignup"
-              >
-                🚀 Sign Up
-              </button>
-              <button
-                class="auth-tab-btn"
-                id="tabLogin"
-                role="tab"
-                aria-selected="false"
-                aria-controls="panelLogin"
-              >
-                🔑 Log In
-              </button>
-            </div>
-
-            <!-- ══ SIGNUP PANEL ══ -->
-            <div class="auth-panel active" id="panelSignup" role="tabpanel" aria-labelledby="tabSignup">
-              <h2>Free mein join karo</h2>
-              <p>Ek minute mein account banao — koi fees nahi, koi catch nahi.</p>
-
-              <form id="signupForm" novalidate autocomplete="off">
-
-                <div class="form-group">
-                  <label for="suName">Full Name *</label>
-                  <input
-                    type="text"
-                    id="suName"
-                    placeholder="Apna pura naam"
-                    maxlength="80"
-                    autocomplete="name"
-                  />
-                </div>
-
-                <div class="form-group">
-                  <label for="suEmail">Email *</label>
-                  <input
-                    type="email"
-                    id="suEmail"
-                    placeholder="aapka@email.com"
-                    maxlength="100"
-                    autocomplete="email"
-                  />
-                </div>
-
-                <div class="form-group">
-                  <label for="suPhone">Phone Number *</label>
-                  <input
-                    type="tel"
-                    id="suPhone"
-                    placeholder="+91 98765 43210"
-                    data-phone
-                    maxlength="15"
-                    autocomplete="tel"
-                  />
-                </div>
-
-                <div class="form-group">
-                  <label for="suPass">Password *</label>
-                  <div class="pw-wrap">
-                    <input
-                      type="password"
-                      id="suPass"
-                      placeholder="Minimum 6 characters"
-                      maxlength="64"
-                      autocomplete="new-password"
-                    />
-                    <button type="button" class="pw-toggle" aria-label="Show password">Show</button>
-                  </div>
-                </div>
-
-                <div class="form-group">
-                  <label>I am a... *</label>
-                  <div class="role-cards" id="suRoleCards">
-                    <div class="role-card" data-role="worker" tabindex="0" role="button" aria-pressed="false">
-                      <span class="role-card-icon">💼</span>
-                      <strong>Worker</strong>
-                      <span>Kaam dhundh raha hoon</span>
-                    </div>
-                    <div class="role-card" data-role="client" tabindex="0" role="button" aria-pressed="false">
-                      <span class="role-card-icon">🏢</span>
-                      <strong>Client</strong>
-                      <span>Kaam karwana chahta hoon</span>
-                    </div>
-                  </div>
-                  <input type="hidden" id="suRole" name="role" />
-                  <div id="suRoleFeedback" style="font-size:0.82rem;margin-top:2px;"></div>
-                </div>
-
-                <div class="form-group">
-                  <label for="suLocation">Location <span style="font-weight:400;color:var(--text-muted);">(optional)</span></label>
-                  <input
-                    type="text"
-                    id="suLocation"
-                    placeholder="e.g. Sector 29, Gurugram"
-                    maxlength="80"
-                  />
-                </div>
-
-                <button type="submit" class="btn btn-primary auth-submit" id="signupBtn">
-                  Create Free Account 🎉
-                </button>
-
-                <p class="terms-note">
-                  Register karke aap GigLega ki
-                  <a href="terms.html" target="_blank">Terms of Service</a> aur
-                  <a href="privacy-policy.html" target="_blank">Privacy Policy</a>
-                  se agree karte ho.
-                </p>
-              </form>
-
-              <div class="auth-divider">already a member?</div>
-
-              <div class="auth-foot">
-                Already account hai?
-                <a href="#" id="goToLoginLink">Log In karo →</a>
+            <div class="field">
+              <label for="loginId">Email or Phone Number</label>
+              <div class="field-input-wrap">
+                <span class="field-icon">📧</span>
+                <input type="text" id="loginId" class="has-icon" placeholder="you@email.com or 98765 43210" autocomplete="username" />
               </div>
+              <div class="field-error" id="loginIdErr">Please enter your email or phone number.</div>
             </div>
 
-            <!-- ══ LOGIN PANEL ══ -->
-            <div class="auth-panel" id="panelLogin" role="tabpanel" aria-labelledby="tabLogin">
-              <h2>Wapas aao! 👋</h2>
-              <p>
-                Apne account mein login karo aur Gurugram ke latest gigs explore karo.
-              </p>
-
-              <form id="loginForm" novalidate autocomplete="off">
-
-                <div class="form-group">
-                  <label for="liEmail">Email *</label>
-                  <input
-                    type="email"
-                    id="liEmail"
-                    placeholder="aapka@email.com"
-                    maxlength="100"
-                    autocomplete="email"
-                  />
-                </div>
-
-                <div class="form-group">
-                  <label for="liPass">Password *</label>
-                  <div class="pw-wrap">
-                    <input
-                      type="password"
-                      id="liPass"
-                      placeholder="Apna password"
-                      maxlength="64"
-                      autocomplete="current-password"
-                    />
-                    <button type="button" class="pw-toggle" aria-label="Show password">Show</button>
-                  </div>
-                </div>
-
-                <button type="submit" class="btn btn-primary auth-submit" id="loginBtn">
-                  Log In 🔑
-                </button>
-
-              </form>
-
-              <div class="auth-divider">new here?</div>
-
-              <div class="auth-foot">
-                Account nahi hai?
-                <a href="#" id="goToSignupLink">Free mein join karo →</a>
+            <div class="field">
+              <label for="loginPw">Password</label>
+              <div class="field-input-wrap">
+                <span class="field-icon">🔒</span>
+                <input type="password" id="loginPw" class="has-icon" placeholder="Your password" autocomplete="current-password" style="padding-right:42px" />
+                <button class="btn-eye" id="eyeLogin" type="button" aria-label="Toggle password">👁️</button>
               </div>
+              <div class="field-error" id="loginPwErr">Please enter your password.</div>
+            </div>
+
+            <div class="check-row">
+              <label class="check-label">
+                <input type="checkbox" id="rememberMe" /> Remember me
+              </label>
+              <button class="btn-forgot" id="btnForgot" type="button">Forgot password?</button>
+            </div>
+
+            <button class="btn-submit" id="btnLogin" type="button">
+              <span class="btn-text">Login →</span>
+              <span class="spinner"></span>
+            </button>
+
+            <div class="auth-divider"><span>or continue with</span></div>
+
+            <button class="btn-social" id="btnGoogleLogin" type="button">
+              <span>🔴</span> Continue with Google <span style="font-size:.75rem;color:var(--gray-400)">(coming soon)</span>
+            </button>
+
+            <div class="auth-switch">
+              Don't have an account? <button id="switchToRegister" type="button">Register free →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ════════════════════════
+             REGISTER PANEL
+        ════════════════════════ -->
+        <div class="auth-panel" id="panelRegister">
+          <div class="auth-body">
+
+            <div class="field">
+              <label for="regName">Full Name</label>
+              <div class="field-input-wrap">
+                <span class="field-icon">👤</span>
+                <input type="text" id="regName" class="has-icon" placeholder="Your full name" autocomplete="name" />
+              </div>
+              <div class="field-error" id="regNameErr">Please enter your full name (min 2 characters).</div>
+            </div>
+
+            <div class="field">
+              <label for="regId">Email or Phone Number</label>
+              <div class="field-input-wrap">
+                <span class="field-icon">📧</span>
+                <input type="text" id="regId" class="has-icon" placeholder="you@email.com or 98765 43210" autocomplete="username" />
+              </div>
+              <div class="field-error" id="regIdErr">Please enter a valid email or 10-digit phone number.</div>
+            </div>
+
+            <div class="field">
+              <label for="regCity">City / Area</label>
+              <div class="field-input-wrap">
+                <span class="field-icon">📍</span>
+                <input type="text" id="regCity" class="has-icon" placeholder="e.g. Gurugram, Sector 45" />
+              </div>
+              <div class="field-error" id="regCityErr">Please enter your city or area.</div>
+            </div>
+
+            <div class="field">
+              <label for="regPw">Password</label>
+              <div class="field-input-wrap">
+                <span class="field-icon">🔒</span>
+                <input type="password" id="regPw" class="has-icon" placeholder="Create a strong password" autocomplete="new-password" style="padding-right:42px" />
+                <button class="btn-eye" id="eyeReg" type="button" aria-label="Toggle password">👁️</button>
+              </div>
+              <div class="pw-strength" id="pwStrength">
+                <div class="pw-bars">
+                  <div class="pw-bar" id="pwBar1"></div>
+                  <div class="pw-bar" id="pwBar2"></div>
+                  <div class="pw-bar" id="pwBar3"></div>
+                  <div class="pw-bar" id="pwBar4"></div>
+                </div>
+                <div class="pw-label" id="pwLabel">Enter a password</div>
+              </div>
+              <div class="field-error" id="regPwErr">Password must be at least 6 characters.</div>
+            </div>
+
+            <div class="field">
+              <label for="regPwConf">Confirm Password</label>
+              <div class="field-input-wrap">
+                <span class="field-icon">🔒</span>
+                <input type="password" id="regPwConf" class="has-icon" placeholder="Repeat your password" autocomplete="new-password" style="padding-right:42px" />
+                <button class="btn-eye" id="eyeRegConf" type="button" aria-label="Toggle password">👁️</button>
+              </div>
+              <div class="field-error" id="regPwConfErr">Passwords do not match.</div>
+            </div>
+
+            <button class="btn-submit" id="btnRegister" type="button">
+              <span class="btn-text">Create Account →</span>
+              <span class="spinner"></span>
+            </button>
+
+            <div class="terms-note">
+              By registering you agree to our
+              <a href="terms.html" target="_blank">Terms of Service</a> and
+              <a href="privacy-policy.html" target="_blank">Privacy Policy</a>.
+            </div>
+
+            <div class="auth-switch" style="margin-top:14px">
+              Already have an account? <button id="switchToLogin" type="button">Login →</button>
             </div>
 
           </div>
+        </div>
 
-          <!-- Trust badges -->
-          <div class="auth-trust fade-up">
-            <span>✅ 100% Free</span>
-            <span>🔒 Safe & Secure</span>
-            <span>📍 Gurugram Local</span>
-            <span>⚡ Instant Access</span>
+        <!-- ════════════════════════
+             FORGOT PASSWORD PANEL
+        ════════════════════════ -->
+        <div class="forgot-panel" id="panelForgot">
+
+          <!-- Step 1: Enter email/phone -->
+          <div id="forgotStep1">
+            <button class="forgot-back" id="forgotBack1" type="button">← Back to Login</button>
+            <div class="forgot-title">🔑 Reset Password</div>
+            <div class="forgot-sub">Enter your registered email or phone number and we'll send you a verification code.</div>
+            <div class="field">
+              <label for="forgotId">Email or Phone Number</label>
+              <div class="field-input-wrap">
+                <span class="field-icon">📧</span>
+                <input type="text" id="forgotId" class="has-icon" placeholder="you@email.com or 98765 43210" />
+              </div>
+              <div class="field-error" id="forgotIdErr">Account not found. Please check and try again.</div>
+            </div>
+            <button class="btn-submit" id="btnSendOtp" type="button">
+              <span class="btn-text">Send OTP →</span>
+              <span class="spinner"></span>
+            </button>
+          </div>
+
+          <!-- Step 2: Enter OTP -->
+          <div id="forgotStep2" style="display:none">
+            <button class="forgot-back" id="forgotBack2" type="button">← Change number</button>
+            <div class="forgot-title">📱 Enter OTP</div>
+            <div class="forgot-sub" id="otpSubText">OTP sent to your email/phone. (Demo: use <strong>1234</strong>)</div>
+            <div class="otp-input-row">
+              <input class="otp-digit" id="otp1" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]" />
+              <input class="otp-digit" id="otp2" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]" />
+              <input class="otp-digit" id="otp3" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]" />
+              <input class="otp-digit" id="otp4" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]" />
+            </div>
+            <div class="field-error" id="otpErr" style="text-align:center">Incorrect OTP. Try again. (Hint: 1234)</div>
+            <div class="otp-timer">Resend in <strong id="otpCountdown">30s</strong> &nbsp;
+              <button class="btn-resend" id="btnResend" type="button" disabled>Resend OTP</button>
+            </div>
+            <button class="btn-submit" id="btnVerifyOtp" type="button">
+              <span class="btn-text">Verify OTP →</span>
+              <span class="spinner"></span>
+            </button>
+          </div>
+
+          <!-- Step 3: New password -->
+          <div id="forgotStep3" style="display:none">
+            <div class="forgot-title">🔒 Set New Password</div>
+            <div class="forgot-sub">Enter and confirm your new password below.</div>
+            <div class="field">
+              <label for="newPw">New Password</label>
+              <div class="field-input-wrap">
+                <span class="field-icon">🔒</span>
+                <input type="password" id="newPw" class="has-icon" placeholder="New password" style="padding-right:42px" />
+                <button class="btn-eye" id="eyeNew" type="button">👁️</button>
+              </div>
+              <div class="field-error" id="newPwErr">Password must be at least 6 characters.</div>
+            </div>
+            <div class="field">
+              <label for="newPwConf">Confirm New Password</label>
+              <div class="field-input-wrap">
+                <span class="field-icon">🔒</span>
+                <input type="password" id="newPwConf" class="has-icon" placeholder="Repeat new password" style="padding-right:42px" />
+                <button class="btn-eye" id="eyeNewConf" type="button">👁️</button>
+              </div>
+              <div class="field-error" id="newPwConfErr">Passwords do not match.</div>
+            </div>
+            <button class="btn-submit" id="btnSetPw" type="button">
+              <span class="btn-text">Save New Password →</span>
+              <span class="spinner"></span>
+            </button>
+          </div>
+
+          <!-- Step 4: Success -->
+          <div class="auth-success" id="forgotSuccess">
+            <div class="success-icon">🎉</div>
+            <h3>Password Reset!</h3>
+            <p>Your password has been updated successfully.<br>Logging you in now...</p>
           </div>
 
         </div>
+
+        <!-- Register success -->
+        <div class="auth-success" id="registerSuccess" style="padding:32px">
+          <div class="success-icon">🎉</div>
+          <h3>Account Created!</h3>
+          <p>Welcome to GigLega! Redirecting you now...</p>
+        </div>
+
       </div>
-    </main>
+    </div>
+  </main>
 
-    <footer id="footer"></footer>
+  <div id="toast-container"></div>
 
-    <script>
-      /* ─────────────────────────────────────────────
-         TAB SWITCHING
-      ───────────────────────────────────────────── */
-      var tabSignup  = document.getElementById("tabSignup");
-      var tabLogin   = document.getElementById("tabLogin");
-      var panelSignup = document.getElementById("panelSignup");
-      var panelLogin  = document.getElementById("panelLogin");
+  <script>
+  (function () {
 
-      function showTab(tab) {
-        var isLogin = tab === "login";
+    var GIG_KEY   = (typeof GL !== "undefined" && GL.STORAGE_KEY_GIGS)  ? GL.STORAGE_KEY_GIGS  : "gl_gigs";
+    var USER_KEY  = (typeof GL !== "undefined" && GL.STORAGE_KEY_USER)  ? GL.STORAGE_KEY_USER  : "gl_user";
+    var USERS_KEY = (typeof GL !== "undefined" && GL.STORAGE_KEY_USERS) ? GL.STORAGE_KEY_USERS : "gl_users";
 
-        tabSignup.classList.toggle("active", !isLogin);
-        tabLogin.classList.toggle("active",   isLogin);
-        tabSignup.setAttribute("aria-selected", String(!isLogin));
-        tabLogin.setAttribute("aria-selected",  String(isLogin));
+    /* ── Redirect param ── */
+    function getParam(n) { return new URLSearchParams(window.location.search).get(n); }
+    var redirectTo = getParam("redirect") || "index.html";
 
-        panelSignup.classList.toggle("active", !isLogin);
-        panelLogin.classList.toggle("active",   isLogin);
+    /* ── If already logged in, redirect ── */
+    var existing = localStorage.getItem(USER_KEY);
+    if (existing) {
+      try {
+        var u = JSON.parse(existing);
+        if (u && u.id) { window.location.href = redirectTo; return; }
+      } catch(e) {}
+    }
 
-        document.title = isLogin
-          ? "Login — GigLega"
-          : "Join GigLega — Free Signup";
+    /* ── Simulated OTP ── */
+    var DEMO_OTP      = "1234";
+    var resetTarget   = null; // user object being reset
+    var otpTimer      = null;
+
+    /* ═══════════════════════════════════════
+       TAB SWITCHING
+    ═══════════════════════════════════════ */
+    function showPanel(name) {
+      document.querySelectorAll(".auth-panel").forEach(function (p) { p.classList.remove("active"); });
+      document.querySelectorAll(".auth-tab").forEach(function (t) { t.classList.remove("active"); });
+      document.getElementById("panelForgot").classList.remove("active");
+      document.getElementById("authTabs").style.display = "grid";
+
+      if (name === "login") {
+        document.getElementById("panelLogin").classList.add("active");
+        document.querySelector('[data-tab="login"]').classList.add("active");
+      } else if (name === "register") {
+        document.getElementById("panelRegister").classList.add("active");
+        document.querySelector('[data-tab="register"]').classList.add("active");
+      } else if (name === "forgot") {
+        document.getElementById("panelLogin").classList.remove("active");
+        document.getElementById("panelRegister").classList.remove("active");
+        document.getElementById("panelForgot").classList.add("active");
+        document.getElementById("authTabs").style.display = "none";
+      }
+    }
+
+    document.querySelectorAll(".auth-tab").forEach(function (tab) {
+      tab.addEventListener("click", function () { showPanel(tab.dataset.tab); });
+    });
+    document.getElementById("switchToRegister").addEventListener("click", function () { showPanel("register"); });
+    document.getElementById("switchToLogin").addEventListener("click", function () { showPanel("login"); });
+
+    /* ═══════════════════════════════════════
+       PASSWORD TOGGLE
+    ═══════════════════════════════════════ */
+    function bindEye(btnId, inputId) {
+      document.getElementById(btnId).addEventListener("click", function () {
+        var inp = document.getElementById(inputId);
+        var isText = inp.type === "text";
+        inp.type = isText ? "password" : "text";
+        this.textContent = isText ? "👁️" : "🙈";
+      });
+    }
+    bindEye("eyeLogin",   "loginPw");
+    bindEye("eyeReg",     "regPw");
+    bindEye("eyeRegConf", "regPwConf");
+    bindEye("eyeNew",     "newPw");
+    bindEye("eyeNewConf", "newPwConf");
+
+    /* ═══════════════════════════════════════
+       PASSWORD STRENGTH
+    ═══════════════════════════════════════ */
+    document.getElementById("regPw").addEventListener("input", function () {
+      var val = this.value;
+      var wrap = document.getElementById("pwStrength");
+      if (!val) { wrap.classList.remove("show"); return; }
+      wrap.classList.add("show");
+
+      var score = 0;
+      if (val.length >= 6)  score++;
+      if (val.length >= 10) score++;
+      if (/[A-Z]/.test(val) && /[a-z]/.test(val)) score++;
+      if (/[0-9]/.test(val) && /[^a-zA-Z0-9]/.test(val)) score++;
+
+      var colors  = ["#ef4444","#f59e0b","#22c55e","#0d9488"];
+      var labels  = ["Weak","Fair","Good","Strong!"];
+      var classes = ["weak","fair","good","strong"];
+      var bars    = [document.getElementById("pwBar1"),document.getElementById("pwBar2"),document.getElementById("pwBar3"),document.getElementById("pwBar4")];
+      var label   = document.getElementById("pwLabel");
+
+      bars.forEach(function (b, i) {
+        b.style.background = i < score ? colors[score - 1] : "var(--gray-200)";
+      });
+      label.textContent  = score > 0 ? labels[score - 1] : "Too short";
+      label.className    = "pw-label " + (score > 0 ? classes[score - 1] : "weak");
+    });
+
+    /* ═══════════════════════════════════════
+       VALIDATION HELPERS
+    ═══════════════════════════════════════ */
+    function showErr(id, msg) {
+      var el = document.getElementById(id);
+      if (msg) el.textContent = msg;
+      el.classList.add("show");
+      var input = el.previousElementSibling && el.previousElementSibling.querySelector("input");
+      if (!input) input = document.getElementById(id.replace("Err","").replace("Id","Id").replace("Pw","Pw"));
+    }
+    function hideErr(id) { document.getElementById(id).classList.remove("show"); }
+    function clearErrs() {
+      document.querySelectorAll(".field-error").forEach(function (e) { e.classList.remove("show"); });
+    }
+
+    function isEmail(v)  { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
+    function isPhone(v)  { return /^[6-9]\d{9}$/.test(v.replace(/\s+/g,"")); }
+    function validId(v)  { return isEmail(v) || isPhone(v.replace(/\s+/g,"")); }
+
+    /* ═══════════════════════════════════════
+       USERS STORAGE
+    ═══════════════════════════════════════ */
+    function getUsers()     { return JSON.parse(localStorage.getItem(USERS_KEY) || "[]"); }
+    function saveUsers(arr) { localStorage.setItem(USERS_KEY, JSON.stringify(arr)); }
+
+    function hashPw(pw) {
+      /* Simple deterministic hash — NOT cryptographic, for demo only */
+      var h = 0;
+      for (var i = 0; i < pw.length; i++) {
+        h = ((h << 5) - h) + pw.charCodeAt(i);
+        h |= 0;
+      }
+      return "h" + Math.abs(h).toString(16);
+    }
+
+    function findUser(identifier) {
+      var id = identifier.trim().replace(/\s+/g,"");
+      return getUsers().find(function (u) {
+        return u.email === id || u.phone === id || u.email === identifier.trim() || u.phone === identifier.trim();
+      }) || null;
+    }
+
+    function loginUser(user, remember) {
+      if (remember) {
+        localStorage.setItem(USER_KEY, JSON.stringify(user));
+      } else {
+        sessionStorage.setItem(USER_KEY, JSON.stringify(user));
+        localStorage.setItem(USER_KEY, JSON.stringify(user)); // fallback
+      }
+    }
+
+    function setLoading(btnId, on) {
+      var btn = document.getElementById(btnId);
+      btn.disabled = on;
+      btn.classList.toggle("loading", on);
+    }
+
+    /* ═══════════════════════════════════════
+       LOGIN
+    ═══════════════════════════════════════ */
+    document.getElementById("btnLogin").addEventListener("click", function () {
+      clearErrs();
+      var id  = document.getElementById("loginId").value.trim();
+      var pw  = document.getElementById("loginPw").value;
+      var rem = document.getElementById("rememberMe").checked;
+      var ok  = true;
+
+      if (!id) { showErr("loginIdErr", "Please enter your email or phone number."); ok = false; }
+      else if (!validId(id)) { showErr("loginIdErr", "Enter a valid email or 10-digit phone number."); ok = false; }
+      if (!pw) { showErr("loginPwErr", "Please enter your password."); ok = false; }
+      if (!ok) return;
+
+      setLoading("btnLogin", true);
+
+      setTimeout(function () {
+        setLoading("btnLogin", false);
+        var user = findUser(id);
+        if (!user) {
+          showErr("loginIdErr", "No account found with this email/phone. Please register first.");
+          return;
+        }
+        if (user.password !== hashPw(pw)) {
+          showErr("loginPwErr", "Incorrect password. Please try again.");
+          return;
+        }
+        loginUser(user, rem);
+        if (typeof showToast === "function") showToast("✅ Welcome back, " + (user.name || "User") + "!", "success");
+        setTimeout(function () { window.location.href = redirectTo; }, 900);
+      }, 900);
+    });
+
+    /* Enter key on login fields */
+    ["loginId","loginPw"].forEach(function (id) {
+      document.getElementById(id).addEventListener("keydown", function (e) {
+        if (e.key === "Enter") document.getElementById("btnLogin").click();
+      });
+    });
+
+    /* ═══════════════════════════════════════
+       REGISTER
+    ═══════════════════════════════════════ */
+    document.getElementById("btnRegister").addEventListener("click", function () {
+      clearErrs();
+      var name    = document.getElementById("regName").value.trim();
+      var id      = document.getElementById("regId").value.trim();
+      var city    = document.getElementById("regCity").value.trim();
+      var pw      = document.getElementById("regPw").value;
+      var pwConf  = document.getElementById("regPwConf").value;
+      var ok      = true;
+
+      if (!name || name.length < 2) { showErr("regNameErr","Please enter your full name (min 2 characters)."); ok = false; }
+      if (!id || !validId(id))      { showErr("regIdErr","Please enter a valid email or 10-digit phone number."); ok = false; }
+      if (!city)                    { showErr("regCityErr","Please enter your city or area."); ok = false; }
+      if (!pw || pw.length < 6)     { showErr("regPwErr","Password must be at least 6 characters."); ok = false; }
+      if (pw !== pwConf)            { showErr("regPwConfErr","Passwords do not match."); ok = false; }
+      if (!ok) return;
+
+      /* Duplicate check */
+      var cleanId = id.replace(/\s+/g,"");
+      var dup = getUsers().find(function (u) { return u.email === cleanId || u.phone === cleanId; });
+      if (dup) {
+        showErr("regIdErr", "An account with this email/phone already exists. Please login instead.");
+        return;
       }
 
-      tabSignup.addEventListener("click", function () { showTab("signup"); });
-      tabLogin.addEventListener("click",  function () { showTab("login");  });
+      setLoading("btnRegister", true);
 
-      document.getElementById("goToLoginLink").addEventListener("click", function (e) {
-        e.preventDefault();
-        showTab("login");
+      setTimeout(function () {
+        setLoading("btnRegister", false);
+
+        var newUser = {
+          id:        "usr_" + Date.now(),
+          name:      name,
+          email:     isEmail(cleanId) ? cleanId : null,
+          phone:     isPhone(cleanId) ? cleanId : null,
+          city:      city,
+          password:  hashPw(pw),
+          createdAt: new Date().toISOString(),
+          skills:    [],
+          avatar:    null,
+          bio:       "",
+          workType:  ""
+        };
+
+        var users = getUsers();
+        users.push(newUser);
+        saveUsers(users);
+        loginUser(newUser, true);
+
+        /* Show success */
+        document.getElementById("panelRegister").style.display = "none";
+        document.getElementById("authTabs").style.display = "none";
+        document.getElementById("registerSuccess").classList.add("show");
+
+        if (typeof showToast === "function") showToast("🎉 Welcome to GigLega, " + name + "!", "success");
+        setTimeout(function () { window.location.href = redirectTo; }, 1800);
+      }, 1000);
+    });
+
+    /* Enter key on register last field */
+    document.getElementById("regPwConf").addEventListener("keydown", function (e) {
+      if (e.key === "Enter") document.getElementById("btnRegister").click();
+    });
+
+    /* ═══════════════════════════════════════
+       FORGOT PASSWORD FLOW
+    ═══════════════════════════════════════ */
+    document.getElementById("btnForgot").addEventListener("click", function () {
+      clearErrs();
+      showPanel("forgot");
+      showForgotStep(1);
+    });
+
+    document.getElementById("forgotBack1").addEventListener("click", function () {
+      showPanel("login");
+    });
+
+    document.getElementById("forgotBack2").addEventListener("click", function () {
+      showForgotStep(1);
+    });
+
+    function showForgotStep(step) {
+      [1,2,3].forEach(function (i) {
+        document.getElementById("forgotStep" + i).style.display = i === step ? "block" : "none";
       });
+      document.getElementById("forgotSuccess").classList.remove("show");
+    }
 
-      document.getElementById("goToSignupLink").addEventListener("click", function (e) {
-        e.preventDefault();
-        showTab("signup");
+    /* Step 1: Send OTP */
+    document.getElementById("btnSendOtp").addEventListener("click", function () {
+      clearErrs();
+      var id = document.getElementById("forgotId").value.trim();
+      if (!id || !validId(id)) {
+        showErr("forgotIdErr","Please enter a valid email or 10-digit phone number.");
+        return;
+      }
+      var user = findUser(id);
+      if (!user) {
+        showErr("forgotIdErr","No account found with this email/phone.");
+        return;
+      }
+      resetTarget = user;
+      setLoading("btnSendOtp", true);
+      setTimeout(function () {
+        setLoading("btnSendOtp", false);
+        var masked = isEmail(id)
+          ? id.replace(/(.{2}).*(@.*)/, "$1***$2")
+          : id.replace(/(\d{2})\d{6}(\d{2})/, "$1******$2");
+        document.getElementById("otpSubText").innerHTML =
+          "OTP sent to <strong>" + masked + "</strong>. &nbsp;(Demo: use <strong>1234</strong>)";
+        showForgotStep(2);
+        startOtpTimer();
+      }, 1000);
+    });
+
+    /* OTP digits auto-advance */
+    ["otp1","otp2","otp3","otp4"].forEach(function (id, i, arr) {
+      var inp = document.getElementById(id);
+      inp.addEventListener("input", function () {
+        this.value = this.value.replace(/\D/g,"").slice(0,1);
+        if (this.value && i < arr.length - 1) {
+          document.getElementById(arr[i+1]).focus();
+        }
       });
-
-      /* ─────────────────────────────────────────────
-         ROLE CARD KEYBOARD SUPPORT
-      ───────────────────────────────────────────── */
-      document.querySelectorAll("#suRoleCards .role-card").forEach(function (card) {
-        card.addEventListener("keydown", function (e) {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            card.click();
-          }
-        });
-
-        card.addEventListener("click", function () {
-          document.querySelectorAll("#suRoleCards .role-card").forEach(function (c) {
-            c.classList.remove("selected");
-            c.setAttribute("aria-pressed", "false");
-          });
-          card.classList.add("selected");
-          card.setAttribute("aria-pressed", "true");
-          document.getElementById("suRole").value = card.getAttribute("data-role");
-          var fb = document.getElementById("suRoleFeedback");
-          fb.textContent = "";
-        });
+      inp.addEventListener("keydown", function (e) {
+        if (e.key === "Backspace" && !this.value && i > 0) {
+          document.getElementById(arr[i-1]).focus();
+        }
       });
+    });
 
-      /* ─────────────────────────────────────────────
-         SIGNUP FORM
-      ───────────────────────────────────────────── */
-      document.getElementById("signupForm").addEventListener("submit", function (e) {
-        e.preventDefault();
+    /* OTP timer */
+    function startOtpTimer() {
+      var sec  = 30;
+      var btn  = document.getElementById("btnResend");
+      var disp = document.getElementById("otpCountdown");
+      btn.disabled = true;
+      clearInterval(otpTimer);
+      otpTimer = setInterval(function () {
+        sec--;
+        disp.textContent = sec + "s";
+        if (sec <= 0) {
+          clearInterval(otpTimer);
+          disp.textContent = "";
+          btn.disabled = false;
+        }
+      }, 1000);
+    }
 
-        /* Role check */
-        var role = document.getElementById("suRole").value;
-        if (!role) {
-          var fb = document.getElementById("suRoleFeedback");
-          fb.textContent = "❌ Worker ya Client select karo";
-          fb.style.color = "#ef4444";
-          fb.style.fontWeight = "700";
+    document.getElementById("btnResend").addEventListener("click", function () {
+      if (typeof showToast === "function") showToast("OTP resent! (Demo: use 1234)", "success");
+      startOtpTimer();
+    });
+
+    /* Step 2: Verify OTP */
+    document.getElementById("btnVerifyOtp").addEventListener("click", function () {
+      hideErr("otpErr");
+      var otp = ["otp1","otp2","otp3","otp4"].map(function (id) {
+        return document.getElementById(id).value;
+      }).join("");
+      if (otp.length < 4) {
+        showErr("otpErr","Please enter the 4-digit OTP.");
+        return;
+      }
+      setLoading("btnVerifyOtp", true);
+      setTimeout(function () {
+        setLoading("btnVerifyOtp", false);
+        if (otp !== DEMO_OTP) {
+          showErr("otpErr","Incorrect OTP. Try again. (Hint: 1234)");
           return;
         }
+        showForgotStep(3);
+      }, 800);
+    });
 
-        var result = validateForm({
-          suName:  { required: true, label: "Full Name",  minLength: 2, maxLength: 80 },
-          suEmail: {
-            required: true, label: "Email",
-            pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-            patternMsg: "Valid email address dalo"
-          },
-          suPhone: {
-            required: true, label: "Phone",
-            pattern: /^[6-9]\d{9}$|^\+91\s?[6-9]\d{4}\s?\d{5}$/,
-            patternMsg: "Valid Indian mobile number dalo"
-          },
-          suPass: {
-            required: true, label: "Password",
-            minLength: 6, maxLength: 64
-          }
+    /* Step 3: Set new password */
+    document.getElementById("btnSetPw").addEventListener("click", function () {
+      hideErr("newPwErr"); hideErr("newPwConfErr");
+      var pw     = document.getElementById("newPw").value;
+      var pwConf = document.getElementById("newPwConf").value;
+      var ok     = true;
+      if (!pw || pw.length < 6) { showErr("newPwErr","Password must be at least 6 characters."); ok = false; }
+      if (pw !== pwConf)        { showErr("newPwConfErr","Passwords do not match."); ok = false; }
+      if (!ok) return;
+
+      setLoading("btnSetPw", true);
+      setTimeout(function () {
+        setLoading("btnSetPw", false);
+        /* Update user password */
+        var users = getUsers();
+        var idx   = users.findIndex(function (u) { return u.id === resetTarget.id; });
+        if (idx > -1) {
+          users[idx].password = hashPw(pw);
+          saveUsers(users);
+          resetTarget.password = hashPw(pw);
+        }
+        loginUser(resetTarget, true);
+        clearInterval(otpTimer);
+
+        [1,2,3].forEach(function (i) {
+          document.getElementById("forgotStep" + i).style.display = "none";
         });
+        document.getElementById("forgotSuccess").classList.add("show");
+        if (typeof showToast === "function") showToast("✅ Password reset successful!", "success");
+        setTimeout(function () { window.location.href = redirectTo; }, 1800);
+      }, 900);
+    });
 
-        if (!result.valid) return;
+    /* Google (demo) */
+    document.getElementById("btnGoogleLogin").addEventListener("click", function () {
+      if (typeof showToast === "function") showToast("Google login coming soon! Use email/phone for now.", "error");
+    });
 
-        var email = document.getElementById("suEmail").value.trim().toLowerCase();
-        var users = lsGet(GL.STORAGE_KEY_USERS, []);
-
-        /* Duplicate email check */
-        var existing = users.find(function (u) {
-          return String(u.email || "").toLowerCase() === email;
-        });
-
-        if (existing) {
-          showFieldError("suEmail", "Yeh email already registered hai — Log In karo");
-          return;
-        }
-
-        var btn = document.getElementById("signupBtn");
-        setButtonLoading(btn, "Creating account...");
-
-        setTimeout(function () {
-          var newUser = {
-            id:        uid(),
-            name:      document.getElementById("suName").value.trim(),
-            email:     email,
-            phone:     document.getElementById("suPhone").value.trim(),
-            password:  btoa(document.getElementById("suPass").value), /* basic obfuscation */
-            role:      role,
-            location:  document.getElementById("suLocation").value.trim(),
-            bio:       "",
-            skills:    "",
-            joinedAt:  new Date().toISOString()
-          };
-
-          users.push(newUser);
-          lsSet(GL.STORAGE_KEY_USERS, users);
-          lsSet(GL.STORAGE_KEY_AUTH, "logged_in");
-          lsSet(GL.STORAGE_KEY_USER, newUser);
-
-          resetButton(btn);
-          showToast("Account ban gaya! GigLega par welcome hai 🎉", "success", 3000);
-
-          setTimeout(function () {
-            var params  = new URLSearchParams(window.location.search);
-            var nextUrl = params.get("next");
-            window.location.href = nextUrl || "dashboard.html";
-          }, 900);
-        }, 700);
-      });
-
-      /* ─────────────────────────────────────────────
-         LOGIN FORM
-      ───────────────────────────────────────────── */
-      document.getElementById("loginForm").addEventListener("submit", function (e) {
-        e.preventDefault();
-
-        var result = validateForm({
-          liEmail: {
-            required: true, label: "Email",
-            pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-            patternMsg: "Valid email address dalo"
-          },
-          liPass: { required: true, label: "Password", minLength: 1 }
-        });
-
-        if (!result.valid) return;
-
-        var email    = document.getElementById("liEmail").value.trim().toLowerCase();
-        var password = document.getElementById("liPass").value;
-        var users    = lsGet(GL.STORAGE_KEY_USERS, []);
-
-        var user = users.find(function (u) {
-          return String(u.email || "").toLowerCase() === email;
-        });
-
-        if (!user) {
-          showFieldError("liEmail", "Yeh email registered nahi hai — Sign Up karo");
-          return;
-        }
-
-        /* Password verify — btoa obfuscation matches signup */
-        var storedPass = user.password || "";
-        var inputPass  = btoa(password);
-
-        if (storedPass !== inputPass) {
-          showFieldError("liPass", "Password galat hai — dobara try karo");
-          return;
-        }
-
-        var btn = document.getElementById("loginBtn");
-        setButtonLoading(btn, "Logging in...");
-
-        setTimeout(function () {
-          lsSet(GL.STORAGE_KEY_AUTH, "logged_in");
-          lsSet(GL.STORAGE_KEY_USER, user);
-
-          resetButton(btn);
-          showToast("Login successful! Welcome back " + (user.name || "") + " 👋", "success", 3000);
-
-          setTimeout(function () {
-            var params  = new URLSearchParams(window.location.search);
-            var nextUrl = params.get("next");
-            window.location.href = nextUrl || "dashboard.html";
-          }, 900);
-        }, 600);
-      });
-
-      /* ─────────────────────────────────────────────
-         LOGOUT SWITCH BUTTON
-      ───────────────────────────────────────────── */
-      document.getElementById("logoutSwitchBtn").addEventListener("click", function () {
-        lsRemove(GL.STORAGE_KEY_AUTH);
-        lsRemove(GL.STORAGE_KEY_USER);
-        document.getElementById("alreadyInBanner").style.display = "none";
-        document.getElementById("authCard").style.display = "";
-        showToast("Logged out! Ab dusre account se login karo.", "info");
-      });
-
-      /* ─────────────────────────────────────────────
-         BOOT — URL param checks
-      ───────────────────────────────────────────── */
-      document.addEventListener("DOMContentLoaded", function () {
-        var params = new URLSearchParams(window.location.search);
-        var tab    = params.get("tab");
-
-        /* If already logged in — show banner, hide form */
-        if (isLoggedIn()) {
-          var user = getCurrentUser();
-          document.getElementById("alreadyInBanner").style.display = "block";
-          document.getElementById("alreadyInBanner").querySelector("strong").textContent =
-            "✅ " + (user && user.name ? user.name + ", aap already logged in hain!" : "Aap already logged in hain!");
-          document.getElementById("authCard").style.display = "none";
-          return;
-        }
-
-        /* ?tab=login pre-selects login tab */
-        if (tab === "login") {
-          showTab("login");
-        }
-      });
-    </script>
-  </body>
+  })();
+  </script>
+</body>
 </html>
