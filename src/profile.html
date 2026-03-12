@@ -9,7 +9,6 @@
     <script defer src="shared.js"></script>
 
     <style>
-      /* ── Page ────────────────────────────────────── */
       .profile-wrap {
         padding: clamp(28px, 5vw, 52px) 0 clamp(56px, 8vw, 88px);
       }
@@ -20,12 +19,20 @@
         align-items: start;
       }
 
-      /* ── Hero card ───────────────────────────────── */
+      /* ── Hero card ───────────────────────────────────────────────
+         🔴 BUG #4 ROOT CAUSE FIX:
+         Old: background: linear-gradient(135deg, #f0fdfa 0%, #fff 55%)
+         This is hardcoded light — stays white in dark mode.
+         In dark mode var(--text) = #f8fafc (near-white),
+         so .profile-name becomes white-on-white = invisible.
+         Fix: use var(--surface) base + teal tint via rgba so it
+         adapts to both light and dark themes.                      */
       .hero-card {
         padding: clamp(24px, 4vw, 40px);
         border: 1px solid var(--border);
         border-radius: 26px;
-        background: linear-gradient(135deg, #f0fdfa 0%, #fff 55%);
+        background: var(--surface);
+        background-image: linear-gradient(135deg, rgba(13, 148, 136, 0.06) 0%, transparent 55%);
         display: flex;
         gap: 22px;
         align-items: flex-start;
@@ -49,10 +56,12 @@
 
       .profile-info { flex: 1; min-width: 0; }
 
+      /* 🔴 BUG #4 FIX — explicit color so it never inherits broken value */
       .profile-name {
         margin: 0 0 4px;
         font-size: clamp(1.4rem, 3vw, 1.9rem);
         letter-spacing: -0.03em;
+        color: var(--text);
       }
 
       .profile-role-row {
@@ -93,12 +102,12 @@
         margin-top: 18px;
       }
 
-      /* ── Completion bar ──────────────────────────── */
+      /* 🔴 BUG #2 CARRY-OVER FIX — background:#fff → var(--surface) */
       .completion-card {
         padding: 18px 20px;
         border: 1px solid var(--border);
         border-radius: 18px;
-        background: #fff;
+        background: var(--surface);
       }
 
       .completion-header {
@@ -116,8 +125,9 @@
         color: var(--teal);
       }
 
+      /* 🔴 BUG #2 CARRY-OVER FIX — background:#e5e7eb → var(--gray-200) */
       .bar-wrap {
-        background: #e5e7eb;
+        background: var(--gray-200);
         border-radius: 99px;
         height: 10px;
         overflow: hidden;
@@ -150,17 +160,18 @@
         color: var(--teal);
       }
 
+      /* 🔴 BUG #2 CARRY-OVER FIX — hardcoded red bg → CSS var */
       .completion-tip.missing {
-        background: #fef2f2;
-        color: #dc2626;
+        background: rgba(239, 68, 68, 0.1);
+        color: #ef4444;
       }
 
-      /* ── Skills ──────────────────────────────────── */
+      /* 🔴 BUG #2 CARRY-OVER FIX — background:#fff → var(--surface) */
       .skills-card {
         padding: 20px;
         border: 1px solid var(--border);
         border-radius: 18px;
-        background: #fff;
+        background: var(--surface);
       }
 
       .skills-card h4 { margin: 0 0 12px; font-size: 0.95rem; font-weight: 800; }
@@ -181,18 +192,18 @@
         font-weight: 700;
       }
 
-      /* ── Stats strip ─────────────────────────────── */
       .stats-row {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
         gap: 12px;
       }
 
+      /* 🔴 BUG #2 CARRY-OVER FIX — background:#fff → var(--surface) */
       .stat-mini {
         padding: 14px 12px;
         border: 1px solid var(--border);
         border-radius: 16px;
-        background: #fff;
+        background: var(--surface);
         text-align: center;
       }
 
@@ -213,12 +224,12 @@
         letter-spacing: 0.04em;
       }
 
-      /* ── Section cards ───────────────────────────── */
+      /* 🔴 BUG #2 CARRY-OVER FIX — background:#fff → var(--surface) */
       .section-card {
         padding: clamp(20px, 3vw, 30px);
         border: 1px solid var(--border);
         border-radius: 22px;
-        background: #fff;
+        background: var(--surface);
       }
 
       .section-card h3 {
@@ -230,18 +241,16 @@
         gap: 8px;
       }
 
-      /* ── Mini gig card ───────────────────────────── */
       .mini-gig {
         padding: 14px 16px;
         border: 1px solid var(--border);
         border-radius: 14px;
-        display: grid;
+        display: block;
         gap: 6px;
         margin-bottom: 10px;
         text-decoration: none;
         color: var(--text);
         transition: box-shadow 0.16s, transform 0.16s;
-        display: block;
       }
 
       .mini-gig:hover {
@@ -259,7 +268,6 @@
         color: var(--text-muted);
       }
 
-      /* ── Own profile edit banner ─────────────────── */
       .own-banner {
         padding: 14px 18px;
         border-radius: 14px;
@@ -273,9 +281,9 @@
         margin-bottom: 22px;
         font-size: 0.9rem;
         font-weight: 600;
+        color: var(--text);
       }
 
-      /* ── Not found ───────────────────────────────── */
       .not-found {
         padding: clamp(48px, 8vw, 88px) 0;
         text-align: center;
@@ -284,7 +292,6 @@
       .not-found h2 { margin: 0 0 10px; font-size: 1.6rem; }
       .not-found p  { margin: 0 0 24px; color: var(--text-muted); }
 
-      /* ── Responsive ──────────────────────────────── */
       @media (min-width: 1024px) {
         .profile-grid {
           grid-template-columns: minmax(0, 1.5fr) 290px;
@@ -310,7 +317,6 @@
     <footer id="footer"></footer>
 
     <script>
-      /* ── Helpers ──────────────────────────────── */
       function escH(v) {
         return String(v == null ? "" : v)
           .replace(/&/g,"&amp;").replace(/</g,"&lt;")
@@ -322,19 +328,15 @@
         return s || (fb || "");
       }
 
-      /* ── Find user ────────────────────────────── */
       function findUser(id) {
-        /* First check logged-in user */
         var me = getCurrentUser();
         if (me && (String(me.id) === String(id) || !id)) return me;
-        /* Then search users list */
         var users = lsGet(GL.STORAGE_KEY_USERS, []);
         return users.find(function (u) {
           return String(u.id) === String(id);
         }) || null;
       }
 
-      /* ── Get gigs posted by user ──────────────── */
       function getGigsForUser(user) {
         var all = getAllGigs() || [];
         return all.filter(function (g) {
@@ -343,7 +345,6 @@
         });
       }
 
-      /* ── Completion tips ──────────────────────── */
       function completionTips(user) {
         var fields = [
           { key: "name",     label: "Name"     },
@@ -357,12 +358,10 @@
         return fields.map(function (f) {
           var filled = user[f.key] && String(user[f.key]).trim().length > 0;
           return '<span class="completion-tip ' + (filled ? "done" : "missing") + '">' +
-            (filled ? "✅" : "❌") + " " + escH(f.label) +
-            "</span>";
+            (filled ? "✅" : "❌") + " " + escH(f.label) + "</span>";
         }).join("");
       }
 
-      /* ── Render full profile ──────────────────── */
       function renderProfile(user, isOwn) {
         document.title = safeS(user.name, "User") + " — GigLega Profile";
 
@@ -377,13 +376,11 @@
         var roleLabel = role === "client" ? "🏢 Client" : "💼 Worker";
         var roleClass = role === "client" ? "badge-teal" : "badge";
 
-        /* Gigs posted */
         var postedGigs = getGigsForUser(user);
         var activeGigs = postedGigs.filter(function (g) {
           return safeS(g.status, "active") === "active";
         });
 
-        /* Applications (only show count on own profile) */
         var appCount = 0;
         if (isOwn) {
           var me = getCurrentUser();
@@ -396,7 +393,6 @@
           }
         }
 
-        /* Skills tags */
         var skillsHtml = "";
         if (skills) {
           skillsHtml = skills.split(",").map(function (s) {
@@ -405,7 +401,6 @@
           }).join("");
         }
 
-        /* Posted gigs list */
         var gigsHtml = "";
         if (postedGigs.length) {
           gigsHtml = postedGigs.slice(0, 6).map(function (g) {
@@ -428,13 +423,13 @@
           }).join("");
         } else {
           gigsHtml = '<p style="color:var(--text-muted);font-size:.9rem;margin:0;">' +
-            (isOwn ? 'Abhi tak koi gig post nahi ki. <a href="post-gig.html" style="color:var(--teal);font-weight:700;">Post karo →</a>' : "Koi active gig nahi hai.") +
+            (isOwn
+              ? 'Abhi tak koi gig post nahi ki. <a href="post-gig.html" style="color:var(--teal);font-weight:700;">Post karo →</a>'
+              : "Koi active gig nahi hai.") +
             '</p>';
         }
 
-        /* ── Main column HTML ── */
         var mainHtml =
-          /* Hero card */
           '<div class="hero-card card fade-up">' +
             '<div class="profile-avatar" id="profileAvatar">' + escH(getInitials(name)) + '</div>' +
             '<div class="profile-info">' +
@@ -463,7 +458,6 @@
             '</div>' +
           '</div>' +
 
-          /* Stats */
           '<div class="stats-row fade-up">' +
             '<div class="stat-mini">' +
               '<div class="stat-mini-val">' + postedGigs.length + '</div>' +
@@ -479,7 +473,6 @@
             '</div>' +
           '</div>' +
 
-          /* Posted gigs section */
           '<div class="section-card fade-up">' +
             '<h3>📌 Posted Gigs</h3>' +
             gigsHtml +
@@ -488,9 +481,7 @@
               : '') +
           '</div>';
 
-        /* ── Sidebar HTML ── */
         var sideHtml =
-          /* Profile completion — own only */
           (isOwn
             ? '<div class="completion-card card fade-up">' +
                 '<div class="completion-header">' +
@@ -505,7 +496,6 @@
               '</div>'
             : '') +
 
-          /* Skills */
           (skillsHtml
             ? '<div class="skills-card card fade-up">' +
                 '<h4>🛠️ Skills</h4>' +
@@ -513,7 +503,6 @@
               '</div>'
             : '') +
 
-          /* Info card */
           '<div class="skills-card card fade-up">' +
             '<h4>ℹ️ About</h4>' +
             '<div style="display:grid;gap:9px;font-size:.88rem;color:var(--text-muted);">' +
@@ -524,7 +513,6 @@
             '</div>' +
           '</div>' +
 
-          /* Trust card */
           '<div class="skills-card card fade-up">' +
             '<h4>🛡️ GigLega Trust</h4>' +
             '<div style="display:grid;gap:7px;font-size:.86rem;color:var(--text-muted);">' +
@@ -534,14 +522,12 @@
             '</div>' +
           '</div>';
 
-        /* ── Compose page ── */
         document.getElementById("profileContent").innerHTML =
           '<div class="profile-grid">' +
             '<div style="display:grid;gap:20px;">' + mainHtml + '</div>' +
             '<aside style="display:grid;gap:16px;align-content:start;">' + sideHtml + '</aside>' +
           '</div>';
 
-        /* Wire action buttons */
         document.getElementById("waContactProfileBtn")?.addEventListener("click", function () {
           if (!isLoggedIn()) {
             showToast("Contact ke liye login karo pehle 🔒", "info");
@@ -566,7 +552,6 @@
         initFadeAnimations();
       }
 
-      /* ── Not found state ──────────────────────── */
       function renderNotFound(id) {
         document.getElementById("profileContent").innerHTML =
           '<div class="not-found">' +
@@ -580,7 +565,6 @@
           '</div>';
       }
 
-      /* ── Own profile banner ───────────────────── */
       function showOwnBanner() {
         document.getElementById("ownBanner").innerHTML =
           '<div class="own-banner fade-up">' +
@@ -592,25 +576,21 @@
           '</div>';
       }
 
-      /* ── Boot ─────────────────────────────────── */
       document.addEventListener("DOMContentLoaded", function () {
         var params = new URLSearchParams(window.location.search);
         var userId = params.get("id");
 
-        /* If no ?id= and not logged in — go to signup */
         if (!userId && !isLoggedIn()) {
           requireAuth("profile.html");
           return;
         }
 
-        /* Resolve which user to show */
         var me   = getCurrentUser();
         var user = userId ? findUser(userId) : me;
 
-        /* Breadcrumb */
         buildBreadcrumb("profileBreadcrumb", [
-          { label: "Home",    href: "index.html"  },
-          { label: "Profile"                       }
+          { label: "Home",    href: "index.html" },
+          { label: "Profile"                      }
         ]);
 
         if (!user) {
@@ -622,7 +602,6 @@
 
         if (isOwn) showOwnBanner();
 
-        /* Update page title + meta */
         document.title = safeS(user.name, "User") + " — GigLega Profile";
         document.querySelector('meta[name="description"]')
           ?.setAttribute("content", safeS(user.name,"User") + " ka GigLega profile. " + safeS(user.bio,"").slice(0,80));
