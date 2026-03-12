@@ -1,672 +1,435 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Worker Dashboard — GigLega</title>
-    <meta name="description" content="GigLega worker dashboard — apni applications track karo aur profile update karo." />
-    <link rel="stylesheet" href="styles.css" />
-    <script defer src="shared.js"></script>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Worker Dashboard — GigLega</title>
+  <meta name="description" content="GigLega worker dashboard — apni earnings track karo aur gigs manage karo." />
+  <link rel="stylesheet" href="styles.css" />
+  <script defer src="shared.js"></script>
+  <style>
+    .dash-wrap{max-width:1000px;margin:0 auto;padding:28px 16px 80px}
 
-    <style>
-      .dash-wrap { padding: clamp(24px,4vw,44px) 0 clamp(48px,8vw,80px); }
+    /* ── Top bar ── */
+    .dash-topbar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:24px}
+    .dash-greeting h1{font-size:1.4rem;font-weight:800;color:var(--primary);margin-bottom:2px}
+    .dash-greeting p{font-size:.85rem;color:var(--gray-500)}
+    .btn-switch-role{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border:1.5px solid var(--teal);border-radius:var(--radius-sm);background:transparent;color:var(--teal);font-weight:700;font-size:.83rem;cursor:pointer;transition:all .2s}
+    .btn-switch-role:hover{background:var(--teal);color:#fff}
 
-      .dash-grid {
-        display: grid;
-        gap: 24px;
-      }
+    /* ── Stats row ── */
+    .stats-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px;margin-bottom:24px}
+    .stat-card{background:var(--surface);border:1.5px solid var(--gray-200);border-radius:var(--radius);padding:18px 20px;box-shadow:var(--shadow-sm)}
+    .stat-label{font-size:.75rem;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+    .stat-value{font-size:1.6rem;font-weight:800;color:var(--primary)}
+    .stat-sub{font-size:.75rem;color:var(--gray-400);margin-top:3px}
+    .stat-card.teal .stat-value{color:var(--teal)}
+    .stat-card.amber .stat-value{color:var(--accent)}
 
-      .dash-sidebar {
-        display: grid;
-        gap: 12px;
-        align-content: start;
-      }
+    /* ── Wallet card ── */
+    .wallet-card{background:linear-gradient(135deg,var(--primary) 0%,var(--teal) 100%);border-radius:var(--radius);padding:24px;color:#fff;margin-bottom:24px;box-shadow:0 4px 18px rgba(13,148,136,.3)}
+    .wallet-top{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;margin-bottom:20px}
+    .wallet-label{font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;opacity:.75}
+    .wallet-amount{font-size:2.4rem;font-weight:800;margin-top:4px}
+    .wallet-sub{font-size:.8rem;opacity:.7;margin-top:2px}
+    .btn-withdraw{background:#fff;color:var(--primary);border:none;padding:10px 22px;border-radius:var(--radius-sm);font-weight:800;font-size:.88rem;cursor:pointer;transition:opacity .2s}
+    .btn-withdraw:hover{opacity:.88}
+    .wallet-breakdown{display:flex;gap:24px;flex-wrap:wrap}
+    .wallet-item{display:flex;flex-direction:column;gap:2px}
+    .wallet-item-label{font-size:.72rem;opacity:.7}
+    .wallet-item-value{font-size:1rem;font-weight:700}
 
-      /* 🔴 BUG #2 CARRY-OVER FIX — background:#fff → var(--surface) */
-      .user-card {
-        padding: 22px 18px;
-        border: 1px solid var(--border);
-        border-radius: 22px;
-        background: var(--surface);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 10px;
-        text-align: center;
-      }
+    /* ── Section ── */
+    .section{margin-bottom:28px}
+    .section-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px}
+    .section-title{font-size:1rem;font-weight:700;color:var(--primary)}
+    .section-link{font-size:.82rem;color:var(--teal);font-weight:600;text-decoration:none}
+    .section-link:hover{text-decoration:underline}
 
-      .user-avatar-lg {
-        width: 64px; height: 64px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, var(--teal), #0369a1);
-        color: #fff;
-        font-size: 1.5rem;
-        font-weight: 900;
-        display: flex; align-items: center; justify-content: center;
-        flex-shrink: 0;
-      }
+    /* ── Gig list ── */
+    .gig-list{display:flex;flex-direction:column;gap:12px}
+    .gig-item{background:var(--surface);border:1.5px solid var(--gray-200);border-radius:var(--radius);padding:16px 18px;box-shadow:var(--shadow-sm);display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap}
+    .gig-item-left{flex:1;min-width:200px}
+    .gig-item-title{font-size:.95rem;font-weight:700;color:var(--text);margin-bottom:5px}
+    .gig-item-meta{display:flex;flex-wrap:wrap;gap:8px}
+    .gig-item-chip{font-size:.73rem;color:var(--gray-500);display:flex;align-items:center;gap:3px}
+    .gig-item-right{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+    .gig-earn{font-size:1rem;font-weight:800;color:var(--teal)}
+    .gig-earn-sub{font-size:.72rem;color:var(--gray-400)}
 
-      .user-card h3 { margin: 0; font-size: 1.05rem; }
-      .user-card p  { margin: 0; font-size: 0.85rem; color: var(--text-muted); }
+    /* Status badges */
+    .s-badge{font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:10px}
+    .s-open{background:rgba(16,185,129,.1);color:#059669}
+    .s-taken{background:rgba(245,158,11,.1);color:#b45309}
+    .s-completed{background:rgba(107,114,128,.1);color:#374151}
 
-      .profile-bar-wrap {
-        width: 100%;
-        background: var(--gray-200);
-        border-radius: 99px;
-        height: 8px;
-        overflow: hidden;
-      }
+    /* ── Empty state ── */
+    .empty-box{text-align:center;padding:40px 24px;color:var(--gray-400);background:var(--surface);border:1.5px dashed var(--gray-200);border-radius:var(--radius)}
+    .empty-box .ei{font-size:2.5rem;margin-bottom:10px}
+    .empty-box p{font-size:.88rem;line-height:1.6}
 
-      .profile-bar-fill {
-        height: 100%;
-        border-radius: 99px;
-        background: linear-gradient(90deg, var(--teal), #0ea5e9);
-        transition: width 0.6s ease;
-      }
+    /* ── Withdraw modal ── */
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9000;display:none;align-items:center;justify-content:center;padding:16px}
+    .modal-overlay.show{display:flex}
+    .modal-box{background:var(--surface);border-radius:var(--radius);padding:28px;max-width:420px;width:100%;box-shadow:0 8px 40px rgba(0,0,0,.2)}
+    .modal-title{font-size:1.1rem;font-weight:800;color:var(--primary);margin-bottom:6px}
+    .modal-sub{font-size:.83rem;color:var(--gray-500);margin-bottom:20px;line-height:1.5}
+    .modal-field{margin-bottom:16px}
+    .modal-field label{display:block;font-weight:600;font-size:.85rem;color:var(--gray-700);margin-bottom:6px}
+    .modal-field input{width:100%;padding:11px 14px;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);font-size:.93rem;background:var(--surface);color:var(--text);font-family:inherit;box-sizing:border-box;transition:border .2s}
+    .modal-field input:focus{outline:none;border-color:var(--teal)}
+    .modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
+    .btn-cancel-modal{padding:10px 20px;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);background:transparent;color:var(--gray-600);font-weight:600;font-size:.88rem;cursor:pointer}
+    .btn-confirm-withdraw{padding:10px 24px;background:var(--teal);color:#fff;border:none;border-radius:var(--radius-sm);font-weight:700;font-size:.88rem;cursor:pointer}
+    .withdraw-success{text-align:center;padding:20px 0;display:none}
+    .withdraw-success .ws-icon{font-size:3rem;margin-bottom:10px}
+    .withdraw-success h4{font-size:1rem;font-weight:700;color:var(--success);margin-bottom:6px}
+    .withdraw-success p{font-size:.83rem;color:var(--gray-500)}
 
-      .profile-bar-label {
-        font-size: 0.8rem;
-        color: var(--text-muted);
-        font-weight: 700;
-      }
+    /* Dark mode */
+    [data-theme=dark] .stat-card{border-color:var(--gray-700)}
+    [data-theme=dark] .gig-item{border-color:var(--gray-700)}
+    [data-theme=dark] .empty-box{border-color:var(--gray-700)}
+    [data-theme=dark] .modal-box{background:var(--gray-900)}
+    [data-theme=dark] .modal-field input{border-color:var(--gray-600);background:var(--gray-800)}
+    [data-theme=dark] .btn-cancel-modal{border-color:var(--gray-600);color:var(--gray-300)}
+  </style>
+</head>
+<body>
+  <div id="announce-bar"></div>
+  <nav id="main-nav"></nav>
 
-      /* 🔴 BUG #2 CARRY-OVER FIX — background:#fff → var(--surface) */
-      .sidebar-nav {
-        background: var(--surface);
-        border: 1px solid var(--border);
-        border-radius: 18px;
-        overflow: hidden;
-      }
+  <!-- Withdraw modal -->
+  <div class="modal-overlay" id="withdrawModal">
+    <div class="modal-box">
+      <div id="withdrawForm">
+        <div class="modal-title">💸 Withdraw Earnings</div>
+        <div class="modal-sub">Enter your UPI ID to withdraw your GigLega balance. Simulated — no real transfer.</div>
+        <div class="modal-field">
+          <label>UPI ID</label>
+          <input type="text" id="upiInput" placeholder="yourname@upi" />
+        </div>
+        <div class="modal-field">
+          <label>Amount (₹)</label>
+          <input type="number" id="withdrawAmount" placeholder="Enter amount" min="1" />
+        </div>
+        <div class="modal-actions">
+          <button class="btn-cancel-modal" id="withdrawCancel">Cancel</button>
+          <button class="btn-confirm-withdraw" id="withdrawConfirm">Withdraw ➤</button>
+        </div>
+      </div>
+      <div class="withdraw-success" id="withdrawSuccess">
+        <div class="ws-icon">🎉</div>
+        <h4>Withdrawal Initiated!</h4>
+        <p>₹<span id="withdrawnAmt">0</span> will be credited to your UPI within 24 hours.<br>(Simulated — Firebase integration pending)</p>
+        <button class="btn-confirm-withdraw" style="margin-top:16px" id="withdrawDone">Done</button>
+      </div>
+    </div>
+  </div>
 
-      .sidebar-nav-item {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 13px 18px;
-        font-size: 0.95rem;
-        font-weight: 700;
-        color: var(--text-muted);
-        cursor: pointer;
-        border: none;
-        background: none;
-        width: 100%;
-        text-align: left;
-        border-bottom: 1px solid var(--border);
-        transition: background 0.14s, color 0.14s;
-      }
+  <main class="page-wrapper">
+    <div class="dash-wrap">
 
-      .sidebar-nav-item:last-child { border-bottom: none; }
+      <nav id="breadcrumb" aria-label="breadcrumb"></nav>
 
-      /* 🔴 BUG #2 CARRY-OVER FIX — #f8fafc → var(--surface-soft) */
-      .sidebar-nav-item:hover { background: var(--surface-soft); color: var(--text); }
+      <!-- Top bar -->
+      <div class="dash-topbar">
+        <div class="dash-greeting">
+          <h1 id="greetingText">Welcome back! 👋</h1>
+          <p>Worker Dashboard — Track your gigs and earnings</p>
+        </div>
+        <button class="btn-switch-role" id="btnSwitchRole">
+          🔄 Switch to Poster Mode
+        </button>
+      </div>
 
-      .sidebar-nav-item.active {
-        background: rgba(13,148,136,0.07);
-        color: var(--teal);
-        border-left: 3px solid var(--teal);
-      }
-
-      .sidebar-nav-item .nav-icon { font-size: 1.1rem; flex-shrink: 0; }
-
-      .sidebar-nav-item .nav-badge {
-        margin-left: auto;
-        background: var(--teal);
-        color: #fff;
-        font-size: 0.72rem;
-        font-weight: 800;
-        padding: 2px 7px;
-        border-radius: 99px;
-        min-width: 20px;
-        text-align: center;
-      }
-
-      .dash-main { min-width: 0; }
-
-      .dashboard-panel { display: none; }
-      .dashboard-panel.active { display: block; }
-
-      .panel-header {
-        margin-bottom: 22px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        flex-wrap: wrap;
-        gap: 12px;
-      }
-
-      .panel-header h2 { margin: 0; font-size: 1.35rem; }
-      .panel-header p  { margin: 4px 0 0; color: var(--text-muted); font-size: 0.9rem; }
-
-      .stat-strip {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 12px;
-        margin-bottom: 24px;
-      }
-
-      /* 🔴 BUG #2 CARRY-OVER FIX — background:#fff → var(--surface) */
-      .stat-cell {
-        padding: 18px 16px;
-        border: 1px solid var(--border);
-        border-radius: 18px;
-        background: var(--surface);
-      }
-
-      .stat-cell-label {
-        font-size: 0.78rem;
-        font-weight: 700;
-        color: var(--text-muted);
-        text-transform: uppercase;
-        letter-spacing: 0.04em;
-        margin-bottom: 4px;
-      }
-
-      .stat-cell-value {
-        font-size: 1.8rem;
-        font-weight: 900;
-        letter-spacing: -0.04em;
-        color: var(--teal);
-        line-height: 1;
-      }
-
-      /* 🔴 BUG #2 CARRY-OVER FIX — background:#fff → var(--surface) */
-      .app-card {
-        padding: 18px;
-        border: 1px solid var(--border);
-        border-radius: 18px;
-        background: var(--surface);
-        display: grid;
-        gap: 10px;
-        margin-bottom: 12px;
-        transition: box-shadow 0.16s;
-      }
-
-      .app-card:hover { box-shadow: 0 4px 16px rgba(13,148,136,0.09); }
-
-      .app-card-top {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        gap: 10px;
-        flex-wrap: wrap;
-      }
-
-      .app-card h4 { margin: 0; font-size: 1rem; }
-      .app-card-company { font-size: 0.85rem; color: var(--text-muted); }
-
-      .app-card-meta {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-        font-size: 0.83rem;
-        color: var(--text-muted);
-      }
-
-      .app-status-badge {
-        padding: 3px 10px;
-        border-radius: 99px;
-        font-size: 0.78rem;
-        font-weight: 800;
-        flex-shrink: 0;
-      }
-
-      .app-status-badge.applied     { background: #eff6ff; color: #2563eb; }
-      .app-status-badge.shortlisted { background: #f0fdf4; color: #16a34a; }
-      .app-status-badge.rejected    { background: #fef2f2; color: #dc2626; }
-
-      /* 🔴 BUG #2 CARRY-OVER FIX — background:#fafafa → var(--surface-soft) */
-      .empty-state {
-        padding: 48px 24px;
-        text-align: center;
-        border: 1.5px dashed var(--border);
-        border-radius: 18px;
-        background: var(--surface-soft);
-      }
-
-      .empty-state .empty-icon { font-size: 2.5rem; margin-bottom: 12px; }
-      .empty-state h3 { margin: 0 0 8px; font-size: 1.05rem; }
-      .empty-state p  { margin: 0 0 20px; color: var(--text-muted); font-size: 0.9rem; }
-
-      .profile-form-grid {
-        display: grid;
-        gap: 16px;
-      }
-
-      .form-group { margin-bottom: 0; }
-
-      .form-group label {
-        display: block;
-        font-weight: 700;
-        font-size: 0.9rem;
-        margin-bottom: 6px;
-      }
-
-      /* 🔴 BUG #2 CARRY-OVER FIX — background:#fff → var(--surface) */
-      .form-group input,
-      .form-group select,
-      .form-group textarea {
-        width: 100%;
-        padding: 11px 14px;
-        border: 1.5px solid var(--border);
-        border-radius: 12px;
-        font-size: 0.95rem;
-        font-family: inherit;
-        color: var(--text);
-        background: var(--surface);
-        outline: none;
-        resize: vertical;
-        transition: border-color 0.18s, box-shadow 0.18s;
-      }
-
-      .form-group input:focus,
-      .form-group select:focus,
-      .form-group textarea:focus {
-        border-color: var(--teal);
-        box-shadow: 0 0 0 3px rgba(13,148,136,0.1);
-      }
-
-      @media (min-width: 640px) {
-        .stat-strip { grid-template-columns: repeat(3, 1fr); }
-        .profile-form-grid { grid-template-columns: 1fr 1fr; }
-      }
-
-      @media (min-width: 1024px) {
-        .dash-grid { grid-template-columns: 240px minmax(0,1fr); }
-        .dash-sidebar { position: sticky; top: 100px; align-self: start; }
-      }
-    </style>
-  </head>
-
-  <body>
-    <div id="announce-bar"></div>
-    <div id="navbar"></div>
-
-    <main>
-      <div class="dash-wrap">
-        <div class="container">
-          <div id="dashBreadcrumb" class="fade-up" style="margin-bottom:18px;"></div>
-
-          <div class="dash-grid" id="dashGrid">
-
-            <!-- ══ SIDEBAR ══ -->
-            <aside class="dash-sidebar">
-
-              <div class="user-card card fade-up" id="userCard">
-                <div class="user-avatar-lg" id="userAvatarLg">U</div>
-                <div>
-                  <h3 id="userCardName">Loading...</h3>
-                  <p id="userCardRole">Worker</p>
-                  <p id="userCardLocation" style="margin-top:2px;"></p>
-                </div>
-                <div style="width:100%;">
-                  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
-                    <span class="profile-bar-label">Profile Completion</span>
-                    <span class="profile-bar-label" id="profilePct">0%</span>
-                  </div>
-                  <div class="profile-bar-wrap">
-                    <div class="profile-bar-fill" id="profileBar" style="width:0%"></div>
-                  </div>
-                </div>
-              </div>
-
-              <nav class="sidebar-nav fade-up" aria-label="Dashboard navigation">
-                <button class="sidebar-nav-item" data-panel="overview">
-                  <span class="nav-icon">🏠</span> Overview
-                </button>
-                <button class="sidebar-nav-item" data-panel="applications">
-                  <span class="nav-icon">📋</span> My Applications
-                  <span class="nav-badge" id="appCountBadge">0</span>
-                </button>
-                <button class="sidebar-nav-item" data-panel="profile">
-                  <span class="nav-icon">👤</span> Edit Profile
-                </button>
-                <button class="sidebar-nav-item" data-panel="settings">
-                  <span class="nav-icon">⚙️</span> Settings
-                </button>
-              </nav>
-
-            </aside>
-
-            <!-- ══ MAIN PANELS ══ -->
-            <div class="dash-main">
-
-              <!-- ── Overview panel ── -->
-              <div class="dashboard-panel" id="overview">
-                <div class="panel-header fade-up">
-                  <div>
-                    <h2 id="greetingText">Namaste! 👋</h2>
-                    <p>Yahan dekho apna application status aur naye gigs explore karo.</p>
-                  </div>
-                  <a href="browse.html" class="btn btn-primary btn-sm">🔍 Browse Gigs</a>
-                </div>
-
-                <div class="stat-strip fade-up" id="workerStats"></div>
-
-                <div class="fade-up" style="margin-bottom:22px;">
-                  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-                    <h3 style="margin:0;font-size:1.05rem;">Recent Applications</h3>
-                    <button class="btn btn-outline btn-sm" data-panel-goto="applications">View All</button>
-                  </div>
-                  <div id="recentAppsOverview"></div>
-                </div>
-              </div>
-
-              <!-- ── Applications panel ── -->
-              <div class="dashboard-panel" id="applications">
-                <div class="panel-header fade-up">
-                  <div>
-                    <h2>My Applications</h2>
-                    <p>Tune jinpe apply kiya hai — saari yahan hain.</p>
-                  </div>
-                  <a href="browse.html" class="btn btn-primary btn-sm">+ Apply More</a>
-                </div>
-                <div id="allApplicationsList" class="fade-up"></div>
-              </div>
-
-              <!-- ── Profile panel ── -->
-              <div class="dashboard-panel" id="profile">
-                <div class="panel-header fade-up">
-                  <div>
-                    <h2>Edit Profile</h2>
-                    <p>Profile jitni complete hogi — utni zyada chances milenge.</p>
-                  </div>
-                </div>
-                <div class="card fade-up" style="padding:clamp(20px,3vw,32px);">
-                  <form id="profileForm" novalidate>
-                    <div class="profile-form-grid">
-                      <div class="form-group">
-                        <label for="pfName">Full Name *</label>
-                        <input type="text" id="pfName" maxlength="80" />
-                      </div>
-                      <div class="form-group">
-                        <label for="pfEmail">Email *</label>
-                        <!-- 🔴 BUG #2 CARRY-OVER FIX — hardcoded bg → opacity -->
-                        <input type="email" id="pfEmail" maxlength="100" readonly
-                          style="opacity:0.6;cursor:not-allowed;" />
-                      </div>
-                      <div class="form-group">
-                        <label for="pfPhone">Phone *</label>
-                        <input type="tel" id="pfPhone" data-phone maxlength="15" />
-                      </div>
-                      <div class="form-group">
-                        <label for="pfLocation">Location</label>
-                        <input type="text" id="pfLocation" placeholder="e.g. Sector 29, Gurugram" maxlength="80" />
-                      </div>
-                      <div class="form-group" style="grid-column:1/-1;">
-                        <label for="pfBio">Bio / About</label>
-                        <textarea id="pfBio" rows="3" placeholder="Apne baare mein kuch batao — skills, experience, availability..." maxlength="300"></textarea>
-                      </div>
-                      <div class="form-group" style="grid-column:1/-1;">
-                        <label for="pfSkills">Skills <span style="font-weight:400;color:var(--text-muted);">(comma separated)</span></label>
-                        <input type="text" id="pfSkills" placeholder="e.g. Delivery, Driving, Teaching" maxlength="200" />
-                      </div>
-                    </div>
-                    <div style="margin-top:20px;display:flex;gap:10px;flex-wrap:wrap;">
-                      <button type="submit" class="btn btn-primary" id="saveProfileBtn">Save Profile</button>
-                      <button type="button" class="btn btn-outline" id="cancelProfileBtn">Cancel</button>
-                    </div>
-                  </form>
-                </div>
-              </div>
-
-              <!-- ── Settings panel ── -->
-              <div class="dashboard-panel" id="settings">
-                <div class="panel-header fade-up">
-                  <h2>Settings</h2>
-                </div>
-                <div class="card fade-up" style="padding:clamp(20px,3vw,32px);display:grid;gap:16px;">
-                  <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border);">
-                    <div>
-                      <strong style="display:block;">Dark Mode</strong>
-                      <span style="font-size:0.85rem;color:var(--text-muted);">Theme toggle karo</span>
-                    </div>
-                    <button class="btn btn-outline btn-sm" data-theme-toggle>Toggle</button>
-                  </div>
-                  <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border);">
-                    <div>
-                      <strong style="display:block;">Switch to Client</strong>
-                      <span style="font-size:0.85rem;color:var(--text-muted);">Gigs post karna chahte ho?</span>
-                    </div>
-                    <button class="btn btn-outline btn-sm" id="switchToClientBtn">Switch</button>
-                  </div>
-                  <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;">
-                    <div>
-                      <strong style="display:block;color:#ef4444;">Logout</strong>
-                      <span style="font-size:0.85rem;color:var(--text-muted);">Is device se log out karo</span>
-                    </div>
-                    <!-- 🔴 BUG #11 CARRY-OVER FIX — safeLogout instead of logout() -->
-                    <button class="btn btn-outline btn-sm" style="color:#ef4444;border-color:#ef4444;" id="dashLogoutBtn">Logout</button>
-                  </div>
-                </div>
-              </div>
-
-            </div>
+      <!-- Wallet card -->
+      <div class="wallet-card">
+        <div class="wallet-top">
+          <div>
+            <div class="wallet-label">💰 GigLega Wallet Balance</div>
+            <div class="wallet-amount">₹<span id="walletBalance">0</span></div>
+            <div class="wallet-sub">Withdrawable anytime via UPI</div>
+          </div>
+          <button class="btn-withdraw" id="btnWithdraw">Withdraw via UPI 💸</button>
+        </div>
+        <div class="wallet-breakdown">
+          <div class="wallet-item">
+            <span class="wallet-item-label">Total Earned</span>
+            <span class="wallet-item-value">₹<span id="totalEarned">0</span></span>
+          </div>
+          <div class="wallet-item">
+            <span class="wallet-item-label">Gigs Completed</span>
+            <span class="wallet-item-value" id="gigsCompleted">0</span>
+          </div>
+          <div class="wallet-item">
+            <span class="wallet-item-label">Avg per Gig</span>
+            <span class="wallet-item-value">₹<span id="avgEarn">0</span></span>
+          </div>
+          <div class="wallet-item">
+            <span class="wallet-item-label">Support Fees Paid</span>
+            <span class="wallet-item-value">₹<span id="feePaid">0</span></span>
           </div>
         </div>
       </div>
-    </main>
 
-    <footer id="footer"></footer>
+      <!-- Stats row -->
+      <div class="stats-row">
+        <div class="stat-card teal">
+          <div class="stat-label">Active Gigs</div>
+          <div class="stat-value" id="statActive">0</div>
+          <div class="stat-sub">Currently in progress</div>
+        </div>
+        <div class="stat-card amber">
+          <div class="stat-label">Completed</div>
+          <div class="stat-value" id="statCompleted">0</div>
+          <div class="stat-sub">All time</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Pending Payment</div>
+          <div class="stat-value" id="statPending">₹0</div>
+          <div class="stat-sub">From active gigs</div>
+        </div>
+      </div>
 
-    <script>
-      function escH(v) {
-        return String(v == null ? "" : v)
-          .replace(/&/g,"&amp;").replace(/</g,"&lt;")
-          .replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+      <!-- Active gigs -->
+      <div class="section">
+        <div class="section-head">
+          <div class="section-title">⚡ Active Gigs</div>
+          <a href="browse.html" class="section-link">Browse More →</a>
+        </div>
+        <div id="activeGigsList"></div>
+      </div>
+
+      <!-- Completed gigs -->
+      <div class="section">
+        <div class="section-head">
+          <div class="section-title">✅ Completed Gigs</div>
+        </div>
+        <div id="completedGigsList"></div>
+      </div>
+
+    </div>
+  </main>
+
+  <footer id="main-footer"></footer>
+  <div id="toast-container"></div>
+
+  <script>
+  (function () {
+
+    var FEE_RATE = 0.06;
+    var GIG_KEY  = (typeof GL !== "undefined" && GL.STORAGE_KEY_GIGS) ? GL.STORAGE_KEY_GIGS : "gl_gigs";
+    var USER_KEY = (typeof GL !== "undefined" && GL.STORAGE_KEY_USER)  ? GL.STORAGE_KEY_USER  : "gl_user";
+
+    /* ── Auth guard ── */
+    var user = typeof getCurrentUser === "function" ? getCurrentUser() : null;
+    if (!user) {
+      window.location.href = "login.html?redirect=dashboard-worker.html";
+      return;
+    }
+
+    /* ── Breadcrumb ── */
+    if (typeof buildBreadcrumb === "function") {
+      buildBreadcrumb("breadcrumb", [
+        { label: "Home", href: "index.html" },
+        { label: "Dashboard" }
+      ]);
+    }
+
+    /* ── Greeting ── */
+    var hour = new Date().getHours();
+    var greet = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
+    document.getElementById("greetingText").textContent = greet + ", " + (user.name || "Worker") + "! 👋";
+
+    /* ── Role switch ── */
+    document.getElementById("btnSwitchRole").addEventListener("click", function () {
+      window.location.href = "dashboard-client.html";
+    });
+
+    /* ── Data helpers ── */
+    function getGigs() { return JSON.parse(localStorage.getItem(GIG_KEY) || "[]"); }
+
+    function getMyGigs() {
+      var all = getGigs();
+      return all.filter(function (g) {
+        return g.takenBy === user.id || g.takenBy === user.name;
+      });
+    }
+
+    /* ── Time ago ── */
+    function timeAgo(iso) {
+      var d = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
+      if (d < 60)    return d + "s ago";
+      if (d < 3600)  return Math.floor(d / 60) + "m ago";
+      if (d < 86400) return Math.floor(d / 3600) + "h ago";
+      return Math.floor(d / 86400) + "d ago";
+    }
+
+    function escHtml(s) {
+      return String(s || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+    }
+
+    /* ═══════════════════════════════════════
+       RENDER
+    ═══════════════════════════════════════ */
+    function render() {
+      var myGigs   = getMyGigs();
+      var active   = myGigs.filter(function (g) { return g.status === "taken"; });
+      var completed= myGigs.filter(function (g) { return g.status === "completed"; });
+
+      /* Wallet calc */
+      var totalEarned = 0;
+      var feePaid     = 0;
+      completed.forEach(function (g) {
+        var fee  = Math.round(g.pricePerHr * FEE_RATE);
+        var net  = g.pricePerHr - fee;
+        totalEarned += net;
+        feePaid     += fee;
+      });
+      var pendingAmt = 0;
+      active.forEach(function (g) {
+        var fee = Math.round(g.pricePerHr * FEE_RATE);
+        pendingAmt += g.pricePerHr - fee;
+      });
+      var avg = completed.length ? Math.round(totalEarned / completed.length) : 0;
+
+      /* Update wallet UI */
+      document.getElementById("walletBalance").textContent  = totalEarned;
+      document.getElementById("totalEarned").textContent    = totalEarned;
+      document.getElementById("gigsCompleted").textContent  = completed.length;
+      document.getElementById("avgEarn").textContent        = avg;
+      document.getElementById("feePaid").textContent        = feePaid;
+      document.getElementById("statActive").textContent     = active.length;
+      document.getElementById("statCompleted").textContent  = completed.length;
+      document.getElementById("statPending").textContent    = "₹" + pendingAmt;
+
+      /* Render active */
+      var activeEl = document.getElementById("activeGigsList");
+      if (active.length === 0) {
+        activeEl.innerHTML = emptyHtml("No active gigs right now.", "Browse open gigs and accept one to start earning!", "browse.html", "Browse Gigs");
+      } else {
+        activeEl.className = "gig-list";
+        activeEl.innerHTML = active.map(function (g) { return gigItemHtml(g, "taken"); }).join("");
+        bindGigActions(activeEl);
       }
 
-      function safeS(v, fb) {
-        var s = String(v == null ? "" : v).trim();
-        return s || (fb || "");
+      /* Render completed */
+      var compEl = document.getElementById("completedGigsList");
+      if (completed.length === 0) {
+        compEl.innerHTML = emptyHtml("No completed gigs yet.", "Complete your first gig to see earnings here.");
+      } else {
+        compEl.className = "gig-list";
+        compEl.innerHTML = completed.map(function (g) { return gigItemHtml(g, "completed"); }).join("");
       }
+    }
 
-      function appStatusBadge(status) {
-        var map = {
-          applied:     { cls: "applied",     label: "Applied" },
-          shortlisted: { cls: "shortlisted", label: "Shortlisted ✅" },
-          rejected:    { cls: "rejected",    label: "Rejected" }
-        };
-        var s = map[status] || map.applied;
-        return '<span class="app-status-badge ' + s.cls + '">' + s.label + '</span>';
-      }
+    /* ── Gig item HTML ── */
+    function gigItemHtml(g, status) {
+      var fee  = Math.round(g.pricePerHr * FEE_RATE);
+      var earn = g.pricePerHr - fee;
+      var badgeCls = status === "taken" ? "s-taken" : "s-completed";
+      var badgeTxt = status === "taken" ? "⚡ In Progress" : "✅ Completed";
+      var payIcon  = g.payType === "cash" ? "💵" : g.payType === "wallet" ? "🔒" : "✅";
 
-      function renderAppCard(app, compact) {
-        var title   = safeS(app.gigTitle,  "Gig");
-        var company = safeS(app.company,   "Client");
-        var loc     = safeS(app.location,  "Gurugram");
-        var budget  = typeof app.budget === "number"
-          ? formatCurrency(app.budget) : safeS(app.budget, "—");
-        var time    = app.appliedAt ? formatRelativeTime(app.appliedAt) : "—";
+      return '<div class="gig-item">' +
+        '<div class="gig-item-left">' +
+          '<div class="gig-item-title">' + escHtml(g.title) + '</div>' +
+          '<div class="gig-item-meta">' +
+            (g.location ? '<span class="gig-item-chip">📍 ' + escHtml(g.location) + '</span>' : '') +
+            '<span class="gig-item-chip">🕒 ' + timeAgo(g.postedAt) + '</span>' +
+            '<span class="gig-item-chip">' + payIcon + ' ' + payLabel(g.payType) + '</span>' +
+            '<span class="gig-item-chip">👤 ' + escHtml(g.posterName || "Poster") + '</span>' +
+          '</div>' +
+        '</div>' +
+        '<div class="gig-item-right">' +
+          '<span class="s-badge ' + badgeCls + '">' + badgeTxt + '</span>' +
+          '<div class="gig-earn">₹' + earn + '</div>' +
+          '<div class="gig-earn-sub">after 6% fee</div>' +
+          (status === "taken"
+            ? '<a href="chat.html?gigId=' + g.id + '" class="btn btn-sm btn-primary" style="margin-top:4px">💬 Open Chat</a>'
+            : '<span style="font-size:.72rem;color:var(--gray-400)">Credited to wallet</span>'
+          ) +
+        '</div>' +
+      '</div>';
+    }
 
-        return '<div class="app-card">' +
-          '<div class="app-card-top">' +
-            '<div>' +
-              '<h4>' + escH(title) + '</h4>' +
-              '<div class="app-card-company">' + escH(company) + '</div>' +
-            '</div>' +
-            appStatusBadge(app.status || "applied") +
-          '</div>' +
-          '<div class="app-card-meta">' +
-            '<span>📍 ' + escH(loc) + '</span>' +
-            '<span>💸 ' + escH(String(budget)) + '</span>' +
-            '<span>🕒 ' + escH(time) + '</span>' +
-          '</div>' +
-          (!compact && app.message
-            ? '<p style="margin:0;font-size:0.87rem;color:var(--text-muted);font-style:italic;">"' + escH(truncateText(app.message, 100)) + '"</p>'
-            : '') +
-          '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
-            (app.gigId
-              ? '<a href="gig-detail.html?id=' + encodeURIComponent(app.gigId) + '" class="btn btn-outline btn-sm">View Gig</a>'
-              : '') +
-          '</div>' +
+    function payLabel(t) {
+      if (t === "cash")   return "Cash";
+      if (t === "wallet") return "Secure Wallet";
+      return "Pay After";
+    }
+
+    function emptyHtml(title, sub, linkHref, linkLabel) {
+      return '<div class="empty-box">' +
+        '<div class="ei">📭</div>' +
+        '<p><strong>' + title + '</strong><br>' + sub + '</p>' +
+        (linkHref ? '<a href="' + linkHref + '" class="btn btn-primary" style="margin-top:14px;display:inline-block">' + linkLabel + '</a>' : '') +
         '</div>';
+    }
+
+    function bindGigActions(container) {
+      /* future: bind any action buttons */
+    }
+
+    /* ═══════════════════════════════════════
+       WITHDRAW MODAL
+    ═══════════════════════════════════════ */
+    var modal         = document.getElementById("withdrawModal");
+    var withdrawForm  = document.getElementById("withdrawForm");
+    var withdrawSucc  = document.getElementById("withdrawSuccess");
+
+    document.getElementById("btnWithdraw").addEventListener("click", function () {
+      withdrawForm.style.display  = "block";
+      withdrawSucc.style.display  = "none";
+      document.getElementById("upiInput").value       = "";
+      document.getElementById("withdrawAmount").value = "";
+      modal.classList.add("show");
+    });
+
+    document.getElementById("withdrawCancel").addEventListener("click", function () {
+      modal.classList.remove("show");
+    });
+
+    modal.addEventListener("click", function (e) {
+      if (e.target === modal) modal.classList.remove("show");
+    });
+
+    document.getElementById("withdrawConfirm").addEventListener("click", function () {
+      var upi    = document.getElementById("upiInput").value.trim();
+      var amount = parseInt(document.getElementById("withdrawAmount").value, 10);
+      var bal    = parseInt(document.getElementById("walletBalance").textContent, 10) || 0;
+
+      if (!upi || !upi.includes("@")) {
+        if (typeof showToast === "function") showToast("Please enter a valid UPI ID.", "error");
+        return;
+      }
+      if (!amount || amount < 1) {
+        if (typeof showToast === "function") showToast("Please enter a valid amount.", "error");
+        return;
+      }
+      if (amount > bal) {
+        if (typeof showToast === "function") showToast("Amount exceeds your wallet balance.", "error");
+        return;
       }
 
-      function renderEmptyState(icon, title, text, btnHtml) {
-        return '<div class="empty-state">' +
-          '<div class="empty-icon">' + icon + '</div>' +
-          '<h3>' + title + '</h3>' +
-          '<p>' + text + '</p>' +
-          (btnHtml || '') +
-          '</div>';
-      }
+      document.getElementById("withdrawnAmt").textContent = amount;
+      withdrawForm.style.display = "none";
+      withdrawSucc.style.display = "block";
+    });
 
-      function loadDashboard() {
-        var user = getCurrentUser();
-        if (!user) return;
+    document.getElementById("withdrawDone").addEventListener("click", function () {
+      modal.classList.remove("show");
+    });
 
-       document.getElementById("userAvatarLg").textContent = getInitials(user.name);
-renderAvatar(document.getElementById("userAvatarLg"), user); // ← ADD THIS
-        document.getElementById("userCardName").textContent     = safeS(user.name, "User");
-        document.getElementById("userCardRole").textContent     = "👷 Worker · GigLega Member";
-        document.getElementById("userCardLocation").textContent = safeS(user.location, "");
-        document.getElementById("greetingText").textContent     = "Namaste, " + safeS(user.name, "Bhai") + "! 👋";
+    /* ── Storage sync ── */
+    window.addEventListener("storage", function (e) {
+      if (e.key === GIG_KEY) render();
+    });
 
-        var pct = calcProfileCompletion(user);
-        document.getElementById("profilePct").textContent   = pct + "%";
-        document.getElementById("profileBar").style.width   = pct + "%";
+    render();
 
-        var apps = getUserApplications(user.id) || [];
-        document.getElementById("appCountBadge").textContent = apps.length;
-
-        var pending     = apps.filter(function (a) { return (a.status || "applied") === "applied"; }).length;
-        var shortlisted = apps.filter(function (a) { return a.status === "shortlisted"; }).length;
-
-        document.getElementById("workerStats").innerHTML =
-          statCell("Total Applied", apps.length,   "💼") +
-          statCell("Pending",       pending,        "⏳") +
-          statCell("Shortlisted",   shortlisted,    "✅");
-
-        /* Recent apps — overview */
-        var recentEl = document.getElementById("recentAppsOverview");
-        if (!apps.length) {
-          recentEl.innerHTML = renderEmptyState(
-            "📭", "Abhi tak koi application nahi",
-            "Browse karo aur apna pehla gig apply karo!",
-            '<a href="browse.html" class="btn btn-primary">Browse Gigs</a>'
-          );
-        } else {
-          recentEl.innerHTML = apps.slice(0, 3).map(function (a) {
-            return renderAppCard(a, true);
-          }).join("");
-        }
-
-        /* All applications */
-        var allEl = document.getElementById("allApplicationsList");
-        if (!apps.length) {
-          allEl.innerHTML = renderEmptyState(
-            "📋", "Koi application nahi mili",
-            "Gigs browse karo aur apply karo — bilkul free!",
-            '<a href="browse.html" class="btn btn-primary">Browse Gigs</a>'
-          );
-        } else {
-          allEl.innerHTML = apps.map(function (a) {
-            return renderAppCard(a, false);
-          }).join("");
-        }
-
-        /* Profile form pre-fill */
-        document.getElementById("pfName").value     = safeS(user.name);
-        document.getElementById("pfEmail").value    = safeS(user.email);
-        document.getElementById("pfPhone").value    = safeS(user.phone);
-        document.getElementById("pfLocation").value = safeS(user.location);
-        document.getElementById("pfBio").value      = safeS(user.bio);
-        document.getElementById("pfSkills").value   = safeS(user.skills);
-      }
-
-      function statCell(label, value, icon) {
-        return '<div class="stat-cell">' +
-          '<div class="stat-cell-label">' + icon + ' ' + label + '</div>' +
-          '<div class="stat-cell-value">' + value + '</div>' +
-          '</div>';
-      }
-
-      /* ── Profile save ── */
-      document.getElementById("profileForm").addEventListener("submit", function (e) {
-        e.preventDefault();
-
-        /* 🔴 BUG FIX — double-escaped regex \\d → \d (was broken in script tag) */
-        var result = validateForm({
-          pfName:  { required: true, label: "Name",  minLength: 2 },
-          pfPhone: {
-            required: true, label: "Phone",
-            pattern: /^[6-9]\d{9}$|^\+91\s?[6-9]\d{4}\s?\d{5}$/,
-            patternMsg: "Valid Indian mobile number dalo"
-          }
-        });
-
-        if (!result.valid) return;
-
-        var btn  = document.getElementById("saveProfileBtn");
-        var user = getCurrentUser() || {};
-
-        /* 🔴 BUG FIX — setButtonLoading wrong args: (btn,"Saving...") → (btn, true, "Saving...") */
-        setButtonLoading(btn, true, "Saving...");
-
-        setTimeout(function () {
-          var updated = Object.assign({}, user, {
-            name:     document.getElementById("pfName").value.trim(),
-            phone:    document.getElementById("pfPhone").value.trim(),
-            location: document.getElementById("pfLocation").value.trim(),
-            bio:      document.getElementById("pfBio").value.trim(),
-            skills:   document.getElementById("pfSkills").value.trim()
-          });
-
-          lsSet(GL.STORAGE_KEY_USER, updated);
-
-          var users = lsGet(GL.STORAGE_KEY_USERS, []);
-          var idx = users.findIndex(function (u) { return u.id === updated.id || u.email === updated.email; });
-          if (idx > -1) { users[idx] = updated; lsSet(GL.STORAGE_KEY_USERS, users); }
-
-          /* 🔴 BUG FIX — resetButton(btn) → setButtonLoading(btn, false) */
-          setButtonLoading(btn, false);
-          showToast("Profile save ho gayi! 🎉", "success");
-          loadDashboard();
-        }, 600);
-      });
-
-      document.getElementById("cancelProfileBtn").addEventListener("click", function () {
-        loadDashboard();
-      });
-
-      /* 🔴 BUG #11 CARRY-OVER FIX — safeLogout with confirmation modal */
-      document.getElementById("dashLogoutBtn").addEventListener("click", function () { safeLogout(); });
-
-      document.getElementById("switchToClientBtn").addEventListener("click", function () {
-        var user = getCurrentUser() || {};
-        var updated = Object.assign({}, user, { role: "client" });
-        lsSet(GL.STORAGE_KEY_USER, updated);
-        showToast("Role switch ho gaya! Client dashboard par ja raha hai...", "success");
-        setTimeout(function () { window.location.href = "dashboard-client.html"; }, 900);
-      });
-
-      document.addEventListener("click", function (e) {
-        var btn = e.target.closest("[data-panel-goto]");
-        if (!btn) return;
-        var panelId = btn.getAttribute("data-panel-goto");
-        var navItem = document.querySelector('.sidebar-nav-item[data-panel="' + panelId + '"]');
-        if (navItem) navItem.click();
-      });
-
-      /* ── Boot ── */
-      document.addEventListener("DOMContentLoaded", function () {
-        if (!requireAuth("dashboard-worker.html")) return;
-
-        buildBreadcrumb("dashBreadcrumb", [
-          { label: "Home",     href: "index.html" },
-          { label: "Dashboard" }
-        ]);
-
-        /* Activate first panel (or hash-matched panel) */
-        var hash = location.hash.slice(1);
-        var firstPanel = hash
-          ? document.querySelector('.sidebar-nav-item[data-panel="' + hash + '"]')
-          : document.querySelector(".sidebar-nav-item[data-panel]");
-        if (firstPanel) firstPanel.click();
-
-        loadDashboard();
-        initFadeAnimations();
-      });
-    </script>
-  </body>
+  })();
+  </script>
+</body>
 </html>
