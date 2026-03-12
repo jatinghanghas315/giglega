@@ -1336,22 +1336,44 @@ function saveUserProfile(updatedUser) {
     lsSet(GL.STORAGE_KEY_USERS, users);
   }
 }
+/* =========================================================
+   BUG #7 FIX — Profile Completion
+   ========================================================= */
 
-/* 🟡 BUG #7 FIX — weighted profile completion */
+var PROFILE_FIELDS = [
+  { key: "name",     label: "Full Name",        weight: 1 },
+  { key: "email",    label: "Email",            weight: 1 },
+  { key: "phone",    label: "Phone Number",     weight: 1 },
+  { key: "role",     label: "Role",             weight: 1 },
+  { key: "location", label: "Location / Area",  weight: 1 },
+  { key: "bio",      label: "About / Bio",      weight: 1 },
+  { key: "skills",   label: "Skills",           weight: 1 }
+];
+
 function calcProfileCompletion(user) {
   if (!user) return 0;
-  const fields = [
-    { key: "name",     weight: 20 },
-    { key: "phone",    weight: 20 },
-    { key: "email",    weight: 15 },
-    { key: "location", weight: 15 },
-    { key: "role",     weight: 10 },
-    { key: "bio",      weight: 10 },
-    { key: "skills",   weight: 10 }
-  ];
-  return fields.reduce((total, f) => {
-    return total + (user[f.key] && String(user[f.key]).trim().length > 0 ? f.weight : 0);
-  }, 0);
+  var filled = PROFILE_FIELDS.filter(function (f) {
+    return user[f.key] && String(user[f.key]).trim().length > 0;
+  }).length;
+  return Math.round((filled / PROFILE_FIELDS.length) * 100);
+}
+
+function getMissingProfileFields(user) {
+  if (!user) return PROFILE_FIELDS.map(function (f) { return f.label; });
+  return PROFILE_FIELDS
+    .filter(function (f) {
+      return !user[f.key] || String(user[f.key]).trim().length === 0;
+    })
+    .map(function (f) { return f.label; });
+}
+
+function getFilledProfileFields(user) {
+  if (!user) return [];
+  return PROFILE_FIELDS
+    .filter(function (f) {
+      return user[f.key] && String(user[f.key]).trim().length > 0;
+    })
+    .map(function (f) { return f.label; });
 }
 
 /* 🟡 BUG #7 FIX — show what's missing to reach 100% */
