@@ -1,129 +1,701 @@
 <!DOCTYPE html>
-<html lang="hi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enterprise Solutions - GigLega</title>
-    <link rel="stylesheet" href="./styles.css" />
-        <link rel="icon" type="image/png" href="./logo.png">
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Enterprise & Bulk Hiring — GigLega</title>
+    <meta
+      name="description"
+      content="GigLega Enterprise — bulk hiring, dedicated support aur custom solutions Gurugram ke businesses ke liye."
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <script defer src="shared.js"></script>
+
     <style>
-        .enterprise-container { max-width: 1000px; margin: 40px auto; padding: 20px; }
-        .hero { text-align: center; padding: 60px 20px; background: linear-gradient(135deg, #001F54 0%, #0A4C95 100%); color: white; border-radius: 15px; margin-bottom: 40px; }
-        .hero h1 { font-size: 2.5em; margin-bottom: 20px; }
-        .hero p { font-size: 1.2em; opacity: 0.9; }
-        .feature { background: white; padding: 30px; margin: 20px 0; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .feature h3 { color: #001F54; margin-bottom: 15px; }
-        .cta-button { background: #FF9800; color: white; padding: 15px 40px; border-radius: 25px; text-decoration: none; display: inline-block; margin-top: 20px; font-weight: bold; }
-        .cta-button:hover { background: #F57C00; }
+      /* ── Page ─────────────────────────────────── */
+      .ent-wrap {
+        padding: clamp(28px,5vw,52px) 0 clamp(56px,8vw,88px);
+      }
+
+      /* ── Hero ─────────────────────────────────── */
+      .ent-hero {
+        position: relative;
+        overflow: hidden;
+        padding: clamp(48px,8vw,80px) clamp(20px,5vw,60px);
+        border-radius: 28px;
+        background: linear-gradient(135deg,#0f172a 0%,#0d4b4b 50%,#0f2644 100%);
+        color: #fff;
+        margin-bottom: clamp(36px,5vw,56px);
+        text-align: center;
+      }
+
+      .ent-hero::before {
+        content: "🏢";
+        position: absolute;
+        font-size: 22rem;
+        opacity: 0.04;
+        right: -3rem;
+        top: -3rem;
+        pointer-events: none;
+        line-height: 1;
+      }
+
+      .ent-hero .badge-dark {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 16px;
+        border-radius: 99px;
+        background: rgba(255,255,255,0.1);
+        border: 1px solid rgba(255,255,255,0.2);
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: #a5f3fc;
+        margin-bottom: 20px;
+      }
+
+      .ent-hero h1 {
+        margin: 0 0 16px;
+        font-size: clamp(2rem,5vw,3.2rem);
+        letter-spacing: -0.05em;
+        line-height: 1.1;
+        color: #fff;
+      }
+
+      .ent-hero h1 span {
+        background: linear-gradient(90deg,#2dd4bf,#38bdf8);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .ent-hero p {
+        margin: 0 auto 32px;
+        max-width: 52ch;
+        color: rgba(255,255,255,0.72);
+        font-size: 1.05rem;
+        line-height: 1.7;
+      }
+
+      .ent-hero-btns {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-bottom: 36px;
+      }
+
+      .btn-hero-primary {
+        padding: 14px 28px;
+        background: linear-gradient(135deg,var(--teal),#0369a1);
+        color: #fff;
+        border-radius: 14px;
+        font-weight: 800;
+        font-size: 0.97rem;
+        border: none;
+        text-decoration: none;
+        cursor: pointer;
+        transition: opacity 0.16s, transform 0.16s;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+      }
+
+      .btn-hero-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+
+      .btn-hero-outline {
+        padding: 14px 28px;
+        background: transparent;
+        color: #fff;
+        border-radius: 14px;
+        font-weight: 700;
+        font-size: 0.97rem;
+        border: 1.5px solid rgba(255,255,255,0.3);
+        text-decoration: none;
+        cursor: pointer;
+        transition: background 0.16s, transform 0.16s;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+      }
+
+      .btn-hero-outline:hover {
+        background: rgba(255,255,255,0.08);
+        transform: translateY(-1px);
+      }
+
+      /* ── Hero stats ───────────────────────────── */
+      .hero-stats-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0;
+        justify-content: center;
+        border-top: 1px solid rgba(255,255,255,0.1);
+        padding-top: 28px;
+      }
+
+      .hero-stat-item {
+        padding: 0 28px;
+        text-align: center;
+        border-right: 1px solid rgba(255,255,255,0.1);
+      }
+
+      .hero-stat-item:last-child { border-right: none; }
+
+      .hero-stat-val {
+        font-size: 1.9rem;
+        font-weight: 900;
+        color: #2dd4bf;
+        letter-spacing: -0.04em;
+        line-height: 1;
+        margin-bottom: 4px;
+      }
+
+      .hero-stat-label {
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: rgba(255,255,255,0.5);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      /* ── Section head ─────────────────────────── */
+      .ent-section-head {
+        margin-bottom: clamp(20px,3vw,30px);
+        padding-bottom: 14px;
+        border-bottom: 2px solid var(--border);
+      }
+
+      .ent-section-head h2 {
+        margin: 0 0 6px;
+        font-size: clamp(1.35rem,2.5vw,1.7rem);
+        letter-spacing: -0.03em;
+      }
+
+      .ent-section-head p {
+        margin: 0;
+        color: var(--text-muted);
+        font-size: 0.93rem;
+      }
+
+      /* ── Features grid ────────────────────────── */
+      .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(260px,1fr));
+        gap: 16px;
+        margin-bottom: clamp(36px,5vw,56px);
+      }
+
+      .feature-card {
+        padding: 24px 20px;
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        background: #fff;
+        transition: box-shadow 0.16s, transform 0.16s, border-color 0.16s;
+      }
+
+      .feature-card:hover {
+        box-shadow: 0 6px 24px rgba(13,148,136,0.1);
+        transform: translateY(-3px);
+        border-color: rgba(13,148,136,0.25);
+      }
+
+      .feature-icon {
+        font-size: 2rem;
+        margin-bottom: 12px;
+        display: block;
+      }
+
+      .feature-card h3 {
+        margin: 0 0 8px;
+        font-size: 1rem;
+        font-weight: 800;
+      }
+
+      .feature-card p {
+        margin: 0;
+        font-size: 0.87rem;
+        color: var(--text-muted);
+        line-height: 1.65;
+      }
+
+      /* ── Pricing plans ────────────────────────── */
+      .plans-grid {
+        display: grid;
+        gap: 16px;
+        margin-bottom: clamp(36px,5vw,56px);
+        align-items: start;
+      }
+
+      .plan-card {
+        padding: clamp(24px,3vw,36px);
+        border: 1.5px solid var(--border);
+        border-radius: 24px;
+        background: #fff;
+        position: relative;
+        transition: box-shadow 0.18s, transform 0.18s;
+      }
+
+      .plan-card:hover {
+        box-shadow: 0 8px 32px rgba(13,148,136,0.1);
+        transform: translateY(-3px);
+      }
+
+      .plan-card.popular {
+        border-color: var(--teal);
+        background: linear-gradient(135deg,#f0fdfa 0%,#fff 60%);
+      }
+
+      .popular-badge {
+        position: absolute;
+        top: -14px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: var(--teal);
+        color: #fff;
+        font-size: 0.75rem;
+        font-weight: 800;
+        padding: 4px 16px;
+        border-radius: 99px;
+        white-space: nowrap;
+        letter-spacing: 0.04em;
+      }
+
+      .plan-name {
+        font-size: 0.82rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--text-muted);
+        margin-bottom: 6px;
+      }
+
+      .plan-price {
+        font-size: clamp(2rem,4vw,2.8rem);
+        font-weight: 900;
+        letter-spacing: -0.05em;
+        color: var(--text);
+        line-height: 1;
+        margin-bottom: 4px;
+      }
+
+      .plan-price sup {
+        font-size: 1.2rem;
+        font-weight: 800;
+        vertical-align: super;
+      }
+
+      .plan-price-note {
+        font-size: 0.82rem;
+        color: var(--text-muted);
+        margin-bottom: 18px;
+        font-weight: 600;
+      }
+
+      .plan-divider {
+        border: none;
+        border-top: 1px solid var(--border);
+        margin: 16px 0;
+      }
+
+      .plan-desc {
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        line-height: 1.6;
+        margin-bottom: 18px;
+      }
+
+      .plan-features-list {
+        list-style: none;
+        padding: 0;
+        margin: 0 0 24px;
+        display: grid;
+        gap: 10px;
+      }
+
+      .plan-features-list li {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        font-size: 0.88rem;
+        color: var(--text-muted);
+        line-height: 1.5;
+      }
+
+      .plan-features-list li .chk {
+        color: var(--teal);
+        font-weight: 900;
+        flex-shrink: 0;
+        margin-top: 1px;
+      }
+
+      .plan-features-list li .na {
+        color: #d1d5db;
+        flex-shrink: 0;
+        margin-top: 1px;
+      }
+
+      /* ── How it works ─────────────────────────── */
+      .how-grid {
+        display: grid;
+        gap: 14px;
+        margin-bottom: clamp(36px,5vw,56px);
+      }
+
+      .how-step {
+        display: flex;
+        gap: 18px;
+        align-items: flex-start;
+        padding: 20px 22px;
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        background: #fff;
+        transition: box-shadow 0.16s;
+      }
+
+      .how-step:hover { box-shadow: 0 3px 14px rgba(13,148,136,0.08); }
+
+      .how-step-num {
+        width: 40px; height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(135deg,var(--teal),#0369a1);
+        color: #fff;
+        font-size: 0.9rem;
+        font-weight: 900;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+
+      .how-step-body h4 { margin: 0 0 4px; font-size: 1rem; font-weight: 800; }
+      .how-step-body p  { margin: 0; font-size: 0.88rem; color: var(--text-muted); line-height: 1.6; }
+
+      /* ── Use cases ────────────────────────────── */
+      .use-cases-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px,1fr));
+        gap: 12px;
+        margin-bottom: clamp(36px,5vw,56px);
+      }
+
+      .use-case-card {
+        padding: 20px 16px;
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        background: #fff;
+        text-align: center;
+        transition: box-shadow 0.15s, transform 0.15s;
+      }
+
+      .use-case-card:hover {
+        box-shadow: 0 4px 16px rgba(13,148,136,0.09);
+        transform: translateY(-2px);
+      }
+
+      .use-case-icon  { font-size: 1.8rem; margin-bottom: 8px; }
+      .use-case-title { font-size: 0.93rem; font-weight: 800; margin-bottom: 5px; }
+      .use-case-desc  { font-size: 0.8rem; color: var(--text-muted); line-height: 1.55; }
+
+      /* ── Testimonials ─────────────────────────── */
+      .testimonials-grid {
+        display: grid;
+        gap: 14px;
+        margin-bottom: clamp(36px,5vw,56px);
+      }
+
+      .testi-card {
+        padding: 22px 20px;
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        background: #fff;
+      }
+
+      .testi-text {
+        font-size: 0.95rem;
+        color: var(--text-muted);
+        line-height: 1.75;
+        font-style: italic;
+        margin-bottom: 16px;
+        padding-left: 14px;
+        border-left: 3px solid var(--teal);
+      }
+
+      .testi-author {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .testi-avatar {
+        width: 40px; height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(135deg,var(--teal),#0369a1);
+        color: #fff;
+        font-weight: 900;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+
+      .testi-author-info strong { display: block; font-size: 0.88rem; }
+      .testi-author-info span   { font-size: 0.8rem; color: var(--text-muted); }
+
+      .testi-stars { color: #f59e0b; font-size: 0.85rem; margin-bottom: 2px; }
+
+      /* ── Enquiry form ─────────────────────────── */
+      .enquiry-section {
+        display: grid;
+        gap: 24px;
+        margin-bottom: clamp(36px,5vw,56px);
+        align-items: start;
+      }
+
+      .enquiry-form-card {
+        padding: clamp(24px,4vw,40px);
+        border: 1.5px solid rgba(13,148,136,0.25);
+        border-radius: 26px;
+        background: linear-gradient(135deg,#f0fdfa 0%,#fff 60%);
+      }
+
+      .enquiry-form-card h2 {
+        margin: 0 0 6px;
+        font-size: 1.4rem;
+        letter-spacing: -0.03em;
+      }
+
+      .enquiry-form-card > p {
+        margin: 0 0 22px;
+        color: var(--text-muted);
+        font-size: 0.9rem;
+      }
+
+      .form-group { margin-bottom: 14px; }
+
+      .form-group label {
+        display: block;
+        font-weight: 700;
+        font-size: 0.9rem;
+        margin-bottom: 6px;
+      }
+
+      .form-group input,
+      .form-group select,
+      .form-group textarea {
+        width: 100%;
+        padding: 12px 14px;
+        border: 1.5px solid var(--border);
+        border-radius: 12px;
+        font-size: 0.95rem;
+        font-family: inherit;
+        color: var(--text);
+        background: #fff;
+        outline: none;
+        resize: vertical;
+        transition: border-color 0.18s, box-shadow 0.18s;
+      }
+
+      .form-group input:focus,
+      .form-group select:focus,
+      .form-group textarea:focus {
+        border-color: var(--teal);
+        box-shadow: 0 0 0 3px rgba(13,148,136,0.1);
+      }
+
+      .form-row-2 {
+        display: grid;
+        gap: 12px;
+      }
+
+      /* ── Enquiry sidebar ──────────────────────── */
+      .enquiry-sidebar { display: grid; gap: 16px; align-content: start; }
+
+      .sidebar-card {
+        padding: 20px 18px;
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        background: #fff;
+      }
+
+      .sidebar-card h4 { margin: 0 0 14px; font-size: 0.97rem; font-weight: 800; }
+
+      .sidebar-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 11px;
+        padding: 10px 0;
+        border-bottom: 1px solid var(--border);
+        font-size: 0.87rem;
+      }
+
+      .sidebar-item:last-child { border-bottom: none; padding-bottom: 0; }
+
+      .sidebar-item-icon { font-size: 1.2rem; flex-shrink: 0; margin-top: 1px; }
+
+      .sidebar-item-body strong { display: block; font-weight: 700; margin-bottom: 2px; }
+      .sidebar-item-body span { color: var(--text-muted); line-height: 1.5; }
+
+      .sidebar-item-body a {
+        color: var(--teal);
+        font-weight: 600;
+        text-decoration: none;
+      }
+
+      .sidebar-item-body a:hover { text-decoration: underline; }
+
+      /* ── Success state ────────────────────────── */
+      .enquiry-success {
+        text-align: center;
+        padding: 40px 20px;
+        display: none;
+      }
+
+      .enquiry-success .s-icon { font-size: 3.2rem; margin-bottom: 14px; }
+      .enquiry-success h3 { margin: 0 0 8px; font-size: 1.4rem; }
+      .enquiry-success p  { margin: 0 0 22px; color: var(--text-muted); max-width: 40ch; margin-left: auto; margin-right: auto; line-height: 1.65; }
+
+      /* ── Green / amber boxes ──────────────────── */
+      .green-box {
+        padding: 12px 14px;
+        border-radius: 12px;
+        background: rgba(13,148,136,0.05);
+        border: 1px solid rgba(13,148,136,0.2);
+        font-size: 0.87rem;
+        color: var(--text-muted);
+        line-height: 1.6;
+        margin: 12px 0;
+      }
+
+      .green-box strong { color: var(--teal); }
+
+      /* ── FAQ ──────────────────────────────────── */
+      .ent-faq { margin-bottom: clamp(36px,5vw,56px); }
+
+      .acc-item {
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        background: #fff;
+        overflow: hidden;
+        margin-bottom: 10px;
+      }
+
+      .acc-header {
+        padding: 16px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        cursor: pointer;
+        font-weight: 700;
+        font-size: 0.97rem;
+        transition: background 0.14s;
+        user-select: none;
+      }
+
+      .acc-header:hover { background: #f8fafc; }
+
+      .acc-toggle {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--teal);
+        flex-shrink: 0;
+        transition: transform 0.22s;
+      }
+
+      .acc-item.open .acc-toggle { transform: rotate(45deg); }
+
+      .acc-body {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease, padding 0.2s;
+        padding: 0 20px;
+        color: var(--text-muted);
+        font-size: 0.92rem;
+        line-height: 1.75;
+      }
+
+      .acc-item.open .acc-body { max-height: 400px; padding: 0 20px 16px; }
+      .acc-body p { margin: 0 0 8px; }
+      .acc-body p:last-child { margin: 0; }
+      .acc-body ul { margin: 6px 0; padding-left: 18px; }
+      .acc-body li { margin-bottom: 4px; }
+      .acc-body a  { color: var(--teal); font-weight: 600; text-decoration: none; }
+      .acc-body a:hover { text-decoration: underline; }
+
+      /* ── Responsive ───────────────────────────── */
+      @media (min-width: 640px) {
+        .form-row-2 { grid-template-columns: 1fr 1fr; }
+        .testimonials-grid { grid-template-columns: 1fr 1fr; }
+        .how-grid { grid-template-columns: 1fr 1fr; }
+        .plans-grid { grid-template-columns: repeat(3,1fr); }
+      }
+
+      @media (min-width: 1024px) {
+        .enquiry-section { grid-template-columns: minmax(0,1.5fr) 300px; }
+      }
     </style>
-</head>
-<body>
-    <nav>
-                <a href="./index.html"><img src="./logo.png" alt="GigLega Logo" style="height:45px;border-radius:50%;object-fit:cover;"></a>
-        <span><strong>Gig</strong><strong style="color:#FF9800">Lega</strong><sup style="font-size:0.6em">Beta</sup></span>
-        <a href="/" style="margin-left:auto">Home</a>
-        <a href="/help-center.html">Help</a>
-        <a href="/contact.html">Contact</a>
-    </nav>
-    
-    <div class="enterprise-container">
-        <div class="hero">
-            <h1>GigLega for Enterprises</h1>
-            <p>Scale your business with Gurugram's trusted hyperlocal workforce</p>
-        </div>
-        
-        <div class="feature">
-            <h3>🏢 Bulk Hiring Solutions</h3>
-            <p>Apne business ke liye ek saath multiple gig workers ya freelancers hire karein. Perfect for:</p>
-            <ul>
-                <li>Delivery fleets</li>
-                <li>Event staffing</li>
-                <li>Seasonal workforce</li>
-                <li>Field operations</li>
-            </ul>
-        </div>
-        
-        <div class="feature">
-            <h3>📊 Dedicated Account Manager</h3>
-            <p>Aapke business ko ek dedicated manager milega jo:</p>
-            <ul>
-                <li>Best talent find karne mein help karega</li>
-                <li>Quality assurance provide karega</li>
-                <li>24/7 support dega</li>
-                <li>Custom solutions suggest karega</li>
-            </ul>
-        </div>
-        
-        <div class="feature">
-            <h3>🔒 Priority Verification</h3>
-            <p>Enterprise clients ko priority verified workers milte hain with:</p>
-            <ul>
-                <li>Background checks</li>
-                <li>Skill verification</li>
-                <li>ID proofs validated</li>
-                <li>Work history verified</li>
-            </ul>
-        </div>
-        
-        <div class="feature">
-            <h3>💰 Flexible Billing</h3>
-            <p>Enterprise-friendly payment options:</p>
-            <ul>
-                <li>Monthly invoicing</li>
-                <li>Bulk discounts</li>
-                <li>Credit period options</li>
-                <li>GST compliant billing</li>
-            </ul>
-        </div>
-        
-        <div class="feature">
-            <h3>📊 Analytics Dashboard</h3>
-            <p>Track aur manage karein apni puri team:</p>
-            <ul>
-                <li>Real-time worker availability</li>
-                <li>Performance metrics</li>
-                <li>Cost analysis</li>
-                <li>Delivery tracking</li>
-            </ul>
-        </div>
-        
-        <div class="feature">
-            <h3>⚙️ Custom Integration</h3>
-            <p>GigLega ko apne existing systems ke saath integrate karein:</p>
-            <ul>
-                <li>API access</li>
-                <li>CRM integration</li>
-                <li>Automated workflows</li>
-                <li>White-label options</li>
-            </ul>
-        </div>
-        
-        <div style="text-align: center; padding: 40px 20px; background: #F5F5F5; border-radius: 10px; margin-top: 40px;">
-            <h2 style="color: #001F54; margin-bottom: 20px;">Ready to Scale?</h2>
-            <p style="font-size: 1.1em; margin-bottom: 25px;">Contact our enterprise team today</p>
-            <a href="/contact.html" class="cta-button">Get Started</a>
-            <p style="margin-top: 20px; color: #666;">Or call us: <strong>9319635257</strong></p>
-            <p style="color: #666;">Email: <strong>Giglega.official@gmail.com</strong></p>
-        </div>
-    </div>
-    
-    <footer style="margin-top:60px">
-        <div>
-            <h3>GigLega</h3>
-            <p>Gurugram ka apna hyperlocal gig platform</p>
-        </div>
-        <div>
-            <h4>Legal</h4>
-            <a href="/terms.html">Terms & Conditions</a>
-            <a href="/privacy-policy.html">Privacy Policy</a>
-            <a href="/trust-safety.html">Trust & Safety</a>
-        </div>
-        <div>
-            <h4>Support</h4>
-            <a href="/help-center.html">Help Center</a>
-            <a href="/contact.html">Contact Us</a>
-        </div>
-        <p>&copy; 2026 GigLega Beta. Made with ❤️ for Gurugram.</p>
-    </footer>
-</body>
-</html>
+  </head>
+
+  <body>
+    <div id="announce-bar"></div>
+    <div id="navbar"></div>
+
+    <main>
+      <div class="ent-wrap">
+        <div class="container">
+
+          <div id="entBreadcrumb" class="fade-up" style="margin-bottom:18px;"></div>
+
+          <!-- ══ HERO ══ -->
+          <div class="ent-hero fade-up">
+            <div class="badge-dark">🏢 Enterprise Solutions</div>
+            <h1>Hire <span>10 Se 10,000</span><br />Workers — Fast.</h1>
+            <p>
+              GigLega Enterprise — Gurugram ke businesses ke liye dedicated bulk hiring,
+              priority support aur custom gig solutions. Ek platform, unlimited hiring power.
+            </p>
+            <div class="ent-hero-btns">
+              <a href="#enquiryForm" class="btn-hero-primary">🚀 Free Enquiry Bhejo</a>
+              <a
+                href="https://wa.me/919319635257?text=Hi%20GigLega!%20Enterprise%20bulk%20hiring%20ke%20baare%20mein%20baat%20karni%20hai."
+                target="_blank"
+                rel="noopener"
+                class="btn-hero-outline"
+              >
+                💬 WhatsApp Karo
+              </a>
+            </div>
+            <div class="hero-stats-row">
+              <div class="hero-stat-item">
+                <div class="hero-stat-val">500+</div>
+                <div class="hero-stat-label">Active Workers</div>
+              </div>
+              <div class="hero-stat-item">
+                <div class="hero-stat-val">24hr</div>
+                <div class="hero-stat-label">Fulfillment</div>
+              </div>
+              <div class="hero-stat-item">
+                <div class="hero-stat-val">₹0</div>
+                <div class="hero-stat-label">Platform Fee</div>
+              </div>
+              <div class="hero-stat-item">
+                <div class="hero-stat-val">10+</div>
+                <div class="hero-stat-label">Categories</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ══ FEATURES ══ -->
+          <div class="ent-section-head fade-up">
+            <h2>⚡ Enterprise Features</h2>
+            <p>Sirf aapke business ke liye built — speed, scale aur simplicity.</p>
+          </div>
+
+          <div class="features-grid fade-up">
+
+            <div class="feature-card">
+              <span class="feature-icon">📦</span>
+              <h3>Bulk Gig Posting</h3>
+              <p>Ek saath 50+ positions post karo — ek form, ek click. Har position ke liye a
