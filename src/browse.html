@@ -720,12 +720,13 @@
           '</div>' +
           (desc ? '<p class="gig-desc">' + escHtml(truncateText(desc, 110)) + '</p>' : '') +
           '<div class="gig-actions">' +
-            (userApplied
-              ? '<span class="badge badge-teal" style="padding:10px 16px;">✅ Applied</span>'
-              : '<button class="btn btn-primary apply-btn" data-gig-id="' + escHtml(String(gig.id || "")) + '">Apply Now</button>'
-            ) +
-            '<button class="btn btn-outline share-btn" data-gig-id="' + escHtml(String(gig.id || "")) + '">Share</button>' +
-          '</div>' +
+  (userApplied
+    ? '<span class="badge badge-teal" style="padding:10px 16px;">✅ Applied</span>'
+    : '<button class="btn btn-primary apply-btn" data-gig-id="' + escHtml(String(gig.id || "")) + '">Apply Now</button>'
+  ) +
+  '<a href="gig-detail.html?id=' + encodeURIComponent(String(gig.id || "")) + '" class="btn btn-outline">View Details</a>' +
+  '<button class="btn btn-outline share-btn" data-gig-id="' + escHtml(String(gig.id || "")) + '">Share</button>' +
+'</div>' +
         '</article>';
       }
 
@@ -928,3 +929,4 @@
     </script>
   </body>
 </html>
+
