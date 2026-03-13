@@ -418,8 +418,10 @@ function renderNav() {
       '<a href="dashboard-worker.html" class="gl-mobile-link">⚡ Worker Dashboard</a>' +
       '<a href="dashboard-client.html" class="gl-mobile-link">📋 Poster Dashboard</a>' +
       '<a href="profile.html" class="gl-mobile-link">👤 My Profile</a>' +
-      '<div class="gl-mobile-divider"></div>' +
-      '<button class="gl-mobile-link" id="mobileLogout" style="color:var(--danger)">🚪 Logout</button>';
+'<a href="wallet.html" class="gl-mobile-link">💰 My Wallet</a>' +
+'<a href="notifications.html" class="gl-mobile-link">🔔 Notifications</a>' +
+'<div class="gl-mobile-divider"></div>' +
+'<button class="gl-mobile-link" id="mobileLogout" style="color:var(--danger)">🚪 Logout</button>';
   } else {
     rightHtml =
       '<a href="login.html" class="gl-btn-ghost">Login</a>' +
