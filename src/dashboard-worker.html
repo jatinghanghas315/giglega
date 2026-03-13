@@ -223,11 +223,16 @@
     var USER_KEY = (typeof GL !== "undefined" && GL.STORAGE_KEY_USER)  ? GL.STORAGE_KEY_USER  : "gl_user";
 
     /* ── Auth guard ── */
-    var user = typeof getCurrentUser === "function" ? getCurrentUser() : null;
-    if (!user) {
-      window.location.href = "login.html?redirect=dashboard-worker.html";
-      return;
-    }
+    var user = (function() {
+  try {
+    var u = JSON.parse(localStorage.getItem("gl_user") || "null");
+    return (u && u.id) ? u : null;
+  } catch(e) { return null; }
+})();
+if (!user) {
+  window.location.href = "login.html?redirect=dashboard-worker.html";
+  return;
+}
 
     /* ── Breadcrumb ── */
     if (typeof buildBreadcrumb === "function") {
