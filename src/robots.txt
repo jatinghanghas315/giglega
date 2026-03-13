@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+
+# Block private pages from Google
+Disallow: /dashboard-client.html
+Disallow: /dashboard-worker.html
+Disallow: /wallet.html
+Disallow: /notifications.html
+Disallow: /gig-edit.html
+Disallow: /chat.html
+Disallow: /profile.html
+
+# Sitemap location
+Sitemap: https://giglega.vercel.app/sitemap.xml
