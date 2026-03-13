@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Edit Gig — GigLega</title>
+  <meta name="robots" content="noindex, nofollow" />
+
+  <script src="shared.js"></script>
+  <link rel="stylesheet" href="styles.css" />
+
+  <style>
+    .edit-wrap {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 32px 16px 80px;
+    }
+
+    /* ── Page header ── */
+    .edit-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+    .edit-header-left h1 {
+      font-size: 1.4rem;
+      font-weight: 900;
+      color: var(--primary);
+      margin-bottom: 4px;
+    }
+    .edit-header-left p {
+      font-size: .84rem;
+      color: var(--gray-500);
+    }
+    .btn-back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: .85rem;
+      font-weight: 700;
+      color: var(--gray-500);
+      text-decoration: none;
+      padding: 8px 14px;
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+      transition: all .2s;
+    }
+    .btn-back-link:hover { border-color: var(--teal); color: var(--teal); text-decoration: none; }
+
+    /* ── Status banner ── */
+    .gig-status-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 14px 18px;
+      border-radius: var(--radius-sm);
+      margin-bottom: 24px;
+      border: 1.5px solid;
+    }
+    .gig-status-bar.open   { background: rgba(16,185,129,.06); border-color: rgba(16,185,129,.2); }
+    .gig-status-bar.closed { background: rgba(239,68,68,.06);  border-color: rgba(239,68,68,.2); }
+    .gig-status-bar.filled { background: rgba(245,158,11,.06); border-color: rgba(245,158,11,.2); }
+    .status-left { display: flex; align-items: center; gap: 10px; }
+    .status-dot  { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .status-dot.open   { background: var(--success); animation: pulse 1.5s ease-in-out infinite; }
+    .status-dot.closed { background: var(--danger); }
+    .status-dot.filled { background: var(--accent); }
+    .status-label { font-size: .88rem; font-weight: 700; color: var(--gray-700); }
+    .status-sub   { font-size: .78rem; color: var(--gray-400); margin-top: 2px; }
+    .btn-toggle-status {
+      padding: 7px 16px;
+      border-radius: var(--radius-xs);
+      font-size: .82rem;
+      font-weight: 700;
+      cursor: pointer;
+      border: 1.5px solid;
+      background: transparent;
+      font-family: var(--font);
+      transition: all .2s;
+    }
+    .btn-toggle-status.close-gig { border-color: var(--danger); color: var(--danger); }
+    .btn-toggle-status.close-gig:hover { background: var(--danger); color: #fff; }
+    .btn-toggle-status.reopen-gig { border-color: var(--success); color: var(--success); }
+    .btn-toggle-status.reopen-gig:hover { background: var(--success); color: #fff; }
+
+    /* ── Form card ── */
+    .edit-card {
+      background: var(--surface);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 28px;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 20px;
+    }
+    .edit-card-title {
+      font-size: .95rem;
+      font-weight: 800;
+      color: var(--primary);
+      margin-bottom: 20px;
+      padding-bottom: 14px;
+      border-bottom: 1.5px solid var(--gray-100);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* ── Form fields ── */
+    .field { margin-bottom: 18px; }
+    .field label {
+      display: block;
+      font-size: .84rem;
+      font-weight: 600;
+      color: var(--gray-700);
+      margin-bottom: 6px;
+    }
+    .field label .req { color: var(--danger); margin-left: 2px; }
+    .field input,
+    .field select,
+    .field textarea {
+      width: 100%;
+      padding: 11px 14px;
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+      font-size: .9rem;
+      font-family: var(--font);
+      background: var(--surface);
+      color: var(--text);
+      transition: border .2s, box-shadow .2s;
+      box-sizing: border-box;
+    }
+    .field input:focus,
+    .field select:focus,
+    .field textarea:focus {
+      outline: none;
+      border-color: var(--teal);
+      box-shadow: 0 0 0 3px rgba(13,148,136,.1);
+    }
+    .field textarea { resize: vertical; min-height: 110px; line-height: 1.6; }
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 520px) { .field-row { grid-template-columns: 1fr; } }
+    .field-hint { font-size: .76rem; color: var(--gray-400); margin-top: 5px; line-height: 1.4; }
+    .char-count { font-size: .73rem; color: var(--gray-400); text-align: right; margin-top: 4px; }
+    .char-count.warn { color: var(--accent); }
+    .char-count.over { color: var(--danger); }
+
+    /* ── Pay type toggle ── */
+    .pay-type-wrap { display: flex; gap: 8px; margin-bottom: 12px; }
+    .pay-type-btn {
+      flex: 1;
+      padding: 9px;
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+      font-size: .84rem;
+      font-weight: 700;
+      color: var(--gray-500);
+      background: transparent;
+      cursor: pointer;
+      transition: all .2s;
+      font-family: var(--font);
+      text-align: center;
+    }
+    .pay-type-btn.active { border-color: var(--teal); background: rgba(13,148,136,.08); color: var(--teal); }
+
+    /* ── Tags input ── */
+    .tags-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 10px 12px;
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+      min-height: 48px;
+      cursor: text;
+      transition: border .2s;
+      background: var(--surface);
+    }
+    .tags-wrap:focus-within { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(13,148,136,.1); }
+    .tag-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      background: rgba(13,148,136,.1);
+      color: var(--teal);
+      border-radius: 12px;
+      font-size: .78rem;
+      font-weight: 700;
+    }
+    .tag-remove {
+      background: none;
+      border: none;
+      color: var(--teal);
+      cursor: pointer;
+      font-size: .75rem;
+      padding: 0;
+      line-height: 1;
+      opacity: .7;
+    }
+    .tag-remove:hover { opacity: 1; }
+    .tag-input {
+      border: none !important;
+      outline: none !important;
+      padding: 0 !important;
+      font-size: .85rem;
+      background: transparent !important;
+      color: var(--text);
+      min-width: 100px;
+      flex: 1;
+      box-shadow: none !important;
+    }
+
+    /* ── Urgency selector ── */
+    .urgency-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .urgency-btn {
+      padding: 10px 8px;
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+      font-size: .82rem;
+      font-weight: 700;
+      color: var(--gray-500);
+      background: transparent;
+      cursor: pointer;
+      transition: all .2s;
+      font-family: var(--font);
+      text-align: center;
+    }
+    .urgency-btn.active.low    { border-color: var(--success); background: rgba(16,185,129,.08); color: var(--success); }
+    .urgency-btn.active.medium { border-color: var(--accent);  background: rgba(245,158,11,.08); color: #b45309; }
+    .urgency-btn.active.high   { border-color: var(--danger);  background: rgba(239,68,68,.08);  color: var(--danger); }
+
+    /* ── Danger zone ── */
+    .danger-zone {
+      background: rgba(239,68,68,.04);
+      border: 1.5px solid rgba(239,68,68,.2);
+      border-radius: var(--radius);
+      padding: 22px 24px;
+      margin-bottom: 20px;
+    }
+    .danger-zone-title {
+      font-size: .9rem;
+      font-weight: 800;
+      color: var(--danger);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .danger-zone-desc { font-size: .84rem; color: var(--gray-500); margin-bottom: 14px; line-height: 1.5; }
+    .btn-delete {
+      padding: 9px 20px;
+      background: transparent;
+      color: var(--danger);
+      border: 1.5px solid var(--danger);
+      border-radius: var(--radius-sm);
+      font-size: .85rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: var(--font);
+      transition: all .2s;
+    }
+    .btn-delete:hover { background: var(--danger); color: #fff; }
+
+    /* ── Save bar ── */
+    .save-bar {
+      position: sticky;
+      bottom: 0;
+      background: var(--surface);
+      border-top: 1.5px solid var(--gray-200);
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      z-index: 100;
+      box-shadow: 0 -4px 16px rgba(0,0,0,.07);
+      margin: 0 -16px;
+    }
+    .save-bar-left { font-size: .82rem; color: var(--gray-400); }
+    .save-bar-left.unsaved { color: var(--accent); font-weight: 700; }
+    .save-bar-actions { display: flex; gap: 10px; }
+    .btn-discard {
+      padding: 10px 20px;
+      background: transparent;
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+      font-size: .88rem;
+      font-weight: 700;
+      color: var(--gray-600);
+      cursor: pointer;
+      font-family: var(--font);
+      transition: all .2s;
+    }
+    .btn-discard:hover { border-color: var(--danger); color: var(--danger); }
+    .btn-save {
+      padding: 10px 24px;
+      background: linear-gradient(135deg, var(--primary), var(--teal));
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-size: .88rem;
+      font-weight: 800;
+      cursor: pointer;
+      font-family: var(--font);
+      transition: opacity .2s, transform .15s;
+      box-shadow: 0 3px 10px rgba(13,148,136,.3);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-save:hover { opacity: .88; transform: translateY(-1px); }
+    .btn-save:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+
+    /* ── Not found / unauthorized ── */
+    .not-found-state {
+      text-align: center;
+      padding: 80px 24px;
+    }
+    .not-found-state .icon { font-size: 3.5rem; margin-bottom: 16px; display: block; }
+    .not-found-state h2 { font-size: 1.2rem; font-weight: 800; color: var(--primary); margin-bottom: 8px; }
+    .not-found-state p  { font-size: .88rem; color: var(--gray-500); margin-bottom: 20px; line-height: 1.6; }
+
+    /* Dark mode */
+    [data-theme="dark"] .edit-card      { border-color: var(--gray-700); }
+    [data-theme="dark"] .edit-card-title{ border-color: var(--gray-700); }
+    [data-theme="dark"] .field label    { color: var(--gray-300); }
+    [data-theme="dark"] .field input,
+    [data-theme="dark"] .field select,
+    [data-theme="dark"] .field textarea { background: var(--gray-800); border-color: var(--gray-600); }
+    [data-theme="dark"] .tags-wrap      { background: var(--gray-800); border-color: var(--gray-600); }
+    [data-theme="dark"] .pay-type-btn   { border-color: var(--gray-600); color: var(--gray-400); }
+    [data-theme="dark"] .urgency-btn    { border-color: var(--gray-600); color: var(--gray-400); }
+    [data-theme="dark"] .save-bar       { border-color: var(--gray-700); }
+    [data-theme="dark"] .btn-discard    { border-color: var(--gray-600); color: var(--gray-400); }
+    [data-theme="dark"] .btn-back-link  { border-color: var(--gray-700); color: var(--gray-400); }
+  </style>
+</head>
+<body>
+
+  <div id="announce-bar"></div>
+  <nav id="main-nav"></nav>
+
+  <main>
+    <div class="edit-wrap">
+
+      <!-- Populated by JS -->
+      <div id="editContent"></div>
+
+    </div>
+  </main>
+
+  <footer id="main-footer"></footer>
+  <div id="toast-container"></div>
+
+  <script>
+  (function () {
+
+    /* ── Auth guard ── */
+    var user = (function () {
+      try {
+        var u = JSON.parse(localStorage.getItem("gl_user") || "null");
+        return (u && u.id) ? u : null;
+      } catch(e) { return null; }
+    })();
+
+    if (!user) {
+      window.location.href = "login.html?redirect=gig-edit.html";
+      return;
+    }
+
+    var gigId  = new URLSearchParams(window.location.search).get("id");
+    var gigs   = JSON.parse(localStorage.getItem("gl_gigs") || "[]");
+    var gigIdx = gigs.findIndex(function (g) { return g.id === gigId; });
+    var gig    = gigs[gigIdx];
+    var wrap   = document.getElementById("editContent");
+
+    /* ── Gig not found ── */
+    if (!gig) {
+      wrap.innerHTML =
+        '<div class="not-found-state">' +
+          '<span class="icon">🔍</span>' +
+          '<h2>Gig not found</h2>' +
+          '<p>This gig doesn\'t exist or may have been deleted.</p>' +
+          '<a href="dashboard-client.html" class="btn btn-primary">← Back to Dashboard</a>' +
+        '</div>';
+      return;
+    }
+
+    /* ── Unauthorized ── */
+    if (gig.postedBy !== user.id && gig.posterEmail !== user.email) {
+      wrap.innerHTML =
+        '<div class="not-found-state">' +
+          '<span class="icon">🔒</span>' +
+          '<h2>Access Denied</h2>' +
+          '<p>You can only edit gigs that you posted.</p>' +
+          '<a href="dashboard-client.html" class="btn btn-primary">← Back to Dashboard</a>' +
+        '</div>';
+      return;
+    }
+
+    /* ── State ── */
+    var tags    = (gig.tags || []).slice();
+    var payType = gig.payType || "hourly";
+    var urgency = gig.urgency || "medium";
+    var isDirty = false;
+
+    /* ── Helpers ── */
+    function escH(s) {
+      return String(s || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+    }
+    function statusLabel(s) {
+      return s === "open" ? "Open — Accepting applications" :
+             s === "closed" ? "Closed — Not accepting applications" :
+             "Filled — Worker hired";
+    }
+
+    /* ── Render page ── */
+    var statusClass = gig.status || "open";
+
+    wrap.innerHTML =
+      /* Header */
+      '<div class="edit-header">' +
+        '<div class="edit-header-left">' +
+          '<h1>✏️ Edit Gig</h1>' +
+          '<p>Changes will be visible to workers immediately after saving.</p>' +
+        '</div>' +
+        '<a href="dashboard-client.html" class="btn-back-link">← My Dashboard</a>' +
+      '</div>' +
+
+      /* Status bar */
+      '<div class="gig-status-bar ' + statusClass + '" id="statusBar">' +
+        '<div class="status-left">' +
+          '<div class="status-dot ' + statusClass + '" id="statusDot"></div>' +
+          '<div>' +
+            '<div class="status-label" id="statusLabelTxt">' + statusLabel(statusClass) + '</div>' +
+            '<div class="status-sub">Gig ID: ' + escH(gigId) + '</div>' +
+          '</div>' +
+        '</div>' +
+        (statusClass === "open"
+          ? '<button class="btn-toggle-status close-gig" id="btnToggleStatus">⏸ Close Gig</button>'
+          : '<button class="btn-toggle-status reopen-gig" id="btnToggleStatus">▶ Reopen Gig</button>') +
+      '</div>' +
+
+      /* Basic Info */
+      '<div class="edit-card">' +
+        '<div class="edit-card-title">📋 Basic Information</div>' +
+
+        '<div class="field">' +
+          '<label>Gig Title <span class="req">*</span></label>' +
+          '<input type="text" id="fTitle" maxlength="80" value="' + escH(gig.title) + '" placeholder="e.g. Need a delivery person for 2 hours" />' +
+          '<div class="char-count" id="titleCount">' + (gig.title || "").length + '/80</div>' +
+        '</div>' +
+
+        '<div class="field">' +
+          '<label>Description <span class="req">*</span></label>' +
+          '<textarea id="fDesc" maxlength="1000" placeholder="Describe exactly what needs to be done, any requirements, tools needed...">' + escH(gig.description) + '</textarea>' +
+          '<div class="char-count" id="descCount">' + (gig.description || "").length + '/1000</div>' +
+        '</div>' +
+
+        '<div class="field-row">' +
+          '<div class="field">' +
+            '<label>Category <span class="req">*</span></label>' +
+            '<select id="fCategory">' +
+              ['Delivery','Cleaning','Moving Help','Tech Support','Tutoring','Cooking','Design','Photography','Plumbing','Electrical','Data Entry','Event Help','Security','Gardening','Other'].map(function(c){
+                return '<option value="' + c + '"' + (gig.category === c ? " selected" : "") + '>' + c + '</option>';
+              }).join("") +
+            '</select>' +
+          '</div>' +
+          '<div class="field">' +
+            '<label>Work Type</label>' +
+            '<select id="fWorkType">' +
+              ['On-site','Remote','Both'].map(function(w){
+                return '<option value="' + w + '"' + (gig.workType === w ? " selected" : "") + '>' + w + '</option>';
+              }).join("") +
+            '</select>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+
+      /* Location & Time */
+      '<div class="edit-card">' +
+        '<div class="edit-card-title">📍 Location & Timing</div>' +
+        '<div class="field-row">' +
+          '<div class="field">' +
+            '<label>City / Area <span class="req">*</span></label>' +
+            '<input type="text" id="fCity" value="' + escH(gig.city) + '" placeholder="e.g. Sector 45, Gurugram" />' +
+          '</div>' +
+          '<div class="field">' +
+            '<label>Full Address / Landmark</label>' +
+            '<input type="text" id="fAddress" value="' + escH(gig.address) + '" placeholder="Specific address or landmark" />' +
+          '</div>' +
+        '</div>' +
+        '<div class="field-row">' +
+          '<div class="field">' +
+            '<label>Start Date</label>' +
+            '<input type="date" id="fDate" value="' + escH(gig.date) + '" />' +
+          '</div>' +
+          '<div class="field">' +
+            '<label>Duration / Hours</label>' +
+            '<input type="text" id="fDuration" value="' + escH(gig.duration) + '" placeholder="e.g. 3 hours, 2 days" />' +
+          '</div>' +
+        '</div>' +
+
+        /* Urgency */
+        '<div class="field">' +
+          '<label>Urgency Level</label>' +
+          '<div class="urgency-grid" id="urgencyGrid">' +
+            '<button class="urgency-btn low'   + (urgency==="low"    ? " active" : "") + '" data-urgency="low">🟢 Low — Flexible</button>' +
+            '<button class="urgency-btn medium' + (urgency==="medium" ? " active" : "") + '" data-urgency="medium">🟡 Medium — Soon</button>' +
+            '<button class="urgency-btn high'  + (urgency==="high"   ? " active" : "") + '" data-urgency="high">🔴 High — Urgent</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+
+      /* Pay */
+      '<div class="edit-card">' +
+        '<div class="edit-card-title">💸 Payment Details</div>' +
+        '<div class="field">' +
+          '<label>Pay Type</label>' +
+          '<div class="pay-type-wrap" id="payTypeWrap">' +
+            '<button class="pay-type-btn' + (payType==="hourly" ? " active" : "") + '" data-pay="hourly">⏱ Hourly</button>' +
+            '<button class="pay-type-btn' + (payType==="fixed"  ? " active" : "") + '" data-pay="fixed">💰 Fixed Price</button>' +
+            '<button class="pay-type-btn' + (payType==="daily"  ? " active" : "") + '" data-pay="daily">📅 Daily Rate</button>' +
+          '</div>' +
+        '</div>' +
+        '<div class="field-row">' +
+          '<div class="field">' +
+            '<label>Amount (₹) <span class="req">*</span></label>' +
+            '<input type="number" id="fPay" min="0" value="' + escH(gig.pricePerHr || gig.pay) + '" placeholder="e.g. 300" />' +
+            '<div class="field-hint" id="payHint">Amount per ' + (payType==="fixed" ? "project" : payType==="daily" ? "day" : "hour") + '</div>' +
+          '</div>' +
+          '<div class="field">' +
+            '<label>Payment Method</label>' +
+            '<select id="fPayMethod">' +
+              ['Cash on Completion','UPI / Online','GigLega Secure Wallet','Negotiable'].map(function(m){
+                return '<option value="' + m + '"' + (gig.payMethod === m ? " selected" : "") + '>' + m + '</option>';
+              }).join("") +
+            '</select>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+
+      /* Requirements */
+      '<div class="edit-card">' +
+        '<div class="edit-card-title">✅ Requirements & Tags</div>' +
+        '<div class="field">' +
+          '<label>Worker Requirements</label>' +
+          '<textarea id="fRequirements" maxlength="400" placeholder="Any specific skills, experience, tools, or qualities needed...">' + escH(gig.requirements) + '</textarea>' +
+        '</div>' +
+        '<div class="field">' +
+          '<label>Tags <span style="font-weight:400;color:var(--gray-400)">(press Enter or comma to add)</span></label>' +
+          '<div class="tags-wrap" id="tagsWrap">' +
+            '<input type="text" class="tag-input" id="tagInput" placeholder="Add a tag..." />' +
+          '</div>' +
+          '<div class="field-hint">Add up to 8 tags to help workers find your gig. e.g. "urgent", "flexible hours"</div>' +
+        '</div>' +
+      '</div>' +
+
+      /* Danger zone */
+      '<div class="danger-zone">' +
+        '<div class="danger-zone-title">🗑️ Danger Zone</div>' +
+        '<div class="danger-zone-desc">Permanently delete this gig. This action cannot be undone. All applications will also be removed.</div>' +
+        '<button class="btn-delete" id="btnDelete">Delete This Gig</button>' +
+      '</div>' +
+
+      /* Sticky save bar */
+      '<div class="save-bar">' +
+        '<div class="save-bar-left" id="saveBarMsg">All changes saved</div>' +
+        '<div class="save-bar-actions">' +
+          '<button class="btn-discard" id="btnDiscard">Discard Changes</button>' +
+          '<button class="btn-save" id="btnSave" disabled>💾 Save Changes</button>' +
+        '</div>' +
+      '</div>';
+
+    /* ── Render existing tags ── */
+    function renderTags() {
+      var wrap2  = document.getElementById("tagsWrap");
+      var input  = document.getElementById("tagInput");
+      wrap2.innerHTML = "";
+      tags.forEach(function (t) {
+        var chip = document.createElement("span");
+        chip.className = "tag-chip";
+        chip.innerHTML = escH(t) + '<button class="tag-remove" data-tag="' + escH(t) + '">✕</button>';
+        wrap2.appendChild(chip);
+      });
+      wrap2.appendChild(input);
+      wrap2.querySelectorAll(".tag-remove").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          tags = tags.filter(function (t) { return t !== btn.dataset.tag; });
+          renderTags();
+          markDirty();
+        });
+      });
+    }
+    renderTags();
+
+    /* ── Tag input ── */
+    document.getElementById("tagsWrap").addEventListener("click", function () {
+      document.getElementById("tagInput").focus();
+    });
+    document.getElementById("tagInput").addEventListener("keydown", function (e) {
+      if ((e.key === "Enter" || e.key === ",") && this.value.trim()) {
+        e.preventDefault();
+        var val = this.value.trim().replace(/,/g,"");
+        if (val && tags.length < 8 && !tags.includes(val)) {
+          tags.push(val);
+          renderTags();
+          markDirty();
+        }
+        document.getElementById("tagInput").value = "";
+      }
+    });
+
+    /* ── Pay type ── */
+    document.getElementById("payTypeWrap").addEventListener("click", function (e) {
+      var btn = e.target.closest(".pay-type-btn");
+      if (!btn) return;
+      payType = btn.dataset.pay;
+      document.querySelectorAll(".pay-type-btn").forEach(function (b) { b.classList.remove("active"); });
+      btn.classList.add("active");
+      document.getElementById("payHint").textContent = "Amount per " + (payType==="fixed" ? "project" : payType==="daily" ? "day" : "hour");
+      markDirty();
+    });
+
+    /* ── Urgency ── */
+    document.getElementById("urgencyGrid").addEventListener("click", function (e) {
+      var btn = e.target.closest(".urgency-btn");
+      if (!btn) return;
+      urgency = btn.dataset.urgency;
+      document.querySelectorAll(".urgency-btn").forEach(function (b) { b.classList.remove("active"); });
+      btn.classList.add("active");
+      markDirty();
+    });
+
+    /* ── Char counters ── */
+    function charCount(inputId, countId, max) {
+      var el = document.getElementById(inputId);
+      var cl = document.getElementById(countId);
+      if (!el || !cl) return;
+      el.addEventListener("input", function () {
+        var len = el.value.length;
+        cl.textContent = len + "/" + max;
+        cl.className = "char-count" + (len > max * .9 ? (len >= max ? " over" : " warn") : "");
+        markDirty();
+      });
+    }
+    charCount("fTitle", "titleCount", 80);
+    charCount("fDesc",  "descCount",  1000);
+
+    /* ── Dirty tracking ── */
+    ["fTitle","fDesc","fCategory","fWorkType","fCity","fAddress","fDate","fDuration","fPay","fPayMethod","fRequirements"].forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) el.addEventListener("input", markDirty);
+    });
+
+    function markDirty() {
+      isDirty = true;
+      document.getElementById("saveBarMsg").textContent = "⚠️ Unsaved changes";
+      document.getElementById("saveBarMsg").className = "save-bar-left unsaved";
+      document.getElementById("btnSave").disabled = false;
+    }
+
+    function markClean() {
+      isDirty = false;
+      document.getElementById("saveBarMsg").textContent = "✅ All changes saved";
+      document.getElementById("saveBarMsg").className = "save-bar-left";
+      document.getElementById("btnSave").disabled = true;
+    }
+
+    /* ── Toggle status ── */
+    document.getElementById("btnToggleStatus").addEventListener("click", function () {
+      var current = gig.status || "open";
+      var next    = current === "open" ? "closed" : "open";
+      var label   = next === "open" ? "reopen" : "close";
+      if (!confirm("Are you sure you want to " + label + " this gig?")) return;
+
+      gig.status = next;
+      gigs[gigIdx] = gig;
+      localStorage.setItem("gl_gigs", JSON.stringify(gigs));
+
+      /* Update UI */
+      var bar = document.getElementById("statusBar");
+      bar.className = "gig-status-bar " + next;
+      document.getElementById("statusDot").className = "status-dot " + next;
+      document.getElementById("statusLabelTxt").textContent = statusLabel(next);
+      var toggleBtn = document.getElementById("btnToggleStatus");
+      if (next === "open") {
+        toggleBtn.className = "btn-toggle-status close-gig";
+        toggleBtn.textContent = "⏸ Close Gig";
+      } else {
+        toggleBtn.className = "btn-toggle-status reopen-gig";
+        toggleBtn.textContent = "▶ Reopen Gig";
+      }
+
+      if (typeof showToast === "function") showToast("Gig " + (next === "open" ? "reopened" : "closed") + " successfully.", "success");
+    });
+
+    /* ── Save ── */
+    document.getElementById("btnSave").addEventListener("click", function () {
+      var title = document.getElementById("fTitle").value.trim();
+      var desc  = document.getElementById("fDesc").value.trim();
+      var city  = document.getElementById("fCity").value.trim();
+      var pay   = document.getElementById("fPay").value.trim();
+
+      if (!title || !desc || !city || !pay) {
+        if (typeof showToast === "function") showToast("Please fill all required fields.", "error");
+        return;
+      }
+
+      var btn = this;
+      btn.disabled    = true;
+      btn.textContent = "⏳ Saving...";
+
+      /* Update gig object */
+      gig.title        = title;
+      gig.description  = desc;
+      gig.category     = document.getElementById("fCategory").value;
+      gig.workType     = document.getElementById("fWorkType").value;
+      gig.city         = city;
+      gig.address      = document.getElementById("fAddress").value.trim();
+      gig.date         = document.getElementById("fDate").value;
+      gig.duration     = document.getElementById("fDuration").value.trim();
+      gig.pricePerHr   = pay;
+      gig.payType      = payType;
+      gig.payMethod    = document.getElementById("fPayMethod").value;
+      gig.requirements = document.getElementById("fRequirements").value.trim();
+      gig.tags         = tags;
+      gig.urgency      = urgency;
+      gig.updatedAt    = new Date().toISOString();
+
+      gigs[gigIdx] = gig;
+      localStorage.setItem("gl_gigs", JSON.stringify(gigs));
+
+      setTimeout(function () {
+        btn.innerHTML = "💾 Save Changes";
+        markClean();
+        if (typeof showToast === "function") showToast("Gig updated successfully!", "success");
+      }, 600);
+    });
+
+    /* ── Discard ── */
+    document.getElementById("btnDiscard").addEventListener("click", function () {
+      if (!isDirty) return;
+      if (confirm("Discard all unsaved changes?")) {
+        window.location.reload();
+      }
+    });
+
+    /* ── Delete ── */
+    document.getElementById("btnDelete").addEventListener("click", function () {
+      if (!confirm("Permanently delete this gig? This cannot be undone.")) return;
+      if (!confirm("Are you 100% sure? All applications will also be removed.")) return;
+
+      gigs.splice(gigIdx, 1);
+      localStorage.setItem("gl_gigs", JSON.stringify(gigs));
+
+      if (typeof showToast === "function") showToast("Gig deleted.", "info");
+      setTimeout(function () {
+        window.location.href = "dashboard-client.html";
+      }, 1200);
+    });
+
+    /* ── Warn before leaving with unsaved changes ── */
+    window.addEventListener("beforeunload", function (e) {
+      if (isDirty) {
+        e.preventDefault();
+        e.returnValue = "";
+      }
+    });
+
+  })();
+  </script>
+
+</body>
+</html>
