@@ -389,6 +389,7 @@
     /* ── Redirect param ── */
     function getParam(n) { return new URLSearchParams(window.location.search).get(n); }
     var redirectTo = getParam("redirect") || "index.html";
+    if (redirectTo.indexOf("login") !== -1) redirectTo = "index.html";
 
     /* ── If already logged in, redirect ── */
     var existing = localStorage.getItem(USER_KEY);
@@ -795,3 +796,4 @@
   </script>
 </body>
 </html>
+
