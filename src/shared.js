@@ -1,3 +1,39 @@
+/* ── PWA Meta Tags — auto inject on every page ── */
+(function injectPWAMeta() {
+  var tags = [
+    { rel: "manifest", href: "/manifest.json" },
+    { name: "theme-color", content: "#1a3c5e" },
+    { name: "mobile-web-app-capable", content: "yes" },
+    { name: "apple-mobile-web-app-capable", content: "yes" },
+    { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
+    { name: "apple-mobile-web-app-title", content: "GigLega" }
+  ];
+
+  tags.forEach(function (t) {
+    /* Skip if already exists */
+    if (t.rel) {
+      if (document.querySelector('link[rel="' + t.rel + '"]')) return;
+      var link = document.createElement("link");
+      link.rel  = t.rel;
+      link.href = t.href;
+      document.head.appendChild(link);
+    } else {
+      if (document.querySelector('meta[name="' + t.name + '"]')) return;
+      var meta = document.createElement("meta");
+      meta.name    = t.name;
+      meta.content = t.content;
+      document.head.appendChild(meta);
+    }
+  });
+
+  /* Apple touch icon */
+  if (!document.querySelector('link[rel="apple-touch-icon"]')) {
+    var icon = document.createElement("link");
+    icon.rel  = "apple-touch-icon";
+    icon.href = "/assets/icons/icon-192.png";
+    document.head.appendChild(icon);
+  }
+})();
 /* ============================================================
    shared.js — GigLega Master Script
    Load in <head> WITHOUT defer or async:
