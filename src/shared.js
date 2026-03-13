@@ -406,6 +406,7 @@ function renderNav() {
           '<a href="browse.html" class="gl-dd-item" role="menuitem">🔍 Browse Gigs</a>' +
           '<a href="post-gig.html" class="gl-dd-item" role="menuitem">➕ Post a Gig</a>' +
           '<div class="gl-dd-divider"></div>' +
+          '<a href="wallet.html" class="gl-dd-item" role="menuitem">💰 My Wallet</a>' +
           '<a href="help-center.html" class="gl-dd-item" role="menuitem">❓ Help Center</a>' +
           '<button class="gl-dd-item danger" id="ddLogout" role="menuitem">🚪 Logout</button>' +
         '</div>' +
