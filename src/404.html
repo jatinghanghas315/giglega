@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>404 — Page Not Found | GigLega</title>
+  <meta name="robots" content="noindex, nofollow" />
+
+  <script src="shared.js"></script>
+  <link rel="stylesheet" href="styles.css" />
+
+  <style>
+    .notfound-page {
+      min-height: calc(100vh - 64px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 16px;
+      background: var(--bg);
+    }
+
+    .notfound-box {
+      text-align: center;
+      max-width: 560px;
+      width: 100%;
+      animation: fadeInUp .4s ease;
+    }
+
+    /* ── Big 404 graphic ── */
+    .notfound-graphic {
+      position: relative;
+      margin-bottom: 32px;
+      display: inline-block;
+    }
+    .notfound-number {
+      font-size: clamp(6rem, 20vw, 10rem);
+      font-weight: 900;
+      line-height: 1;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--teal) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -4px;
+      display: block;
+    }
+    .notfound-emoji {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: clamp(2.5rem, 8vw, 4rem);
+      animation: floatBob 3s ease-in-out infinite;
+      filter: drop-shadow(0 4px 12px rgba(0,0,0,.15));
+    }
+    @keyframes floatBob {
+      0%, 100% { transform: translate(-50%, -50%) translateY(0); }
+      50%       { transform: translate(-50%, -50%) translateY(-10px); }
+    }
+
+    /* ── Text ── */
+    .notfound-title {
+      font-size: clamp(1.4rem, 4vw, 1.9rem);
+      font-weight: 900;
+      color: var(--primary);
+      margin-bottom: 12px;
+    }
+    .notfound-sub {
+      font-size: .95rem;
+      color: var(--gray-500);
+      line-height: 1.75;
+      margin-bottom: 32px;
+      max-width: 420px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .notfound-sub strong {
+      color: var(--primary);
+      font-weight: 700;
+    }
+
+    /* ── Actions ── */
+    .notfound-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 40px;
+    }
+    .btn-home {
+      padding: 13px 28px;
+      background: linear-gradient(135deg, var(--primary), var(--teal));
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-size: .95rem;
+      font-weight: 800;
+      cursor: pointer;
+      text-decoration: none;
+      transition: transform .2s, box-shadow .2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      box-shadow: 0 4px 14px rgba(13,148,136,.3);
+    }
+    .btn-home:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(13,148,136,.4); text-decoration: none; color: #fff; }
+    .btn-back {
+      padding: 13px 28px;
+      background: var(--surface);
+      color: var(--gray-700);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+      font-size: .95rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all .2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .btn-back:hover { border-color: var(--teal); color: var(--teal); text-decoration: none; }
+
+    /* ── Quick links ── */
+    .notfound-links-title {
+      font-size: .75rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .8px;
+      color: var(--gray-400);
+      margin-bottom: 14px;
+    }
+    .notfound-links {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .notfound-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      background: var(--surface);
+      border: 1.5px solid var(--gray-200);
+      border-radius: 20px;
+      font-size: .82rem;
+      font-weight: 600;
+      color: var(--gray-600);
+      text-decoration: none;
+      transition: all .2s;
+    }
+    .notfound-link:hover { border-color: var(--teal); color: var(--teal); background: rgba(13,148,136,.04); text-decoration: none; }
+
+    /* ── URL display ── */
+    .notfound-url {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--gray-100);
+      border-radius: var(--radius-xs);
+      padding: 6px 14px;
+      font-size: .78rem;
+      font-family: var(--font-mono, monospace);
+      color: var(--gray-500);
+      margin-bottom: 28px;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* Dark mode */
+    [data-theme="dark"] .btn-back     { border-color: var(--gray-700); color: var(--gray-300); }
+    [data-theme="dark"] .notfound-link{ border-color: var(--gray-700); color: var(--gray-400); }
+    [data-theme="dark"] .notfound-url { background: var(--gray-800); color: var(--gray-500); }
+  </style>
+</head>
+<body>
+
+  <div id="announce-bar"></div>
+  <nav id="main-nav"></nav>
+
+  <main class="notfound-page">
+    <div class="notfound-box">
+
+      <!-- Graphic -->
+      <div class="notfound-graphic">
+        <span class="notfound-number">404</span>
+        <span class="notfound-emoji">🔍</span>
+      </div>
+
+      <!-- Text -->
+      <h1 class="notfound-title">Yeh page nahi mila!</h1>
+      <p class="notfound-sub">
+        The page you're looking for doesn't exist, was moved, or the URL is incorrect.<br>
+        <strong>Don't worry</strong> — there are plenty of gigs waiting for you.
+      </p>
+
+      <!-- URL that was attempted -->
+      <div class="notfound-url" id="attemptedUrl">
+        🔗 <span id="urlDisplay"></span>
+      </div>
+
+      <!-- Actions -->
+      <div class="notfound-actions">
+        <a href="index.html" class="btn-home">🏠 Go to Homepage</a>
+        <button class="btn-back" id="btnGoBack">← Go Back</button>
+      </div>
+
+      <!-- Quick links -->
+      <div class="notfound-links-title">Or jump to</div>
+      <div class="notfound-links">
+        <a href="browse.html"    class="notfound-link">🔍 Browse Gigs</a>
+        <a href="post-gig.html"  class="notfound-link">➕ Post a Gig</a>
+        <a href="profile.html"   class="notfound-link">👤 My Profile</a>
+        <a href="help-center.html" class="notfound-link">❓ Help Center</a>
+        <a href="contact.html"   class="notfound-link">📬 Contact Us</a>
+      </div>
+
+    </div>
+  </main>
+
+  <footer id="main-footer"></footer>
+  <div id="toast-container"></div>
+
+  <script>
+    /* Show the attempted URL */
+    var urlEl = document.getElementById("urlDisplay");
+    if (urlEl) urlEl.textContent = window.location.href;
+
+    /* Go back button */
+    document.getElementById("btnGoBack").addEventListener("click", function () {
+      if (window.history.length > 1) {
+        window.history.back();
+      } else {
+        window.location.href = "index.html";
+      }
+    });
+  </script>
+
+</body>
+</html>
