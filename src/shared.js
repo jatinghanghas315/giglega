@@ -567,6 +567,7 @@ function renderFooter() {
             '<a href="profile.html">My Profile</a>' +
             '<a href="trust-safety.html">Trust & Safety</a>' +
             '<a href="help-center.html">Help Center</a>' +
+            '<a href="index.html#faq">FAQ</a>' +
           '</div>' +
 
           /* For Posters col */
@@ -576,7 +577,7 @@ function renderFooter() {
             '<a href="dashboard-client.html">My Posted Gigs</a>' +
             '<a href="enterprise.html">Enterprise</a>' +
             '<a href="trust-safety.html">Safety Tips</a>' +
-            '<a href="help-center.html">FAQ</a>' +
+            '<a href="index.html#faq">FAQ</a>' +
           '</div>' +
 
           /* Company col */
