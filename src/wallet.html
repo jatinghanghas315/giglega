@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Wallet — GigLega</title>
+
+  <script src="shared.js"></script>
+  <link rel="stylesheet" href="styles.css" />
+
+  <style>
+    .wallet-wrap { max-width: 900px; margin: 0 auto; padding: 28px 16px 80px; }
+
+    /* ── Balance hero card ── */
+    .balance-hero {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--teal) 100%);
+      border-radius: var(--radius);
+      padding: 32px 28px;
+      color: #fff;
+      margin-bottom: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+    .balance-hero::before {
+      content: "";
+      position: absolute;
+      top: -60px; right: -60px;
+      width: 220px; height: 220px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.07);
+      pointer-events: none;
+    }
+    .balance-hero::after {
+      content: "";
+      position: absolute;
+      bottom: -40px; left: -30px;
+      width: 160px; height: 160px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.05);
+      pointer-events: none;
+    }
+    .balance-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 24px;
+      position: relative;
+      z-index: 1;
+    }
+    .balance-label { font-size: .8rem; font-weight: 700; opacity: .7; text-transform: uppercase; letter-spacing: .8px; margin-bottom: 6px; }
+    .balance-amount {
+      font-size: clamp(2.2rem, 6vw, 3rem);
+      font-weight: 900;
+      color: #fff;
+      line-height: 1;
+      letter-spacing: -1px;
+    }
+    .balance-amount sup { font-size: 1.1rem; vertical-align: super; font-weight: 700; }
+    .balance-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      background: rgba(255,255,255,.15);
+      border: 1px solid rgba(255,255,255,.25);
+      border-radius: 20px;
+      font-size: .78rem;
+      font-weight: 700;
+      color: #fff;
+      margin-top: 8px;
+    }
+    .balance-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      position: relative;
+      z-index: 1;
+    }
+    .btn-wallet-primary {
+      padding: 11px 22px;
+      background: #fff;
+      color: var(--primary);
+      border: none;
+      border-radius: var(--radius-sm);
+      font-size: .88rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all .2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font);
+    }
+    .btn-wallet-primary:hover { opacity: .9; transform: translateY(-1px); }
+    .btn-wallet-outline {
+      padding: 11px 22px;
+      background: transparent;
+      color: #fff;
+      border: 1.5px solid rgba(255,255,255,.4);
+      border-radius: var(--radius-sm);
+      font-size: .88rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all .2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font);
+    }
+    .btn-wallet-outline:hover { border-color: #fff; background: rgba(255,255,255,.1); }
+
+    /* Balance mini stats */
+    .balance-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0;
+      border-top: 1px solid rgba(255,255,255,.15);
+      padding-top: 20px;
+      margin-top: 4px;
+      position: relative;
+      z-index: 1;
+    }
+    .balance-stat {
+      text-align: center;
+      padding: 0 12px;
+      border-right: 1px solid rgba(255,255,255,.15);
+    }
+    .balance-stat:last-child { border-right: none; }
+    .balance-stat-val { font-size: 1.2rem; font-weight: 800; color: #fff; }
+    .balance-stat-lbl { font-size: .7rem; opacity: .65; text-transform: uppercase; letter-spacing: .5px; margin-top: 3px; }
+
+    /* ── Quick stats row ── */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+    .stat-card {
+      background: var(--surface);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 16px 18px;
+      box-shadow: var(--shadow-sm);
+    }
+    .stat-label { font-size: .72rem; font-weight: 700; color: var(--gray-400); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 5px; }
+    .stat-value { font-size: 1.4rem; font-weight: 800; color: var(--primary); }
+    .stat-value.green  { color: var(--success); }
+    .stat-value.amber  { color: var(--accent); }
+    .stat-value.danger { color: var(--danger); }
+    .stat-sub { font-size: .73rem; color: var(--gray-400); margin-top: 3px; }
+
+    /* ── Layout ── */
+    .wallet-grid {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 20px;
+      align-items: start;
+    }
+    @media (max-width: 768px) { .wallet-grid { grid-template-columns: 1fr; } }
+
+    /* ── Transaction list ── */
+    .card {
+      background: var(--surface);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+    }
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      border-bottom: 1.5px solid var(--gray-100);
+    }
+    .card-title { font-size: .95rem; font-weight: 800; color: var(--primary); }
+    .card-action { font-size: .8rem; font-weight: 700; color: var(--teal); cursor: pointer; background: none; border: none; font-family: var(--font); }
+    .card-action:hover { text-decoration: underline; }
+
+    /* Filter chips */
+    .filter-chips {
+      display: flex;
+      gap: 6px;
+      padding: 12px 20px;
+      border-bottom: 1px solid var(--gray-100);
+      overflow-x: auto;
+    }
+    .chip {
+      padding: 5px 14px;
+      border-radius: 16px;
+      border: 1.5px solid var(--gray-200);
+      font-size: .76rem;
+      font-weight: 700;
+      color: var(--gray-500);
+      cursor: pointer;
+      background: transparent;
+      white-space: nowrap;
+      transition: all .2s;
+      font-family: var(--font);
+    }
+    .chip.active { border-color: var(--teal); background: rgba(13,148,136,.08); color: var(--teal); }
+    .chip:hover:not(.active) { border-color: var(--gray-400); color: var(--gray-700); }
+
+    /* Transaction rows */
+    .txn-list { padding: 0; }
+    .txn-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--gray-100);
+      transition: background .15s;
+    }
+    .txn-row:last-child { border-bottom: none; }
+    .txn-row:hover { background: var(--gray-50); }
+    .txn-icon {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+    .txn-icon.credit  { background: rgba(16,185,129,.12); }
+    .txn-icon.debit   { background: rgba(239,68,68,.1); }
+    .txn-icon.pending { background: rgba(245,158,11,.1); }
+    .txn-icon.fee     { background: rgba(107,114,128,.1); }
+    .txn-body { flex: 1; min-width: 0; }
+    .txn-title { font-size: .88rem; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .txn-sub   { font-size: .75rem; color: var(--gray-400); margin-top: 2px; }
+    .txn-right { text-align: right; flex-shrink: 0; }
+    .txn-amount { font-size: .92rem; font-weight: 800; }
+    .txn-amount.credit  { color: var(--success); }
+    .txn-amount.debit   { color: var(--danger); }
+    .txn-amount.pending { color: var(--accent); }
+    .txn-amount.fee     { color: var(--gray-500); }
+    .txn-date { font-size: .72rem; color: var(--gray-400); margin-top: 2px; }
+    .txn-badge {
+      font-size: .65rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 6px;
+      margin-top: 4px;
+      display: inline-block;
+    }
+    .txn-badge.completed { background: rgba(16,185,129,.1); color: var(--success); }
+    .txn-badge.pending   { background: rgba(245,158,11,.1); color: #b45309; }
+    .txn-badge.failed    { background: rgba(239,68,68,.1);  color: var(--danger); }
+
+    /* Empty transactions */
+    .txn-empty {
+      text-align: center;
+      padding: 48px 20px;
+      color: var(--gray-400);
+    }
+    .txn-empty .ei { font-size: 2.5rem; margin-bottom: 10px; display: block; }
+    .txn-empty p   { font-size: .85rem; line-height: 1.6; }
+
+    /* ── Right sidebar ── */
+    .sidebar-card {
+      background: var(--surface);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 16px;
+      overflow: hidden;
+    }
+    .sidebar-title {
+      font-size: .88rem;
+      font-weight: 800;
+      color: var(--primary);
+      padding: 14px 18px;
+      border-bottom: 1.5px solid var(--gray-100);
+    }
+    .sidebar-body { padding: 16px 18px; }
+
+    /* Add Money form */
+    .form-field { margin-bottom: 14px; }
+    .form-field label { display: block; font-size: .82rem; font-weight: 600; color: var(--gray-700); margin-bottom: 5px; }
+    .form-field input,
+    .form-field select {
+      width: 100%;
+      padding: 10px 13px;
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+      font-size: .88rem;
+      font-family: var(--font);
+      background: var(--surface);
+      color: var(--text);
+      transition: border .2s;
+      box-sizing: border-box;
+    }
+    .form-field input:focus,
+    .form-field select:focus { outline: none; border-color: var(--teal); box-shadow: 0 0 0 3px rgba(13,148,136,.1); }
+
+    /* Quick amounts */
+    .quick-amounts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; margin-bottom: 14px; }
+    .qa-btn {
+      padding: 8px 4px;
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+      font-size: .8rem;
+      font-weight: 700;
+      color: var(--gray-600);
+      background: transparent;
+      cursor: pointer;
+      text-align: center;
+      transition: all .2s;
+      font-family: var(--font);
+    }
+    .qa-btn:hover,
+    .qa-btn.active { border-color: var(--teal); background: rgba(13,148,136,.08); color: var(--teal); }
+
+    /* Submit btn */
+    .btn-full {
+      width: 100%;
+      padding: 11px;
+      border-radius: var(--radius-sm);
+      font-size: .88rem;
+      font-weight: 800;
+      cursor: pointer;
+      font-family: var(--font);
+      transition: all .2s;
+      border: none;
+    }
+    .btn-full.primary {
+      background: linear-gradient(135deg, var(--primary), var(--teal));
+      color: #fff;
+      box-shadow: 0 3px 10px rgba(13,148,136,.3);
+    }
+    .btn-full.primary:hover { opacity: .88; transform: translateY(-1px); }
+    .btn-full.primary:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+    .btn-full.danger { background: transparent; border: 1.5px solid var(--danger); color: var(--danger); margin-top: 8px; }
+    .btn-full.danger:hover { background: var(--danger); color: #fff; }
+
+    /* UPI details */
+    .upi-box {
+      background: var(--gray-50);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+      padding: 12px 14px;
+      margin-bottom: 14px;
+      font-size: .82rem;
+    }
+    .upi-label { color: var(--gray-400); font-size: .72rem; font-weight: 700; margin-bottom: 3px; }
+    .upi-id { font-weight: 800; color: var(--primary); font-size: .88rem; display: flex; align-items: center; justify-content: space-between; }
+    .btn-copy { background: none; border: none; cursor: pointer; color: var(--teal); font-size: .75rem; font-weight: 700; padding: 0; font-family: var(--font); }
+    .btn-copy:hover { text-decoration: underline; }
+
+    /* ── Withdraw modal ── */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.5);
+      z-index: 2000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      display: none;
+    }
+    .modal-overlay.open { display: flex; animation: fadeIn .2s ease; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .modal-box {
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 28px;
+      max-width: 420px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0,0,0,.2);
+      animation: slideUp .25s ease;
+    }
+    @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .modal-title { font-size: 1rem; font-weight: 800; color: var(--primary); margin-bottom: 6px; }
+    .modal-sub   { font-size: .83rem; color: var(--gray-500); margin-bottom: 20px; line-height: 1.5; }
+    .modal-close { float: right; background: none; border: none; font-size: 1.1rem; cursor: pointer; color: var(--gray-400); margin-top: -4px; }
+    .modal-close:hover { color: var(--danger); }
+    .modal-row   { display: flex; gap: 10px; margin-top: 12px; }
+
+    /* ── Safety note ── */
+    .safety-note {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      padding: 12px 14px;
+      background: rgba(13,148,136,.06);
+      border: 1px solid rgba(13,148,136,.15);
+      border-radius: var(--radius-sm);
+      font-size: .78rem;
+      color: var(--gray-600);
+      line-height: 1.5;
+    }
+    .safety-note .si { flex-shrink: 0; font-size: 1rem; }
+
+    /* Dark mode */
+    [data-theme="dark"] .card         { border-color: var(--gray-700); }
+    [data-theme="dark"] .card-header  { border-color: var(--gray-700); }
+    [data-theme="dark"] .filter-chips { border-color: var(--gray-700); }
+    [data-theme="dark"] .txn-row      { border-color: var(--gray-800); }
+    [data-theme="dark"] .txn-row:hover{ background: var(--gray-800); }
+    [data-theme="dark"] .stat-card    { border-color: var(--gray-700); }
+    [data-theme="dark"] .sidebar-card { border-color: var(--gray-700); }
+    [data-theme="dark"] .sidebar-title{ border-color: var(--gray-700); }
+    [data-theme="dark"] .upi-box      { background: var(--gray-800); border-color: var(--gray-700); }
+    [data-theme="dark"] .form-field input,
+    [data-theme="dark"] .form-field select { background: var(--gray-800); border-color: var(--gray-600); }
+    [data-theme="dark"] .modal-box    { background: var(--gray-900); }
+    [data-theme="dark"] .chip         { border-color: var(--gray-700); color: var(--gray-400); }
+    [data-theme="dark"] .safety-note  { color: var(--gray-400); }
+  </style>
+</head>
+<body>
+
+  <div id="announce-bar"></div>
+  <nav id="main-nav"></nav>
+
+  <main>
+    <div class="wallet-wrap">
+
+      <nav id="breadcrumb"></nav>
+
+      <!-- ── Balance Hero ── -->
+      <div class="balance-hero">
+        <div class="balance-top">
+          <div>
+            <div class="balance-label">GigLega Secure Wallet</div>
+            <div class="balance-amount"><sup>₹</sup><span id="balanceDisplay">0.00</span></div>
+            <div class="balance-status">🔒 Secured &amp; Protected</div>
+          </div>
+          <div style="text-align:right;position:relative;z-index:1">
+            <div style="font-size:.75rem;opacity:.6;margin-bottom:4px">Wallet ID</div>
+            <div style="font-size:.82rem;font-weight:700;opacity:.85" id="walletId">GL-XXXX</div>
+            <div style="font-size:.72rem;opacity:.5;margin-top:6px" id="lastUpdated"></div>
+          </div>
+        </div>
+        <div class="balance-actions">
+          <button class="btn-wallet-primary" id="btnAddMoney">➕ Add Money</button>
+          <button class="btn-wallet-outline" id="btnWithdraw">🏦 Withdraw</button>
+          <button class="btn-wallet-outline" id="btnSendMoney">📤 Send</button>
+        </div>
+        <div class="balance-stats">
+          <div class="balance-stat">
+            <div class="balance-stat-val" id="totalIn">₹0</div>
+            <div class="balance-stat-lbl">Total In</div>
+          </div>
+          <div class="balance-stat">
+            <div class="balance-stat-val" id="totalOut">₹0</div>
+            <div class="balance-stat-lbl">Total Out</div>
+          </div>
+          <div class="balance-stat">
+            <div class="balance-stat-val" id="pendingAmt">₹0</div>
+            <div class="balance-stat-lbl">In Escrow</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Stats row ── -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-label">Earned</div>
+          <div class="stat-value green" id="statEarned">₹0</div>
+          <div class="stat-sub">From gigs</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Spent</div>
+          <div class="stat-value danger" id="statSpent">₹0</div>
+          <div class="stat-sub">On gigs posted</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Withdrawn</div>
+          <div class="stat-value" id="statWithdrawn">₹0</div>
+          <div class="stat-sub">To bank / UPI</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Fees Paid</div>
+          <div class="stat-value amber" id="statFees">₹0</div>
+          <div class="stat-sub">6% GigLega fee</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Transactions</div>
+          <div class="stat-value" id="statTxns">0</div>
+          <div class="stat-sub">All time</div>
+        </div>
+      </div>
+
+      <!-- ── Main grid ── -->
+      <div class="wallet-grid">
+
+        <!-- LEFT — Transactions -->
+        <div>
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">📋 Transaction History</div>
+              <button class="card-action" id="btnExport">⬇ Export CSV</button>
+            </div>
+            <div class="filter-chips" id="filterChips">
+              <button class="chip active" data-filter="all">All</button>
+              <button class="chip" data-filter="credit">Money In</button>
+              <button class="chip" data-filter="debit">Money Out</button>
+              <button class="chip" data-filter="pending">Pending</button>
+              <button class="chip" data-filter="fee">Fees</button>
+            </div>
+            <div class="txn-list" id="txnList"></div>
+          </div>
+        </div>
+
+        <!-- RIGHT — Sidebar -->
+        <div>
+
+          <!-- Add Money -->
+          <div class="sidebar-card" id="addMoneyPanel">
+            <div class="sidebar-title">➕ Add Money</div>
+            <div class="sidebar-body">
+              <div class="form-field">
+                <label>Amount (₹)</label>
+                <input type="number" id="addAmount" placeholder="e.g. 500" min="10" max="50000" />
+              </div>
+              <div class="quick-amounts" id="quickAmounts">
+                <button class="qa-btn" data-amount="100">₹100</button>
+                <button class="qa-btn" data-amount="250">₹250</button>
+                <button class="qa-btn" data-amount="500">₹500</button>
+                <button class="qa-btn" data-amount="1000">₹1000</button>
+                <button class="qa-btn" data-amount="2000">₹2000</button>
+                <button class="qa-btn" data-amount="5000">₹5000</button>
+              </div>
+              <div class="form-field">
+                <label>Payment Method</label>
+                <select id="addMethod">
+                  <option value="upi">UPI</option>
+                  <option value="netbanking">Net Banking</option>
+                  <option value="card">Debit / Credit Card</option>
+                </select>
+              </div>
+              <button class="btn-full primary" id="btnConfirmAdd">Add to Wallet</button>
+
+              <div style="margin-top:14px">
+                <div class="safety-note">
+                  <span class="si">🔒</span>
+                  <span>Your payment is secured. Money reflects instantly after successful payment.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Withdraw Panel -->
+          <div class="sidebar-card">
+            <div class="sidebar-title">🏦 Withdraw to Bank</div>
+            <div class="sidebar-body">
+              <div class="form-field">
+                <label>Amount (₹)</label>
+                <input type="number" id="withdrawAmount" placeholder="Min ₹100" min="100" />
+              </div>
+              <div class="form-field">
+                <label>Withdraw To</label>
+                <select id="withdrawTo">
+                  <option value="upi">UPI ID</option>
+                  <option value="bank">Bank Account</option>
+                </select>
+              </div>
+              <div class="form-field">
+                <label>UPI ID / Account Number</label>
+                <input type="text" id="withdrawDest" placeholder="e.g. name@upi or 9319635257" />
+              </div>
+              <button class="btn-full primary" id="btnConfirmWithdraw">Request Withdrawal</button>
+              <div style="margin-top:10px;font-size:.76rem;color:var(--gray-400);line-height:1.5;text-align:center">
+                Withdrawals processed within 24 hours on business days.
+              </div>
+            </div>
+          </div>
+
+          <!-- Safety info -->
+          <div class="sidebar-card">
+            <div class="sidebar-title">🛡️ Wallet Safety</div>
+            <div class="sidebar-body" style="display:flex;flex-direction:column;gap:10px">
+              <div class="safety-note"><span class="si">🔒</span><span>Funds in escrow are held until both parties confirm gig completion.</span></div>
+              <div class="safety-note"><span class="si">⚡</span><span>Payments release automatically when a gig is marked complete.</span></div>
+              <div class="safety-note"><span class="si">🚫</span><span>Never share your wallet PIN or OTP with anyone — including support staff.</span></div>
+              <a href="trust-safety.html" style="font-size:.8rem;font-weight:700;color:var(--teal);text-decoration:none;text-align:center;display:block;margin-top:4px">View full safety guide →</a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ── Withdraw modal ── -->
+  <div class="modal-overlay" id="withdrawModal">
+    <div class="modal-box">
+      <button class="modal-close" id="closeWithdrawModal">✕</button>
+      <div class="modal-title">🏦 Confirm Withdrawal</div>
+      <div class="modal-sub" id="withdrawModalSub">Withdrawing ₹0 to your UPI.</div>
+      <div class="form-field">
+        <label>Enter your Wallet PIN</label>
+        <input type="password" id="walletPin" maxlength="4" placeholder="4-digit PIN" style="letter-spacing:8px;font-size:1.2rem;text-align:center" />
+      </div>
+      <div class="modal-row">
+        <button class="btn-full primary" id="btnFinalWithdraw">Confirm</button>
+      </div>
+      <div style="font-size:.75rem;color:var(--gray-400);text-align:center;margin-top:10px">
+        Default PIN is <strong>1234</strong> — change in Profile settings.
+      </div>
+    </div>
+  </div>
+
+  <footer id="main-footer"></footer>
+  <div id="toast-container"></div>
+
+  <script>
+  (function () {
+
+    /* ── Auth ── */
+    var user = (function () {
+      try {
+        var u = JSON.parse(localStorage.getItem("gl_user") || "null");
+        return (u && u.id) ? u : null;
+      } catch(e) { return null; }
+    })();
+    if (!user) { window.location.href = "login.html?redirect=wallet.html"; return; }
+
+    /* ── Breadcrumb ── */
+    if (typeof buildBreadcrumb === "function") {
+      buildBreadcrumb("breadcrumb", [
+        { label: "Home", href: "index.html" },
+        { label: "Wallet" }
+      ]);
+    }
+
+    /* ── Wallet storage ── */
+    var WALLET_KEY = "gl_wallet_" + user.id;
+    var TXN_KEY    = "gl_txns_"   + user.id;
+
+    function getWallet() {
+      return JSON.parse(localStorage.getItem(WALLET_KEY) || JSON.stringify({
+        balance: 0, totalIn: 0, totalOut: 0, pending: 0,
+        earned: 0, spent: 0, withdrawn: 0, fees: 0,
+        createdAt: new Date().toISOString()
+      }));
+    }
+    function saveWallet(w) { localStorage.setItem(WALLET_KEY, JSON.stringify(w)); }
+    function getTxns()     { return JSON.parse(localStorage.getItem(TXN_KEY) || "[]"); }
+    function saveTxns(t)   { localStorage.setItem(TXN_KEY, JSON.stringify(t)); }
+
+    function addTxn(type, title, sub, amount, status) {
+      var txns = getTxns();
+      txns.unshift({
+        id:     "txn_" + Date.now(),
+        type:   type,
+        title:  title,
+        sub:    sub,
+        amount: amount,
+        status: status || "completed",
+        date:   new Date().toISOString()
+      });
+      saveTxns(txns);
+    }
+
+    /* ── Seed demo transactions if empty ── */
+    (function seedDemo() {
+      var txns = getTxns();
+      if (txns.length > 0) return;
+      var wallet = getWallet();
+      wallet.balance   = 1250;
+      wallet.totalIn   = 2000;
+      wallet.totalOut  = 750;
+      wallet.earned    = 1500;
+      wallet.spent     = 500;
+      wallet.withdrawn = 250;
+      wallet.fees      = 90;
+      saveWallet(wallet);
+      saveTxns([
+        { id:"txn_1", type:"credit", title:"Payment received — Delivery Gig", sub:"Gig completed · Poster: Rahul S.", amount:500, status:"completed", date: new Date(Date.now()-3600000).toISOString() },
+        { id:"txn_2", type:"fee",    title:"GigLega service fee", sub:"6% on ₹500 gig", amount:-30, status:"completed", date: new Date(Date.now()-3600000+100).toISOString() },
+        { id:"txn_3", type:"credit", title:"Payment received — Data Entry Task", sub:"Gig completed · Poster: Priya M.", amount:1000, status:"completed", date: new Date(Date.now()-86400000).toISOString() },
+        { id:"txn_4", type:"fee",    title:"GigLega service fee", sub:"6% on ₹1000 gig", amount:-60, status:"completed", date: new Date(Date.now()-86400000+100).toISOString() },
+        { id:"txn_5", type:"debit",  title:"Withdrawal to UPI", sub:"name@upi · Processed", amount:-250, status:"completed", date: new Date(Date.now()-172800000).toISOString() },
+        { id:"txn_6", type:"pending",title:"Escrow — Cleaning Gig", sub:"Gig in progress · Release on completion", amount:500, status:"pending", date: new Date(Date.now()-7200000).toISOString() },
+        { id:"txn_7", type:"credit", title:"Top-up via UPI", sub:"Added via PhonePe", amount:500, status:"completed", date: new Date(Date.now()-259200000).toISOString() }
+      ]);
+    })();
+
+    /* ── Helpers ── */
+    function fmt(n) { return "₹" + Math.abs(Number(n || 0)).toLocaleString("en-IN"); }
+    function escH(s) { return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+    function fmtDate(iso) {
+      var d = new Date(iso);
+      return d.toLocaleDateString("en-IN", { day:"numeric", month:"short", year:"numeric" }) +
+             " · " + d.toLocaleTimeString("en-IN", { hour:"2-digit", minute:"2-digit" });
+    }
+    function timeAgo(iso) {
+      var s = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
+      if (s < 60)    return s + "s ago";
+      if (s < 3600)  return Math.floor(s/60) + "m ago";
+      if (s < 86400) return Math.floor(s/3600) + "h ago";
+      return Math.floor(s/86400) + "d ago";
+    }
+
+    var txnIcons = { credit:"💰", debit:"📤", pending:"⏳", fee:"📋" };
+
+    /* ── Render ── */
+    var currentFilter = "all";
+
+    function render() {
+      var w = getWallet();
+
+      /* Balance hero */
+      document.getElementById("balanceDisplay").textContent = Number(w.balance).toLocaleString("en-IN", { minimumFractionDigits: 2 });
+      document.getElementById("walletId").textContent = "GL-" + user.id.slice(-6).toUpperCase();
+      document.getElementById("lastUpdated").textContent = "Updated just now";
+      document.getElementById("totalIn").textContent   = fmt(w.totalIn);
+      document.getElementById("totalOut").textContent  = fmt(w.totalOut);
+      document.getElementById("pendingAmt").textContent= fmt(w.pending);
+
+      /* Stats */
+      document.getElementById("statEarned").textContent   = fmt(w.earned);
+      document.getElementById("statSpent").textContent    = fmt(w.spent);
+      document.getElementById("statWithdrawn").textContent= fmt(w.withdrawn);
+      document.getElementById("statFees").textContent     = fmt(w.fees);
+
+      /* Transactions */
+      var txns = getTxns();
+      var filtered = currentFilter === "all" ? txns : txns.filter(function(t){ return t.type === currentFilter; });
+      document.getElementById("statTxns").textContent = txns.length;
+      renderTxns(filtered);
+    }
+
+    function renderTxns(txns) {
+      var el = document.getElementById("txnList");
+      if (!txns.length) {
+        el.innerHTML = '<div class="txn-empty"><span class="ei">📭</span><p>No transactions found.<br>Add money or complete a gig to see activity here.</p></div>';
+        return;
+      }
+      el.innerHTML = txns.map(function (t) {
+        var isPos = t.amount > 0;
+        var cls   = t.type === "pending" ? "pending" : t.type === "fee" ? "fee" : isPos ? "credit" : "debit";
+        var amtTxt = (isPos ? "+" : "") + fmt(t.amount);
+        return '<div class="txn-row">' +
+          '<div class="txn-icon ' + cls + '">' + (txnIcons[t.type] || "💳") + '</div>' +
+          '<div class="txn-body">' +
+            '<div class="txn-title">' + escH(t.title) + '</div>' +
+            '<div class="txn-sub">' + escH(t.sub || "") + '</div>' +
+          '</div>' +
+          '<div class="txn-right">' +
+            '<div class="txn-amount ' + cls + '">' + amtTxt + '</div>' +
+            '<div class="txn-date">' + timeAgo(t.date) + '</div>' +
+            '<div class="txn-badge ' + (t.status||"completed") + '">' + (t.status||"completed") + '</div>' +
+          '</div>' +
+        '</div>';
+      }).join("");
+    }
+
+    /* ── Filter chips ── */
+    document.getElementById("filterChips").addEventListener("click", function (e) {
+      var chip = e.target.closest(".chip");
+      if (!chip) return;
+      currentFilter = chip.dataset.filter;
+      document.querySelectorAll(".chip").forEach(function (c) { c.classList.remove("active"); });
+      chip.classList.add("active");
+      render();
+    });
+
+    /* ── Quick amounts ── */
+    document.getElementById("quickAmounts").addEventListener("click", function (e) {
+      var btn = e.target.closest(".qa-btn");
+      if (!btn) return;
+      document.getElementById("addAmount").value = btn.dataset.amount;
+      document.querySelectorAll(".qa-btn").forEach(function (b) { b.classList.remove("active"); });
+      btn.classList.add("active");
+    });
+
+    /* ── Scroll to add money ── */
+    document.getElementById("btnAddMoney").addEventListener("click", function () {
+      document.getElementById("addMoneyPanel").scrollIntoView({ behavior: "smooth", block: "start" });
+      document.getElementById("addAmount").focus();
+    });
+
+    /* ── Confirm Add Money ── */
+    document.getElementById("btnConfirmAdd").addEventListener("click", function () {
+      var amt    = parseFloat(document.getElementById("addAmount").value);
+      var method = document.getElementById("addMethod").value;
+      if (!amt || amt < 10) {
+        if (typeof showToast === "function") showToast("Minimum add amount is ₹10.", "error");
+        return;
+      }
+      var btn = this;
+      btn.disabled    = true;
+      btn.textContent = "⏳ Processing...";
+
+      setTimeout(function () {
+        var w = getWallet();
+        w.balance += amt;
+        w.totalIn += amt;
+        saveWallet(w);
+        addTxn("credit", "Top-up via " + method.toUpperCase(), "Added to GigLega Wallet", amt);
+        document.getElementById("addAmount").value = "";
+        document.querySelectorAll(".qa-btn").forEach(function (b) { b.classList.remove("active"); });
+        btn.disabled    = false;
+        btn.textContent = "Add to Wallet";
+        render();
+        if (typeof showToast === "function") showToast("✅ ₹" + amt + " added to your wallet!", "success");
+      }, 1200);
+    });
+
+    /* ── Open Withdraw Modal ── */
+    function openWithdrawModal() {
+      var amt  = parseFloat(document.getElementById("withdrawAmount").value);
+      var dest = document.getElementById("withdrawDest").value.trim();
+      var to   = document.getElementById("withdrawTo").value;
+      var w    = getWallet();
+
+      if (!amt || amt < 100) { if (typeof showToast === "function") showToast("Minimum withdrawal is ₹100.", "error"); return; }
+      if (amt > w.balance)   { if (typeof showToast === "function") showToast("Insufficient wallet balance.", "error"); return; }
+      if (!dest)             { if (typeof showToast === "function") showToast("Enter your UPI ID or account number.", "error"); return; }
+
+      document.getElementById("withdrawModalSub").textContent =
+        "Withdrawing ₹" + amt + " to your " + to.toUpperCase() + " (" + dest + ").";
+      document.getElementById("walletPin").value = "";
+      document.getElementById("withdrawModal").classList.add("open");
+    }
+
+    document.getElementById("btnWithdraw").addEventListener("click", openWithdrawModal);
+    document.getElementById("btnConfirmWithdraw").addEventListener("click", openWithdrawModal);
+    document.getElementById("closeWithdrawModal").addEventListener("click", function () {
+      document.getElementById("withdrawModal").classList.remove("open");
+    });
+    document.getElementById("withdrawModal").addEventListener("click", function (e) {
+      if (e.target === this) this.classList.remove("open");
+    });
+
+    /* ── Final Withdraw ── */
+    document.getElementById("btnFinalWithdraw").addEventListener("click", function () {
+      var pin = document.getElementById("walletPin").value;
+      if (pin !== "1234") {
+        if (typeof showToast === "function") showToast("Incorrect PIN. Default is 1234.", "error");
+        return;
+      }
+      var amt  = parseFloat(document.getElementById("withdrawAmount").value);
+      var dest = document.getElementById("withdrawDest").value.trim();
+      var btn  = this;
+
+      btn.disabled    = true;
+      btn.textContent = "⏳ Processing...";
+
+      setTimeout(function () {
+        var w = getWallet();
+        w.balance   -= amt;
+        w.totalOut  += amt;
+        w.withdrawn += amt;
+        saveWallet(w);
+        addTxn("debit", "Withdrawal to " + dest, "Processing — 24hr settlement", -amt, "pending");
+
+        document.getElementById("withdrawModal").classList.remove("open");
+        document.getElementById("withdrawAmount").value = "";
+        document.getElementById("withdrawDest").value   = "";
+        btn.disabled    = false;
+        btn.textContent = "Confirm";
+        render();
+        if (typeof showToast === "function") showToast("✅ Withdrawal of ₹" + amt + " initiated! 24hr processing.", "success");
+      }, 1400);
+    });
+
+    /* ── Send Money ── */
+    document.getElementById("btnSendMoney").addEventListener("click", function () {
+      if (typeof showToast === "function") showToast("Send Money feature coming soon!", "info");
+    });
+
+    /* ── Export CSV ── */
+    document.getElementById("btnExport").addEventListener("click", function () {
+      var txns = getTxns();
+      if (!txns.length) { if (typeof showToast === "function") showToast("No transactions to export.", "info"); return; }
+      var rows = ["Type,Title,Sub,Amount,Status,Date"];
+      txns.forEach(function (t) {
+        rows.push([t.type, '"' + t.title + '"', '"' + (t.sub||"") + '"', t.amount, t.status, t.date].join(","));
+      });
+      var blob = new Blob([rows.join("\n")], { type: "text/csv" });
+      var a    = document.createElement("a");
+      a.href   = URL.createObjectURL(blob);
+      a.download = "giglega-wallet-" + user.id.slice(-4) + ".csv";
+      a.click();
+      if (typeof showToast === "function") showToast("✅ Transactions exported!", "success");
+    });
+
+    render();
+
+  })();
+  </script>
+
+</body>
+</html>
