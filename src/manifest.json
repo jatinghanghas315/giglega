@@ -1,0 +1,76 @@
+{
+  "name": "GigLega — Find Local Gigs",
+  "short_name": "GigLega",
+  "description": "Hyperlocal gig platform for Gurugram. Find workers or get hired instantly.",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#1a3c5e",
+  "theme_color": "#1a3c5e",
+  "lang": "en",
+  "scope": "/",
+  "categories": ["business", "productivity", "lifestyle"],
+  "icons": [
+    {
+      "src": "assets/icons/icon-72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/icons/icon-96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/icons/icon-128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Browse Gigs",
+      "short_name": "Browse",
+      "description": "Find gigs near you",
+      "url": "/browse.html",
+      "icons": [{ "src": "assets/icons/icon-96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Post a Gig",
+      "short_name": "Post Gig",
+      "description": "Post a new gig",
+      "url": "/post-gig.html",
+      "icons": [{ "src": "assets/icons/icon-96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "My Wallet",
+      "short_name": "Wallet",
+      "description": "Check your GigLega wallet",
+      "url": "/wallet.html",
+      "icons": [{ "src": "assets/icons/icon-96.png", "sizes": "96x96" }]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "assets/screenshots/home.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "label": "GigLega Home"
+    }
+  ]
+}
