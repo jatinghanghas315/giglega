@@ -346,12 +346,13 @@ if (!user) {
         workerSection +
         completeBar +
         cashPrompt +
-        '<div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">' +
-          '<a href="gig-detail.html?id=' + g.id + '" class="btn btn-sm btn-outline">View Gig →</a>' +
-          (g.status === "open"
-            ? '<button class="btn btn-sm btn-danger" data-delete-id="' + g.id + '">🗑️ Delete</button>'
-            : '') +
-        '</div>' +
+       '<div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">' +
+  '<a href="gig-detail.html?id=' + g.id + '" class="btn btn-sm btn-outline">View Gig →</a>' +
+  (g.status === "open"
+    ? '<a href="gig-edit.html?id=' + g.id + '" class="btn btn-sm btn-outline">✏️ Edit</a>' +
+      '<button class="btn btn-sm btn-danger" data-delete-id="' + g.id + '">🗑️ Delete</button>'
+    : '') +
+'</div>'+
       '</div>';
     }
 
