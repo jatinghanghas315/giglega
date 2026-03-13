@@ -443,8 +443,9 @@ function renderNav() {
           '<a href="post-gig.html" class="gl-dd-item" role="menuitem">➕ Post a Gig</a>' +
           '<div class="gl-dd-divider"></div>' +
           '<a href="wallet.html" class="gl-dd-item" role="menuitem">💰 My Wallet</a>' +
-          '<a href="notifications.html" class="gl-dd-item" role="menuitem">🔔 Notifications</a>' +
-          '<a href="help-center.html" class="gl-dd-item" role="menuitem">❓ Help Center</a>' +
+         '<a href="notifications.html" class="gl-dd-item" role="menuitem">🔔 Notifications</a>' +
+         '<a href="reviews.html" class="gl-dd-item" role="menuitem">⭐ My Reviews</a>' +
+         '<a href="help-center.html" class="gl-dd-item" role="menuitem">❓ Help Center</a>' +
           '<button class="gl-dd-item danger" id="ddLogout" role="menuitem">🚪 Logout</button>' +
         '</div>' +
       '</div>';
@@ -456,6 +457,7 @@ function renderNav() {
       '<a href="profile.html" class="gl-mobile-link">👤 My Profile</a>' +
 '<a href="wallet.html" class="gl-mobile-link">💰 My Wallet</a>' +
 '<a href="notifications.html" class="gl-mobile-link">🔔 Notifications</a>' +
+'<a href="reviews.html" class="gl-mobile-link">⭐ My Reviews</a>' +
 '<div class="gl-mobile-divider"></div>' +
 '<button class="gl-mobile-link" id="mobileLogout" style="color:var(--danger)">🚪 Logout</button>';
   } else {
