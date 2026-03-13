@@ -609,4 +609,39 @@ function renderFooter() {
 
       '</div>' +
     '</footer>';
+   /* ── PWA: Register Service Worker ── */
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", function () {
+    navigator.serviceWorker.register("/service-worker.js")
+      .then(function (reg) {
+        console.log("[GigLega] SW registered:", reg.scope);
+      })
+      .catch(function (err) {
+        console.warn("[GigLega] SW failed:", err);
+      });
+  });
+}
+
+/* ── PWA: Install prompt ── */
+var deferredPrompt = null;
+window.addEventListener("beforeinstallprompt", function (e) {
+  e.preventDefault();
+  deferredPrompt = e;
+
+  /* Show "Install App" button if it exists on the page */
+  var installBtn = document.getElementById("btnInstallApp");
+  if (installBtn) {
+    installBtn.style.display = "inline-flex";
+    installBtn.addEventListener("click", function () {
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then(function (result) {
+        if (result.outcome === "accepted") {
+          if (typeof showToast === "function") showToast("🎉 GigLega installed!", "success");
+        }
+        deferredPrompt = null;
+        installBtn.style.display = "none";
+      });
+    });
+  }
+});
 }
