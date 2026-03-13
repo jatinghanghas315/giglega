@@ -8,60 +8,59 @@
   <link rel="stylesheet" href="styles.css" />
   <script defer src="shared.js"></script>
   <style>
-    /* ── Page layout ── */
     .browse-wrap{max-width:1100px;margin:0 auto;padding:32px 16px 80px}
     .browse-hero{margin-bottom:28px}
     .browse-hero h1{font-size:1.7rem;font-weight:800;color:var(--primary);margin-bottom:4px}
     .browse-hero p{color:var(--gray-500);font-size:.95rem}
 
-    /* ── Filter bar ── */
     .filter-bar{background:var(--surface);border:1px solid var(--gray-200);border-radius:var(--radius);padding:18px 20px;margin-bottom:24px;box-shadow:var(--shadow-sm)}
     .filter-row{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
     .filter-row:last-child{margin-bottom:0}
 
-    /* Search */
     .search-wrap{position:relative;flex:1;min-width:220px}
     .search-wrap input{width:100%;padding:10px 14px 10px 38px;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);font-size:.93rem;background:var(--surface);color:var(--text);font-family:inherit;transition:border .2s;box-sizing:border-box}
     .search-wrap input:focus{outline:none;border-color:var(--teal)}
     .search-wrap .search-icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:1rem;pointer-events:none}
 
-    /* Type toggle */
     .type-toggle{display:flex;gap:8px}
     .type-pill{padding:9px 20px;border-radius:20px;border:1.5px solid var(--gray-200);background:var(--surface);color:var(--gray-600);font-weight:600;font-size:.87rem;cursor:pointer;transition:all .2s;white-space:nowrap}
     .type-pill.active{border-color:var(--teal);background:var(--teal);color:#fff}
     .type-pill:hover:not(.active){border-color:var(--teal);color:var(--teal)}
 
-    /* Category chips */
     .cat-chips{display:flex;gap:8px;flex-wrap:wrap}
     .cat-chip{padding:7px 16px;border-radius:20px;border:1.5px solid var(--gray-200);background:var(--surface);color:var(--gray-600);font-size:.82rem;font-weight:600;cursor:pointer;transition:all .2s;white-space:nowrap}
     .cat-chip.active{border-color:var(--primary);background:var(--primary);color:#fff}
     .cat-chip:hover:not(.active){border-color:var(--primary);color:var(--primary)}
 
-    /* Results count */
+    /* Active filter chips */
+    .active-filters{display:none;margin-bottom:14px;flex-wrap:wrap;gap:8px;align-items:center}
+    .active-filters.show{display:flex}
+    .af-chip{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;background:rgba(13,148,136,.1);border:1.5px solid var(--teal);border-radius:14px;font-size:.76rem;font-weight:700;color:var(--teal)}
+    .af-chip button{background:none;border:none;cursor:pointer;color:var(--teal);font-size:.8rem;padding:0;line-height:1;font-weight:800}
+    .af-clear-all{padding:4px 12px;background:transparent;border:1.5px solid var(--gray-300);border-radius:14px;font-size:.74rem;font-weight:700;color:var(--gray-500);cursor:pointer;font-family:inherit}
+    .af-clear-all:hover{border-color:var(--danger);color:var(--danger)}
+
     .results-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px}
     .results-count{font-size:.88rem;color:var(--gray-500)}
     .results-count strong{color:var(--primary)}
+    .sort-select{padding:7px 12px;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);font-size:.82rem;font-family:inherit;background:var(--surface);color:var(--text);cursor:pointer;transition:border .2s}
+    .sort-select:focus{outline:none;border-color:var(--teal)}
 
-    /* ── Gig Grid ── */
     .gig-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px}
 
-    /* ── Gig Card ── */
     .gig-card{background:var(--surface);border:1.5px solid var(--gray-200);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow-sm);transition:transform .2s,box-shadow .2s,opacity .3s;position:relative;display:flex;flex-direction:column}
     .gig-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-md)}
     .gig-card.taken{opacity:.55;pointer-events:none}
     .gig-card.taken-flash{border-color:var(--danger)!important}
 
-    /* Status badge */
     .gig-status-badge{position:absolute;top:14px;right:14px;padding:4px 10px;border-radius:12px;font-size:.72rem;font-weight:700;letter-spacing:.3px}
     .badge-open{background:rgba(16,185,129,.12);color:#059669}
     .badge-taken{background:rgba(239,68,68,.12);color:#dc2626}
 
-    /* Type tag */
     .gig-type-tag{display:inline-block;font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:10px;margin-bottom:10px}
     .tag-hyperlocal{background:rgba(245,158,11,.12);color:#b45309}
     .tag-remote{background:rgba(99,102,241,.12);color:#4338ca}
 
-    /* Card body */
     .gig-cat{font-size:.78rem;color:var(--gray-400);margin-bottom:4px}
     .gig-title{font-size:1rem;font-weight:700;color:var(--text);margin-bottom:8px;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
     .gig-desc{font-size:.82rem;color:var(--gray-500);line-height:1.5;margin-bottom:12px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
@@ -69,34 +68,29 @@
     .gig-meta{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
     .gig-meta-item{display:flex;align-items:center;gap:4px;font-size:.78rem;color:var(--gray-500)}
 
-    /* Price row */
     .gig-price-row{display:flex;align-items:baseline;gap:8px;margin-bottom:6px}
     .gig-price{font-size:1.2rem;font-weight:800;color:var(--primary)}
     .gig-price-unit{font-size:.78rem;color:var(--gray-400)}
 
-    /* Earnings strip */
     .gig-earn-strip{background:linear-gradient(90deg,rgba(13,148,136,.08) 0%,rgba(26,60,94,.06) 100%);border:1px solid rgba(13,148,136,.2);border-radius:8px;padding:8px 12px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center}
     .gig-earn-label{font-size:.75rem;color:var(--gray-500)}
     .gig-earn-val{font-size:.9rem;font-weight:800;color:var(--teal)}
 
-    /* Taken countdown */
     .taken-bar{height:3px;background:var(--danger);border-radius:2px;margin-bottom:10px;display:none}
     .taken-bar.show{display:block}
     .taken-bar-inner{height:100%;background:var(--danger);border-radius:2px;width:100%;transition:width linear}
 
-    /* Action button */
     .btn-accept{width:100%;padding:11px;background:linear-gradient(135deg,var(--primary) 0%,var(--teal) 100%);color:#fff;border:none;border-radius:var(--radius-sm);font-weight:700;font-size:.9rem;cursor:pointer;transition:opacity .2s,transform .15s;margin-top:auto}
     .btn-accept:hover{opacity:.9;transform:translateY(-1px)}
     .btn-accept:disabled{opacity:.5;cursor:not-allowed;transform:none}
     .btn-taken{width:100%;padding:11px;background:var(--gray-200);color:var(--gray-500);border:none;border-radius:var(--radius-sm);font-weight:700;font-size:.9rem;cursor:not-allowed;margin-top:auto}
 
-    /* Empty state */
-    .empty-state{text-align:center;padding:64px 24px;color:var(--gray-400)}
+    .empty-state{text-align:center;padding:64px 24px;color:var(--gray-400);background:var(--surface);border:1.5px dashed var(--gray-200);border-radius:var(--radius)}
     .empty-state .empty-icon{font-size:3.5rem;margin-bottom:16px}
     .empty-state h3{font-size:1.1rem;font-weight:700;color:var(--gray-600);margin-bottom:8px}
     .empty-state p{font-size:.88rem;line-height:1.6}
+    .btn-clear-filters{margin-top:16px;padding:10px 24px;background:var(--teal);color:#fff;border:none;border-radius:var(--radius-sm);font-weight:700;cursor:pointer;font-family:inherit;font-size:.88rem}
 
-    /* Loading skeleton */
     .skeleton-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px}
     .skeleton-card{background:var(--surface);border:1.5px solid var(--gray-200);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow-sm)}
     .skel{background:var(--gray-100);border-radius:6px;animation:skel-pulse 1.4s ease-in-out infinite}
@@ -106,7 +100,6 @@
     .skel-btn{height:40px;width:100%;margin-top:16px;border-radius:var(--radius-sm)}
     @keyframes skel-pulse{0%,100%{opacity:1}50%{opacity:.45}}
 
-    /* Dark mode */
     [data-theme=dark] .filter-bar{border-color:var(--gray-700)}
     [data-theme=dark] .gig-card{border-color:var(--gray-700)}
     [data-theme=dark] .type-pill{border-color:var(--gray-600);color:var(--gray-300);background:var(--gray-800)}
@@ -117,6 +110,8 @@
     [data-theme=dark] .skel{background:var(--gray-700)}
     [data-theme=dark] .skeleton-card{border-color:var(--gray-700)}
     [data-theme=dark] .gig-earn-strip{background:rgba(13,148,136,.1);border-color:rgba(13,148,136,.25)}
+    [data-theme=dark] .sort-select{border-color:var(--gray-600);background:var(--gray-800)}
+    [data-theme=dark] .empty-state{border-color:var(--gray-700)}
   </style>
 </head>
 <body>
@@ -136,29 +131,35 @@
       <!-- Filter Bar -->
       <div class="filter-bar">
         <div class="filter-row">
-          <!-- Search -->
           <div class="search-wrap">
             <span class="search-icon">🔎</span>
             <input type="text" id="searchInput" placeholder="Search gigs, skills, locations..." />
           </div>
-          <!-- Type toggle -->
           <div class="type-toggle">
             <button type="button" class="type-pill active" id="pillAll">All</button>
             <button type="button" class="type-pill" id="pillHyperlocal">📍 Hyperlocal</button>
             <button type="button" class="type-pill" id="pillRemote">💻 Remote</button>
           </div>
         </div>
-        <!-- Category chips -->
         <div class="filter-row">
           <div class="cat-chips" id="catChips"></div>
         </div>
       </div>
 
+      <!-- Active Filter Tags -->
+      <div class="active-filters" id="activeFilters"></div>
+
       <!-- Results meta -->
       <div class="results-meta">
         <div class="results-count" id="resultsCount"></div>
-        <div style="font-size:.78rem;color:var(--gray-400)">
-          Gigs disappear once a worker accepts them
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <select class="sort-select" id="sortSelect">
+            <option value="newest">🕒 Newest First</option>
+            <option value="pay-high">💰 Pay: High → Low</option>
+            <option value="pay-low">💸 Pay: Low → High</option>
+            <option value="earn-high">⭐ Earnings: High → Low</option>
+          </select>
+          <div style="font-size:.78rem;color:var(--gray-400)">Gigs disappear once taken</div>
         </div>
       </div>
 
@@ -190,33 +191,34 @@
         { value:"driver",        label:"🚗 Driver" }
       ],
       remote: [
-        { value:"logo-design",     label:"🎨 Logo Design" },
-        { value:"video-editing",   label:"🎬 Video Editing" },
-        { value:"web-dev",         label:"🌐 Web Dev" },
-        { value:"content-writing", label:"✍️ Content Writing" },
-        { value:"social-media",    label:"📱 Social Media" },
-        { value:"data-entry",      label:"📊 Data Entry" },
-        { value:"graphic-design",  label:"🖼️ Graphic Design" },
-        { value:"voiceover",       label:"🎙️ Voiceover" },
-        { value:"translation",     label:"🌍 Translation" },
-        { value:"customer-support",label:"🎧 Customer Support" }
+        { value:"logo-design",      label:"🎨 Logo Design" },
+        { value:"video-editing",    label:"🎬 Video Editing" },
+        { value:"web-dev",          label:"🌐 Web Dev" },
+        { value:"content-writing",  label:"✍️ Content Writing" },
+        { value:"social-media",     label:"📱 Social Media" },
+        { value:"data-entry",       label:"📊 Data Entry" },
+        { value:"graphic-design",   label:"🖼️ Graphic Design" },
+        { value:"voiceover",        label:"🎙️ Voiceover" },
+        { value:"translation",      label:"🌍 Translation" },
+        { value:"customer-support", label:"🎧 Customer Support" }
       ]
     };
 
     var FEE_RATE   = 0.06;
-    var TAKEN_SHOW = 30000; // 30 seconds before card vanishes
+    var TAKEN_SHOW = 30000;
     var GIG_KEY    = (typeof GL !== "undefined" && GL.STORAGE_KEY_GIGS) ? GL.STORAGE_KEY_GIGS : "gl_gigs";
 
-    var currentType = "all";
-    var currentCat  = "all";
-    var searchQuery = "";
-    var takenTimers = {};
+    var currentType  = "all";
+    var currentCat   = "all";
+    var currentSort  = "newest";
+    var searchQuery  = "";
+    var takenTimers  = {};
 
-    /* ── DOM refs ── */
-    var gigGrid    = document.getElementById("gigGrid");
-    var searchInput= document.getElementById("searchInput");
-    var catChipsEl = document.getElementById("catChips");
+    var gigGrid      = document.getElementById("gigGrid");
+    var searchInput  = document.getElementById("searchInput");
+    var catChipsEl   = document.getElementById("catChips");
     var resultsCount = document.getElementById("resultsCount");
+    var afEl         = document.getElementById("activeFilters");
 
     /* ── Breadcrumb ── */
     if (typeof buildBreadcrumb === "function") {
@@ -229,16 +231,16 @@
     /* ═══════════════════════════════════════
        TYPE TOGGLE
     ═══════════════════════════════════════ */
-    document.getElementById("pillAll").addEventListener("click", function () { setType("all"); });
+    document.getElementById("pillAll").addEventListener("click",        function () { setType("all"); });
     document.getElementById("pillHyperlocal").addEventListener("click", function () { setType("hyperlocal"); });
-    document.getElementById("pillRemote").addEventListener("click", function () { setType("remote"); });
+    document.getElementById("pillRemote").addEventListener("click",     function () { setType("remote"); });
 
     function setType(type) {
       currentType = type;
       currentCat  = "all";
-      document.getElementById("pillAll").classList.toggle("active", type === "all");
+      document.getElementById("pillAll").classList.toggle("active",        type === "all");
       document.getElementById("pillHyperlocal").classList.toggle("active", type === "hyperlocal");
-      document.getElementById("pillRemote").classList.toggle("active", type === "remote");
+      document.getElementById("pillRemote").classList.toggle("active",     type === "remote");
       buildCatChips();
       render();
     }
@@ -279,49 +281,48 @@
     }
 
     function getCatLabel(val) {
-      var all = CATS.hyperlocal.concat(CATS.remote);
+      var all   = CATS.hyperlocal.concat(CATS.remote);
       var found = all.find(function (c) { return c.value === val; });
       return found ? found.label : val;
     }
 
     /* ═══════════════════════════════════════
-       SEARCH
+       SEARCH & SORT
     ═══════════════════════════════════════ */
     searchInput.addEventListener("input", function () {
       searchQuery = searchInput.value.trim().toLowerCase();
       render();
     });
 
+    document.getElementById("sortSelect").addEventListener("change", function () {
+      currentSort = this.value;
+      render();
+    });
+
     /* ═══════════════════════════════════════
        DATA
     ═══════════════════════════════════════ */
-    function getGigs() {
-      return JSON.parse(localStorage.getItem(GIG_KEY) || "[]");
-    }
-
-    function saveGigs(gigs) {
-      localStorage.setItem(GIG_KEY, JSON.stringify(gigs));
-    }
+    function getGigs()       { return JSON.parse(localStorage.getItem(GIG_KEY) || "[]"); }
+    function saveGigs(gigs)  { localStorage.setItem(GIG_KEY, JSON.stringify(gigs)); }
 
     function getFilteredGigs() {
       var gigs = getGigs();
+      var now  = Date.now();
 
-      // Exclude fully vanished (taken + past 30s window)
-      var now = Date.now();
+      // Remove vanished / completed
       gigs = gigs.filter(function (g) {
         if (g.status === "taken" && g.takenAt) {
-          var elapsed = now - new Date(g.takenAt).getTime();
-          return elapsed < TAKEN_SHOW;
+          return (now - new Date(g.takenAt).getTime()) < TAKEN_SHOW;
         }
         if (g.status === "completed") return false;
         return true;
       });
 
-      // Type filter
+      // Type
       if (currentType !== "all") {
         gigs = gigs.filter(function (g) { return g.type === currentType; });
       }
-      // Category filter
+      // Category
       if (currentCat !== "all") {
         gigs = gigs.filter(function (g) { return g.category === currentCat; });
       }
@@ -330,12 +331,22 @@
         gigs = gigs.filter(function (g) {
           return (
             g.title.toLowerCase().includes(searchQuery) ||
-            (g.description || "").toLowerCase().includes(searchQuery) ||
-            (g.location || "").toLowerCase().includes(searchQuery) ||
-            (g.categoryLabel || "").toLowerCase().includes(searchQuery)
+            (g.description  || "").toLowerCase().includes(searchQuery) ||
+            (g.location     || "").toLowerCase().includes(searchQuery) ||
+            (g.categoryLabel|| "").toLowerCase().includes(searchQuery)
           );
         });
       }
+
+      // Sort
+      gigs.sort(function (a, b) {
+        if (currentSort === "newest")    return new Date(b.postedAt) - new Date(a.postedAt);
+        if (currentSort === "pay-high")  return b.pricePerHr - a.pricePerHr;
+        if (currentSort === "pay-low")   return a.pricePerHr - b.pricePerHr;
+        if (currentSort === "earn-high") return (b.pricePerHr * (1 - FEE_RATE)) - (a.pricePerHr * (1 - FEE_RATE));
+        return 0;
+      });
+
       return gigs;
     }
 
@@ -344,10 +355,58 @@
     ═══════════════════════════════════════ */
     function timeAgo(isoStr) {
       var diff = Math.floor((Date.now() - new Date(isoStr).getTime()) / 1000);
-      if (diff < 60)  return diff + "s ago";
-      if (diff < 3600) return Math.floor(diff / 60) + "m ago";
+      if (diff < 60)    return diff + "s ago";
+      if (diff < 3600)  return Math.floor(diff / 60) + "m ago";
       if (diff < 86400) return Math.floor(diff / 3600) + "h ago";
       return Math.floor(diff / 86400) + "d ago";
+    }
+
+    /* ═══════════════════════════════════════
+       RENDER ACTIVE FILTER TAGS
+    ═══════════════════════════════════════ */
+    function renderActiveFilters() {
+      var tags = [];
+      if (currentType !== "all") tags.push({
+        label: currentType === "hyperlocal" ? "📍 Hyperlocal" : "💻 Remote",
+        clear: function () { setType("all"); }
+      });
+      if (currentCat !== "all") tags.push({
+        label: getCatLabel(currentCat),
+        clear: function () { setCat("all"); }
+      });
+      if (searchQuery) tags.push({
+        label: '🔎 "' + searchQuery + '"',
+        clear: function () { searchInput.value = ""; searchQuery = ""; render(); }
+      });
+
+      if (!tags.length) {
+        afEl.classList.remove("show");
+        afEl.innerHTML = "";
+        return;
+      }
+
+      afEl.classList.add("show");
+      afEl.innerHTML = '<span style="font-size:.78rem;color:var(--gray-500);font-weight:600">Active:</span>';
+
+      tags.forEach(function (t) {
+        var chip = document.createElement("span");
+        chip.className = "af-chip";
+        chip.innerHTML = escHtml(t.label) + ' <button title="Remove">✕</button>';
+        chip.querySelector("button").addEventListener("click", t.clear);
+        afEl.appendChild(chip);
+      });
+
+      var clearAll = document.createElement("button");
+      clearAll.className   = "af-clear-all";
+      clearAll.textContent = "Clear All";
+      clearAll.addEventListener("click", function () {
+        setType("all");
+        setCat("all");
+        searchInput.value = "";
+        searchQuery = "";
+        render();
+      });
+      afEl.appendChild(clearAll);
     }
 
     /* ═══════════════════════════════════════
@@ -356,18 +415,34 @@
     function render() {
       var gigs = getFilteredGigs();
 
-      // Update count
+      renderActiveFilters();
+
       var openCount = gigs.filter(function (g) { return g.status === "open"; }).length;
-      resultsCount.innerHTML = "<strong>" + gigs.length + "</strong> gig" + (gigs.length !== 1 ? "s" : "") + " found" +
-        (openCount < gigs.length ? " (<span style='color:var(--teal)'>" + openCount + " open</span>)" : "");
+      resultsCount.innerHTML =
+        "<strong>" + gigs.length + "</strong> gig" + (gigs.length !== 1 ? "s" : "") + " found" +
+        (openCount < gigs.length
+          ? " (<span style='color:var(--teal)'>" + openCount + " open</span>)"
+          : "");
 
       if (gigs.length === 0) {
-        gigGrid.innerHTML = '<div class="empty-state">' +
-          '<div class="empty-icon">🔍</div>' +
-          '<h3>Koi gig nahi mila!</h3>' +
-          '<p>No gigs match your filters right now.<br>Try changing the category or check back soon.</p>' +
-          '<a href="post-gig.html" class="btn btn-primary" style="margin-top:16px;display:inline-block">+ Post a Gig</a>' +
+        var hasFilters = currentType !== "all" || currentCat !== "all" || searchQuery;
+        gigGrid.innerHTML =
+          '<div class="empty-state">' +
+            '<div class="empty-icon">' + (hasFilters ? "🔍" : "📋") + '</div>' +
+            '<h3>' + (hasFilters ? "No gigs match your filters" : "No gigs yet!") + '</h3>' +
+            '<p>' + (hasFilters
+              ? "Try clearing a filter or broadening your search."
+              : "Be the first to post a gig in your area.") +
+            '</p>' +
+            (hasFilters
+              ? '<button class="btn-clear-filters" id="btnClearFilters">✕ Clear All Filters</button>'
+              : '<a href="post-gig.html" class="btn btn-primary" style="margin-top:16px;display:inline-block">+ Post a Gig</a>') +
           '</div>';
+        var cf = document.getElementById("btnClearFilters");
+        if (cf) cf.addEventListener("click", function () {
+          setType("all"); setCat("all");
+          searchInput.value = ""; searchQuery = ""; render();
+        });
         return;
       }
 
@@ -386,15 +461,12 @@
       var payIcon = gig.payType === "cash" ? "💵" : gig.payType === "wallet" ? "🔒" : "✅";
 
       var card = document.createElement("div");
-      card.className = "gig-card" + (isTaken ? " taken taken-flash" : "");
+      card.className     = "gig-card" + (isTaken ? " taken taken-flash" : "");
       card.dataset.gigId = gig.id;
 
-      // Countdown bar (only for taken)
-      var barHtml = "";
-      if (isTaken) {
-        barHtml = '<div class="taken-bar show" id="bar_' + gig.id + '">' +
-                  '<div class="taken-bar-inner" id="barInner_' + gig.id + '"></div></div>';
-      }
+      var barHtml = isTaken
+        ? '<div class="taken-bar show" id="bar_' + gig.id + '"><div class="taken-bar-inner" id="barInner_' + gig.id + '"></div></div>'
+        : "";
 
       var typeTag = gig.type === "hyperlocal"
         ? '<span class="gig-type-tag tag-hyperlocal">📍 Hyperlocal</span>'
@@ -412,9 +484,9 @@
         barHtml +
         statusBadge +
         typeTag +
-        '<div class="gig-cat">' + (gig.categoryLabel || gig.category) + '</div>' +
-        '<div class="gig-title">' + escHtml(gig.title) + '</div>' +
-        '<div class="gig-desc">' + escHtml(gig.description || "") + '</div>' +
+        '<div class="gig-cat">'        + escHtml(gig.categoryLabel || gig.category) + '</div>' +
+        '<div class="gig-title">'       + escHtml(gig.title) + '</div>' +
+        '<div class="gig-desc">'        + escHtml(gig.description || "") + '</div>' +
         '<div class="gig-meta">' +
           (gig.location ? '<span class="gig-meta-item">📍 ' + escHtml(gig.location) + '</span>' : '') +
           '<span class="gig-meta-item">🕒 ' + timeAgo(gig.postedAt) + '</span>' +
@@ -430,16 +502,14 @@
         '</div>' +
         actionBtn;
 
-      // Accept handler
       if (!isTaken) {
         card.querySelector(".btn-accept").addEventListener("click", function () {
           acceptGig(gig.id, card);
         });
       }
 
-      // Start countdown animation if taken
       if (isTaken && gig.takenAt) {
-        var elapsed = Date.now() - new Date(gig.takenAt).getTime();
+        var elapsed   = Date.now() - new Date(gig.takenAt).getTime();
         var remaining = Math.max(0, TAKEN_SHOW - elapsed);
         startCountdownBar(gig.id, remaining);
       }
@@ -454,7 +524,7 @@
     }
 
     function escHtml(str) {
-      return String(str)
+      return String(str || "")
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
@@ -465,7 +535,6 @@
        ACCEPT GIG
     ═══════════════════════════════════════ */
     function acceptGig(gigId, card) {
-      // Auth check
       var user = typeof getCurrentUser === "function" ? getCurrentUser() : null;
       if (!user) {
         if (typeof showToast === "function") showToast("Please log in to accept a gig.", "error");
@@ -473,10 +542,10 @@
         return;
       }
 
-      // Prevent poster accepting their own gig
       var gigs = getGigs();
       var gig  = gigs.find(function (g) { return g.id === gigId; });
       if (!gig) return;
+
       if (gig.posterId && user.id && gig.posterId === user.id) {
         if (typeof showToast === "function") showToast("You can't accept your own gig!", "error");
         return;
@@ -487,43 +556,36 @@
         return;
       }
 
-      // Lock gig
       gig.status  = "taken";
       gig.takenAt = new Date().toISOString();
       gig.takenBy = user.id || user.name || "worker";
       saveGigs(gigs);
 
-      // Update card UI immediately
       card.classList.add("taken", "taken-flash");
       var acceptBtn = card.querySelector(".btn-accept");
-      if (acceptBtn) {
-        acceptBtn.outerHTML = '<button class="btn-taken" disabled>🔒 Already Taken</button>';
-      }
+      if (acceptBtn) acceptBtn.outerHTML = '<button class="btn-taken" disabled>🔒 Already Taken</button>';
       var badge = card.querySelector(".gig-status-badge");
       if (badge) { badge.className = "gig-status-badge badge-taken"; badge.textContent = "🔒 Taken"; }
 
-      // Add countdown bar
       var bar = document.createElement("div");
       bar.className = "taken-bar show";
-      bar.id = "bar_" + gigId;
+      bar.id        = "bar_" + gigId;
       bar.innerHTML = '<div class="taken-bar-inner" id="barInner_' + gigId + '"></div>';
       card.insertBefore(bar, card.firstChild);
 
       if (typeof showToast === "function") showToast("✅ Gig accepted! Check your dashboard.", "success");
 
-      // Redirect worker to chat/dashboard
       setTimeout(function () {
         window.location.href = "dashboard-worker.html?gigId=" + gigId;
       }, 1800);
 
-      // Start 30s countdown then remove card
       startCountdownBar(gigId, TAKEN_SHOW);
       takenTimers[gigId] = setTimeout(function () {
         var el = document.querySelector('[data-gig-id="' + gigId + '"]');
         if (el) {
-          el.style.transition = "opacity .5s, transform .5s";
-          el.style.opacity = "0";
-          el.style.transform = "scale(.95)";
+          el.style.transition = "opacity .5s,transform .5s";
+          el.style.opacity    = "0";
+          el.style.transform  = "scale(.95)";
           setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 500);
         }
         render();
@@ -531,30 +593,26 @@
     }
 
     /* ═══════════════════════════════════════
-       COUNTDOWN BAR ANIMATION
+       COUNTDOWN BAR
     ═══════════════════════════════════════ */
     function startCountdownBar(gigId, duration) {
       setTimeout(function () {
         var inner = document.getElementById("barInner_" + gigId);
         if (!inner) return;
         inner.style.transition = "width " + (duration / 1000) + "s linear";
-        inner.style.width = "0%";
+        inner.style.width      = "0%";
       }, 50);
     }
 
-    /* ═══════════════════════════════════════
-       AUTO REFRESH every 15s
-    ═══════════════════════════════════════ */
+    /* ── Auto refresh every 15s ── */
     setInterval(function () { render(); }, 15000);
 
-    /* ── Storage change (multi-tab sync) ── */
+    /* ── Multi-tab sync ── */
     window.addEventListener("storage", function (e) {
       if (e.key === GIG_KEY) render();
     });
 
-    /* ═══════════════════════════════════════
-       INIT
-    ═══════════════════════════════════════ */
+    /* ── Init ── */
     buildCatChips();
     render();
 
