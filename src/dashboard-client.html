@@ -165,11 +165,16 @@
     var GIG_KEY  = (typeof GL !== "undefined" && GL.STORAGE_KEY_GIGS) ? GL.STORAGE_KEY_GIGS : "gl_gigs";
 
     /* ── Auth guard ── */
-    var user = typeof getCurrentUser === "function" ? getCurrentUser() : null;
-    if (!user) {
-      window.location.href = "login.html?redirect=dashboard-client.html";
-      return;
-    }
+    var user = (function() {
+  try {
+    var u = JSON.parse(localStorage.getItem("gl_user") || "null");
+    return (u && u.id) ? u : null;
+  } catch(e) { return null; }
+})();
+if (!user) {
+  window.location.href = "login.html?redirect=dashboard-client.html";
+  return;
+}
 
     /* ── Breadcrumb ── */
     if (typeof buildBreadcrumb === "function") {
