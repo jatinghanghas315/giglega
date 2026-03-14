@@ -1,274 +1,440 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Sign Up - GigLega Beta</title>
-    <link rel="stylesheet" href="./styles.css" />
-        <link rel="icon" type="image/png" href="./logo.png">
-    <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap"
-      rel="stylesheet"
-    />
-    <style>
-      .signup-container {
-        max-width: 600px;
-        margin: 60px auto;
-        background: white;
-        padding: 40px;
-        border-radius: 14px;
-        box-shadow: 0 4px 25px rgba(0,0,0,0.1);
-      }
-      .signup-title {
-        margin: 0 0 10px;
-        color: #003366;
-        font-size: 2em;
-        text-align: center;
-      }
-      .signup-subtitle {
-        color: #666;
-        text-align: center;
-        margin-bottom: 30px;
-      }
-      .form-group {
-        margin-bottom: 20px;
-      }
-      .form-group label {
-        display: block;
-        margin-bottom: 8px;
-        color: #003366;
-        font-weight: 600;
-      }
-      .form-group input,
-      .form-group select {
-        width: 100%;
-        padding: 12px;
-        border: 2px solid #e0e0e0;
-        border-radius: 8px;
-        font-size: 1em;
-        font-family: 'Poppins', sans-serif;
-        box-sizing: border-box;
-        transition: border 0.3s;
-      }
-      .form-group input:focus,
-      .form-group select:focus {
-        outline: none;
-        border-color: #FFA500;
-      }
-      .error-message {
-        display: none;
-        background: #ffebee;
-        color: #c62828;
-        padding: 12px;
-        border-radius: 8px;
-        margin-bottom: 20px;
-        font-size: 0.9em;
-      }
-      .submit-btn {
-        width: 100%;
-        padding: 15px;
-        background: linear-gradient(135deg, #FFA500, #FF6B35);
-        color: white;
-        border: none;
-        border-radius: 10px;
-        font-size: 1.1em;
-        font-weight: bold;
-        cursor: pointer;
-        font-family: 'Poppins', sans-serif;
-        transition: all 0.3s;
-      }
-      .submit-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(255,165,0,0.3);
-      }
-      .submit-btn:disabled {
-        background: #ccc;
-        cursor: not-allowed;
-        transform: none;
-      }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign Up — GigLega</title>
+  <meta name="description" content="GigLega join karo free mein. Worker ya poster — dono welcome hain." />
+  <link rel="stylesheet" href="styles.css" />
+  <script src="shared.js"></script>
+  <style>
+    .auth-page {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+      background: linear-gradient(135deg, rgba(26,60,94,.04) 0%, rgba(13,148,136,.06) 100%);
+    }
+    .auth-card {
+      background: var(--surface);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-lg);
+      width: 100%;
+      max-width: 500px;
+      overflow: hidden;
+    }
+    .auth-brand {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--teal) 100%);
+      padding: 28px 32px 24px;
+      text-align: center;
+      color: #fff;
+    }
+    .auth-logo { font-size: 1.9rem; font-weight: 900; letter-spacing: -1px; margin-bottom: 4px; }
+    .auth-logo span { opacity: .75; }
+    .auth-tagline { font-size: .82rem; opacity: .75; }
+
+    .auth-body { padding: 28px 32px 32px; }
+    @media(max-width:480px){ .auth-body { padding: 20px 20px 24px; } }
+
+    /* Role picker */
+    .role-pick { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+    .role-card {
+      border: 2px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+      padding: 16px 12px;
+      text-align: center;
+      cursor: pointer;
+      transition: var(--transition);
+      background: var(--surface);
+    }
+    .role-card:hover { border-color: var(--teal); }
+    .role-card.active { border-color: var(--teal); background: rgba(13,148,136,.06); }
+    .role-card input { display: none; }
+    .role-icon { font-size: 1.8rem; margin-bottom: 6px; }
+    .role-name { font-size: .88rem; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+    .role-desc { font-size: .74rem; color: var(--gray-400); line-height: 1.4; }
+
+    .field { margin-bottom: 18px; }
+    .field label { display: block; font-weight: 600; font-size: .86rem; color: var(--gray-700); margin-bottom: 6px; }
+    .field-input-wrap { position: relative; }
+    .field-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 1rem; pointer-events: none; }
+    .field input, .field select, .field textarea {
+      width: 100%; padding: 11px 14px; border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-sm); font-size: .93rem; background: var(--surface);
+      color: var(--text); font-family: var(--font); transition: border .2s, box-shadow .2s; box-sizing: border-box;
+    }
+    .field input.has-icon, .field select.has-icon { padding-left: 38px; }
+    .field input.has-icon-right { padding-right: 42px; }
+    .field input:focus, .field select:focus, .field textarea:focus {
+      outline: none; border-color: var(--teal); box-shadow: 0 0 0 3px rgba(13,148,136,.1);
+    }
+    .field-error { font-size: .76rem; color: var(--danger); margin-top: 5px; font-weight: 600; display: none; }
+    .field-error.show { display: block; }
+    .field-hint { font-size: .76rem; color: var(--gray-400); margin-top: 5px; }
+    .btn-eye { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 1rem; color: var(--gray-400); padding: 4px; line-height: 1; }
+    .btn-eye:hover { color: var(--gray-700); }
+
+    .pw-strength { margin-top: 8px; display: none; }
+    .pw-strength.show { display: block; }
+    .pw-bars { display: flex; gap: 4px; margin-bottom: 4px; }
+    .pw-bar { flex: 1; height: 4px; border-radius: 2px; background: var(--gray-200); transition: background .3s; }
+    .pw-lbl { font-size: .74rem; font-weight: 600; color: var(--gray-400); }
+
+    /* Skills checkboxes */
+    .skills-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+    .skill-chip {
+      display: flex; align-items: center; gap: 5px;
+      padding: 6px 12px; border-radius: var(--radius-full);
+      border: 1.5px solid var(--gray-200); background: var(--surface);
+      font-size: .78rem; font-weight: 600; color: var(--gray-600);
+      cursor: pointer; transition: var(--transition); user-select: none;
+    }
+    .skill-chip input { display: none; }
+    .skill-chip.checked { border-color: var(--teal); background: rgba(13,148,136,.08); color: var(--teal); }
+
+    .btn-submit {
+      width: 100%; padding: 13px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--teal) 100%);
+      color: #fff; border: none; border-radius: var(--radius-sm);
+      font-weight: 800; font-size: .95rem; cursor: pointer;
+      transition: transform .15s, box-shadow .15s, opacity .2s;
+      box-shadow: 0 4px 14px rgba(13,148,136,.35); margin-bottom: 16px;
+      font-family: var(--font); display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn-submit:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(13,148,136,.45); }
+    .btn-submit:disabled { opacity: .55; transform: none; cursor: not-allowed; box-shadow: none; }
+    .btn-submit .spinner { display: none; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,.35); border-top-color: #fff; border-radius: 50%; animation: spin .65s linear infinite; }
+    .btn-submit.loading .btn-text { display: none; }
+    .btn-submit.loading .spinner { display: inline-block; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .terms-note { font-size: .74rem; color: var(--gray-400); text-align: center; line-height: 1.6; margin-top: 12px; }
+    .terms-note a { color: var(--teal); }
+    .auth-switch { text-align: center; font-size: .83rem; color: var(--gray-500); margin-top: 14px; }
+    .auth-switch a { color: var(--teal); font-weight: 700; }
+
+    .auth-success { text-align: center; padding: 40px 24px; display: none; }
+    .auth-success.show { display: block; }
+    .auth-success .s-icon { font-size: 3.5rem; margin-bottom: 16px; }
+    .auth-success h3 { font-size: 1.2rem; font-weight: 800; color: var(--success); margin-bottom: 8px; }
+    .auth-success p { font-size: .88rem; color: var(--gray-500); line-height: 1.6; }
+
+    /* Dark */
+    [data-theme=dark] .auth-card { border-color: var(--gray-700); }
+    [data-theme=dark] .field input,
+    [data-theme=dark] .field select,
+    [data-theme=dark] .field textarea { border-color: var(--gray-600); background: var(--gray-800); }
+    [data-theme=dark] .field label { color: var(--gray-300); }
+    [data-theme=dark] .role-card { border-color: var(--gray-700); background: var(--gray-800); }
+    [data-theme=dark] .skill-chip { border-color: var(--gray-700); background: var(--gray-800); color: var(--gray-300); }
+    [data-theme=dark] .pw-bar { background: var(--gray-700); }
+  </style>
 </head>
-<body style="background: var(--color-bg);">
-    <div class="beta-banner">
-      🎉 GigLega Beta ab Gurugram mein Live hai! Pehle 100 users mein shaamil ho jao — Join Karo, Free Hai!
+<body>
+  <div id="announce-bar"></div>
+  <nav id="main-nav"></nav>
+
+  <main>
+    <div class="auth-page">
+      <div class="auth-card">
+
+        <div class="auth-brand">
+          <div class="auth-logo">Gig<span>Lega</span></div>
+          <div class="auth-tagline">Join free — find gigs or hire talent in Gurugram</div>
+        </div>
+
+        <!-- Form -->
+        <div class="auth-body" id="signupForm">
+
+          <!-- Role picker -->
+          <div style="margin-bottom:8px;font-weight:700;font-size:.88rem;color:var(--gray-600)">
+            I want to…
+          </div>
+          <div class="role-pick">
+            <label class="role-card active" id="roleWorkerCard">
+              <input type="radio" name="role" value="worker" id="roleWorker" checked />
+              <div class="role-icon">⚡</div>
+              <div class="role-name">Find Work</div>
+              <div class="role-desc">Accept gigs & earn money</div>
+            </label>
+            <label class="role-card" id="rolePosterCard">
+              <input type="radio" name="role" value="poster" id="rolePoster" />
+              <div class="role-icon">📋</div>
+              <div class="role-name">Hire Help</div>
+              <div class="role-desc">Post gigs & get things done</div>
+            </label>
+          </div>
+
+          <div class="field">
+            <label for="regName">Full Name <span style="color:var(--danger)">*</span></label>
+            <div class="field-input-wrap">
+              <span class="field-icon">👤</span>
+              <input type="text" id="regName" class="has-icon" placeholder="Your full name" autocomplete="name" />
+            </div>
+            <div class="field-error" id="regNameErr">Please enter your full name (min 2 chars).</div>
+          </div>
+
+          <div class="field">
+            <label for="regId">Email or Phone <span style="color:var(--danger)">*</span></label>
+            <div class="field-input-wrap">
+              <span class="field-icon">📧</span>
+              <input type="text" id="regId" class="has-icon" placeholder="you@email.com or 9876543210" autocomplete="username" />
+            </div>
+            <div class="field-error" id="regIdErr">Enter a valid email or 10-digit phone number.</div>
+          </div>
+
+          <div class="field">
+            <label for="regCity">City / Area <span style="color:var(--danger)">*</span></label>
+            <div class="field-input-wrap">
+              <span class="field-icon">📍</span>
+              <input type="text" id="regCity" class="has-icon" placeholder="e.g. Gurugram, Sector 45" />
+            </div>
+            <div class="field-error" id="regCityErr">Please enter your city or area.</div>
+          </div>
+
+          <!-- Skills (shown for worker role) -->
+          <div class="field" id="skillsField">
+            <label>Your Skills <span style="font-size:.76rem;color:var(--gray-400)">(optional, select all that apply)</span></label>
+            <div class="skills-grid" id="skillsGrid"></div>
+          </div>
+
+          <div class="field">
+            <label for="regPw">Password <span style="color:var(--danger)">*</span></label>
+            <div class="field-input-wrap">
+              <span class="field-icon">🔒</span>
+              <input type="password" id="regPw" class="has-icon has-icon-right" placeholder="Create a strong password" autocomplete="new-password" />
+              <button class="btn-eye" id="eyeReg" type="button" aria-label="Toggle password">👁️</button>
+            </div>
+            <div class="pw-strength" id="pwStrength">
+              <div class="pw-bars">
+                <div class="pw-bar" id="pb1"></div>
+                <div class="pw-bar" id="pb2"></div>
+                <div class="pw-bar" id="pb3"></div>
+                <div class="pw-bar" id="pb4"></div>
+              </div>
+              <div class="pw-lbl" id="pwLbl">Enter a password</div>
+            </div>
+            <div class="field-error" id="regPwErr">Password must be at least 6 characters.</div>
+          </div>
+
+          <div class="field">
+            <label for="regPwConf">Confirm Password <span style="color:var(--danger)">*</span></label>
+            <div class="field-input-wrap">
+              <span class="field-icon">🔒</span>
+              <input type="password" id="regPwConf" class="has-icon has-icon-right" placeholder="Repeat your password" autocomplete="new-password" />
+              <button class="btn-eye" id="eyeRegConf" type="button" aria-label="Toggle">👁️</button>
+            </div>
+            <div class="field-error" id="regPwConfErr">Passwords do not match.</div>
+          </div>
+
+          <button class="btn-submit" id="btnRegister" type="button">
+            <span class="btn-text">Create Account →</span>
+            <span class="spinner"></span>
+          </button>
+
+          <div class="terms-note">
+            By registering you agree to our
+            <a href="terms.html" target="_blank">Terms of Service</a> and
+            <a href="privacy-policy.html" target="_blank">Privacy Policy</a>.
+          </div>
+
+          <div class="auth-switch">
+            Already have an account? <a href="login.html">Login →</a>
+          </div>
+
+        </div>
+
+        <!-- Success state -->
+        <div class="auth-success" id="signupSuccess">
+          <div class="s-icon">🎉</div>
+          <h3 id="successTitle">Welcome to GigLega!</h3>
+          <p id="successBody">Your account has been created.<br>Redirecting you now...</p>
+        </div>
+
+      </div>
     </div>
+  </main>
 
-    <nav>
-      <div class="nav-container">
-        <div class="logo">
-                      <img src="./logo.png" alt="GigLega Logo" style="width:48px;height:48px;border-radius:50%;object-fit:cover;">
-          <span>GigLega</span>
-        </div>
+  <div id="toast-container"></div>
 
-        <ul class="nav-links">
-          <li><a href="index.html">Home</a></li>
-          <li><a href="browse.html">Browse Gigs</a></li>
-          <li><a href="post-gig.html">Post Gig</a></li>
-          <li><a href="contact.html">Contact</a></li>
-        </ul>
+  <script>
+  document.addEventListener("DOMContentLoaded", function () {
 
-        <a href="login.html" class="cta-button">Login</a>
-      </div>
-    </nav>
+    var USER_KEY  = (typeof GL !== "undefined") ? GL.STORAGE_KEY_USER  : "gl_user";
+    var USERS_KEY = (typeof GL !== "undefined") ? GL.STORAGE_KEY_USERS : "gl_users";
 
-    <div class="signup-container">
-      <h2 class="signup-title">Free Mein Judo! 🚀</h2>
-      <p class="signup-subtitle">Apna account banao aur gigs dhundna shuru karo</p>
+    /* ✅ If already logged in, go to dashboard */
+    var existing = (typeof getCurrentUser === "function") ? getCurrentUser() : safeParseUser();
+    if (existing) { window.location.replace("dashboard.html"); return; }
 
-      <div id="error-message" class="error-message"></div>
+    var redirectTo = getParam("redirect") || "dashboard.html";
+    if (/login|signup/i.test(redirectTo)) redirectTo = "dashboard.html";
 
-      <form id="signup-form">
-        <div class="form-group">
-          <label for="name">Pura Naam *</label>
-          <input type="text" id="name" placeholder="Apna naam likho" required />
-        </div>
+    var ALL_SKILLS = [
+      "🧹 House Help","🛒 Errands","📦 Moving","🔧 Handyman","💻 Tech Help",
+      "🧓 Elderly Care","🐕 Pet Care","📚 Tutoring","🎉 Events","🏡 Gardening",
+      "🎨 Design","🎬 Video Edit","🌐 Web Dev","✍️ Writing","📱 Social Media",
+      "📊 Data Entry","🎙️ Voiceover","🚗 Driver","🧼 Cleaning","🎧 Support"
+    ];
 
-        <div class="form-group">
-          <label for="email">Email *</label>
-          <input type="email" id="email" placeholder="example@gmail.com" required />
-        </div>
+    /* ── Helpers ── */
+    function getParam(n) { return new URLSearchParams(window.location.search).get(n); }
+    function safeParseUser() {
+      try { var u = JSON.parse(localStorage.getItem(USER_KEY)||"null"); return (u&&u.id)?u:null; } catch(e){return null;}
+    }
+    function getUsers()     { try { return JSON.parse(localStorage.getItem(USERS_KEY)||"[]"); } catch(e){return [];} }
+    function saveUsers(arr) { localStorage.setItem(USERS_KEY, JSON.stringify(arr)); }
+    function saveUser(u)    { localStorage.setItem(USER_KEY, JSON.stringify(u)); }
+    function isEmail(v)     { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim()); }
+    function isPhone(v)     { return /^[6-9]\d{9}$/.test(v.replace(/\s+/g,"")); }
+    function validId(v)     { return isEmail(v)||isPhone(v); }
+    function hashPw(pw) {
+      var h = 0;
+      for (var i=0;i<pw.length;i++){h=((h<<5)-h)+pw.charCodeAt(i);h|=0;}
+      return "h"+Math.abs(h).toString(16);
+    }
+    function findUser(id) {
+      var c = id.trim().replace(/\s+/g,"");
+      return getUsers().find(function(u){return u.email===c||u.phone===c;})||null;
+    }
+    function showErr(id,msg) {
+      var el=document.getElementById(id); if(!el)return;
+      if(msg) el.textContent=msg; el.classList.add("show");
+    }
+    function clearErrs() { document.querySelectorAll(".field-error").forEach(function(e){e.classList.remove("show");}); }
+    function setLoading(id,on) { var b=document.getElementById(id); if(!b)return; b.disabled=on; b.classList.toggle("loading",on); }
 
-        <div class="form-group">
-          <label for="password">Password *</label>
-          <input type="password" id="password" placeholder="Kam se kam 6 characters" required minlength="6" />
-        </div>
+    /* ── Build skills grid ── */
+    var skillsGrid = document.getElementById("skillsGrid");
+    ALL_SKILLS.forEach(function(skill){
+      var chip = document.createElement("label");
+      chip.className = "skill-chip";
+      chip.innerHTML = '<input type="checkbox" value="'+skill+'" /> '+skill;
+      chip.querySelector("input").addEventListener("change", function(){
+        chip.classList.toggle("checked", this.checked);
+      });
+      skillsGrid.appendChild(chip);
+    });
 
-        <div class="form-group">
-          <label for="phone">Phone Number *</label>
-          <input type="tel" id="phone" placeholder="9876543210" required pattern="[0-9]{10}" />
-        </div>
+    /* ── Role picker ── */
+    var workerCard = document.getElementById("roleWorkerCard");
+    var posterCard = document.getElementById("rolePosterCard");
+    var skillsField = document.getElementById("skillsField");
 
-        <div class="form-group">
-          <label for="role">Main Role *</label>
-          <select id="role" required>
-            <option value="">Select karo...</option>
-            <option value="Gig Worker">Gig Worker (Local/Hyperlocal kaam)</option>
-            <option value="Freelancer">Freelancer (Remote/Digital kaam)</option>
-            <option value="Both">Both (Dono kaam kar sakta hun)</option>
-            <option value="Client">Client (Kaam dena hai)</option>
-          </select>
-        </div>
+    function updateRole() {
+      var isWorker = document.getElementById("roleWorker").checked;
+      workerCard.classList.toggle("active",  isWorker);
+      posterCard.classList.toggle("active", !isWorker);
+      skillsField.style.display = isWorker ? "block" : "none";
+    }
+    workerCard.addEventListener("click", function(){ document.getElementById("roleWorker").checked=true; updateRole(); });
+    posterCard.addEventListener("click", function(){ document.getElementById("rolePoster").checked=true; updateRole(); });
+    updateRole();
 
-        <div class="form-group">
-          <label for="location">Location *</label>
-          <input type="text" id="location" placeholder="Gurugram, Sector XX" value="Gurugram" required />
-        </div>
+    /* ── Eye toggles ── */
+    function bindEye(btnId, inputId) {
+      var btn=document.getElementById(btnId), inp=document.getElementById(inputId);
+      if(!btn||!inp)return;
+      btn.addEventListener("click",function(){
+        var t=inp.type==="text"; inp.type=t?"password":"text"; btn.textContent=t?"👁️":"🙈";
+      });
+    }
+    bindEye("eyeReg","regPw"); bindEye("eyeRegConf","regPwConf");
 
-        <button type="submit" id="signup-btn" class="submit-btn">
-          Free Mein Judo!
-        </button>
-      </form>
+    /* ── Password strength ── */
+    document.getElementById("regPw").addEventListener("input",function(){
+      var val=this.value, wrap=document.getElementById("pwStrength");
+      if(!val){wrap.classList.remove("show");return;}
+      wrap.classList.add("show");
+      var score=0;
+      if(val.length>=6)score++;
+      if(val.length>=10)score++;
+      if(/[A-Z]/.test(val)&&/[a-z]/.test(val))score++;
+      if(/[0-9]/.test(val)&&/[^a-zA-Z0-9]/.test(val))score++;
+      var colors=["#ef4444","#f59e0b","#22c55e","#0d9488"];
+      var labels=["Weak","Fair","Good","Strong!"];
+      for(var i=1;i<=4;i++){var b=document.getElementById("pb"+i);if(b)b.style.background=i<=score?colors[score-1]:"var(--gray-200)";}
+      var lbl=document.getElementById("pwLbl");if(lbl)lbl.textContent=score>0?labels[score-1]:"Too short";
+    });
 
-      <p style="margin-top: 20px; text-align: center; color: #666;">
-        Pehle se account hai? <a href="login.html" style="color: #FFA500; font-weight: 600; text-decoration: none;">Login Karo</a>
-      </p>
-    </div>
+    /* ── Register ── */
+    document.getElementById("btnRegister").addEventListener("click", doRegister);
+    document.getElementById("regPwConf").addEventListener("keydown",function(e){if(e.key==="Enter")doRegister();});
 
-    <footer>
-      <div>
-        <h3>GigLega</h3>
-        <p>Gurugram ka apna hyperlocal gig platform</p>
-        <p>&copy; 2025 GigLega Beta. Made with ❤️ for Gurugram.</p>
-      </div>
-      <div>
-        <h4>Legal</h4>
-        <a href="terms.html">Terms & Conditions</a>
-        <a href="privacy-policy.html">Privacy Policy</a>
-        <a href="trust-safety.html">Trust & Safety</a>
-      </div>
-      <div>
-        <h4>Support</h4>
-        <a href="help-center.html">Help Center</a>
-        <a href="contact.html">Contact Us</a>
-      </div>
-      <div>
-        <h4>Contact</h4>
-        <p><strong>Email: </strong>Giglega.official@gmail.com</p>
-        <p><strong>Call us: </strong><a href="https://wa.me/919319635257">9319635257</a></p>
-        <p><strong>Address: </strong>H.no 82 Om Vihar Phase 1 palam Vihar Extn, Opp Sec 23A h.u.d.a park- 122017</p>
-      </div>
-    </footer>
+    function doRegister() {
+      clearErrs();
+      var name   = document.getElementById("regName").value.trim();
+      var id     = document.getElementById("regId").value.trim();
+      var city   = document.getElementById("regCity").value.trim();
+      var pw     = document.getElementById("regPw").value;
+      var pwConf = document.getElementById("regPwConf").value;
+      var role   = document.getElementById("roleWorker").checked ? "worker" : "poster";
+      var ok     = true;
 
-    <script type="module">
-      import { auth, db } from './firebase-config.js';
-      import { createUserWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
-      import { doc, setDoc } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+      if (!name||name.length<2)  { showErr("regNameErr"); ok=false; }
+      if (!id||!validId(id))     { showErr("regIdErr");   ok=false; }
+      if (!city)                 { showErr("regCityErr"); ok=false; }
+      if (!pw||pw.length<6)      { showErr("regPwErr");   ok=false; }
+      if (pw!==pwConf)           { showErr("regPwConfErr"); ok=false; }
+      if (!ok) return;
 
-      const signupForm = document.getElementById('signup-form');
-      const errorMessage = document.getElementById('error-message');
-      const signupBtn = document.getElementById('signup-btn');
-
-      function showError(message) {
-        errorMessage.textContent = message;
-        errorMessage.style.display = 'block';
-        setTimeout(() => {
-          errorMessage.style.display = 'none';
-        }, 5000);
+      var clean = id.replace(/\s+/g,"");
+      if (findUser(clean)) {
+        showErr("regIdErr","Account already exists with this email/phone. Please login.");
+        return;
       }
 
-      signupForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        
-        const name = document.getElementById('name').value.trim();
-        const email = document.getElementById('email').value.trim();
-        const password = document.getElementById('password').value;
-        const phone = document.getElementById('phone').value.trim();
-        const role = document.getElementById('role').value;
-        const location = document.getElementById('location').value.trim();
+      /* Collect selected skills */
+      var skills = [];
+      if (role === "worker") {
+        document.querySelectorAll("#skillsGrid input:checked").forEach(function(inp){
+          skills.push(inp.value);
+        });
+      }
 
-        if (!role) {
-          showError('Please select a role!');
-          return;
-        }
+      setLoading("btnRegister", true);
+      setTimeout(function(){
+        setLoading("btnRegister", false);
+        var newUser = {
+          id:        "usr_" + Date.now(),
+          name:      name,
+          email:     isEmail(clean) ? clean : null,
+          phone:     isPhone(clean) ? clean : null,
+          city:      city,
+          role:      role,
+          password:  hashPw(pw),
+          skills:    skills,
+          avatar:    null,
+          bio:       "",
+          createdAt: new Date().toISOString()
+        };
+        var users = getUsers();
+        users.push(newUser);
+        saveUsers(users);
+        saveUser(newUser);
 
-        signupBtn.textContent = 'Account ban raha hai...';
-        signupBtn.disabled = true;
+        /* Show success UI */
+        document.getElementById("signupForm").style.display = "none";
+        var succ = document.getElementById("signupSuccess");
+        succ.classList.add("show");
+        document.getElementById("successTitle").textContent =
+          "Welcome, " + name.split(" ")[0] + "! 🎉";
+        document.getElementById("successBody").innerHTML =
+          "Your <strong>" + (role==="worker"?"Worker":"Poster") +
+          "</strong> account is ready.<br>Redirecting you now...";
 
-        try {
-          // Create auth user
-          const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-          const user = userCredential.user;
-          
-          console.log('User created:', user.uid);
+        showToast("🎉 Account created! Welcome to GigLega.", "success");
 
-          // Create user profile in Firestore
-          await setDoc(doc(db, 'users', user.uid), {
-            name: name,
-            email: email,
-            phone: phone,
-            role: role,
-            location: location,
-            createdAt: new Date().toISOString(),
-            rating: 0,
-            gigsPosted: 0,
-            gigsCompleted: 0
-          });
+        /* Role-based redirect */
+        var dest = role === "worker" ? "dashboard-worker.html" : "dashboard-client.html";
+        if (redirectTo && !/login|signup/i.test(redirectTo)) dest = redirectTo;
+        setTimeout(function(){ window.location.replace(dest); }, 1800);
+      }, 1000);
+    }
 
-          console.log('Profile created in Firestore');
-          
-          // Redirect to dashboard
-          alert('🎉 Welcome to GigLega! Account successfully ban gaya!');
-          window.location.href = '/dashboard.html';
-        } catch (error) {
-          console.error('Signup error:', error);
-          let errorMsg = 'Signup mein problem aayi. Please try again.';
-          
-          if (error.code === 'auth/email-already-in-use') {
-            errorMsg = 'Email pehle se registered hai. Login karo!';
-          } else if (error.code === 'auth/invalid-email') {
-            errorMsg = 'Email format galat hai.';
-          } else if (error.code === 'auth/weak-password') {
-            errorMsg = 'Password weak hai. Kam se kam 6 characters chahiye.';
-          } else if (error.code === 'auth/network-request-failed') {
-            errorMsg = 'Network problem hai. Internet check karo.';
-          }
-          
-          showError(errorMsg);
-          signupBtn.textContent = 'Free Mein Judo!';
-          signupBtn.disabled = false;
-        }
-      });
-    </script>
+  });
+  </script>
 </body>
 </html>
-
