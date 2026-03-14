@@ -1,14 +1,26 @@
+# GigLega — robots.txt
+# https://giglega.in
+
 User-agent: *
 Allow: /
 
-# Block private pages from Google
-Disallow: /dashboard-client.html
+Disallow: /login.html
+Disallow: /forgot-password.html
 Disallow: /dashboard-worker.html
+Disallow: /dashboard-client.html
 Disallow: /wallet.html
 Disallow: /notifications.html
-Disallow: /gig-edit.html
 Disallow: /chat.html
 Disallow: /profile.html
+Disallow: /reviews.html
 
-# Sitemap location
-Sitemap: https://giglega.vercel.app/sitemap.xml
+Disallow: /api/
+Disallow: /service-worker.js
+Disallow: /__sync-queue.json
+
+User-agent: Googlebot
+Allow: /styles.css
+Allow: /shared.js
+Allow: /assets/
+
+Sitemap: https://giglega.in/sitemap.xml
