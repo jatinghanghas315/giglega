@@ -3,2014 +3,437 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Client Dashboard — GigLega</title>
-  <meta name="description" content="GigLega client dashboard — apne gigs manage karo, applications dekho, payments track karo." />
+  <title>Poster Dashboard — GigLega</title>
+  <meta name="description" content="GigLega poster dashboard — apne posted gigs manage karo." />
   <link rel="stylesheet" href="styles.css" />
   <script src="shared.js"></script>
   <style>
-
-    /* ══════════════════════════════════
-       DASHBOARD LAYOUT
-    ══════════════════════════════════ */
-    .cd-wrapper {
-      min-height: 100vh;
-      background: var(--bg);
-    }
-
-    /* ══════════════════════════════════
-       WELCOME HERO
-    ══════════════════════════════════ */
-    .cd-hero {
-      background: linear-gradient(135deg, #0b1e35 0%, var(--primary) 55%, #0d4f47 100%);
-      padding: 32px 20px 56px;
-      position: relative; overflow: hidden;
-    }
-    .cd-hero::before {
-      content: "";
-      position: absolute; inset: 0;
-      background:
-        radial-gradient(ellipse at 15% 70%, rgba(13,148,136,.22) 0%, transparent 50%),
-        radial-gradient(ellipse at 85% 15%, rgba(245,158,11,.08) 0%, transparent 50%);
-      pointer-events: none;
-    }
-    .cd-hero::after {
-      content: "";
-      position: absolute; inset: 0;
-      background-image:
-        linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
-      background-size: 52px 52px; pointer-events: none;
-    }
-    .cd-hero-inner {
-      position: relative; z-index: 1;
-      max-width: 1200px; margin: 0 auto;
-      display: flex; align-items: flex-start;
-      justify-content: space-between; gap: 20px; flex-wrap: wrap;
-    }
-
-    .cd-hero-left {}
-    .cd-greeting {
-      font-size: .8rem; font-weight: 700;
-      color: rgba(255,255,255,.6);
-      text-transform: uppercase; letter-spacing: .6px;
-      margin-bottom: 8px;
-    }
-    .cd-hero-name {
-      font-size: clamp(1.4rem, 3vw, 2rem);
-      font-weight: 900; color: #fff; line-height: 1.2;
-      margin-bottom: 6px; letter-spacing: -.4px;
-    }
-    .cd-hero-name span { color: #6ee7b7; }
-    .cd-hero-sub {
-      font-size: .88rem; color: rgba(255,255,255,.65);
-      margin-bottom: 18px; line-height: 1.6;
-    }
-    .cd-hero-chips {
-      display: flex; flex-wrap: wrap; gap: 8px;
-    }
-    .cd-hero-chip {
-      display: inline-flex; align-items: center; gap: 6px;
-      background: rgba(255,255,255,.12);
-      border: 1px solid rgba(255,255,255,.18);
-      border-radius: var(--radius-full);
-      padding: 5px 13px;
-      font-size: .76rem; font-weight: 700; color: rgba(255,255,255,.9);
-    }
-
-    .cd-hero-right {
-      display: flex; flex-direction: column;
-      align-items: flex-end; gap: 12px; flex-shrink: 0;
-    }
-    .cd-avatar-wrap {
-      display: flex; align-items: center; gap: 13px;
-    }
-    .cd-avatar {
-      width: 58px; height: 58px; border-radius: 50%;
-      background: linear-gradient(135deg, #6ee7b7, var(--teal));
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.5rem; font-weight: 900; color: #fff;
-      border: 3px solid rgba(255,255,255,.25);
-      flex-shrink: 0;
-    }
-    .cd-avatar-info {}
-    .cd-av-name   { font-size: .96rem; font-weight: 800; color: #fff; }
-    .cd-av-rating {
-      display: flex; align-items: center; gap: 5px;
-      font-size: .78rem; color: rgba(255,255,255,.7); font-weight: 600;
-    }
-    .cd-av-rating strong { color: #fbbf24; }
-
-    .btn-post-gig {
-      display: inline-flex; align-items: center; gap: 8px;
-      padding: 12px 24px;
-      background: linear-gradient(135deg, #059669, #0d9488);
-      border: none; border-radius: var(--radius-sm);
-      color: #fff; font-weight: 900; font-size: .95rem;
-      cursor: pointer; font-family: var(--font);
-      box-shadow: 0 4px 16px rgba(5,150,105,.35);
-      transition: transform .2s, box-shadow .2s;
-      text-decoration: none;
-    }
-    .btn-post-gig:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(5,150,105,.4); color: #fff; text-decoration: none; }
-
-    /* ══════════════════════════════════
-       STATS STRIP (overlaps hero)
-    ══════════════════════════════════ */
-    .cd-stats-strip {
-      max-width: 1200px; margin: -28px auto 0;
-      padding: 0 20px;
-      position: relative; z-index: 10;
-    }
-    .cd-stats-grid {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 14px;
-    }
-    @media(max-width:900px) { .cd-stats-grid { grid-template-columns: repeat(3,1fr); } }
-    @media(max-width:560px) { .cd-stats-grid { grid-template-columns: repeat(2,1fr); } }
-
-    .stat-card {
-      background: var(--surface);
-      border: 1.5px solid var(--gray-200);
-      border-radius: var(--radius);
-      padding: 18px 16px;
-      box-shadow: var(--shadow);
-      position: relative; overflow: hidden;
-      transition: transform .2s, box-shadow .2s;
-    }
-    .stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
-    [data-theme=dark] .stat-card { border-color: var(--gray-700); }
-
-    .stat-card::before {
-      content: ""; position: absolute;
-      top: 0; left: 0; right: 0; height: 3px;
-    }
-    .stat-card.c1::before { background: linear-gradient(90deg, var(--primary), var(--teal)); }
-    .stat-card.c2::before { background: linear-gradient(90deg, #059669, #34d399); }
-    .stat-card.c3::before { background: linear-gradient(90deg, #7c3aed, #a78bfa); }
-    .stat-card.c4::before { background: linear-gradient(90deg, #d97706, #fbbf24); }
-    .stat-card.c5::before { background: linear-gradient(90deg, #dc2626, #f87171); }
-
-    .stat-icon {
-      font-size: 1.6rem; margin-bottom: 8px; line-height: 1;
-    }
-    .stat-value {
-      font-size: 1.7rem; font-weight: 900;
-      color: var(--primary); line-height: 1;
-      margin-bottom: 3px; letter-spacing: -.5px;
-    }
-    .stat-label {
-      font-size: .72rem; font-weight: 700;
-      text-transform: uppercase; letter-spacing: .4px;
-      color: var(--gray-400);
-    }
-    .stat-change {
-      font-size: .72rem; font-weight: 700;
-      margin-top: 6px; display: flex; align-items: center; gap: 3px;
-    }
-    .stat-change.up   { color: var(--success); }
-    .stat-change.down { color: var(--danger); }
-    .stat-change.neu  { color: var(--gray-400); }
-
-    /* ══════════════════════════════════
-       TAB NAV
-    ══════════════════════════════════ */
-    .cd-tabs-bar {
-      background: var(--surface);
-      border-bottom: 1.5px solid var(--gray-200);
-      position: sticky; top: 0; z-index: 40;
-      box-shadow: var(--shadow-sm);
-      margin-top: 28px;
-    }
-    [data-theme=dark] .cd-tabs-bar { border-color: var(--gray-700); }
-
-    .cd-tabs-inner {
-      max-width: 1200px; margin: 0 auto;
-      padding: 0 20px;
-      display: flex; gap: 0; overflow-x: auto;
-    }
-    .cd-tabs-inner::-webkit-scrollbar { display: none; }
-
-    .cd-tab {
-      display: flex; align-items: center; gap: 7px;
-      padding: 14px 18px;
-      font-size: .86rem; font-weight: 700;
-      color: var(--gray-500); cursor: pointer;
-      border-bottom: 2.5px solid transparent;
-      white-space: nowrap; background: none;
-      border-left: none; border-right: none; border-top: none;
-      font-family: var(--font);
-      transition: color .18s, border-color .18s;
-      flex-shrink: 0;
-    }
-    .cd-tab:hover  { color: var(--primary); }
-    .cd-tab.active { color: var(--primary); border-bottom-color: var(--teal); }
-    [data-theme=dark] .cd-tab { color: var(--gray-400); }
-
-    .cd-tab-badge {
-      background: var(--danger); color: #fff;
-      font-size: .65rem; font-weight: 800;
-      padding: 1px 6px; border-radius: 10px;
-      min-width: 18px; text-align: center;
-    }
-    .cd-tab-badge.teal { background: var(--teal); }
-    .cd-tab-badge.amber { background: #f59e0b; }
-
-    /* ══════════════════════════════════
-       MAIN BODY
-    ══════════════════════════════════ */
-    .cd-body {
-      max-width: 1200px; margin: 0 auto;
-      padding: 28px 20px 80px;
-    }
-
-    /* TAB PANELS */
-    .cd-panel { display: none; }
-    .cd-panel.active { display: block; }
-
-    /* Grid layouts */
-    .cd-two-col {
-      display: grid;
-      grid-template-columns: 1fr 360px;
-      gap: 24px; align-items: start;
-    }
-    @media(max-width:960px) { .cd-two-col { grid-template-columns: 1fr; } }
-
-    /* ══════════════════════════════════
-       SECTION HEADERS
-    ══════════════════════════════════ */
-    .cd-section-hdr {
-      display: flex; align-items: center;
-      justify-content: space-between; gap: 12px;
-      margin-bottom: 16px;
-    }
-    .cd-section-title {
-      font-size: 1rem; font-weight: 900; color: var(--primary);
-      display: flex; align-items: center; gap: 8px;
-    }
-    .cd-section-action {
-      font-size: .8rem; font-weight: 700; color: var(--teal);
-      cursor: pointer; background: none; border: none;
-      font-family: var(--font); padding: 0;
-      transition: opacity .18s; text-decoration: none;
-    }
-    .cd-section-action:hover { opacity: .75; text-decoration: none; }
-
-    /* ══════════════════════════════════
-       GIG CARDS
-    ══════════════════════════════════ */
-    .gig-cards-list {
-      display: flex; flex-direction: column; gap: 14px;
-      margin-bottom: 24px;
-    }
-
-    .gig-card {
-      background: var(--surface);
-      border: 1.5px solid var(--gray-200);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow-sm);
-      overflow: hidden;
-      transition: box-shadow .2s, transform .2s;
-    }
-    .gig-card:hover { box-shadow: var(--shadow); transform: translateY(-1px); }
-    [data-theme=dark] .gig-card { border-color: var(--gray-700); }
-
-    .gig-card-top {
-      padding: 16px 20px 12px;
-      display: flex; gap: 16px; align-items: flex-start;
-    }
-    .gig-card-icon {
-      width: 46px; height: 46px; border-radius: 12px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.3rem; flex-shrink: 0;
-    }
-    .gig-card-icon.blue   { background: rgba(26,60,94,.1); }
-    .gig-card-icon.green  { background: rgba(5,150,105,.1); }
-    .gig-card-icon.purple { background: rgba(124,58,237,.1); }
-    .gig-card-icon.amber  { background: rgba(217,119,6,.1); }
-
-    .gig-card-info { flex: 1; min-width: 0; }
-    .gig-card-title {
-      font-size: .96rem; font-weight: 800; color: var(--primary);
-      margin-bottom: 5px; line-height: 1.3;
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    }
-    .gig-card-meta {
-      display: flex; flex-wrap: wrap; gap: 10px;
-      font-size: .78rem; color: var(--gray-400); font-weight: 600;
-    }
-    .gcm-item { display: flex; align-items: center; gap: 4px; }
-
-    .gig-card-right {
-      display: flex; flex-direction: column;
-      align-items: flex-end; gap: 6px; flex-shrink: 0;
-    }
-    .gig-status-badge {
-      font-size: .7rem; font-weight: 800;
-      padding: 3px 10px; border-radius: 6px;
-    }
-    .gsb-active   { background: rgba(16,185,129,.1); color: #059669; }
-    .gsb-paused   { background: rgba(245,158,11,.1); color: #d97706; }
-    .gsb-closed   { background: rgba(107,114,128,.12); color: var(--gray-500); }
-    .gsb-pending  { background: rgba(99,102,241,.1); color: #6366f1; }
-    .gsb-filled   { background: rgba(26,60,94,.1); color: var(--primary); }
-
-    .gig-budget {
-      font-size: 1.05rem; font-weight: 900; color: var(--primary);
-    }
-
-    /* Gig card footer */
-    .gig-card-footer {
-      padding: 10px 20px 14px;
-      border-top: 1px solid var(--gray-100);
-      display: flex; align-items: center;
-      justify-content: space-between; gap: 10px; flex-wrap: wrap;
-    }
-    [data-theme=dark] .gig-card-footer { border-color: var(--gray-700); }
-
-    .gig-card-stats {
-      display: flex; gap: 16px; flex-wrap: wrap;
-    }
-    .gcs-item {
-      display: flex; flex-direction: column; gap: 1px;
-    }
-    .gcs-val   { font-size: .92rem; font-weight: 900; color: var(--text); }
-    .gcs-label { font-size: .68rem; font-weight: 600; color: var(--gray-400); text-transform: uppercase; letter-spacing: .3px; }
-
-    .gig-card-actions {
-      display: flex; gap: 8px; flex-wrap: wrap;
-    }
-    .btn-gca {
-      padding: 7px 14px; border-radius: 7px;
-      font-size: .78rem; font-weight: 700;
-      cursor: pointer; font-family: var(--font);
-      border: 1.5px solid var(--gray-200);
-      background: none; color: var(--gray-600);
-      transition: all .15s;
-    }
-    .btn-gca:hover { border-color: var(--teal); color: var(--teal); }
-    .btn-gca.primary {
-      background: linear-gradient(135deg, var(--primary), var(--teal));
-      border-color: transparent; color: #fff;
-    }
-    .btn-gca.primary:hover { opacity: .9; }
-    [data-theme=dark] .btn-gca { border-color: var(--gray-600); color: var(--gray-400); }
-
-    /* Mini progress bar on gig card */
-    .gig-fill-bar {
-      margin: 0 20px 12px;
-    }
-    .gfb-label {
-      display: flex; justify-content: space-between;
-      font-size: .72rem; font-weight: 600; color: var(--gray-400);
-      margin-bottom: 4px;
-    }
-    .gfb-track {
-      height: 4px; background: var(--gray-100); border-radius: 2px; overflow: hidden;
-    }
-    [data-theme=dark] .gfb-track { background: var(--gray-700); }
-    .gfb-fill {
-      height: 100%; border-radius: 2px;
-      background: linear-gradient(90deg, var(--primary), var(--teal));
-      transition: width .4s ease;
-    }
-
-    /* ══════════════════════════════════
-       APPLICATION CARDS
-    ══════════════════════════════════ */
-    .app-cards-list {
-      display: flex; flex-direction: column; gap: 12px;
-    }
-
-    .app-card {
-      background: var(--surface);
-      border: 1.5px solid var(--gray-200);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow-sm);
-      overflow: hidden;
-      transition: box-shadow .18s;
-    }
-    .app-card:hover { box-shadow: var(--shadow); }
-    [data-theme=dark] .app-card { border-color: var(--gray-700); }
-    .app-card.new-app { border-color: rgba(13,148,136,.3); }
-
-    .app-card-body {
-      padding: 14px 18px;
-      display: flex; gap: 14px; align-items: flex-start;
-    }
-    .app-avatar {
-      width: 44px; height: 44px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1rem; font-weight: 800; color: #fff; flex-shrink: 0;
-    }
-    .app-info { flex: 1; min-width: 0; }
-    .app-name {
-      font-size: .92rem; font-weight: 800; color: var(--text);
-      margin-bottom: 2px; display: flex; align-items: center; gap: 7px;
-    }
-    .app-verified {
-      font-size: .68rem; background: rgba(13,148,136,.1);
-      color: var(--teal); padding: 1px 6px; border-radius: 5px;
-      font-weight: 700;
-    }
-    .app-new-badge {
-      font-size: .65rem; background: var(--danger); color: #fff;
-      padding: 1px 6px; border-radius: 5px; font-weight: 800;
-    }
-    .app-meta {
-      font-size: .78rem; color: var(--gray-400);
-      margin-bottom: 6px; display: flex; gap: 10px; flex-wrap: wrap;
-    }
-    .app-gig-label {
-      font-size: .78rem; font-weight: 700; color: var(--primary);
-    }
-
-    .app-card-right {
-      display: flex; flex-direction: column;
-      align-items: flex-end; gap: 8px; flex-shrink: 0;
-    }
-    .app-rating {
-      font-size: .82rem; font-weight: 700;
-      color: var(--text); display: flex; align-items: center; gap: 4px;
-    }
-    .app-time {
-      font-size: .72rem; color: var(--gray-400); font-weight: 600;
-    }
-
-    .app-card-footer {
-      padding: 10px 18px 14px;
-      border-top: 1px solid var(--gray-100);
-      display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
-    }
-    [data-theme=dark] .app-card-footer { border-color: var(--gray-700); }
-
-    .btn-app {
-      padding: 7px 16px; border-radius: 7px;
-      font-size: .8rem; font-weight: 700;
-      cursor: pointer; font-family: var(--font);
-      transition: all .15s; border: 1.5px solid transparent;
-    }
-    .btn-app-accept { background: var(--success); color: #fff; }
-    .btn-app-accept:hover { background: #047857; }
-    .btn-app-decline { background: none; border-color: rgba(239,68,68,.3); color: var(--danger); }
-    .btn-app-decline:hover { background: rgba(239,68,68,.06); border-color: var(--danger); }
-    .btn-app-view { background: none; border-color: var(--gray-200); color: var(--gray-600); }
-    .btn-app-view:hover { border-color: var(--teal); color: var(--teal); }
-    [data-theme=dark] .btn-app-view { border-color: var(--gray-600); }
-
-    .app-msg-preview {
-      margin-left: auto;
-      font-size: .76rem; color: var(--gray-400);
-      font-style: italic;
-      max-width: 200px; overflow: hidden;
-      white-space: nowrap; text-overflow: ellipsis;
-    }
-
-    /* ══════════════════════════════════
-       SIDEBAR WIDGETS
-    ══════════════════════════════════ */
-
-    /* Wallet card */
-    .wallet-card {
-      background: linear-gradient(135deg, #0b2240 0%, var(--primary) 60%, #0d4f47 100%);
-      border-radius: var(--radius);
-      padding: 22px;
-      margin-bottom: 20px;
-      color: #fff; position: relative; overflow: hidden;
-    }
-    .wallet-card::before {
-      content: "";
-      position: absolute; inset: 0;
-      background-image:
-        linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
-      background-size: 36px 36px; pointer-events: none;
-    }
-    .wc-inner { position: relative; z-index: 1; }
-    .wc-label { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: rgba(255,255,255,.6); margin-bottom: 4px; }
-    .wc-balance {
-      font-size: 2rem; font-weight: 900; color: #fff;
-      line-height: 1; margin-bottom: 2px;
-    }
-    .wc-balance span { font-size: 1rem; font-weight: 600; }
-    .wc-sub   { font-size: .76rem; color: rgba(255,255,255,.6); margin-bottom: 16px; }
-    .wc-row {
-      display: flex; justify-content: space-between;
-      font-size: .8rem; color: rgba(255,255,255,.7);
-      padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,.1);
-    }
-    .wc-row:last-of-type { border-bottom: none; }
-    .wc-row strong { color: #fff; }
-    .wc-btns { display: flex; gap: 8px; margin-top: 14px; }
-    .btn-wc {
-      flex: 1; padding: 9px;
-      border-radius: var(--radius-sm);
-      font-weight: 700; font-size: .8rem;
-      cursor: pointer; font-family: var(--font);
-      text-align: center; transition: all .18s;
-      display: flex; align-items: center; justify-content: center; gap: 5px;
-    }
-    .btn-wc-primary {
-      background: rgba(255,255,255,.18);
-      border: 1.5px solid rgba(255,255,255,.28); color: #fff;
-    }
-    .btn-wc-primary:hover { background: rgba(255,255,255,.28); }
-    .btn-wc-outline {
-      background: transparent;
-      border: 1.5px solid rgba(255,255,255,.2); color: rgba(255,255,255,.8);
-    }
-    .btn-wc-outline:hover { border-color: rgba(255,255,255,.4); }
-
-    /* Notifications widget */
-    .notif-card {
-      background: var(--surface);
-      border: 1.5px solid var(--gray-200);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow-sm);
-      overflow: hidden;
-      margin-bottom: 20px;
-    }
-    [data-theme=dark] .notif-card { border-color: var(--gray-700); }
-
-    .notif-header {
-      padding: 14px 18px;
-      border-bottom: 1.5px solid var(--gray-100);
-      display: flex; align-items: center; justify-content: space-between;
-      background: linear-gradient(135deg, rgba(26,60,94,.03), rgba(13,148,136,.04));
-    }
-    [data-theme=dark] .notif-header { border-color: var(--gray-700); }
-    .nh-title { font-size: .9rem; font-weight: 800; color: var(--primary); display: flex; align-items: center; gap: 7px; }
-    .nh-count { background: var(--danger); color: #fff; font-size: .66rem; font-weight: 800; padding: 1px 6px; border-radius: 10px; }
-    .nh-clear { font-size: .74rem; font-weight: 700; color: var(--teal); background: none; border: none; cursor: pointer; font-family: var(--font); }
-
-    .notif-item {
-      display: flex; gap: 12px; align-items: flex-start;
-      padding: 12px 18px;
-      border-bottom: 1px solid var(--gray-100);
-      transition: background .15s; cursor: pointer;
-    }
-    .notif-item:last-child { border-bottom: none; }
-    .notif-item:hover { background: rgba(13,148,136,.03); }
-    [data-theme=dark] .notif-item { border-color: var(--gray-700); }
-    .notif-item.unread { background: rgba(13,148,136,.04); }
-
-    .ni-dot {
-      width: 8px; height: 8px; border-radius: 50%;
-      background: var(--teal); flex-shrink: 0; margin-top: 6px;
-    }
-    .ni-dot.read { background: var(--gray-300); }
-    .ni-content {}
-    .ni-text { font-size: .84rem; color: var(--text); line-height: 1.55; margin-bottom: 2px; }
-    .ni-time { font-size: .72rem; color: var(--gray-400); font-weight: 600; }
-
-    /* Profile completion */
-    .profile-card {
-      background: var(--surface);
-      border: 1.5px solid var(--gray-200);
-      border-radius: var(--radius);
-      padding: 18px;
-      margin-bottom: 20px;
-      box-shadow: var(--shadow-sm);
-    }
-    [data-theme=dark] .profile-card { border-color: var(--gray-700); }
-    .pc-title { font-size: .88rem; font-weight: 800; color: var(--primary); margin-bottom: 4px; display: flex; align-items: center; gap: 7px; }
-    .pc-sub   { font-size: .76rem; color: var(--gray-400); margin-bottom: 12px; }
-    .pc-meter { background: var(--gray-100); border-radius: 6px; height: 6px; overflow: hidden; margin-bottom: 6px; }
-    [data-theme=dark] .pc-meter { background: var(--gray-700); }
-    .pc-fill  { height: 100%; border-radius: 6px; background: linear-gradient(90deg, var(--primary), var(--teal)); transition: width .4s; }
-    .pc-pct   { font-size: .76rem; font-weight: 700; color: var(--text); margin-bottom: 12px; }
-    .pc-items { display: flex; flex-direction: column; gap: 6px; }
-    .pc-item  {
-      display: flex; align-items: center; gap: 8px;
-      font-size: .8rem; color: var(--gray-500);
-    }
-    .pc-item .pci-dot {
-      width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
-    }
-    .pc-item.done   { color: var(--success); }
-    .pc-item.done .pci-dot   { background: var(--success); }
-    .pc-item.todo .pci-dot   { background: var(--gray-300); }
-
-    /* Quick post widget */
-    .quick-post-card {
-      background: linear-gradient(135deg, rgba(13,148,136,.06), rgba(26,60,94,.04));
-      border: 1.5px solid rgba(13,148,136,.18);
-      border-radius: var(--radius);
-      padding: 18px;
-      margin-bottom: 20px;
-    }
-    .qpc-title { font-size: .88rem; font-weight: 800; color: var(--primary); margin-bottom: 4px; }
-    .qpc-sub   { font-size: .76rem; color: var(--gray-500); margin-bottom: 14px; line-height: 1.5; }
-    .btn-qpc {
-      display: block; width: 100%;
-      padding: 11px; text-align: center;
-      background: linear-gradient(135deg, var(--primary), var(--teal));
-      color: #fff; border: none; border-radius: var(--radius-sm);
-      font-weight: 800; font-size: .88rem; cursor: pointer;
-      font-family: var(--font); text-decoration: none;
-      transition: opacity .2s, transform .2s;
-    }
-    .btn-qpc:hover { opacity: .9; transform: translateY(-1px); text-decoration: none; color: #fff; }
-
-    /* Recent activity */
-    .activity-card {
-      background: var(--surface);
-      border: 1.5px solid var(--gray-200);
-      border-radius: var(--radius);
-      overflow: hidden;
-      box-shadow: var(--shadow-sm);
-      margin-bottom: 20px;
-    }
-    [data-theme=dark] .activity-card { border-color: var(--gray-700); }
-
-    .activity-header {
-      padding: 14px 18px;
-      border-bottom: 1.5px solid var(--gray-100);
-      background: linear-gradient(135deg, rgba(26,60,94,.03), rgba(13,148,136,.04));
-    }
-    [data-theme=dark] .activity-header { border-color: var(--gray-700); }
-    .ah-title { font-size: .9rem; font-weight: 800; color: var(--primary); }
-
-    .activity-item {
-      display: flex; gap: 12px; align-items: flex-start;
-      padding: 12px 18px;
-      border-bottom: 1px solid var(--gray-100);
-    }
-    .activity-item:last-child { border-bottom: none; }
-    [data-theme=dark] .activity-item { border-color: var(--gray-700); }
-
-    .ai-icon {
-      width: 32px; height: 32px; border-radius: 9px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: .95rem; flex-shrink: 0;
-    }
-    .ai-icon.green  { background: rgba(5,150,105,.1); }
-    .ai-icon.blue   { background: rgba(26,60,94,.1); }
-    .ai-icon.amber  { background: rgba(217,119,6,.1); }
-    .ai-icon.purple { background: rgba(124,58,237,.1); }
-    .ai-icon.red    { background: rgba(220,38,38,.1); }
-
-    .ai-content {}
-    .ai-text { font-size: .84rem; color: var(--text); line-height: 1.5; margin-bottom: 1px; }
-    .ai-time { font-size: .72rem; color: var(--gray-400); font-weight: 600; }
-
-    /* ══════════════════════════════════
-       PAYMENTS TAB
-    ══════════════════════════════════ */
-    .payments-grid {
-      display: grid; grid-template-columns: repeat(3,1fr); gap: 16px;
-      margin-bottom: 24px;
-    }
-    @media(max-width:640px) { .payments-grid { grid-template-columns: 1fr; } }
-
-    .pay-stat-card {
-      background: var(--surface);
-      border: 1.5px solid var(--gray-200);
-      border-radius: var(--radius);
-      padding: 18px;
-      box-shadow: var(--shadow-sm);
-    }
-    [data-theme=dark] .pay-stat-card { border-color: var(--gray-700); }
-    .psc-icon  { font-size: 1.6rem; margin-bottom: 8px; }
-    .psc-val   { font-size: 1.6rem; font-weight: 900; color: var(--primary); margin-bottom: 3px; }
-    .psc-label { font-size: .74rem; font-weight: 700; text-transform: uppercase; letter-spacing: .4px; color: var(--gray-400); }
-
-    /* Transaction table */
-    .txn-table-wrap {
-      background: var(--surface);
-      border: 1.5px solid var(--gray-200);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow-sm);
-      overflow: hidden;
-      margin-bottom: 20px;
-    }
-    [data-theme=dark] .txn-table-wrap { border-color: var(--gray-700); }
-
-    .txn-table-header {
-      padding: 14px 18px;
-      border-bottom: 1.5px solid var(--gray-100);
-      display: flex; align-items: center; justify-content: space-between;
-      background: linear-gradient(135deg, rgba(26,60,94,.03), rgba(13,148,136,.04));
-    }
-    [data-theme=dark] .txn-table-header { border-color: var(--gray-700); }
-    .tth-title { font-size: .9rem; font-weight: 800; color: var(--primary); }
-    .tth-filter {
-      padding: 6px 12px;
-      border: 1.5px solid var(--gray-200);
-      border-radius: var(--radius-sm);
-      background: var(--surface); color: var(--text);
-      font-family: var(--font); font-size: .78rem; cursor: pointer;
-    }
-    [data-theme=dark] .tth-filter { border-color: var(--gray-600); background: var(--gray-800); }
-
-    .txn-row {
-      display: flex; align-items: center; gap: 14px;
-      padding: 13px 18px;
-      border-bottom: 1px solid var(--gray-100);
-      transition: background .15s;
-    }
-    .txn-row:last-child { border-bottom: none; }
-    .txn-row:hover { background: rgba(13,148,136,.03); }
-    [data-theme=dark] .txn-row { border-color: var(--gray-700); }
-
-    .txn-icon {
-      width: 36px; height: 36px; border-radius: 10px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1rem; flex-shrink: 0;
-    }
-    .txn-icon.out  { background: rgba(220,38,38,.08); }
-    .txn-icon.in   { background: rgba(5,150,105,.08); }
-    .txn-icon.hold { background: rgba(245,158,11,.08); }
-
-    .txn-info { flex: 1; min-width: 0; }
-    .txn-title { font-size: .88rem; font-weight: 700; color: var(--text); margin-bottom: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .txn-sub   { font-size: .74rem; color: var(--gray-400); font-weight: 600; }
-
-    .txn-right { text-align: right; flex-shrink: 0; }
-    .txn-amount { font-size: .96rem; font-weight: 900; }
-    .txn-amount.out  { color: var(--danger); }
-    .txn-amount.in   { color: var(--success); }
-    .txn-amount.hold { color: #d97706; }
-    .txn-date { font-size: .72rem; color: var(--gray-400); font-weight: 600; }
-
-    /* ══════════════════════════════════
-       REVIEWS TAB
-    ══════════════════════════════════ */
-    .reviews-summary {
-      display: grid; grid-template-columns: 200px 1fr; gap: 24px;
-      background: var(--surface);
-      border: 1.5px solid var(--gray-200);
-      border-radius: var(--radius);
-      padding: 22px;
-      box-shadow: var(--shadow-sm);
-      margin-bottom: 24px;
-    }
-    @media(max-width:560px) { .reviews-summary { grid-template-columns: 1fr; } }
-    [data-theme=dark] .reviews-summary { border-color: var(--gray-700); }
-
-    .rs-score-big {
-      text-align: center;
-      border-right: 1.5px solid var(--gray-100);
-      padding-right: 24px;
-    }
-    @media(max-width:560px) { .rs-score-big { border-right: none; border-bottom: 1.5px solid var(--gray-100); padding-right: 0; padding-bottom: 16px; } }
-    [data-theme=dark] .rs-score-big { border-color: var(--gray-700); }
-    .rsb-num { font-size: 3.5rem; font-weight: 900; color: var(--primary); line-height: 1; }
-    .rsb-stars { font-size: 1.3rem; margin: 6px 0; }
-    .rsb-count { font-size: .78rem; color: var(--gray-400); font-weight: 600; }
-
-    .rs-bars {}
-    .rsb-row {
-      display: flex; align-items: center; gap: 10px;
-      margin-bottom: 7px;
-    }
-    .rsb-label { font-size: .76rem; font-weight: 700; color: var(--gray-500); width: 30px; flex-shrink: 0; }
-    .rsb-track { flex: 1; height: 7px; background: var(--gray-100); border-radius: 4px; overflow: hidden; }
-    [data-theme=dark] .rsb-track { background: var(--gray-700); }
-    .rsb-fill  { height: 100%; border-radius: 4px; background: linear-gradient(90deg, #f59e0b, #fbbf24); }
-    .rsb-count-label { font-size: .74rem; font-weight: 700; color: var(--gray-400); width: 20px; text-align: right; }
-
-    .review-item {
-      background: var(--surface);
-      border: 1.5px solid var(--gray-200);
-      border-radius: var(--radius);
-      padding: 18px;
-      margin-bottom: 14px;
-      box-shadow: var(--shadow-sm);
-    }
-    [data-theme=dark] .review-item { border-color: var(--gray-700); }
-    .ri-header {
-      display: flex; align-items: flex-start; gap: 12px;
-      margin-bottom: 10px;
-    }
-    .ri-avatar {
-      width: 40px; height: 40px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-weight: 800; font-size: .95rem; color: #fff; flex-shrink: 0;
-    }
-    .ri-name   { font-size: .9rem; font-weight: 800; color: var(--text); }
-    .ri-meta   { font-size: .74rem; color: var(--gray-400); font-weight: 600; }
-    .ri-stars  { margin-left: auto; font-size: .95rem; }
-    .ri-body   { font-size: .86rem; color: var(--gray-600); line-height: 1.7; }
-    [data-theme=dark] .ri-body { color: var(--gray-400); }
-    .ri-tags   { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
-    .ri-tag {
-      font-size: .72rem; font-weight: 700;
-      padding: 3px 8px; border-radius: 5px;
-      background: rgba(13,148,136,.08); color: var(--teal);
-    }
-
-    /* ══════════════════════════════════
-       EMPTY STATES
-    ══════════════════════════════════ */
-    .empty-state {
-      text-align: center; padding: 48px 24px;
-      background: var(--surface);
-      border: 1.5px dashed var(--gray-200);
-      border-radius: var(--radius);
-    }
-    [data-theme=dark] .empty-state { border-color: var(--gray-700); }
-    .es-icon  { font-size: 3rem; margin-bottom: 12px; line-height: 1; }
-    .es-title { font-size: 1rem; font-weight: 800; color: var(--primary); margin-bottom: 6px; }
-    .es-sub   { font-size: .86rem; color: var(--gray-400); line-height: 1.65; margin-bottom: 18px; }
-    .btn-es {
-      display: inline-flex; align-items: center; gap: 7px;
-      padding: 10px 22px;
-      background: linear-gradient(135deg, var(--primary), var(--teal));
-      color: #fff; border: none; border-radius: var(--radius-sm);
-      font-weight: 700; font-size: .88rem; cursor: pointer;
-      font-family: var(--font); text-decoration: none;
-      transition: opacity .2s;
-    }
-    .btn-es:hover { opacity: .9; text-decoration: none; color: #fff; }
-
-    /* ══════════════════════════════════
-       MY GIGS TAB — filter bar
-    ══════════════════════════════════ */
-    .gig-filter-bar {
-      display: flex; gap: 10px; align-items: center;
-      flex-wrap: wrap; margin-bottom: 18px;
-    }
-    .gig-filter-btn {
-      padding: 7px 16px; border-radius: var(--radius-full);
-      border: 1.5px solid var(--gray-200);
-      background: none; color: var(--gray-500);
-      font-size: .8rem; font-weight: 700; cursor: pointer;
-      font-family: var(--font); transition: all .15s;
-    }
-    .gig-filter-btn:hover  { border-color: var(--teal); color: var(--teal); }
-    .gig-filter-btn.active { background: var(--primary); border-color: var(--primary); color: #fff; }
-    [data-theme=dark] .gig-filter-btn { border-color: var(--gray-600); }
-
-    .gig-sort-select {
-      margin-left: auto;
-      padding: 7px 12px; border-radius: var(--radius-sm);
-      border: 1.5px solid var(--gray-200);
-      background: var(--surface); color: var(--text);
-      font-family: var(--font); font-size: .8rem; cursor: pointer;
-    }
-    [data-theme=dark] .gig-sort-select { border-color: var(--gray-600); background: var(--gray-800); }
-
-    /* ══════════════════════════════════
-       INFO BOX
-    ══════════════════════════════════ */
-    .cd-info-box {
-      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-      padding: 11px 14px; margin-bottom: 20px;
-      font-size: .85rem; line-height: 1.65;
-    }
-    .cd-info-box.teal   { background: rgba(13,148,136,.07);  border-left: 3px solid var(--teal); }
-    .cd-info-box.warn   { background: rgba(245,158,11,.07);  border-left: 3px solid #f59e0b; }
-    .cd-info-box.green  { background: rgba(16,185,129,.06);  border-left: 3px solid #059669; }
-
-    /* ══════════════════════════════════
-       MOBILE BOTTOM NAV
-    ══════════════════════════════════ */
-    .cd-bottom-nav {
-      display: none;
-      position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
-      background: var(--surface);
-      border-top: 1.5px solid var(--gray-200);
-      padding: 6px 0 calc(6px + env(safe-area-inset-bottom));
-      box-shadow: 0 -4px 16px rgba(0,0,0,.08);
-    }
-    [data-theme=dark] .cd-bottom-nav { border-color: var(--gray-700); }
-    @media(max-width:640px) { .cd-bottom-nav { display: flex; } }
-
-    .cbn-inner {
-      display: flex; width: 100%; justify-content: space-around;
-    }
-    .cbn-item {
-      display: flex; flex-direction: column; align-items: center; gap: 3px;
-      padding: 6px 12px; cursor: pointer;
-      background: none; border: none; font-family: var(--font);
-      flex: 1;
-    }
-    .cbn-icon  { font-size: 1.3rem; line-height: 1; }
-    .cbn-label { font-size: .62rem; font-weight: 700; color: var(--gray-400); }
-    .cbn-item.active .cbn-label { color: var(--teal); }
-
-    @media(max-width:640px) {
-      .cd-body { padding-bottom: 100px; }
-    }
-
+    .dash-wrap{max-width:1000px;margin:0 auto;padding:28px 16px 80px}
+
+    /* ── Top bar ── */
+    .dash-topbar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:24px}
+    .dash-greeting h1{font-size:1.4rem;font-weight:800;color:var(--primary);margin-bottom:2px}
+    .dash-greeting p{font-size:.85rem;color:var(--gray-500)}
+    .topbar-actions{display:flex;gap:10px;flex-wrap:wrap}
+    .btn-switch-role{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border:1.5px solid var(--teal);border-radius:var(--radius-sm);background:transparent;color:var(--teal);font-weight:700;font-size:.83rem;cursor:pointer;transition:all .2s}
+    .btn-switch-role:hover{background:var(--teal);color:#fff}
+    .btn-post-new{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;background:var(--primary);color:#fff;border:none;border-radius:var(--radius-sm);font-weight:700;font-size:.83rem;cursor:pointer;transition:opacity .2s}
+    .btn-post-new:hover{opacity:.88}
+
+    /* ── Stats ── */
+    .stats-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:16px;margin-bottom:24px}
+    .stat-card{background:var(--surface);border:1.5px solid var(--gray-200);border-radius:var(--radius);padding:18px 20px;box-shadow:var(--shadow-sm)}
+    .stat-label{font-size:.75rem;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+    .stat-value{font-size:1.6rem;font-weight:800;color:var(--primary)}
+    .stat-sub{font-size:.75rem;color:var(--gray-400);margin-top:3px}
+    .stat-card.teal .stat-value{color:var(--teal)}
+    .stat-card.amber .stat-value{color:var(--accent)}
+    .stat-card.danger .stat-value{color:var(--danger)}
+
+    /* ── Tabs ── */
+    .tab-bar{display:flex;gap:4px;border-bottom:2px solid var(--gray-200);margin-bottom:20px;overflow-x:auto}
+    .tab-btn{padding:10px 20px;border:none;background:transparent;font-weight:600;font-size:.88rem;color:var(--gray-500);cursor:pointer;border-bottom:2.5px solid transparent;margin-bottom:-2px;white-space:nowrap;transition:all .2s}
+    .tab-btn.active{color:var(--primary);border-bottom-color:var(--primary)}
+    .tab-btn:hover:not(.active){color:var(--gray-700)}
+    .tab-panel{display:none}
+    .tab-panel.active{display:block}
+
+    /* ── Gig cards ── */
+    .gig-card{background:var(--surface);border:1.5px solid var(--gray-200);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow-sm);margin-bottom:14px}
+    .gig-card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:10px;flex-wrap:wrap}
+    .gig-card-title{font-size:.97rem;font-weight:700;color:var(--text)}
+    .gig-card-meta{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+    .gig-meta-chip{font-size:.73rem;color:var(--gray-500);display:flex;align-items:center;gap:3px}
+
+    /* Status badges */
+    .s-badge{font-size:.72rem;font-weight:700;padding:4px 11px;border-radius:10px;white-space:nowrap}
+    .s-open{background:rgba(16,185,129,.1);color:#059669}
+    .s-taken{background:rgba(245,158,11,.1);color:#b45309}
+    .s-completed{background:rgba(107,114,128,.1);color:#374151}
+
+    /* ── Worker applicant row ── */
+    .worker-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;background:var(--gray-50);border:1px solid var(--gray-200);border-radius:var(--radius-sm);flex-wrap:wrap}
+    .worker-info{display:flex;align-items:center;gap:10px}
+    .worker-avatar{width:36px;height:36px;border-radius:50%;background:var(--teal);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;flex-shrink:0}
+    .worker-name{font-size:.88rem;font-weight:700;color:var(--text)}
+    .worker-phone{font-size:.77rem;color:var(--gray-500)}
+    .worker-actions{display:flex;gap:8px;flex-wrap:wrap}
+
+    /* ── Mark complete ── */
+    .complete-bar{background:rgba(16,185,129,.06);border:1.5px solid #6ee7b7;border-radius:var(--radius-sm);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-top:12px}
+    .complete-bar-text{font-size:.83rem;color:var(--gray-600);flex:1}
+    .btn-mark-complete{padding:9px 18px;background:var(--success);color:#fff;border:none;border-radius:var(--radius-sm);font-weight:700;font-size:.82rem;cursor:pointer;transition:opacity .2s;white-space:nowrap}
+    .btn-mark-complete:hover{opacity:.88}
+    .btn-mark-complete:disabled{opacity:.5;cursor:not-allowed}
+
+    /* ── Cash fee prompt ── */
+    .cash-fee-prompt{background:rgba(245,158,11,.08);border:1.5px solid var(--accent);border-radius:var(--radius-sm);padding:14px 16px;margin-top:12px;display:none}
+    .cash-fee-prompt.show{display:block}
+    .cash-fee-title{font-size:.85rem;font-weight:700;color:#b45309;margin-bottom:6px}
+    .cash-fee-desc{font-size:.8rem;color:var(--gray-600);line-height:1.5;margin-bottom:10px}
+    .btn-pay-fee{padding:9px 18px;background:var(--accent);color:#fff;border:none;border-radius:var(--radius-sm);font-weight:700;font-size:.82rem;cursor:pointer}
+
+    /* ── Empty ── */
+    .empty-box{text-align:center;padding:40px 24px;color:var(--gray-400);background:var(--surface);border:1.5px dashed var(--gray-200);border-radius:var(--radius)}
+    .empty-box .ei{font-size:2.5rem;margin-bottom:10px}
+    .empty-box p{font-size:.88rem;line-height:1.6}
+
+    /* Dark mode */
+    [data-theme=dark] .stat-card{border-color:var(--gray-700)}
+    [data-theme=dark] .gig-card{border-color:var(--gray-700)}
+    [data-theme=dark] .tab-bar{border-color:var(--gray-700)}
+    [data-theme=dark] .worker-row{background:var(--gray-800);border-color:var(--gray-700)}
+    [data-theme=dark] .empty-box{border-color:var(--gray-700)}
+    [data-theme=dark] .complete-bar{background:rgba(16,185,129,.08)}
+    [data-theme=dark] .complete-bar-text{color:var(--gray-300)}
+    [data-theme=dark] .cash-fee-desc{color:var(--gray-400)}
   </style>
 </head>
 <body>
-
-  <div id="page-loader"></div>
   <div id="announce-bar"></div>
   <nav id="main-nav"></nav>
 
-  <main class="cd-wrapper">
+  <main class="page-wrapper">
+    <div class="dash-wrap">
 
-    <!-- ══════════════════════════════════
-         WELCOME HERO
-    ══════════════════════════════════ -->
-    <section class="cd-hero">
-      <div class="cd-hero-inner">
-        <div class="cd-hero-left">
-          <div class="cd-greeting" id="greetingText">Good evening 👋</div>
-          <h1 class="cd-hero-name">Rahul <span>Kumar</span></h1>
-          <p class="cd-hero-sub">
-            3 active gigs hain — 7 nayi applications aayi hain aaj. Dekho!
-          </p>
-          <div class="cd-hero-chips">
-            <span class="cd-hero-chip">🏆 Trusted Poster</span>
-            <span class="cd-hero-chip">✅ 12 Gigs Completed</span>
-            <span class="cd-hero-chip">⭐ 4.8 Rating</span>
-          </div>
+      <nav id="breadcrumb" aria-label="breadcrumb"></nav>
+
+      <!-- Top bar -->
+      <div class="dash-topbar">
+        <div class="dash-greeting">
+          <h1 id="greetingText">Welcome back! 👋</h1>
+          <p>Poster Dashboard — Manage your posted gigs</p>
         </div>
-        <div class="cd-hero-right">
-          <div class="cd-avatar-wrap">
-            <div class="cd-avatar">RK</div>
-            <div class="cd-avatar-info">
-              <div class="cd-av-name">Rahul Kumar</div>
-              <div class="cd-av-rating">
-                <span>⭐</span>
-                <strong>4.8</strong>
-                <span>(12 reviews)</span>
-              </div>
-            </div>
-          </div>
-          <a href="post-gig-form.html" class="btn-post-gig">
-            ➕ Post New Gig
-          </a>
+        <div class="topbar-actions">
+          <button class="btn-switch-role" id="btnSwitchRole">🔄 Switch to Worker Mode</button>
+          <button class="btn-post-new" onclick="window.location.href='post-gig.html'">+ Post a New Gig</button>
         </div>
       </div>
-    </section>
 
-    <!-- ══════════════════════════════════
-         STATS STRIP
-    ══════════════════════════════════ -->
-    <div class="cd-stats-strip">
-      <div class="cd-stats-grid">
-        <div class="stat-card c1">
-          <div class="stat-icon">📋</div>
-          <div class="stat-value" id="statActiveGigs">3</div>
-          <div class="stat-label">Active Gigs</div>
-          <div class="stat-change up">↑ 1 this week</div>
+      <!-- Stats -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-label">Total Posted</div>
+          <div class="stat-value" id="statTotal">0</div>
+          <div class="stat-sub">All time</div>
         </div>
-        <div class="stat-card c2">
-          <div class="stat-icon">✅</div>
-          <div class="stat-value">12</div>
+        <div class="stat-card teal">
+          <div class="stat-label">Open</div>
+          <div class="stat-value" id="statOpen">0</div>
+          <div class="stat-sub">Awaiting worker</div>
+        </div>
+        <div class="stat-card amber">
+          <div class="stat-label">In Progress</div>
+          <div class="stat-value" id="statProgress">0</div>
+          <div class="stat-sub">Worker accepted</div>
+        </div>
+        <div class="stat-card">
           <div class="stat-label">Completed</div>
-          <div class="stat-change up">↑ 2 this month</div>
+          <div class="stat-value" id="statCompleted">0</div>
+          <div class="stat-sub">All time</div>
         </div>
-        <div class="stat-card c3">
-          <div class="stat-icon">📩</div>
-          <div class="stat-value" id="statApps">27</div>
-          <div class="stat-label">Applications</div>
-          <div class="stat-change up">↑ 7 today</div>
-        </div>
-        <div class="stat-card c4">
-          <div class="stat-icon">💰</div>
-          <div class="stat-value">₹18.4k</div>
+        <div class="stat-card danger">
           <div class="stat-label">Total Spent</div>
-          <div class="stat-change neu">This month</div>
-        </div>
-        <div class="stat-card c5">
-          <div class="stat-icon">⭐</div>
-          <div class="stat-value">4.8</div>
-          <div class="stat-label">Avg Rating</div>
-          <div class="stat-change up">↑ 0.1 this month</div>
+          <div class="stat-value" id="statSpent">₹0</div>
+          <div class="stat-sub">On completed gigs</div>
         </div>
       </div>
+
+      <!-- Tabs -->
+      <div class="tab-bar">
+        <button class="tab-btn active" data-tab="open">🟢 Open (<span id="tabCountOpen">0</span>)</button>
+        <button class="tab-btn" data-tab="progress">⚡ In Progress (<span id="tabCountProgress">0</span>)</button>
+        <button class="tab-btn" data-tab="completed">✅ Completed (<span id="tabCountCompleted">0</span>)</button>
+        <button class="tab-btn" data-tab="all">📋 All Gigs</button>
+      </div>
+
+      <div id="tabOpen"      class="tab-panel active"></div>
+      <div id="tabProgress"  class="tab-panel"></div>
+      <div id="tabCompleted" class="tab-panel"></div>
+      <div id="tabAll"       class="tab-panel"></div>
+
     </div>
+  </main>
 
-    <!-- ══════════════════════════════════
-         TAB NAV
-    ══════════════════════════════════ -->
-    <div class="cd-tabs-bar">
-      <div class="cd-tabs-inner" id="cdTabs">
-        <button class="cd-tab active" data-tab="overview">🏠 Overview</button>
-        <button class="cd-tab" data-tab="mygigs">
-          📋 My Gigs
-          <span class="cd-tab-badge teal">3</span>
-        </button>
-        <button class="cd-tab" data-tab="applications">
-          📩 Applications
-          <span class="cd-tab-badge">7</span>
-        </button>
-        <button class="cd-tab" data-tab="payments">💰 Payments</button>
-        <button class="cd-tab" data-tab="reviews">⭐ Reviews</button>
-      </div>
-    </div>
+  <footer id="main-footer"></footer>
+  <div id="toast-container"></div>
 
-    <!-- ══════════════════════════════════
-         BODY PANELS
-    ══════════════════════════════════ -->
-    <div class="cd-body">
+  <script>
+  (function () {
 
-      <!-- ════ TAB: OVERVIEW ════ -->
-      <div class="cd-panel active" id="panel-overview">
-        <div class="cd-two-col">
+    var FEE_RATE = 0.06;
+    var GIG_KEY  = (typeof GL !== "undefined" && GL.STORAGE_KEY_GIGS) ? GL.STORAGE_KEY_GIGS : "gl_gigs";
 
-          <!-- LEFT -->
-          <div>
+    /* ── Auth guard ── */
+    var user = (function() {
+  try {
+    var u = JSON.parse(localStorage.getItem("gl_user") || "null");
+    return (u && u.id) ? u : null;
+  } catch(e) { return null; }
+})();
+if (!user) {
+  window.location.href = "login.html?redirect=dashboard-client.html";
+  return;
+}
 
-            <!-- Active gigs quick view -->
-            <div class="cd-section-hdr">
-              <div class="cd-section-title">📋 Active Gigs</div>
-              <button class="cd-section-action" id="btnViewAllGigs">View All →</button>
-            </div>
+    /* ── Breadcrumb ── */
+    if (typeof buildBreadcrumb === "function") {
+      buildBreadcrumb("breadcrumb", [
+        { label: "Home", href: "index.html" },
+        { label: "Dashboard" }
+      ]);
+    }
 
-            <div class="gig-cards-list" id="overviewGigList">
-              <!-- Gig 1 -->
-              <div class="gig-card">
-                <div class="gig-card-top">
-                  <div class="gig-card-icon blue">📦</div>
-                  <div class="gig-card-info">
-                    <div class="gig-card-title">Weekend Warehouse Packing Helper</div>
-                    <div class="gig-card-meta">
-                      <span class="gcm-item">📍 Sector 14, Gurugram</span>
-                      <span class="gcm-item">📅 Mar 14</span>
-                      <span class="gcm-item">👥 2 positions</span>
-                    </div>
-                  </div>
-                  <div class="gig-card-right">
-                    <span class="gig-status-badge gsb-active">🟢 Active</span>
-                    <span class="gig-budget">₹1,200</span>
-                  </div>
-                </div>
-                <div class="gig-fill-bar">
-                  <div class="gfb-label">
-                    <span>Applications: 8</span>
-                    <span>2/2 positions open</span>
-                  </div>
-                  <div class="gfb-track"><div class="gfb-fill" style="width:60%"></div></div>
-                </div>
-                <div class="gig-card-footer">
-                  <div class="gig-card-stats">
-                    <div class="gcs-item">
-                      <div class="gcs-val">8</div>
-                      <div class="gcs-label">Applicants</div>
-                    </div>
-                    <div class="gcs-item">
-                      <div class="gcs-val">142</div>
-                      <div class="gcs-label">Views</div>
-                    </div>
-                    <div class="gcs-item">
-                      <div class="gcs-val">2d</div>
-                      <div class="gcs-label">Left</div>
-                    </div>
-                  </div>
-                  <div class="gig-card-actions">
-                    <button class="btn-gca" onclick="openTab('applications')">📩 Applications</button>
-                    <button class="btn-gca" onclick="window.location.href='gig-edit.html'">✏️ Edit</button>
-                    <button class="btn-gca primary" onclick="window.location.href='gig-detail.html'">View →</button>
-                  </div>
-                </div>
-              </div>
+    /* ── Greeting ── */
+    var hour  = new Date().getHours();
+    var greet = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
+    document.getElementById("greetingText").textContent = greet + ", " + (user.name || "Poster") + "! 👋";
 
-              <!-- Gig 2 -->
-              <div class="gig-card">
-                <div class="gig-card-top">
-                  <div class="gig-card-icon green">🛵</div>
-                  <div class="gig-card-info">
-                    <div class="gig-card-title">Grocery Delivery — Gurugram Sector 29</div>
-                    <div class="gig-card-meta">
-                      <span class="gcm-item">📍 Sector 29, Gurugram</span>
-                      <span class="gcm-item">📅 Mar 16–17</span>
-                      <span class="gcm-item">👥 1 position</span>
-                    </div>
-                  </div>
-                  <div class="gig-card-right">
-                    <span class="gig-status-badge gsb-active">🟢 Active</span>
-                    <span class="gig-budget">₹800/day</span>
-                  </div>
-                </div>
-                <div class="gig-fill-bar">
-                  <div class="gfb-label">
-                    <span>Applications: 14</span>
-                    <span>1/1 position open</span>
-                  </div>
-                  <div class="gfb-track"><div class="gfb-fill" style="width:80%"></div></div>
-                </div>
-                <div class="gig-card-footer">
-                  <div class="gig-card-stats">
-                    <div class="gcs-item">
-                      <div class="gcs-val">14</div>
-                      <div class="gcs-label">Applicants</div>
-                    </div>
-                    <div class="gcs-item">
-                      <div class="gcs-val">289</div>
-                      <div class="gcs-label">Views</div>
-                    </div>
-                    <div class="gcs-item">
-                      <div class="gcs-val">4d</div>
-                      <div class="gcs-label">Left</div>
-                    </div>
-                  </div>
-                  <div class="gig-card-actions">
-                    <button class="btn-gca" onclick="openTab('applications')">📩 Applications</button>
-                    <button class="btn-gca" onclick="window.location.href='gig-edit.html'">✏️ Edit</button>
-                    <button class="btn-gca primary">View →</button>
-                  </div>
-                </div>
-              </div>
+    /* ── Role switch ── */
+    document.getElementById("btnSwitchRole").addEventListener("click", function () {
+      window.location.href = "dashboard-worker.html";
+    });
 
-              <!-- Gig 3 -->
-              <div class="gig-card">
-                <div class="gig-card-top">
-                  <div class="gig-card-icon amber">🎪</div>
-                  <div class="gig-card-info">
-                    <div class="gig-card-title">Event Setup Helper — Corporate Event</div>
-                    <div class="gig-card-meta">
-                      <span class="gcm-item">📍 DLF Cyber Hub, Gurugram</span>
-                      <span class="gcm-item">📅 Mar 20</span>
-                      <span class="gcm-item">👥 5 positions</span>
-                    </div>
-                  </div>
-                  <div class="gig-card-right">
-                    <span class="gig-status-badge gsb-pending">🔵 Filling</span>
-                    <span class="gig-budget">₹1,500</span>
-                  </div>
-                </div>
-                <div class="gig-fill-bar">
-                  <div class="gfb-label">
-                    <span>Applications: 5</span>
-                    <span>3/5 positions filled</span>
-                  </div>
-                  <div class="gfb-track"><div class="gfb-fill" style="width:60%"></div></div>
-                </div>
-                <div class="gig-card-footer">
-                  <div class="gig-card-stats">
-                    <div class="gcs-item">
-                      <div class="gcs-val">5</div>
-                      <div class="gcs-label">Applicants</div>
-                    </div>
-                    <div class="gcs-item">
-                      <div class="gcs-val">98</div>
-                      <div class="gcs-label">Views</div>
-                    </div>
-                    <div class="gcs-item">
-                      <div class="gcs-val">7d</div>
-                      <div class="gcs-label">Left</div>
-                    </div>
-                  </div>
-                  <div class="gig-card-actions">
-                    <button class="btn-gca" onclick="openTab('applications')">📩 Applications</button>
-                    <button class="btn-gca" onclick="window.location.href='gig-edit.html'">✏️ Edit</button>
-                    <button class="btn-gca primary">View →</button>
-                  </div>
-                </div>
-              </div>
-            </div>
+    /* ── Tabs ── */
+    document.querySelectorAll(".tab-btn").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        document.querySelectorAll(".tab-btn").forEach(function (b) { b.classList.remove("active"); });
+        document.querySelectorAll(".tab-panel").forEach(function (p) { p.classList.remove("active"); });
+        btn.classList.add("active");
+        document.getElementById("tab" + capitalize(btn.dataset.tab)).classList.add("active");
+      });
+    });
 
-            <!-- Recent applications -->
-            <div class="cd-section-hdr" style="margin-top:8px">
-              <div class="cd-section-title">📩 Latest Applications</div>
-              <button class="cd-section-action" id="btnViewAllApps">View All →</button>
-            </div>
+    function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
 
-            <div class="app-cards-list" id="overviewAppList">
-              <!-- App 1 -->
-              <div class="app-card new-app">
-                <div class="app-card-body">
-                  <div class="app-avatar" style="background:linear-gradient(135deg,#059669,#0d9488)">AS</div>
-                  <div class="app-info">
-                    <div class="app-name">
-                      Arjun Singh
-                      <span class="app-verified">✅ Verified</span>
-                      <span class="app-new-badge">NEW</span>
-                    </div>
-                    <div class="app-meta">
-                      <span>⭐ 4.6</span>
-                      <span>14 gigs done</span>
-                      <span>📍 Gurugram</span>
-                    </div>
-                    <div class="app-gig-label">📦 Warehouse Packing Helper</div>
-                  </div>
-                  <div class="app-card-right">
-                    <span class="app-rating">⭐ 4.6</span>
-                    <span class="app-time">2 min ago</span>
-                  </div>
-                </div>
-                <div class="app-card-footer">
-                  <button class="btn-app btn-app-accept" onclick="acceptApp(this)">✅ Accept</button>
-                  <button class="btn-app btn-app-decline" onclick="declineApp(this)">✕ Decline</button>
-                  <button class="btn-app btn-app-view">👁️ View Profile</button>
-                  <span class="app-msg-preview">"Main kal se shuru kar sakta hoon…"</span>
-                </div>
-              </div>
+    /* ── Data ── */
+    function getGigs() { return JSON.parse(localStorage.getItem(GIG_KEY) || "[]"); }
+    function saveGigs(g) { localStorage.setItem(GIG_KEY, JSON.stringify(g)); }
 
-              <!-- App 2 -->
-              <div class="app-card new-app">
-                <div class="app-card-body">
-                  <div class="app-avatar" style="background:linear-gradient(135deg,#7c3aed,#a78bfa)">PK</div>
-                  <div class="app-info">
-                    <div class="app-name">
-                      Priya Kumari
-                      <span class="app-verified">✅ Verified</span>
-                      <span class="app-new-badge">NEW</span>
-                    </div>
-                    <div class="app-meta">
-                      <span>⭐ 4.9</span>
-                      <span>22 gigs done</span>
-                      <span>📍 Gurugram</span>
-                    </div>
-                    <div class="app-gig-label">🛵 Grocery Delivery</div>
-                  </div>
-                  <div class="app-card-right">
-                    <span class="app-rating">⭐ 4.9</span>
-                    <span class="app-time">18 min ago</span>
-                  </div>
-                </div>
-                <div class="app-card-footer">
-                  <button class="btn-app btn-app-accept" onclick="acceptApp(this)">✅ Accept</button>
-                  <button class="btn-app btn-app-decline" onclick="declineApp(this)">✕ Decline</button>
-                  <button class="btn-app btn-app-view">👁️ View Profile</button>
-                  <span class="app-msg-preview">"Meri apni bike hai, experienced hoon…"</span>
-                </div>
-              </div>
+    function getMyGigs() {
+      return getGigs().filter(function (g) { return g.posterId === user.id; });
+    }
 
-              <!-- App 3 -->
-              <div class="app-card">
-                <div class="app-card-body">
-                  <div class="app-avatar" style="background:linear-gradient(135deg,#d97706,#fbbf24)">RS</div>
-                  <div class="app-info">
-                    <div class="app-name">Rohit Sharma</div>
-                    <div class="app-meta">
-                      <span>⭐ 4.3</span>
-                      <span>7 gigs done</span>
-                      <span>📍 Faridabad</span>
-                    </div>
-                    <div class="app-gig-label">🎪 Event Setup Helper</div>
-                  </div>
-                  <div class="app-card-right">
-                    <span class="app-rating">⭐ 4.3</span>
-                    <span class="app-time">1 hr ago</span>
-                  </div>
-                </div>
-                <div class="app-card-footer">
-                  <button class="btn-app btn-app-accept" onclick="acceptApp(this)">✅ Accept</button>
-                  <button class="btn-app btn-app-decline" onclick="declineApp(this)">✕ Decline</button>
-                  <button class="btn-app btn-app-view">👁️ View Profile</button>
-                  <span class="app-msg-preview">"Events mein 2 saal ka experience hai…"</span>
-                </div>
-              </div>
-            </div>
+    function timeAgo(iso) {
+      var d = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
+      if (d < 60)    return d + "s ago";
+      if (d < 3600)  return Math.floor(d / 60) + "m ago";
+      if (d < 86400) return Math.floor(d / 3600) + "h ago";
+      return Math.floor(d / 86400) + "d ago";
+    }
 
-          </div>
+    function escHtml(s) {
+      return String(s || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+    }
 
-          <!-- RIGHT SIDEBAR -->
-          <div>
+    function payLabel(t) {
+      if (t === "cash")   return "💵 Cash";
+      if (t === "wallet") return "🔒 Secure Wallet";
+      return "✅ Pay After";
+    }
 
-            <!-- Wallet card -->
-            <div class="wallet-card">
-              <div class="wc-inner">
-                <div class="wc-label">💼 Platform Wallet</div>
-                <div class="wc-balance"><span>₹</span>3,240</div>
-                <div class="wc-sub">Available balance</div>
-                <div class="wc-row"><span>In Escrow</span><strong>₹4,500</strong></div>
-                <div class="wc-row"><span>Released (Mar)</span><strong>₹18,400</strong></div>
-                <div class="wc-row"><span>Pending Payout</span><strong>₹0</strong></div>
-                <div class="wc-btns">
-                  <button class="btn-wc btn-wc-primary" onclick="openTab('payments')">💰 Add Funds</button>
-                  <button class="btn-wc btn-wc-outline" onclick="openTab('payments')">📊 History</button>
-                </div>
-              </div>
-            </div>
+    /* ═══════════════════════════════════════
+       RENDER
+    ═══════════════════════════════════════ */
+    function render() {
+      var mine      = getMyGigs();
+      var open      = mine.filter(function (g) { return g.status === "open"; });
+      var progress  = mine.filter(function (g) { return g.status === "taken"; });
+      var completed = mine.filter(function (g) { return g.status === "completed"; });
 
-            <!-- Notifications -->
-            <div class="notif-card">
-              <div class="notif-header">
-                <div class="nh-title">
-                  🔔 Notifications
-                  <span class="nh-count" id="notifCount">4</span>
-                </div>
-                <button class="nh-clear" id="btnClearNotifs">Clear all</button>
-              </div>
-              <div id="notifList">
-                <div class="notif-item unread" data-notif>
-                  <div class="ni-dot"></div>
-                  <div class="ni-content">
-                    <div class="ni-text">📩 <strong>Arjun Singh</strong> ne Warehouse Packing ke liye apply kiya</div>
-                    <div class="ni-time">2 min ago</div>
-                  </div>
-                </div>
-                <div class="notif-item unread" data-notif>
-                  <div class="ni-dot"></div>
-                  <div class="ni-content">
-                    <div class="ni-text">📩 <strong>Priya Kumari</strong> ne Grocery Delivery ke liye apply kiya</div>
-                    <div class="ni-time">18 min ago</div>
-                  </div>
-                </div>
-                <div class="notif-item unread" data-notif>
-                  <div class="ni-dot"></div>
-                  <div class="ni-content">
-                    <div class="ni-text">⭐ <strong>Kavya S.</strong> ne tumhe 5 star rating di!</div>
-                    <div class="ni-time">2 hrs ago</div>
-                  </div>
-                </div>
-                <div class="notif-item unread" data-notif>
-                  <div class="ni-dot"></div>
-                  <div class="ni-content">
-                    <div class="ni-text">✅ Warehouse Gig ka payment ₹1,128 release ho gaya</div>
-                    <div class="ni-time">3 hrs ago</div>
-                  </div>
-                </div>
-                <div class="notif-item" data-notif>
-                  <div class="ni-dot read"></div>
-                  <div class="ni-content">
-                    <div class="ni-text">🎉 Tumhara "Event Setup Helper" gig live ho gaya</div>
-                    <div class="ni-time">Yesterday</div>
-                  </div>
-                </div>
-              </div>
-            </div>
+      /* Stats */
+      document.getElementById("statTotal").textContent     = mine.length;
+      document.getElementById("statOpen").textContent      = open.length;
+      document.getElementById("statProgress").textContent  = progress.length;
+      document.getElementById("statCompleted").textContent = completed.length;
 
-            <!-- Profile completion -->
-            <div class="profile-card">
-              <div class="pc-title">👤 Profile Completion</div>
-              <div class="pc-sub">Complete profile = better worker applications</div>
-              <div class="pc-meter"><div class="pc-fill" style="width:70%"></div></div>
-              <div class="pc-pct">70% Complete</div>
-              <div class="pc-items">
-                <div class="pc-item done"><div class="pci-dot"></div>Basic info ✓</div>
-                <div class="pc-item done"><div class="pci-dot"></div>Phone verified ✓</div>
-                <div class="pc-item done"><div class="pci-dot"></div>Email verified ✓</div>
-                <div class="pc-item done"><div class="pci-dot"></div>First gig posted ✓</div>
-                <div class="pc-item todo"><div class="pci-dot"></div>Add profile photo</div>
-                <div class="pc-item todo"><div class="pci-dot"></div>Add business description</div>
-                <div class="pc-item todo"><div class="pci-dot"></div>Link UPI / bank account</div>
-              </div>
-              <a href="profile.html" style="display:flex;align-items:center;justify-content:center;gap:7px;margin-top:14px;padding:9px;background:linear-gradient(135deg,var(--primary),var(--teal));color:#fff;border-radius:var(--radius-sm);font-weight:700;font-size:.82rem;text-decoration:none">
-                Complete Profile →
-              </a>
-            </div>
+      var totalSpent = 0;
+      completed.forEach(function (g) { totalSpent += g.pricePerHr || 0; });
+      document.getElementById("statSpent").textContent = "₹" + totalSpent;
 
-            <!-- Quick post -->
-            <div class="quick-post-card">
-              <div class="qpc-title">➕ Need More Help?</div>
-              <div class="qpc-sub">GigLega pe thousands of verified workers hain — abhi post karo!</div>
-              <a href="post-gig-form.html" class="btn-qpc">🚀 Post New Gig — Free</a>
-            </div>
+      /* Tab counts */
+      document.getElementById("tabCountOpen").textContent      = open.length;
+      document.getElementById("tabCountProgress").textContent  = progress.length;
+      document.getElementById("tabCountCompleted").textContent = completed.length;
 
-            <!-- Recent Activity -->
-            <div class="activity-card">
-              <div class="activity-header">
-                <div class="ah-title">📊 Recent Activity</div>
-              </div>
-              <div class="activity-item">
-                <div class="ai-icon green">✅</div>
-                <div class="ai-content">
-                  <div class="ai-text"><strong>Warehouse Gig</strong> marked complete</div>
-                  <div class="ai-time">3 hrs ago</div>
-                </div>
-              </div>
-              <div class="activity-item">
-                <div class="ai-icon blue">📋</div>
-                <div class="ai-content">
-                  <div class="ai-text"><strong>Event Setup Helper</strong> gig posted</div>
-                  <div class="ai-time">Yesterday</div>
-                </div>
-              </div>
-              <div class="activity-item">
-                <div class="ai-icon amber">💰</div>
-                <div class="ai-content">
-                  <div class="ai-text">Payment ₹1,128 released to Arjun</div>
-                  <div class="ai-time">Yesterday</div>
-                </div>
-              </div>
-              <div class="activity-item">
-                <div class="ai-icon purple">⭐</div>
-                <div class="ai-content">
-                  <div class="ai-text">Received 5★ review from Kavya S.</div>
-                  <div class="ai-time">2 days ago</div>
-                </div>
-              </div>
-              <div class="activity-item">
-                <div class="ai-icon red">🚨</div>
-                <div class="ai-content">
-                  <div class="ai-text">Dispute resolved — ₹600 refunded</div>
-                  <div class="ai-time">3 days ago</div>
-                </div>
-              </div>
-            </div>
+      /* Render panels */
+      renderPanel("tabOpen",      open,      "open");
+      renderPanel("tabProgress",  progress,  "taken");
+      renderPanel("tabCompleted", completed, "completed");
+      renderPanel("tabAll",       mine,      "all");
+    }
 
-          </div>
+    function renderPanel(elId, gigs, status) {
+      var el = document.getElementById(elId);
+      if (gigs.length === 0) {
+        var msgs = {
+          open:      ["No open gigs.", "Post a new gig to find workers in your area."],
+          taken:     ["No gigs in progress.", "Once a worker accepts your gig, it appears here."],
+          completed: ["No completed gigs yet.", "Completed gigs will show up here with payment history."],
+          all:       ["You haven't posted any gigs yet.", "Click 'Post a New Gig' to get started!"]
+        };
+        var m = msgs[status] || msgs.all;
+        el.innerHTML = emptyHtml(m[0], m[1]);
+        return;
+      }
+      el.innerHTML = gigs.map(function (g) { return gigCardHtml(g); }).join("");
+      bindCardActions(el);
+    }
 
-        </div>
-      </div>
-      <!-- /overview -->
+    /* ── Gig card HTML ── */
+    function gigCardHtml(g) {
+      var fee  = Math.round(g.pricePerHr * FEE_RATE);
+      var earn = g.pricePerHr - fee;
 
-      <!-- ════ TAB: MY GIGS ════ -->
-      <div class="cd-panel" id="panel-mygigs">
+      var badgeCls = g.status === "open" ? "s-open" : g.status === "taken" ? "s-taken" : "s-completed";
+      var badgeTxt = g.status === "open" ? "🟢 Open"
+                   : g.status === "taken" ? "⚡ In Progress"
+                   : "✅ Completed";
 
-        <div class="gig-filter-bar" id="gigFilterBar">
-          <button class="gig-filter-btn active" data-filter="all">All (5)</button>
-          <button class="gig-filter-btn" data-filter="active">🟢 Active (3)</button>
-          <button class="gig-filter-btn" data-filter="paused">🟡 Paused (1)</button>
-          <button class="gig-filter-btn" data-filter="closed">⚫ Closed (1)</button>
-          <select class="gig-sort-select" id="gigSortSelect">
-            <option value="recent">Sort: Recent</option>
-            <option value="apps">Most Applications</option>
-            <option value="budget">Highest Budget</option>
-          </select>
-        </div>
+      /* Worker section */
+      var workerSection = "";
+      if (g.status === "taken" && g.takenBy) {
+        var initials = (g.takenBy || "W").slice(0,2).toUpperCase();
+        workerSection =
+          '<div style="margin-top:12px;margin-bottom:4px;font-size:.78rem;font-weight:700;color:var(--gray-400);text-transform:uppercase">Worker Assigned</div>' +
+          '<div class="worker-row">' +
+            '<div class="worker-info">' +
+              '<div class="worker-avatar">' + initials + '</div>' +
+              '<div>' +
+                '<div class="worker-name">' + escHtml(g.takenBy) + '</div>' +
+                '<div class="worker-phone">Accepted ' + timeAgo(g.takenAt || g.postedAt) + '</div>' +
+              '</div>' +
+            '</div>' +
+            '<div class="worker-actions">' +
+              '<a href="chat.html?gigId=' + g.id + '" class="btn btn-sm btn-primary">💬 Chat</a>' +
+            '</div>' +
+          '</div>';
+      }
 
-        <div class="cd-info-box teal">
-          💡 <strong>Pro Tip:</strong> Gigs jo weekend mein post hoti hain unhe 35% zyada applications milti hain. Next posting Friday ko try karo!
-        </div>
+      /* Complete bar (only for taken + non-cash) */
+      var completeBar = "";
+      if (g.status === "taken") {
+        completeBar =
+          '<div class="complete-bar">' +
+            '<div class="complete-bar-text">Worker has accepted. Once done, release payment.</div>' +
+            '<button class="btn-mark-complete" data-gig-id="' + g.id + '">✅ Mark Complete & Release Payment</button>' +
+          '</div>';
+      }
 
-        <div class="gig-cards-list" id="myGigsList">
+      /* Cash fee prompt (shown after completion for cash gigs) */
+      var cashPrompt = "";
+      if (g.status === "completed" && g.payType === "cash") {
+        cashPrompt =
+          '<div class="cash-fee-prompt show">' +
+            '<div class="cash-fee-title">💳 GigLega Support Fee Due</div>' +
+            '<div class="cash-fee-desc">You paid the worker in cash. Please pay the GigLega support fee of <strong>₹' + fee + '</strong> via UPI to keep the platform running.</div>' +
+            '<button class="btn-pay-fee" data-gig-id="' + g.id + '" data-fee="' + fee + '">Pay ₹' + fee + ' Support Fee</button>' +
+          '</div>';
+      }
 
-          <!-- Same 3 active gigs + paused + closed -->
-          <div class="gig-card" data-status="active">
-            <div class="gig-card-top">
-              <div class="gig-card-icon blue">📦</div>
-              <div class="gig-card-info">
-                <div class="gig-card-title">Weekend Warehouse Packing Helper</div>
-                <div class="gig-card-meta">
-                  <span class="gcm-item">📍 Sec 14, Gurugram</span>
-                  <span class="gcm-item">📅 Mar 14</span>
-                  <span class="gcm-item">📦 Warehouse</span>
-                </div>
-              </div>
-              <div class="gig-card-right">
-                <span class="gig-status-badge gsb-active">🟢 Active</span>
-                <span class="gig-budget">₹1,200</span>
-              </div>
-            </div>
-            <div class="gig-fill-bar">
-              <div class="gfb-label"><span>8 applications</span><span>2/2 open</span></div>
-              <div class="gfb-track"><div class="gfb-fill" style="width:60%"></div></div>
-            </div>
-            <div class="gig-card-footer">
-              <div class="gig-card-stats">
-                <div class="gcs-item"><div class="gcs-val">8</div><div class="gcs-label">Apps</div></div>
-                <div class="gcs-item"><div class="gcs-val">142</div><div class="gcs-label">Views</div></div>
-                <div class="gcs-item"><div class="gcs-val">2d</div><div class="gcs-label">Left</div></div>
-              </div>
-              <div class="gig-card-actions">
-                <button class="btn-gca">⏸️ Pause</button>
-                <button class="btn-gca" onclick="window.location.href='gig-edit.html'">✏️ Edit</button>
-                <button class="btn-gca primary">View →</button>
-              </div>
-            </div>
-          </div>
+      return '<div class="gig-card" data-gig-id="' + g.id + '">' +
+        '<div class="gig-card-head">' +
+          '<div class="gig-card-title">' + escHtml(g.title) + '</div>' +
+          '<span class="s-badge ' + badgeCls + '">' + badgeTxt + '</span>' +
+        '</div>' +
+        '<div class="gig-card-meta">' +
+          (g.location ? '<span class="gig-meta-chip">📍 ' + escHtml(g.location) + '</span>' : '') +
+          '<span class="gig-meta-chip">🕒 ' + timeAgo(g.postedAt) + '</span>' +
+          '<span class="gig-meta-chip">' + payLabel(g.payType) + '</span>' +
+          '<span class="gig-meta-chip">💰 ₹' + g.pricePerHr + '/hr</span>' +
+          '<span class="gig-meta-chip">Worker gets ₹' + earn + '</span>' +
+        '</div>' +
+        workerSection +
+        completeBar +
+        cashPrompt +
+       '<div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">' +
+  '<a href="gig-detail.html?id=' + g.id + '" class="btn btn-sm btn-outline">View Gig →</a>' +
+  (g.status === "open"
+    ? '<a href="gig-edit.html?id=' + g.id + '" class="btn btn-sm btn-outline">✏️ Edit</a>' +
+      '<button class="btn btn-sm btn-danger" data-delete-id="' + g.id + '">🗑️ Delete</button>'
+    : '') +
+'</div>'+
+      '</div>';
+    }
 
-          <div class="gig-card" data-status="active">
-            <div class="gig-card-top">
-              <div class="gig-card-icon green">🛵</div>
-              <div class="gig-card-info">
-                <div class="gig-card-title">Grocery Delivery — Gurugram Sector 29</div>
-                <div class="gig-card-meta">
-                  <span class="gcm-item">📍 Sec 29, Gurugram</span>
-                  <span class="gcm-item">📅 Mar 16–17</span>
-                  <span class="gcm-item">🛵 Delivery</span>
-                </div>
-              </div>
-              <div class="gig-card-right">
-                <span class="gig-status-badge gsb-active">🟢 Active</span>
-                <span class="gig-budget">₹800/day</span>
-              </div>
-            </div>
-            <div class="gig-fill-bar">
-              <div class="gfb-label"><span>14 applications</span><span>1/1 open</span></div>
-              <div class="gfb-track"><div class="gfb-fill" style="width:80%"></div></div>
-            </div>
-            <div class="gig-card-footer">
-              <div class="gig-card-stats">
-                <div class="gcs-item"><div class="gcs-val">14</div><div class="gcs-label">Apps</div></div>
-                <div class="gcs-item"><div class="gcs-val">289</div><div class="gcs-label">Views</div></div>
-                <div class="gcs-item"><div class="gcs-val">4d</div><div class="gcs-label">Left</div></div>
-              </div>
-              <div class="gig-card-actions">
-                <button class="btn-gca">⏸️ Pause</button>
-                <button class="btn-gca" onclick="window.location.href='gig-edit.html'">✏️ Edit</button>
-                <button class="btn-gca primary">View →</button>
-              </div>
-            </div>
-          </div>
+    /* ═══════════════════════════════════════
+       BIND ACTIONS
+    ═══════════════════════════════════════ */
+    function bindCardActions(container) {
 
-          <div class="gig-card" data-status="active">
-            <div class="gig-card-top">
-              <div class="gig-card-icon amber">🎪</div>
-              <div class="gig-card-info">
-                <div class="gig-card-title">Event Setup Helper — Corporate Event</div>
-                <div class="gig-card-meta">
-                  <span class="gcm-item">📍 DLF Cyber Hub</span>
-                  <span class="gcm-item">📅 Mar 20</span>
-                  <span class="gcm-item">🎪 Event</span>
-                </div>
-              </div>
-              <div class="gig-card-right">
-                <span class="gig-status-badge gsb-filled">🔵 Filling</span>
-                <span class="gig-budget">₹1,500</span>
-              </div>
-            </div>
-            <div class="gig-fill-bar">
-              <div class="gfb-label"><span>5 applications</span><span>3/5 filled</span></div>
-              <div class="gfb-track"><div class="gfb-fill" style="width:60%"></div></div>
-            </div>
-            <div class="gig-card-footer">
-              <div class="gig-card-stats">
-                <div class="gcs-item"><div class="gcs-val">5</div><div class="gcs-label">Apps</div></div>
-                <div class="gcs-item"><div class="gcs-val">98</div><div class="gcs-label">Views</div></div>
-                <div class="gcs-item"><div class="gcs-val">7d</div><div class="gcs-label">Left</div></div>
-              </div>
-              <div class="gig-card-actions">
-                <button class="btn-gca">⏸️ Pause</button>
-                <button class="btn-gca" onclick="window.location.href='gig-edit.html'">✏️ Edit</button>
-                <button class="btn-gca primary">View →</button>
-              </div>
-            </div>
-          </div>
+      /* Mark complete */
+      container.querySelectorAll(".btn-mark-complete").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          var gigId = btn.getAttribute("data-gig-id");
+          if (!confirm("Mark this gig as complete and release payment to the worker?")) return;
 
-          <!-- Paused gig -->
-          <div class="gig-card" data-status="paused" style="opacity:.85">
-            <div class="gig-card-top">
-              <div class="gig-card-icon blue">🧹</div>
-              <div class="gig-card-info">
-                <div class="gig-card-title">Office Deep Cleaning — Udyog Vihar</div>
-                <div class="gig-card-meta">
-                  <span class="gcm-item">📍 Udyog Vihar, Gurugram</span>
-                  <span class="gcm-item">📅 TBD</span>
-                  <span class="gcm-item">🧹 Cleaning</span>
-                </div>
-              </div>
-              <div class="gig-card-right">
-                <span class="gig-status-badge gsb-paused">🟡 Paused</span>
-                <span class="gig-budget">₹2,000</span>
-              </div>
-            </div>
-            <div class="gig-card-footer">
-              <div class="gig-card-stats">
-                <div class="gcs-item"><div class="gcs-val">3</div><div class="gcs-label">Apps</div></div>
-                <div class="gcs-item"><div class="gcs-val">54</div><div class="gcs-label">Views</div></div>
-                <div class="gcs-item"><div class="gcs-val">—</div><div class="gcs-label">Left</div></div>
-              </div>
-              <div class="gig-card-actions">
-                <button class="btn-gca">▶️ Resume</button>
-                <button class="btn-gca" onclick="window.location.href='gig-edit.html'">✏️ Edit</button>
-                <button class="btn-gca primary">View →</button>
-              </div>
-            </div>
-          </div>
+          btn.disabled = true;
+          btn.textContent = "⏳ Processing...";
 
-          <!-- Closed gig -->
-          <div class="gig-card" data-status="closed" style="opacity:.7">
-            <div class="gig-card-top">
-              <div class="gig-card-icon blue">🚛</div>
-              <div class="gig-card-info">
-                <div class="gig-card-title">Office Relocation Helper — March 5</div>
-                <div class="gig-card-meta">
-                  <span class="gcm-item">📍 Sec 44, Gurugram</span>
-                  <span class="gcm-item">📅 Mar 5 (Completed)</span>
-                  <span class="gcm-item">🚛 Moving</span>
-                </div>
-              </div>
-              <div class="gig-card-right">
-                <span class="gig-status-badge gsb-closed">⚫ Closed</span>
-                <span class="gig-budget">₹3,500</span>
-              </div>
-            </div>
-            <div class="gig-card-footer">
-              <div class="gig-card-stats">
-                <div class="gcs-item"><div class="gcs-val">19</div><div class="gcs-label">Apps</div></div>
-                <div class="gcs-item"><div class="gcs-val">412</div><div class="gcs-label">Views</div></div>
-                <div class="gcs-item"><div class="gcs-val">Done</div><div class="gcs-label">Status</div></div>
-              </div>
-              <div class="gig-card-actions">
-                <button class="btn-gca">🔁 Repost</button>
-                <button class="btn-gca primary">View →</button>
-              </div>
-            </div>
-          </div>
+          var gigs = getGigs();
+          var g    = gigs.find(function (x) { return x.id === gigId; });
+          if (g) {
+            g.status      = "completed";
+            g.completedAt = new Date().toISOString();
+            saveGigs(gigs);
+          }
 
-        </div>
+          /* Inject system msg in chat */
+          var CHAT_KEY = "gl_chats";
+          var chats    = JSON.parse(localStorage.getItem(CHAT_KEY) || "{}");
+          if (!chats[gigId]) chats[gigId] = [];
+          chats[gigId].push({
+            id: "sys_" + Date.now(), type: "system",
+            text: "✅ Gig marked complete by poster. Payment released to worker.",
+            sentAt: new Date().toISOString()
+          });
+          localStorage.setItem(CHAT_KEY, JSON.stringify(chats));
 
-        <div style="text-align:center;margin-top:12px">
-          <a href="post-gig-form.html" class="btn-es">➕ Post Another Gig</a>
-        </div>
+          if (typeof showToast === "function") showToast("✅ Gig completed! Payment released to worker.", "success");
+          setTimeout(render, 600);
+        });
+      });
 
-      </div>
-      <!-- /mygigs -->
+      /* Pay cash support fee */
+      container.querySelectorAll(".btn-pay-fee").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          var fee = btn.getAttribute("data-fee");
+          btn.disabled = true;
+          btn.textContent = "⏳ Processing...";
+          setTimeout(function () {
+            if (typeof showToast === "function") showToast("✅ Support fee of ₹" + fee + " paid successfully!", "success");
+            btn.closest(".cash-fee-prompt").innerHTML =
+              '<div style="color:var(--success);font-size:.85rem;font-weight:700">✅ Support fee paid. Thank you!</div>';
+          }, 1200);
+        });
+      });
 
-      <!-- ════ TAB: APPLICATIONS ════ -->
-      <div class="cd-panel" id="panel-applications">
+      /* Delete open gig */
+      container.querySelectorAll("[data-delete-id]").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          var gigId = btn.getAttribute("data-delete-id");
+          if (!confirm("Delete this gig? This cannot be undone.")) return;
+          var gigs = getGigs().filter(function (g) { return g.id !== gigId; });
+          saveGigs(gigs);
+          if (typeof showToast === "function") showToast("Gig deleted.", "success");
+          render();
+        });
+      });
+    }
 
-        <div class="cd-info-box warn">
-          📩 <strong>7 nayi applications hain</strong> aaj — jaldi respond karo, workers dusre gigs pe bhi apply karte hain!
-        </div>
+    function emptyHtml(title, sub) {
+      return '<div class="empty-box"><div class="ei">📭</div>' +
+        '<p><strong>' + title + '</strong><br>' + sub + '</p></div>';
+    }
 
-        <div class="cd-two-col">
-          <div>
-            <div class="cd-section-hdr">
-              <div class="cd-section-title">📩 All Applications (27)</div>
-              <div style="display:flex;gap:8px">
-                <select style="padding:6px 10px;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-family:var(--font);font-size:.78rem;cursor:pointer">
-                  <option>All Gigs</option>
-                  <option>Warehouse Packing</option>
-                  <option>Grocery Delivery</option>
-                  <option>Event Setup</option>
-                </select>
-                <select style="padding:6px 10px;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-family:var(--font);font-size:.78rem;cursor:pointer">
-                  <option>All Status</option>
-                  <option>Pending</option>
-                  <option>Accepted</option>
-                  <option>Declined</option>
-                </select>
-              </div>
-            </div>
+    /* ── Storage sync ── */
+    window.addEventListener("storage", function (e) {
+      if (e.key === GIG_KEY) render();
+    });
 
-            <div class="app-cards-list" id="allAppsList">
+    render();
 
-              <div class="app-card new-app">
-                <div class="app-card-body">
-                  <div class="app-avatar" style="background:linear-gradient(135deg,#059669,#0d9488)">AS</div>
-                  <div class="app-info">
-                    <div class="app-name">Arjun Singh <span class="app-verified">✅</span> <span class="app-new-badge">NEW</span></div>
-                    <div class="app-meta"><span>⭐ 4.6</span><span>14 gigs</span><span>📍 Gurugram</span><span>Age: 24</span></div>
-                    <div class="app-gig-label">📦 Warehouse Packing Helper</div>
-                  </div>
-                  <div class="app-card-right">
-                    <span class="app-rating">⭐ 4.6</span>
-                    <span class="app-time">2 min ago</span>
-                  </div>
-                </div>
-                <div style="padding:0 18px 10px;font-size:.84rem;color:var(--gray-500);font-style:italic;line-height:1.6">
-                  "Main kal se shuru kar sakta hoon, physical work mein experienced hoon. 3 saal warehouse background hai."
-                </div>
-                <div class="app-card-footer">
-                  <button class="btn-app btn-app-accept" onclick="acceptApp(this)">✅ Accept</button>
-                  <button class="btn-app btn-app-decline" onclick="declineApp(this)">✕ Decline</button>
-                  <button class="btn-app btn-app-view">💬 Chat</button>
-                  <button class="btn-app btn-app-view">👁️ Profile</button>
-                </div>
-              </div>
-
-              <div class="app-card new-app">
-                <div class="app-card-body">
-                  <div class="app-avatar" style="background:linear-gradient(135deg,#7c3aed,#a78bfa)">PK</div>
-                  <div class="app-info">
-                    <div class="app-name">Priya Kumari <span class="app-verified">✅</span> <span class="app-new-badge">NEW</span></div>
-                    <div class="app-meta"><span>⭐ 4.9</span><span>22 gigs</span><span>📍 Gurugram</span><span>Age: 26</span></div>
-                    <div class="app-gig-label">🛵 Grocery Delivery</div>
-                  </div>
-                  <div class="app-card-right">
-                    <span class="app-rating">⭐ 4.9</span>
-                    <span class="app-time">18 min ago</span>
-                  </div>
-                </div>
-                <div style="padding:0 18px 10px;font-size:.84rem;color:var(--gray-500);font-style:italic;line-height:1.6">
-                  "Meri Activa hai, Gurugram mein 2 saal delivery experience. Morning slots perfectly available hain."
-                </div>
-                <div class="app-card-footer">
-                  <button class="btn-app btn-app-accept" onclick="acceptApp(this)">✅ Accept</button>
-                  <button class="btn-app btn-app-decline" onclick="declineApp(this)">✕ Decline</button>
-                  <button class="btn-app btn-app-view">💬 Chat</button>
-                  <button class="btn-app btn-app-view">👁️ Profile</button>
-                </div>
-              </div>
-
-              <div class="app-card new-app">
-                <div class="app-card-body">
-                  <div class="app-avatar" style="background:linear-gradient(135deg,#d97706,#fbbf24)">RS</div>
-                  <div class="app-info">
-                    <div class="app-name">Rohit Sharma <span class="app-new-badge">NEW</span></div>
-                    <div class="app-meta"><span>⭐ 4.3</span><span>7 gigs</span><span>📍 Faridabad</span><span>Age: 22</span></div>
-                    <div class="app-gig-label">🎪 Event Setup Helper</div>
-                  </div>
-                  <div class="app-card-right">
-                    <span class="app-rating">⭐ 4.3</span>
-                    <span class="app-time">1 hr ago</span>
-                  </div>
-                </div>
-                <div style="padding:0 18px 10px;font-size:.84rem;color:var(--gray-500);font-style:italic;line-height:1.6">
-                  "Corporate events mein 2 saal experience, setup aur breakdown dono kar sakta hoon."
-                </div>
-                <div class="app-card-footer">
-                  <button class="btn-app btn-app-accept" onclick="acceptApp(this)">✅ Accept</button>
-                  <button class="btn-app btn-app-decline" onclick="declineApp(this)">✕ Decline</button>
-                  <button class="btn-app btn-app-view">💬 Chat</button>
-                  <button class="btn-app btn-app-view">👁️ Profile</button>
-                </div>
-              </div>
-
-              <!-- Accepted -->
-              <div class="app-card" style="border-color:rgba(16,185,129,.3)">
-                <div class="app-card-body">
-                  <div class="app-avatar" style="background:linear-gradient(135deg,#059669,#6ee7b7)">KS</div>
-                  <div class="app-info">
-                    <div class="app-name">Kavya Sharma <span class="app-verified">✅</span></div>
-                    <div class="app-meta"><span>⭐ 4.9</span><span>31 gigs</span><span>📍 Gurugram</span></div>
-                    <div class="app-gig-label">🎪 Event Setup Helper</div>
-                  </div>
-                  <div class="app-card-right">
-                    <span style="font-size:.72rem;font-weight:800;padding:3px 9px;border-radius:6px;background:rgba(16,185,129,.1);color:#059669">✅ Accepted</span>
-                    <span class="app-time">Yesterday</span>
-                  </div>
-                </div>
-                <div class="app-card-footer">
-                  <button class="btn-app btn-app-view">💬 Chat</button>
-                  <button class="btn-app btn-app-view">👁️ Profile</button>
-                  <button class="btn-app btn-app-view" onclick="window.location.href='post-gig.html'">📋 Post-Gig</button>
-                </div>
-              </div>
-
-            </div>
-          </div>
-
-          <!-- Apps sidebar -->
-          <div>
-            <div style="background:var(--surface);border:1.5px solid var(--gray-200);border-radius:var(--radius);padding:18px;margin-bottom:20px;box-shadow:var(--shadow-sm)">
-              <div style="font-size:.88rem;font-weight:800;color:var(--primary);margin-bottom:14px">📊 Application Stats</div>
-              <div style="display:flex;flex-direction:column;gap:10px">
-                <div style="display:flex;justify-content:space-between;font-size:.86rem;padding:8px 0;border-bottom:1px solid var(--gray-100)">
-                  <span style="color:var(--gray-500);font-weight:600">Total Applications</span>
-                  <strong>27</strong>
-                </div>
-                <div style="display:flex;justify-content:space-between;font-size:.86rem;padding:8px 0;border-bottom:1px solid var(--gray-100)">
-                  <span style="color:var(--gray-500);font-weight:600">Pending Review</span>
-                  <strong style="color:var(--danger)">7</strong>
-                </div>
-                <div style="display:flex;justify-content:space-between;font-size:.86rem;padding:8px 0;border-bottom:1px solid var(--gray-100)">
-                  <span style="color:var(--gray-500);font-weight:600">Accepted</span>
-                  <strong style="color:var(--success)">4</strong>
-                </div>
-                <div style="display:flex;justify-content:space-between;font-size:.86rem;padding:8px 0">
-                  <span style="color:var(--gray-500);font-weight:600">Declined</span>
-                  <strong style="color:var(--gray-400)">16</strong>
-                </div>
-              </div>
-            </div>
-
-            <div class="cd-info-box teal">
-              💡 <strong>Top tip:</strong> Applications 24 ghante ke andar review karo — 3x better experience score milta hai!
-            </div>
-
-            <div style="background:var(--surface);border:1.5px solid var(--gray-200);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow-sm)">
-              <div style="font-size:.88rem;font-weight:800;color:var(--primary);margin-bottom:12px">⭐ Top Applicants Today</div>
-              <div style="display:flex;flex-direction:column;gap:10px">
-                <div style="display:flex;align-items:center;gap:10px">
-                  <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#a78bfa);display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-size:.86rem;flex-shrink:0">PK</div>
-                  <div>
-                    <div style="font-size:.86rem;font-weight:700;color:var(--text)">Priya Kumari</div>
-                    <div style="font-size:.74rem;color:var(--gray-400)">⭐ 4.9 • 22 gigs</div>
-                  </div>
-                  <div style="margin-left:auto;font-size:.72rem;font-weight:800;background:rgba(13,148,136,.1);color:var(--teal);padding:2px 7px;border-radius:5px">Top Pick</div>
-                </div>
-                <div style="display:flex;align-items:center;gap:10px">
-                  <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#059669,#0d9488);display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-size:.86rem;flex-shrink:0">AS</div>
-                  <div>
-                    <div style="font-size:.86rem;font-weight:700;color:var(--text)">Arjun Singh</div>
-                    <div style="font-size:.74rem;color:var(--gray-400)">⭐ 4.6 • 14 gigs</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <!-- /applications -->
-
-      <!-- ════ TAB: PAYMENTS ════ -->
-      <div class="cd-panel" id="panel-payments">
-
-        <div class="payments-grid">
-          <div class="pay-stat-card">
-            <div class="psc-icon">💰</div>
-            <div class="psc-val">₹18,400</div>
-            <div class="psc-label">Total Spent (Mar)</div>
-          </div>
-          <div class="pay-stat-card">
-            <div class="psc-icon">🏦</div>
-            <div class="psc-val">₹3,240</div>
-            <div class="psc-label">Wallet Balance</div>
-          </div>
-          <div class="pay-stat-card">
-            <div class="psc-icon">🔒</div>
-            <div class="psc-val">₹4,500</div>
-            <div class="psc-label">In Escrow</div>
-          </div>
-        </div>
-
-        <div class="cd-two-col">
-          <div>
-            <div class="txn-table-wrap">
-              <div class="txn-table-header">
-                <div class="tth-title">📊 Transaction History</div>
-                <select class="tth-filter">
-                  <option>All Time</option>
-                  <option>This Month</option>
-                  <option>Last Month</option>
-                </select>
-              </div>
-
-              <div class="txn-row">
-                <div class="txn-icon out">💸</div>
-                <div class="txn-info">
-                  <div class="txn-title">Payment Released — Arjun Singh</div>
-                  <div class="txn-sub">Warehouse Packing • GIG #GL-2026-0314</div>
-                </div>
-                <div class="txn-right">
-                  <div class="txn-amount out">−₹1,128</div>
-                  <div class="txn-date">Mar 14, 2026</div>
-                </div>
-              </div>
-
-              <div class="txn-row">
-                <div class="txn-icon hold">🔒</div>
-                <div class="txn-info">
-                  <div class="txn-title">Escrow Hold — Event Setup</div>
-                  <div class="txn-sub">Event Helper • GIG #GL-2026-0320</div>
-                </div>
-                <div class="txn-right">
-                  <div class="txn-amount hold">🔒 ₹4,500</div>
-                  <div class="txn-date">Mar 13, 2026</div>
-                </div>
-              </div>
-
-              <div class="txn-row">
-                <div class="txn-icon in">💵</div>
-                <div class="txn-info">
-                  <div class="txn-title">Wallet Top-up</div>
-                  <div class="txn-sub">UPI • PhonePe</div>
-                </div>
-                <div class="txn-right">
-                  <div class="txn-amount in">+₹5,000</div>
-                  <div class="txn-date">Mar 12, 2026</div>
-                </div>
-              </div>
-
-              <div class="txn-row">
-                <div class="txn-icon out">💸</div>
-                <div class="txn-info">
-                  <div class="txn-title">Payment Released — Kavya Sharma</div>
-                  <div class="txn-sub">Event Setup • GIG #GL-2026-0305</div>
-                </div>
-                <div class="txn-right">
-                  <div class="txn-amount out">−₹3,290</div>
-                  <div class="txn-date">Mar 7, 2026</div>
-                </div>
-              </div>
-
-              <div class="txn-row">
-                <div class="txn-icon out">💸</div>
-                <div class="txn-info">
-                  <div class="txn-title">Payment Released — Mohan Das</div>
-                  <div class="txn-sub">Office Relocation • GIG #GL-2026-0301</div>
-                </div>
-                <div class="txn-right">
-                  <div class="txn-amount out">−₹3,290</div>
-                  <div class="txn-date">Mar 6, 2026</div>
-                </div>
-              </div>
-
-              <div class="txn-row">
-                <div class="txn-icon in">💵</div>
-                <div class="txn-info">
-                  <div class="txn-title">Dispute Refund</div>
-                  <div class="txn-sub">Partial refund • GIG #GL-2026-0228</div>
-                </div>
-                <div class="txn-right">
-                  <div class="txn-amount in">+₹600</div>
-                  <div class="txn-date">Mar 3, 2026</div>
-                </div>
-              </div>
-
-            </div>
-          </div>
-
-          <div>
-            <div style="background:var(--surface);border:1.5px solid var(--gray-200);border-radius:var(--radius);padding:18px;margin-bottom:20px;box-shadow:var(--shadow-sm)">
-              <div style="font-size:.88rem;font-weight:800;color:var(--primary);margin-bottom:14px">💳 Add Funds</div>
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
-                <button style="padding:10px;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);background:none;cursor:pointer;font-family:var(--font);font-size:.82rem;font-weight:700;color:var(--gray-600);transition:all .15s" onmouseover="this.style.borderColor='var(--teal)';this.style.color='var(--teal)'" onmouseout="this.style.borderColor='var(--gray-200)';this.style.color='var(--gray-600)'">📱 UPI</button>
-                <button style="padding:10px;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);background:none;cursor:pointer;font-family:var(--font);font-size:.82rem;font-weight:700;color:var(--gray-600);transition:all .15s" onmouseover="this.style.borderColor='var(--teal)';this.style.color='var(--teal)'" onmouseout="this.style.borderColor='var(--gray-200)';this.style.color='var(--gray-600)'">🏦 NetBanking</button>
-                <button style="padding:10px;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);background:none;cursor:pointer;font-family:var(--font);font-size:.82rem;font-weight:700;color:var(--gray-600);transition:all .15s" onmouseover="this.style.borderColor='var(--teal)';this.style.color='var(--teal)'" onmouseout="this.style.borderColor='var(--gray-200)';this.style.color='var(--gray-600)'">💳 Card</button>
-                <button style="padding:10px;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);background:none;cursor:pointer;font-family:var(--font);font-size:.82rem;font-weight:700;color:var(--gray-600);transition:all .15s" onmouseover="this.style.borderColor='var(--teal)';this.style.color='var(--teal)'" onmouseout="this.style.borderColor='var(--gray-200)';this.style.color='var(--gray-600)'">📲 Wallet</button>
-              </div>
-              <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
-                <button class="gig-filter-btn" onclick="setAmount(500)" style="padding:6px 14px">+ ₹500</button>
-                <button class="gig-filter-btn" onclick="setAmount(1000)" style="padding:6px 14px">+ ₹1,000</button>
-                <button class="gig-filter-btn" onclick="setAmount(2000)" style="padding:6px 14px">+ ₹2,000</button>
-                <button class="gig-filter-btn" onclick="setAmount(5000)" style="padding:6px 14px">+ ₹5,000</button>
-              </div>
-              <input type="number" id="topupAmount" placeholder="Custom amount (min ₹100)"
-                style="width:100%;padding:10px 13px;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-family:var(--font);font-size:.9rem;box-sizing:border-box;margin-bottom:10px" />
-              <button style="width:100%;padding:11px;background:linear-gradient(135deg,var(--primary),var(--teal));color:#fff;border:none;border-radius:var(--radius-sm);font-weight:800;font-size:.9rem;cursor:pointer;font-family:var(--font)">
-                💰 Add Funds
-              </button>
-            </div>
-
-            <div class="cd-info-box teal">
-              🔒 <strong>Secure Payments:</strong> Sabhi payments Razorpay gateway se process hoti hain. Tumhara paise escrow mein safe rehta hai jab tak gig complete nahi hota.
-            </div>
-          </div>
-        </div>
-      </div>
-      <!-- /payments -->
-
-      <!-- ════ TAB: REVIEWS ════ -->
-      <div class="cd-panel" id="panel-reviews">
-
-        <div class="reviews-summary">
-          <div class="rs-score-big">
-            <div class="rsb-num">4.8</div>
-            <div class="rsb-stars">⭐⭐⭐⭐⭐</div>
-            <div class="rsb-count">12 reviews</div>
-          </div>
-          <div class="rs-bars">
-            <div class="rsb-row">
-              <span class="rsb-label">5★</span>
-              <div class="rsb-track"><div class="rsb-fill" style="width:80%"></div></div>
-              <span class="rsb-count-label">9</span>
-            </div>
-            <div class="rsb-row">
-              <span class="rsb-label">4★</span>
-              <div class="rsb-track"><div class="rsb-fill" style="width:17%"></div></div>
-              <span class="rsb-count-label">2</span>
-            </div>
-            <div class="rsb-row">
-              <span class="rsb-label">3★</span>
-              <div class="rsb-track"><div class="rsb-fill" style="width:8%"></div></div>
-              <span class="rsb-count-label">1</span>
-            </div>
-            <div class="rsb-row">
-              <span class="rsb-label">2★</span>
-              <div class="rsb-track"><div class="rsb-fill" style="width:0%"></div></div>
-              <span class="rsb-count-label">0</span>
-            </div>
-            <div class="rsb-row">
-              <span class="rsb-label">1★</span>
-              <div class="rsb-track"><div class="rsb-fill" style="width:0%"></div></div>
-              <span class="rsb-count-label">0</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="review-item">
-          <div class="ri-header">
-            <div class="ri-avatar" style="background:linear-gradient(135deg,#059669,#6ee7b7)">KS</div>
-            <div>
-              <div class="ri-name">Kavya Sharma</div>
-              <div class="ri-meta">Event Setup Helper • Mar 7, 2026</div>
-            </div>
-            <div class="ri-stars">⭐⭐⭐⭐⭐</div>
-          </div>
-          <div class="ri-body">
-            Bahut achhe poster hain! Instructions bilkul clear thi, payment on-time release ki. Location easy to find thi. Aage bhi kaam karna chahungi.
-          </div>
-          <div class="ri-tags">
-            <span class="ri-tag">⚖️ Fair</span>
-            <span class="ri-tag">📋 Clear Instructions</span>
-            <span class="ri-tag">⏰ On-time Payment</span>
-            <span class="ri-tag">🤝 Respectful</span>
-          </div>
-        </div>
-
-        <div class="review-item">
-          <div class="ri-header">
-            <div class="ri-avatar" style="background:linear-gradient(135deg,#7c3aed,#a78bfa)">AS</div>
-            <div>
-              <div class="ri-name">Arjun Singh</div>
-              <div class="ri-meta">Warehouse Packing • Mar 5, 2026</div>
-            </div>
-            <div class="ri-stars">⭐⭐⭐⭐⭐</div>
-          </div>
-          <div class="ri-body">
-            Professional poster. Kaam clearly describe kiya, saaf environment tha. Payment bhi jaldi release ki. Highly recommend.
-          </div>
-          <div class="ri-tags">
-            <span class="ri-tag">🏢 Professional</span>
-            <span class="ri-tag">🔁 Would Work Again</span>
-            <span class="ri-tag">💰 Fair Pay</span>
-          </div>
-        </div>
-
-        <div class="review-item">
-          <div class="ri-header">
-            <div class="ri-avatar" style="background:linear-gradient(135deg,#d97706,#fbbf24)">MD</div>
-            <div>
-              <div class="ri-name">Mohan Das</div>
-              <div class="ri-meta">Office Relocation • Mar 6, 2026</div>
-            </div>
-            <div class="ri-stars">⭐⭐⭐⭐</div>
-          </div>
-          <div class="ri-body">
-            Achha experience tha. Thoda address difficult tha dhundhna but kaam ok tha. Payment on time di. Aage try karunga.
-          </div>
-          <div class="ri-tags">
-            <span class="ri-tag">⏰ On-time Payment</span>
-          </div>
-        </div>
-
-        <div class="review-item">
-          <div class="ri-header">
-            <div class="ri-avatar" style="background:linear-gradient(135deg,#dc2626,#f87171)">RV</div>
-            <div>
-              <div class="ri-name">Riya Verma</div>
-              <div class="ri-meta">Data Entry Work • Feb 20, 2026</div>
-            </div>
-            <div class="ri-stars">⭐⭐⭐</div>
-          </div>
-          <div class="ri-body">
-            Kaam theek tha but description mein kuch cheezein miss thi. Payment timely aayi. Communication improve ho sakti hai.
-          </div>
-          <div class="ri-tags">
-            <span class="ri-tag">💰 
+  })();
+  </script>
+</body>
+</html>

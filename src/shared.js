@@ -109,7 +109,7 @@
             '→ Login to Continue' +
           '</a>' +
           '<p style="margin-top:14px;font-size:.82rem;color:var(--gray-400)">' +
-            "Don't have an account? <a href='signup.html' style='color:var(--teal);font-weight:600'>Register free</a>" +
+            "Don't have an account? <a href='login.html#mode=register' style='color:var(--teal);font-weight:600'>Register free</a>" +
           '</p>';
         // Replace main content with wall
         if (main.firstChild) {
@@ -262,7 +262,7 @@
     if (!user) {
       authSection =
         '<a href="login.html" class="btn btn-ghost nav-btn-login">Login</a>' +
-        '<a href="signup.html" class="btn btn-primary nav-btn-signup">Join Free →</a>';
+        '<a href="login.html#mode=register" class="btn btn-primary nav-btn-signup">Join Free →</a>';
     } else {
       var initials = (user.name || "U").split(" ").map(function (w) { return w[0]; }).join("").slice(0,2).toUpperCase();
       var notifBadge = notifCount > 0
@@ -354,7 +354,7 @@
             '<div class="nav-mobile-divider"></div>' +
             '<button class="nav-mobile-link nav-mobile-logout" id="mobileLogoutBtn">🚪 Logout</button>'
           : '<a href="login.html"  class="nav-mobile-link">🔑 Login</a>' +
-            '<a href="signup.html" class="nav-mobile-link">✨ Register Free</a>'
+            '<a href="login.html#mode=register" class="nav-mobile-link">✨ Register Free</a>'
         ) +
       '</div>';
 
@@ -764,11 +764,11 @@
       "@media(max-width:768px){.footer-inner{grid-template-columns:1fr}.footer-links{grid-template-columns:repeat(2,1fr)}.footer-bottom{flex-direction:column;text-align:center}}",
 
       /* ── Dark mode overrides ── */
-      "[data-theme=dark] .main-nav{border-color:var(--gray-700);background:var(--gray-900)}",
+      "[data-theme=dark] .main-nav{border-color:var(--gray-700);background:var(--bg)}",
       "[data-theme=dark] .nav-link:hover,[data-theme=dark] .nav-link.active{background:rgba(13,148,136,.1)}",
       "[data-theme=dark] .nav-icon-btn{border-color:var(--gray-700);color:var(--gray-300)}",
       "[data-theme=dark] .nav-avatar-btn{border-color:var(--gray-700)}",
-      "[data-theme=dark] .nav-dropdown{border-color:var(--gray-700);background:var(--gray-900)}",
+      "[data-theme=dark] .nav-dropdown{border-color:var(--gray-700);background:var(--surface)}",
       "[data-theme=dark] .nav-dropdown-divider{background:var(--gray-700)}",
       "[data-theme=dark] .nav-dd-item{color:var(--gray-300)}",
       "[data-theme=dark] .nav-mobile-menu{border-color:var(--gray-700)}",
@@ -776,7 +776,11 @@
       "[data-theme=dark] .nav-hamburger{border-color:var(--gray-700)}",
       "[data-theme=dark] .nav-hamburger span{background:var(--gray-300)}",
       "[data-theme=dark] .announce-bar{opacity:.9}",
-      "[data-theme=dark] .toast{border-color:var(--gray-700);background:var(--gray-900)}"
+      "[data-theme=dark] .main-footer{background:#020617;color:var(--gray-400)}",
+      "[data-theme=dark] .footer-logo{color:var(--gray-700)}",
+      "[data-theme=dark] .footer-col a{color:var(--gray-500)}",
+      "[data-theme=dark] .footer-bottom{color:var(--gray-400);border-color:rgba(148,163,184,.2)}",
+      "[data-theme=dark] .toast{border-color:var(--gray-700);background:var(--surface)}"
 
     ].join("\n");
     document.head.appendChild(style);
@@ -790,8 +794,9 @@
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', function () {
       try {
-        navigator.serviceWorker.register('/service-worker.js', {
-          scope: '/',
+        var swUrl = new URL('service-worker.js', window.location.href).toString();
+        navigator.serviceWorker.register(swUrl, {
+          scope: './',
           updateViaCache: 'none'
         }).then(function (reg) {
           console.log('[GigLega] SW registered:', reg.scope);
@@ -802,10 +807,20 @@
             if (!newSW) return;
             newSW.addEventListener('statechange', function () {
               if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
+                // Activate update immediately so users don't keep stale shell assets.
+                newSW.postMessage({ type: 'SKIP_WAITING' });
                 showUpdateBanner(newSW);
               }
             });
           });
+        });
+
+        // Reload once when a new service worker takes control.
+        var swRefreshing = false;
+        navigator.serviceWorker.addEventListener('controllerchange', function () {
+          if (swRefreshing) return;
+          swRefreshing = true;
+          window.location.reload();
         });
 
         // Listen for messages from SW

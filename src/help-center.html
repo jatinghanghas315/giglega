@@ -1433,4 +1433,258 @@
     /* ── Breadcrumb ── */
     if (typeof buildBreadcrumb === "function") {
       buildBreadcrumb("breadcrumb", [
-        { label: "Home", href: "
+        { label: "Home", href: "index.html" },
+        { label: "Help Center" }
+      ]);
+    }
+
+    var navItems       = Array.prototype.slice.call(document.querySelectorAll(".hc-nav-item"));
+    var catView        = document.getElementById("hcCategoryView");
+    var articleView    = document.getElementById("hcArticleDetail");
+    var searchView     = document.getElementById("hcSearchView");
+    var searchInput    = document.getElementById("hcSearchInput");
+    var searchClear    = document.getElementById("hcSearchClear");
+    var searchDropdown = document.getElementById("searchDropdown");
+
+    var catMap = {};
+    HC_DATA.categories.forEach(function (c) { catMap[c.id] = c; });
+
+    function getArticlesByCat(catId) {
+      return HC_DATA.articles.filter(function (a) { return a.cat === catId; });
+    }
+
+    function setActiveNav(catId) {
+      navItems.forEach(function (btn) {
+        btn.classList.toggle("active", btn.getAttribute("data-cat") === catId);
+      });
+    }
+
+    function articleItemHtml(a) {
+      return '' +
+        '<button class="hc-article-item" data-article="' + a.id + '">' +
+          '<div class="hai-main">' +
+            '<div class="hai-left">' +
+              '<span class="hai-icon">' + a.icon + '</span>' +
+              '<div>' +
+                '<div class="hai-title">' + escHtml(a.title) + '</div>' +
+                '<div class="hai-meta">' + escHtml(a.meta) + '</div>' +
+              '</div>' +
+            '</div>' +
+            (a.badge ? '<span class="hai-badge">' + escHtml(a.badge) + '</span>' : '') +
+          '</div>' +
+          '<span class="hai-arr">→</span>' +
+        '</button>';
+    }
+
+    function bindArticleButtons(scope) {
+      Array.prototype.slice.call(scope.querySelectorAll('[data-article]')).forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          openArticle(btn.getAttribute('data-article'));
+        });
+      });
+    }
+
+    function renderOverview() {
+      var cards = HC_DATA.categories.map(function (c) {
+        return '' +
+          '<button class="hc-cat-card" data-open-cat="' + c.id + '">' +
+            '<div class="hcc-icon">' + c.icon + '</div>' +
+            '<div class="hcc-title">' + escHtml(c.title) + '</div>' +
+            '<div class="hcc-count">' + getArticlesByCat(c.id).length + ' articles</div>' +
+          '</button>';
+      }).join('');
+
+      catView.innerHTML = '' +
+        '<div class="hc-cat-header">' +
+          '<div class="hc-cat-icon">🏠</div>' +
+          '<div><div class="hc-cat-title">Help Center Overview</div><div class="hc-cat-sub">Choose a category to continue</div></div>' +
+        '</div>' +
+        '<div class="hc-overview-grid">' + cards + '</div>';
+
+      Array.prototype.slice.call(catView.querySelectorAll('[data-open-cat]')).forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          renderCategory(btn.getAttribute('data-open-cat'));
+        });
+      });
+    }
+
+    function renderCategory(catId) {
+      currentCat = catId;
+      currentArticle = null;
+      articleView.classList.remove('show');
+      searchView.classList.remove('show');
+      catView.style.display = '';
+
+      if (catId === 'overview') {
+        setActiveNav('overview');
+        renderOverview();
+        if (typeof buildBreadcrumb === "function") {
+          buildBreadcrumb("breadcrumb", [
+            { label: "Home", href: "index.html" },
+            { label: "Help Center" }
+          ]);
+        }
+        return;
+      }
+
+      setActiveNav(catId);
+      var cat = catMap[catId];
+      var list = getArticlesByCat(catId);
+      catView.innerHTML = '' +
+        '<div class="hc-cat-header">' +
+          '<div class="hc-cat-icon">' + cat.icon + '</div>' +
+          '<div><div class="hc-cat-title">' + escHtml(cat.title) + '</div><div class="hc-cat-sub">' + escHtml(cat.desc) + '</div></div>' +
+        '</div>' +
+        '<div class="hc-articles">' + list.map(articleItemHtml).join('') + '</div>';
+
+      bindArticleButtons(catView);
+      if (typeof buildBreadcrumb === "function") {
+        buildBreadcrumb("breadcrumb", [
+          { label: "Home", href: "index.html" },
+          { label: "Help Center", href: "help-center.html" },
+          { label: cat.title }
+        ]);
+      }
+    }
+
+    function openArticle(articleId) {
+      var article = HC_DATA.articles.find(function (a) { return a.id === articleId; });
+      if (!article) return;
+
+      currentArticle = article;
+      catView.style.display = 'none';
+      searchView.classList.remove('show');
+      articleView.classList.add('show');
+
+      var cat = catMap[article.cat];
+      document.getElementById('adCategory').textContent = (cat ? cat.icon + ' ' + cat.title : 'Article');
+      document.getElementById('adTitle').textContent = article.title;
+      document.getElementById('adMeta').textContent = article.meta;
+      document.getElementById('adBody').innerHTML = article.body;
+
+      var related = (article.related || []).map(function (id) {
+        return HC_DATA.articles.find(function (a) { return a.id === id; });
+      }).filter(Boolean);
+      var relEl = document.getElementById('adRelated');
+      relEl.innerHTML = related.map(function (r) {
+        return '<button class="had-related-item" data-article="' + r.id + '">' + r.icon + ' ' + escHtml(r.title) + '</button>';
+      }).join('');
+      bindArticleButtons(relEl);
+
+      if (typeof buildBreadcrumb === "function") {
+        buildBreadcrumb("breadcrumb", [
+          { label: "Home", href: "index.html" },
+          { label: "Help Center", href: "help-center.html" },
+          { label: cat ? cat.title : 'Category', href: "#" },
+          { label: article.title }
+        ]);
+      }
+    }
+
+    function runSearch(q) {
+      var query = String(q || '').trim().toLowerCase();
+      if (!query) return [];
+      return HC_DATA.articles.filter(function (a) {
+        var cat = catMap[a.cat] ? catMap[a.cat].title : '';
+        return (a.title + ' ' + a.meta + ' ' + a.body + ' ' + cat).toLowerCase().indexOf(query) !== -1;
+      }).slice(0, 8);
+    }
+
+    function renderDropdownResults(results) {
+      if (!results.length) {
+        searchDropdown.innerHTML = '<div class="sr-empty">No matching article found.</div>';
+      } else {
+        searchDropdown.innerHTML = results.map(function (a) {
+          return '' +
+            '<button class="sr-item" data-article="' + a.id + '">' +
+              '<div class="sr-title">' + a.icon + ' ' + escHtml(a.title) + '</div>' +
+              '<div class="sr-meta">' + escHtml(catMap[a.cat].title) + ' • ' + escHtml(a.meta) + '</div>' +
+            '</button>';
+        }).join('');
+      }
+      searchDropdown.classList.add('show');
+      bindArticleButtons(searchDropdown);
+    }
+
+    function openSearchView(query) {
+      var results = runSearch(query);
+      catView.style.display = 'none';
+      articleView.classList.remove('show');
+      searchView.classList.add('show');
+      document.getElementById('srQueryLabel').textContent = 'Results for "' + query + '"';
+      document.getElementById('srCountLabel').textContent = results.length + ' article(s) found';
+      var list = document.getElementById('srResultsList');
+      list.innerHTML = results.length ? results.map(articleItemHtml).join('') : '<div class="sr-empty">Try different keywords like payment, safety, account.</div>';
+      bindArticleButtons(list);
+      searchDropdown.classList.remove('show');
+    }
+
+    searchInput.addEventListener('input', function () {
+      var val = searchInput.value.trim();
+      searchClear.classList.toggle('show', !!val);
+      if (val.length < 2) {
+        searchDropdown.classList.remove('show');
+        return;
+      }
+      renderDropdownResults(runSearch(val));
+    });
+
+    searchInput.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        if (searchInput.value.trim()) openSearchView(searchInput.value.trim());
+      }
+    });
+
+    searchClear.addEventListener('click', function () {
+      searchInput.value = '';
+      searchClear.classList.remove('show');
+      searchDropdown.classList.remove('show');
+      renderCategory(currentCat || 'overview');
+    });
+
+    document.getElementById('btnSearchBack').addEventListener('click', function () {
+      searchView.classList.remove('show');
+      catView.style.display = '';
+      renderCategory(currentCat || 'overview');
+    });
+
+    document.getElementById('btnArticleBack').addEventListener('click', function () {
+      articleView.classList.remove('show');
+      catView.style.display = '';
+      renderCategory(currentCat || 'overview');
+    });
+
+    Array.prototype.slice.call(document.querySelectorAll('.hc-popular-tag')).forEach(function (tag) {
+      tag.addEventListener('click', function () {
+        var q = tag.getAttribute('data-q') || '';
+        searchInput.value = q;
+        searchClear.classList.toggle('show', !!q);
+        openSearchView(q);
+      });
+    });
+
+    navItems.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        renderCategory(btn.getAttribute('data-cat'));
+      });
+    });
+
+    document.addEventListener('click', function (e) {
+      if (!searchDropdown.contains(e.target) && e.target !== searchInput) {
+        searchDropdown.classList.remove('show');
+      }
+    });
+
+    document.getElementById('btnHelpYes').addEventListener('click', function () {
+      if (typeof showToast === 'function') showToast('Thanks! Glad this helped. 🙌', 'success');
+    });
+    document.getElementById('btnHelpNo').addEventListener('click', function () {
+      if (typeof showToast === 'function') showToast('Thanks! We will improve this article. ✍️', 'info');
+    });
+
+    renderCategory('overview');
+  });
+  </script>
+</body>
+</html>

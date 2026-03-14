@@ -1892,7 +1892,108 @@
       let sel = 0;
       group.querySelectorAll(".attr-star").forEach(star => {
         star.addEventListener("click", function() {
-          sel = parseInt(this.dataset.val);
+          sel = parseInt(this.dataset.val, 10);
           group.querySelectorAll(".attr-star").forEach((s,i) => {
             s.classList.toggle("active", i < sel);
           });
+          group.dataset.selected = String(sel);
+        });
+      });
+    });
+
+    function toggleTag(btn) {
+      btn.classList.toggle("active");
+    }
+
+    function updateCharCount(el) {
+      const c = (el.value || "").length;
+      const out = document.getElementById("charCount");
+      if (out) out.textContent = String(c);
+    }
+
+    function clearReviewForm() {
+      const name = document.getElementById("reviewClientName");
+      const gig  = document.getElementById("reviewGigType");
+      const txt  = document.getElementById("reviewText");
+      const rec  = document.getElementById("recommendToggle");
+      if (name) name.value = "";
+      if (gig)  gig.value = "";
+      if (txt)  txt.value = "";
+      if (rec)  rec.checked = true;
+      selectedStars = 0;
+      document.querySelectorAll("#starPicker .sp-star").forEach(s => {
+        s.classList.remove("active", "hovered");
+      });
+      document.querySelectorAll(".attr-stars").forEach(group => {
+        group.dataset.selected = "0";
+        group.querySelectorAll(".attr-star").forEach(s => s.classList.remove("active"));
+      });
+      document.querySelectorAll(".wr-tag.active").forEach(s => s.classList.remove("active"));
+      const starLabel = document.getElementById("starLabel");
+      if (starLabel) starLabel.textContent = "Rating chunna zaroori hai";
+      updateCharCount({ value: "" });
+      showToast("Form clear ho gaya.", "info");
+    }
+
+    function submitReview() {
+      const clientName = (document.getElementById("reviewClientName") || {}).value || "";
+      const gigType    = (document.getElementById("reviewGigType") || {}).value || "";
+      const reviewText = (document.getElementById("reviewText") || {}).value || "";
+      if (!clientName.trim()) return showToast("Client ka naam required hai.", "warning");
+      if (!gigType.trim())    return showToast("Gig type select karo.", "warning");
+      if (selectedStars < 1)  return showToast("Overall rating select karo.", "warning");
+      if (reviewText.trim().length < 30) return showToast("Review minimum 30 characters hona chahiye.", "warning");
+
+      showToast("✅ Review submit ho gaya! Thanks for your feedback.", "success");
+      clearReviewForm();
+    }
+
+    function renderKeywordCloud() {
+      const cloud = document.getElementById("keywordCloud");
+      if (!cloud) return;
+      const words = [
+        { t: "Timely Payment", w: 3 },
+        { t: "Professional", w: 2 },
+        { t: "Clear Brief", w: 2 },
+        { t: "Friendly", w: 2 },
+        { t: "Quick Response", w: 1 },
+        { t: "Respectful", w: 2 }
+      ];
+      cloud.innerHTML = words.map(item => {
+        const size = 11 + item.w * 2;
+        return '<span style="font-size:' + size + 'px;padding:6px 10px;border-radius:999px;border:1px solid var(--gray-200);background:var(--surface);font-weight:700;color:var(--gray-600)">' + item.t + '</span>';
+      }).join("");
+    }
+
+    function renderReviewDistSidebar() {
+      const el = document.getElementById("reviewDistSidebar");
+      if (!el) return;
+      el.innerHTML = STAR_DATA.map(d => (
+        '<div class="stat-row">' +
+          '<span class="sr-lbl">' + d.star + '⭐</span>' +
+          '<span class="sr-val">' + d.count + ' (' + d.pct + '%)</span>' +
+        '</div>'
+      )).join("");
+    }
+
+    function renderTrendChart() {
+      const chart = document.getElementById("ratingTrendChart");
+      if (!chart) return;
+      const vals = [4.0,4.1,4.2,4.3,4.4,4.4,4.5,4.6,4.5,4.7,4.8,4.8];
+      chart.innerHTML = vals.map((v, i) => {
+        const h = Math.max(18, Math.round(v / 5 * 100));
+        const bg = (i === vals.length - 1) ? 'var(--teal)' : '#f59e0b';
+        return '<div title="'+v+'" style="flex:1;min-width:0;border-radius:6px 6px 0 0;height:'+h+'px;background:'+bg+';opacity:.9"></div>';
+      }).join('');
+    }
+
+    renderKeywordCloud();
+    renderReviewDistSidebar();
+    renderTrendChart();
+
+  </script>
+
+  <footer id="main-footer"></footer>
+  <div id="toast-container"></div>
+</body>
+</html>
