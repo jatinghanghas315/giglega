@@ -4,167 +4,642 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Browse Gigs — GigLega</title>
-  <meta name="description" content="Gurugram ke best gigs browse karo. Hyperlocal aur remote dono available. Abhi apply karo." />
+  <meta name="description" content="Gurugram NCR ke best gigs browse karo. Filter by category, budget, type aur location." />
   <link rel="stylesheet" href="styles.css" />
-  <script defer src="shared.js"></script>
+  <script src="shared.js"></script>
   <style>
-    .browse-wrap{max-width:1100px;margin:0 auto;padding:32px 16px 80px}
-    .browse-hero{margin-bottom:28px}
-    .browse-hero h1{font-size:1.7rem;font-weight:800;color:var(--primary);margin-bottom:4px}
-    .browse-hero p{color:var(--gray-500);font-size:.95rem}
 
-    .filter-bar{background:var(--surface);border:1px solid var(--gray-200);border-radius:var(--radius);padding:18px 20px;margin-bottom:24px;box-shadow:var(--shadow-sm)}
-    .filter-row{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
-    .filter-row:last-child{margin-bottom:0}
+    /* ══════════════════════════════════
+       PAGE LAYOUT
+    ══════════════════════════════════ */
+    .browse-page {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 28px 20px 60px;
+    }
 
-    .search-wrap{position:relative;flex:1;min-width:220px}
-    .search-wrap input{width:100%;padding:10px 14px 10px 38px;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);font-size:.93rem;background:var(--surface);color:var(--text);font-family:inherit;transition:border .2s;box-sizing:border-box}
-    .search-wrap input:focus{outline:none;border-color:var(--teal)}
-    .search-wrap .search-icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:1rem;pointer-events:none}
+    /* ══════════════════════════════════
+       TOP BAR
+    ══════════════════════════════════ */
+    .browse-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+    .browse-title    { font-size: 1.5rem; font-weight: 900; color: var(--primary); margin-bottom: 2px; }
+    .browse-subtitle { font-size: .84rem; color: var(--gray-400); }
 
-    .type-toggle{display:flex;gap:8px}
-    .type-pill{padding:9px 20px;border-radius:20px;border:1.5px solid var(--gray-200);background:var(--surface);color:var(--gray-600);font-weight:600;font-size:.87rem;cursor:pointer;transition:all .2s;white-space:nowrap}
-    .type-pill.active{border-color:var(--teal);background:var(--teal);color:#fff}
-    .type-pill:hover:not(.active){border-color:var(--teal);color:var(--teal)}
+    /* ══════════════════════════════════
+       SEARCH + SORT BAR
+    ══════════════════════════════════ */
+    .search-sort-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+    .search-box {
+      flex: 1;
+      min-width: 200px;
+      position: relative;
+    }
+    .search-box-icon {
+      position: absolute;
+      left: 12px; top: 50%;
+      transform: translateY(-50%);
+      font-size: 1rem;
+      pointer-events: none;
+    }
+    .search-box input {
+      width: 100%;
+      padding: 10px 14px 10px 38px;
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+      font-size: .9rem;
+      font-family: var(--font);
+      background: var(--surface);
+      color: var(--text);
+      transition: border .2s, box-shadow .2s;
+      box-sizing: border-box;
+    }
+    .search-box input:focus {
+      outline: none;
+      border-color: var(--teal);
+      box-shadow: 0 0 0 3px rgba(13,148,136,.1);
+    }
+    .search-box input::placeholder { color: var(--gray-400); }
 
-    .cat-chips{display:flex;gap:8px;flex-wrap:wrap}
-    .cat-chip{padding:7px 16px;border-radius:20px;border:1.5px solid var(--gray-200);background:var(--surface);color:var(--gray-600);font-size:.82rem;font-weight:600;cursor:pointer;transition:all .2s;white-space:nowrap}
-    .cat-chip.active{border-color:var(--primary);background:var(--primary);color:#fff}
-    .cat-chip:hover:not(.active){border-color:var(--primary);color:var(--primary)}
+    .sort-select {
+      padding: 10px 14px;
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+      font-size: .88rem;
+      font-family: var(--font);
+      background: var(--surface);
+      color: var(--text);
+      cursor: pointer;
+      min-width: 160px;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239ca3af' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 32px;
+      transition: border .2s;
+    }
+    .sort-select:focus { outline: none; border-color: var(--teal); }
 
-    /* Active filter chips */
-    .active-filters{display:none;margin-bottom:14px;flex-wrap:wrap;gap:8px;align-items:center}
-    .active-filters.show{display:flex}
-    .af-chip{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;background:rgba(13,148,136,.1);border:1.5px solid var(--teal);border-radius:14px;font-size:.76rem;font-weight:700;color:var(--teal)}
-    .af-chip button{background:none;border:none;cursor:pointer;color:var(--teal);font-size:.8rem;padding:0;line-height:1;font-weight:800}
-    .af-clear-all{padding:4px 12px;background:transparent;border:1.5px solid var(--gray-300);border-radius:14px;font-size:.74rem;font-weight:700;color:var(--gray-500);cursor:pointer;font-family:inherit}
-    .af-clear-all:hover{border-color:var(--danger);color:var(--danger)}
+    .btn-filter-toggle {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 10px 16px;
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+      background: var(--surface);
+      font-size: .88rem;
+      font-weight: 700;
+      color: var(--gray-600);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: var(--transition);
+      font-family: var(--font);
+    }
+    .btn-filter-toggle:hover,
+    .btn-filter-toggle.active {
+      border-color: var(--teal);
+      color: var(--teal);
+      background: rgba(13,148,136,.05);
+    }
+    .filter-badge {
+      background: var(--teal);
+      color: #fff;
+      font-size: .65rem;
+      font-weight: 800;
+      border-radius: 10px;
+      padding: 1px 7px;
+      min-width: 18px;
+      text-align: center;
+    }
 
-    .results-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px}
-    .results-count{font-size:.88rem;color:var(--gray-500)}
-    .results-count strong{color:var(--primary)}
-    .sort-select{padding:7px 12px;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);font-size:.82rem;font-family:inherit;background:var(--surface);color:var(--text);cursor:pointer;transition:border .2s}
-    .sort-select:focus{outline:none;border-color:var(--teal)}
+    [data-theme=dark] .search-box input,
+    [data-theme=dark] .sort-select,
+    [data-theme=dark] .btn-filter-toggle {
+      border-color: var(--gray-700);
+      background: var(--gray-800);
+    }
 
-    .gig-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px}
+    /* ══════════════════════════════════
+       FILTER CHIPS ROW
+    ══════════════════════════════════ */
+    .filter-chips-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .filter-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 14px;
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-full);
+      background: var(--surface);
+      font-size: .8rem;
+      font-weight: 600;
+      color: var(--gray-600);
+      cursor: pointer;
+      transition: all .18s;
+      user-select: none;
+      white-space: nowrap;
+    }
+    .filter-chip:hover { border-color: var(--teal); color: var(--teal); }
+    .filter-chip.active {
+      border-color: var(--teal);
+      background: rgba(13,148,136,.09);
+      color: var(--teal);
+    }
+    [data-theme=dark] .filter-chip {
+      border-color: var(--gray-700);
+      background: var(--gray-800);
+      color: var(--gray-400);
+    }
+    [data-theme=dark] .filter-chip.active {
+      background: rgba(13,148,136,.15);
+    }
 
-    .gig-card{background:var(--surface);border:1.5px solid var(--gray-200);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow-sm);transition:transform .2s,box-shadow .2s,opacity .3s;position:relative;display:flex;flex-direction:column}
-    .gig-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-md)}
-    .gig-card.taken{opacity:.55;pointer-events:none}
-    .gig-card.taken-flash{border-color:var(--danger)!important}
+    /* ══════════════════════════════════
+       ADVANCED FILTER PANEL
+    ══════════════════════════════════ */
+    .filter-panel {
+      background: var(--surface);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      margin-bottom: 20px;
+      display: none;
+      animation: fadeSlide .2s ease;
+    }
+    .filter-panel.open { display: block; }
+    @keyframes fadeSlide {
+      from { opacity: 0; transform: translateY(-8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .fp-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      align-items: end;
+    }
+    @media(max-width:900px){ .fp-grid { grid-template-columns: repeat(2,1fr); } }
+    @media(max-width:520px){ .fp-grid { grid-template-columns: 1fr; } }
 
-    .gig-status-badge{position:absolute;top:14px;right:14px;padding:4px 10px;border-radius:12px;font-size:.72rem;font-weight:700;letter-spacing:.3px}
-    .badge-open{background:rgba(16,185,129,.12);color:#059669}
-    .badge-taken{background:rgba(239,68,68,.12);color:#dc2626}
+    .fp-group label {
+      display: block;
+      font-size: .78rem;
+      font-weight: 700;
+      color: var(--gray-500);
+      text-transform: uppercase;
+      letter-spacing: .4px;
+      margin-bottom: 7px;
+    }
+    .fp-group input,
+    .fp-group select {
+      width: 100%;
+      padding: 9px 12px;
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+      font-size: .88rem;
+      font-family: var(--font);
+      background: var(--surface);
+      color: var(--text);
+      box-sizing: border-box;
+      transition: border .2s;
+      appearance: none;
+    }
+    .fp-group input:focus,
+    .fp-group select:focus { outline: none; border-color: var(--teal); }
 
-    .gig-type-tag{display:inline-block;font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:10px;margin-bottom:10px}
-    .tag-hyperlocal{background:rgba(245,158,11,.12);color:#b45309}
-    .tag-remote{background:rgba(99,102,241,.12);color:#4338ca}
+    .fp-actions { display: flex; gap: 10px; align-items: center; justify-content: flex-end; margin-top: 16px; }
+    .btn-clear-filters {
+      background: none; border: none; color: var(--danger);
+      font-size: .84rem; font-weight: 700; cursor: pointer;
+      font-family: var(--font); padding: 8px 14px;
+      border-radius: var(--radius-sm);
+      transition: background .2s;
+    }
+    .btn-clear-filters:hover { background: rgba(239,68,68,.07); }
 
-    .gig-cat{font-size:.78rem;color:var(--gray-400);margin-bottom:4px}
-    .gig-title{font-size:1rem;font-weight:700;color:var(--text);margin-bottom:8px;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-    .gig-desc{font-size:.82rem;color:var(--gray-500);line-height:1.5;margin-bottom:12px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+    [data-theme=dark] .filter-panel { border-color: var(--gray-700); }
+    [data-theme=dark] .fp-group input,
+    [data-theme=dark] .fp-group select { border-color: var(--gray-700); background: var(--gray-800); }
 
-    .gig-meta{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
-    .gig-meta-item{display:flex;align-items:center;gap:4px;font-size:.78rem;color:var(--gray-500)}
+    /* ══════════════════════════════════
+       RESULTS BAR
+    ══════════════════════════════════ */
+    .results-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1.5px solid var(--gray-200);
+    }
+    .results-count { font-size: .86rem; font-weight: 700; color: var(--gray-500); }
+    .results-count strong { color: var(--primary); }
 
-    .gig-price-row{display:flex;align-items:baseline;gap:8px;margin-bottom:6px}
-    .gig-price{font-size:1.2rem;font-weight:800;color:var(--primary)}
-    .gig-price-unit{font-size:.78rem;color:var(--gray-400)}
+    .view-toggle { display: flex; gap: 4px; }
+    .btn-view {
+      width: 34px; height: 34px;
+      border: 1.5px solid var(--gray-200);
+      border-radius: 6px;
+      background: var(--surface);
+      cursor: pointer;
+      font-size: 1rem;
+      display: flex; align-items: center; justify-content: center;
+      transition: var(--transition);
+    }
+    .btn-view.active { border-color: var(--teal); background: rgba(13,148,136,.08); }
+    .btn-view:hover  { border-color: var(--teal); }
 
-    .gig-earn-strip{background:linear-gradient(90deg,rgba(13,148,136,.08) 0%,rgba(26,60,94,.06) 100%);border:1px solid rgba(13,148,136,.2);border-radius:8px;padding:8px 12px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center}
-    .gig-earn-label{font-size:.75rem;color:var(--gray-500)}
-    .gig-earn-val{font-size:.9rem;font-weight:800;color:var(--teal)}
+    [data-theme=dark] .results-bar { border-color: var(--gray-700); }
+    [data-theme=dark] .btn-view { border-color: var(--gray-700); background: var(--gray-800); }
 
-    .taken-bar{height:3px;background:var(--danger);border-radius:2px;margin-bottom:10px;display:none}
-    .taken-bar.show{display:block}
-    .taken-bar-inner{height:100%;background:var(--danger);border-radius:2px;width:100%;transition:width linear}
+    /* ══════════════════════════════════
+       GIG GRID / LIST
+    ══════════════════════════════════ */
+    .gigs-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    .gigs-grid.view-list {
+      grid-template-columns: 1fr;
+    }
+    @media(max-width:960px){ .gigs-grid:not(.view-list) { grid-template-columns: repeat(2,1fr); } }
+    @media(max-width:560px){ .gigs-grid { grid-template-columns: 1fr !important; } }
 
-    .btn-accept{width:100%;padding:11px;background:linear-gradient(135deg,var(--primary) 0%,var(--teal) 100%);color:#fff;border:none;border-radius:var(--radius-sm);font-weight:700;font-size:.9rem;cursor:pointer;transition:opacity .2s,transform .15s;margin-top:auto}
-    .btn-accept:hover{opacity:.9;transform:translateY(-1px)}
-    .btn-accept:disabled{opacity:.5;cursor:not-allowed;transform:none}
-    .btn-taken{width:100%;padding:11px;background:var(--gray-200);color:var(--gray-500);border:none;border-radius:var(--radius-sm);font-weight:700;font-size:.9rem;cursor:not-allowed;margin-top:auto}
+    /* List view card variant */
+    .gigs-grid.view-list .gig-card {
+      flex-direction: row;
+      align-items: flex-start;
+      gap: 20px;
+    }
+    .gigs-grid.view-list .gig-card-left  { flex: 1; min-width: 0; }
+    .gigs-grid.view-list .gig-card-right { flex-shrink: 0; display: flex; flex-direction: column; align-items: flex-end; gap: 10px; min-width: 140px; }
+    @media(max-width:600px){
+      .gigs-grid.view-list .gig-card { flex-direction: column; }
+      .gigs-grid.view-list .gig-card-right { align-items: flex-start; min-width: 0; }
+    }
 
-    .empty-state{text-align:center;padding:64px 24px;color:var(--gray-400);background:var(--surface);border:1.5px dashed var(--gray-200);border-radius:var(--radius)}
-    .empty-state .empty-icon{font-size:3.5rem;margin-bottom:16px}
-    .empty-state h3{font-size:1.1rem;font-weight:700;color:var(--gray-600);margin-bottom:8px}
-    .empty-state p{font-size:.88rem;line-height:1.6}
-    .btn-clear-filters{margin-top:16px;padding:10px 24px;background:var(--teal);color:#fff;border:none;border-radius:var(--radius-sm);font-weight:700;cursor:pointer;font-family:inherit;font-size:.88rem}
+    /* ── Gig card ── */
+    .gig-card {
+      background: var(--surface);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      box-shadow: var(--shadow-sm);
+      transition: transform .2s, box-shadow .2s;
+      display: flex;
+      flex-direction: column;
+      cursor: pointer;
+    }
+    .gig-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-md);
+      border-color: rgba(13,148,136,.25);
+    }
+    .gig-card.taken { opacity: .5; pointer-events: none; }
 
-    .skeleton-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px}
-    .skeleton-card{background:var(--surface);border:1.5px solid var(--gray-200);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow-sm)}
-    .skel{background:var(--gray-100);border-radius:6px;animation:skel-pulse 1.4s ease-in-out infinite}
-    .skel-title{height:18px;width:70%;margin-bottom:10px}
-    .skel-line{height:12px;width:100%;margin-bottom:8px}
-    .skel-line.w60{width:60%}
-    .skel-btn{height:40px;width:100%;margin-top:16px;border-radius:var(--radius-sm)}
-    @keyframes skel-pulse{0%,100%{opacity:1}50%{opacity:.45}}
+    .gig-top-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .gig-type-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: .7rem;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 8px;
+    }
+    .tag-hyperlocal { background: rgba(245,158,11,.12); color: #b45309; }
+    .tag-remote     { background: rgba(99,102,241,.12);  color: #4338ca; }
 
-    [data-theme=dark] .filter-bar{border-color:var(--gray-700)}
-    [data-theme=dark] .gig-card{border-color:var(--gray-700)}
-    [data-theme=dark] .type-pill{border-color:var(--gray-600);color:var(--gray-300);background:var(--gray-800)}
-    [data-theme=dark] .cat-chip{border-color:var(--gray-600);color:var(--gray-300);background:var(--gray-800)}
-    [data-theme=dark] .cat-chip.active{background:var(--primary);border-color:var(--primary);color:#fff}
-    [data-theme=dark] .search-wrap input{border-color:var(--gray-600);background:var(--gray-800)}
-    [data-theme=dark] .btn-taken{background:var(--gray-700);color:var(--gray-500)}
-    [data-theme=dark] .skel{background:var(--gray-700)}
-    [data-theme=dark] .skeleton-card{border-color:var(--gray-700)}
-    [data-theme=dark] .gig-earn-strip{background:rgba(13,148,136,.1);border-color:rgba(13,148,136,.25)}
-    [data-theme=dark] .sort-select{border-color:var(--gray-600);background:var(--gray-800)}
-    [data-theme=dark] .empty-state{border-color:var(--gray-700)}
+    .gig-status-badge {
+      font-size: .68rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: var(--radius-full);
+    }
+    .status-open   { background: rgba(16,185,129,.12); color: #059669; }
+    .status-taken  { background: rgba(239,68,68,.1);   color: #dc2626; }
+    .status-done   { background: rgba(99,102,241,.1);  color: #4338ca; }
+
+    .gig-card-title {
+      font-size: .96rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 6px;
+      line-height: 1.35;
+    }
+    .gig-card-desc {
+      font-size: .81rem;
+      color: var(--gray-500);
+      line-height: 1.55;
+      margin-bottom: 12px;
+    }
+    .gig-card-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .meta-chip {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: .74rem;
+      color: var(--gray-400);
+      font-weight: 500;
+    }
+
+    .gig-earn-strip {
+      background: linear-gradient(90deg, rgba(13,148,136,.07), rgba(26,60,94,.05));
+      border: 1px solid rgba(13,148,136,.18);
+      border-radius: 8px;
+      padding: 8px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .earn-label { font-size: .72rem; color: var(--gray-400); }
+    .earn-val   { font-size: .92rem; font-weight: 800; color: var(--teal); }
+    .budget-val { font-size: .88rem; font-weight: 800; color: var(--primary); }
+
+    .gig-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-top: auto;
+    }
+    .poster-info {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: .74rem;
+      color: var(--gray-400);
+    }
+    .poster-av {
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--teal));
+      display: flex; align-items: center; justify-content: center;
+      font-size: .55rem; font-weight: 800; color: #fff; flex-shrink: 0;
+    }
+
+    [data-theme=dark] .gig-card { border-color: var(--gray-700); }
+    [data-theme=dark] .gig-earn-strip { background: rgba(13,148,136,.1); border-color: rgba(13,148,136,.2); }
+
+    /* ══════════════════════════════════
+       EMPTY / LOADING STATES
+    ══════════════════════════════════ */
+    .browse-empty {
+      text-align: center;
+      padding: 72px 24px;
+      background: var(--surface);
+      border: 1.5px dashed var(--gray-200);
+      border-radius: var(--radius);
+    }
+    .browse-empty .e-icon  { font-size: 3.5rem; margin-bottom: 16px; }
+    .browse-empty .e-title { font-size: 1.05rem; font-weight: 700; color: var(--gray-600); margin-bottom: 6px; }
+    .browse-empty .e-body  { font-size: .86rem; color: var(--gray-400); line-height: 1.6; margin-bottom: 20px; }
+    [data-theme=dark] .browse-empty { border-color: var(--gray-700); }
+
+    /* Skeleton cards */
+    .skel-card {
+      background: var(--surface);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    [data-theme=dark] .skel-card { border-color: var(--gray-700); }
+
+    /* ══════════════════════════════════
+       PAGINATION
+    ══════════════════════════════════ */
+    .pagination {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      margin-top: 36px;
+      flex-wrap: wrap;
+    }
+    .pg-btn {
+      width: 36px; height: 36px;
+      border: 1.5px solid var(--gray-200);
+      border-radius: 8px;
+      background: var(--surface);
+      cursor: pointer;
+      font-size: .88rem;
+      font-weight: 700;
+      color: var(--gray-600);
+      display: flex; align-items: center; justify-content: center;
+      transition: var(--transition);
+      font-family: var(--font);
+    }
+    .pg-btn:hover    { border-color: var(--teal); color: var(--teal); }
+    .pg-btn.active   { background: var(--primary); border-color: var(--primary); color: #fff; }
+    .pg-btn:disabled { opacity: .35; cursor: not-allowed; }
+    [data-theme=dark] .pg-btn { border-color: var(--gray-700); background: var(--gray-800); }
+
+    /* ══════════════════════════════════
+       ACTIVE FILTER TAGS
+    ══════════════════════════════════ */
+    .active-filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .af-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px 4px 12px;
+      border-radius: var(--radius-full);
+      background: rgba(13,148,136,.1);
+      border: 1px solid rgba(13,148,136,.25);
+      font-size: .76rem;
+      font-weight: 700;
+      color: var(--teal);
+    }
+    .af-remove {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--teal);
+      font-size: .82rem;
+      padding: 0 2px;
+      line-height: 1;
+      opacity: .7;
+      transition: opacity .2s;
+    }
+    .af-remove:hover { opacity: 1; }
+
+    /* ══════════════════════════════════
+       POST GIG PROMO (shown to logged in users)
+    ══════════════════════════════════ */
+    .post-gig-promo {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--teal) 100%);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+    .pgp-text h3 { color: #fff; font-size: .98rem; font-weight: 800; margin-bottom: 2px; }
+    .pgp-text p  { color: rgba(255,255,255,.75); font-size: .82rem; }
+
   </style>
 </head>
 <body>
+  <div id="page-loader"></div>
   <div id="announce-bar"></div>
   <nav id="main-nav"></nav>
 
-  <main class="page-wrapper">
-    <div class="browse-wrap">
+  <main>
+    <div class="browse-page">
 
-      <div class="browse-hero">
-        <h1>🔍 Browse Gigs</h1>
-        <p>Find work near you — accept a gig and start earning today.</p>
+      <!-- Breadcrumb -->
+      <div id="breadcrumb"></div>
+
+      <!-- Top -->
+      <div class="browse-top">
+        <div>
+          <div class="browse-title">Browse Gigs 🔍</div>
+          <div class="browse-subtitle" id="browseSubtitle">Gurugram NCR ke sabse latest gigs</div>
+        </div>
+        <a href="post-gig.html" class="btn btn-primary btn-sm">➕ Post a Gig</a>
       </div>
 
-      <nav id="breadcrumb" aria-label="breadcrumb"></nav>
+      <!-- Post Gig Promo (logged-in only) -->
+      <div class="post-gig-promo hidden" id="postGigPromo">
+        <div class="pgp-text">
+          <h3>Koi kaam karwana hai? Post karo!</h3>
+          <p>Verified workers ko directly reach karo — ek gig post karo aaj hi.</p>
+        </div>
+        <a href="post-gig.html" class="btn" style="background:#fff;color:var(--primary);font-weight:800;border:none;padding:10px 20px;border-radius:var(--radius-sm);white-space:nowrap;text-decoration:none">
+          ➕ Post a Gig
+        </a>
+      </div>
 
-      <!-- Filter Bar -->
-      <div class="filter-bar">
-        <div class="filter-row">
-          <div class="search-wrap">
-            <span class="search-icon">🔎</span>
-            <input type="text" id="searchInput" placeholder="Search gigs, skills, locations..." />
+      <!-- Search + Sort Bar -->
+      <div class="search-sort-bar">
+        <div class="search-box">
+          <span class="search-box-icon">🔍</span>
+          <input type="text" id="searchInput" placeholder="Search gigs by title, category, location…" autocomplete="off" />
+        </div>
+        <select class="sort-select" id="sortSelect">
+          <option value="newest">🕐 Newest First</option>
+          <option value="oldest">🕰️ Oldest First</option>
+          <option value="budget-high">💰 Budget: High → Low</option>
+          <option value="budget-low">💸 Budget: Low → High</option>
+          <option value="earn-high">⚡ Earnings: High → Low</option>
+        </select>
+        <button class="btn-filter-toggle" id="btnFilterToggle">
+          ⚙️ Filters
+          <span class="filter-badge hidden" id="filterBadge">0</span>
+        </button>
+      </div>
+
+      <!-- Quick Filter Chips -->
+      <div class="filter-chips-row" id="chipRow"></div>
+
+      <!-- Advanced Filter Panel -->
+      <div class="filter-panel" id="filterPanel">
+        <div class="fp-grid">
+          <div class="fp-group">
+            <label>Category</label>
+            <select id="fpCat">
+              <option value="">All Categories</option>
+            </select>
           </div>
-          <div class="type-toggle">
-            <button type="button" class="type-pill active" id="pillAll">All</button>
-            <button type="button" class="type-pill" id="pillHyperlocal">📍 Hyperlocal</button>
-            <button type="button" class="type-pill" id="pillRemote">💻 Remote</button>
+          <div class="fp-group">
+            <label>Type</label>
+            <select id="fpType">
+              <option value="">All Types</option>
+              <option value="hyperlocal">📍 Hyperlocal</option>
+              <option value="remote">🌐 Remote</option>
+            </select>
+          </div>
+          <div class="fp-group">
+            <label>Min Budget (₹)</label>
+            <input type="number" id="fpMin" placeholder="e.g. 200" min="0" />
+          </div>
+          <div class="fp-group">
+            <label>Max Budget (₹)</label>
+            <input type="number" id="fpMax" placeholder="e.g. 5000" min="0" />
           </div>
         </div>
-        <div class="filter-row">
-          <div class="cat-chips" id="catChips"></div>
+        <div class="fp-actions">
+          <button class="btn-clear-filters" id="btnClearFilters">✕ Clear All Filters</button>
+          <button class="btn btn-primary btn-sm" id="btnApplyFilters">Apply Filters →</button>
         </div>
       </div>
 
-      <!-- Active Filter Tags -->
+      <!-- Active filter tags -->
       <div class="active-filters" id="activeFilters"></div>
 
-      <!-- Results meta -->
-      <div class="results-meta">
-        <div class="results-count" id="resultsCount"></div>
-        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-          <select class="sort-select" id="sortSelect">
-            <option value="newest">🕒 Newest First</option>
-            <option value="pay-high">💰 Pay: High → Low</option>
-            <option value="pay-low">💸 Pay: Low → High</option>
-            <option value="earn-high">⭐ Earnings: High → Low</option>
-          </select>
-          <div style="font-size:.78rem;color:var(--gray-400)">Gigs disappear once taken</div>
+      <!-- Results Bar -->
+      <div class="results-bar">
+        <div class="results-count" id="resultsCount">
+          Showing <strong>0</strong> gigs
+        </div>
+        <div class="view-toggle">
+          <button class="btn-view active" id="btnGrid" title="Grid view">⊞</button>
+          <button class="btn-view"        id="btnList" title="List view">☰</button>
         </div>
       </div>
 
       <!-- Gig Grid -->
-      <div id="gigGrid"></div>
+      <div class="gigs-grid" id="gigsGrid"></div>
+
+      <!-- Empty state -->
+      <div class="browse-empty hidden" id="browseEmpty">
+        <div class="e-icon">🔍</div>
+        <div class="e-title">Koi gig nahi mili</div>
+        <div class="e-body">
+          Try different keywords, remove some filters,<br/>
+          ya ek naya gig post karo!
+        </div>
+        <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+          <button class="btn btn-secondary btn-sm" id="btnResetSearch">✕ Clear Search</button>
+          <a href="post-gig.html" class="btn btn-primary btn-sm">➕ Post a Gig</a>
+        </div>
+      </div>
+
+      <!-- Pagination -->
+      <div class="pagination" id="pagination"></div>
 
     </div>
   </main>
@@ -173,52 +648,12 @@
   <div id="toast-container"></div>
 
   <script>
-  (function () {
+  document.addEventListener("DOMContentLoaded", function () {
 
-    var CATS = {
-      hyperlocal: [
-        { value:"house-help",    label:"🧹 House Help" },
-        { value:"errands",       label:"🛒 Errands" },
-        { value:"moving-help",   label:"📦 Moving Help" },
-        { value:"handyman",      label:"🔧 Handyman" },
-        { value:"tech-help",     label:"💻 Tech Help" },
-        { value:"elderly-care",  label:"🧓 Elderly Care" },
-        { value:"pet-care",      label:"🐕 Pet Care" },
-        { value:"tutoring",      label:"📚 Tutoring" },
-        { value:"event-help",    label:"🎉 Event Help" },
-        { value:"gardening",     label:"🏡 Gardening" },
-        { value:"deep-cleaning", label:"🧼 Deep Cleaning" },
-        { value:"driver",        label:"🚗 Driver" }
-      ],
-      remote: [
-        { value:"logo-design",      label:"🎨 Logo Design" },
-        { value:"video-editing",    label:"🎬 Video Editing" },
-        { value:"web-dev",          label:"🌐 Web Dev" },
-        { value:"content-writing",  label:"✍️ Content Writing" },
-        { value:"social-media",     label:"📱 Social Media" },
-        { value:"data-entry",       label:"📊 Data Entry" },
-        { value:"graphic-design",   label:"🖼️ Graphic Design" },
-        { value:"voiceover",        label:"🎙️ Voiceover" },
-        { value:"translation",      label:"🌍 Translation" },
-        { value:"customer-support", label:"🎧 Customer Support" }
-      ]
-    };
-
-    var FEE_RATE   = 0.06;
-    var TAKEN_SHOW = 30000;
-    var GIG_KEY    = (typeof GL !== "undefined" && GL.STORAGE_KEY_GIGS) ? GL.STORAGE_KEY_GIGS : "gl_gigs";
-
-    var currentType  = "all";
-    var currentCat   = "all";
-    var currentSort  = "newest";
-    var searchQuery  = "";
-    var takenTimers  = {};
-
-    var gigGrid      = document.getElementById("gigGrid");
-    var searchInput  = document.getElementById("searchInput");
-    var catChipsEl   = document.getElementById("catChips");
-    var resultsCount = document.getElementById("resultsCount");
-    var afEl         = document.getElementById("activeFilters");
+    /* ── Storage keys ── */
+    var GIGS_KEY  = (typeof GL !== "undefined") ? GL.STORAGE_KEY_GIGS  : "gl_gigs";
+    var USERS_KEY = (typeof GL !== "undefined") ? GL.STORAGE_KEY_USERS : "gl_users";
+    var FEE_RATE  = (typeof GL !== "undefined") ? GL.FEE_RATE : 0.06;
 
     /* ── Breadcrumb ── */
     if (typeof buildBreadcrumb === "function") {
@@ -228,395 +663,415 @@
       ]);
     }
 
-    /* ═══════════════════════════════════════
-       TYPE TOGGLE
-    ═══════════════════════════════════════ */
-    document.getElementById("pillAll").addEventListener("click",        function () { setType("all"); });
-    document.getElementById("pillHyperlocal").addEventListener("click", function () { setType("hyperlocal"); });
-    document.getElementById("pillRemote").addEventListener("click",     function () { setType("remote"); });
-
-    function setType(type) {
-      currentType = type;
-      currentCat  = "all";
-      document.getElementById("pillAll").classList.toggle("active",        type === "all");
-      document.getElementById("pillHyperlocal").classList.toggle("active", type === "hyperlocal");
-      document.getElementById("pillRemote").classList.toggle("active",     type === "remote");
-      buildCatChips();
-      render();
+    /* ── User ── */
+    var currentUser = (typeof getCurrentUser === "function") ? getCurrentUser() : null;
+    if (currentUser) {
+      document.getElementById("postGigPromo").classList.remove("hidden");
     }
 
-    /* ═══════════════════════════════════════
-       CATEGORY CHIPS
-    ═══════════════════════════════════════ */
-    function buildCatChips() {
-      catChipsEl.innerHTML = "";
-
-      var allChip = document.createElement("button");
-      allChip.type = "button";
-      allChip.className = "cat-chip" + (currentCat === "all" ? " active" : "");
-      allChip.textContent = "All";
-      allChip.addEventListener("click", function () { setCat("all"); });
-      catChipsEl.appendChild(allChip);
-
-      var list = currentType === "all"
-        ? CATS.hyperlocal.concat(CATS.remote)
-        : (CATS[currentType] || []);
-
-      list.forEach(function (c) {
-        var chip = document.createElement("button");
-        chip.type = "button";
-        chip.className = "cat-chip" + (currentCat === c.value ? " active" : "");
-        chip.textContent = c.label;
-        chip.addEventListener("click", function () { setCat(c.value); });
-        catChipsEl.appendChild(chip);
-      });
+    /* ── Helpers ── */
+    function escH(s) {
+      return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+    }
+    function timeAgo(iso) {
+      if (!iso) return "";
+      var d = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
+      if (d < 60)    return d + "s ago";
+      if (d < 3600)  return Math.floor(d/60)  + "m ago";
+      if (d < 86400) return Math.floor(d/3600) + "h ago";
+      return Math.floor(d/86400) + "d ago";
+    }
+    function getUsers() {
+      try { return JSON.parse(localStorage.getItem(USERS_KEY)||"[]"); } catch(e){ return []; }
+    }
+    function getUserName(uid) {
+      if (!uid || uid === "demo") return "Demo Poster";
+      var u = getUsers().find(function(x){ return x.id === uid; });
+      return u ? (u.name || "User") : "User";
+    }
+    function getUserInitials(uid) {
+      var n = getUserName(uid);
+      return n.split(" ").map(function(w){ return w[0]; }).join("").slice(0,2).toUpperCase();
     }
 
-    function setCat(val) {
-      currentCat = val;
-      document.querySelectorAll(".cat-chip").forEach(function (ch) {
-        ch.classList.toggle("active", ch.textContent.trim() === (val === "all" ? "All" : getCatLabel(val)));
-      });
-      render();
+    /* ── Data ── */
+    var allGigs = [];
+    try { allGigs = JSON.parse(localStorage.getItem(GIGS_KEY)||"[]"); } catch(e){ allGigs = []; }
+
+    /* If empty, seed demo gigs */
+    if (!allGigs.length) {
+      allGigs = [
+        { id:"gig_d1", title:"House Cleaning — 3BHK", description:"Reliable cleaner chahiye full 3BHK ke liye Saturday ko. All supplies provided.", budget:800, category:"House Help", type:"hyperlocal", location:"Sector 56, Gurugram", status:"open", createdAt: new Date(Date.now()-3600000).toISOString(), posterId:"demo" },
+        { id:"gig_d2", title:"Grocery Pickup & Delivery", description:"BigBazaar se saman lana hai ghar pe. Light items only. 1-2 ghante max.", budget:300, category:"Errands", type:"hyperlocal", location:"DLF Phase 3", status:"open", createdAt: new Date(Date.now()-7200000).toISOString(), posterId:"demo" },
+        { id:"gig_d3", title:"Logo Design — Startup", description:"Clean minimal logo chahiye food delivery startup ke liye. 2 concepts.", budget:1500, category:"Design", type:"remote", location:"Remote", status:"open", createdAt: new Date(Date.now()-10800000).toISOString(), posterId:"demo" },
+        { id:"gig_d4", title:"Math Tutor — Class 10", description:"Meri beti ko maths weak hai. Weekend 2 hours daily. Nearby preferred.", budget:600, category:"Tutoring", type:"hyperlocal", location:"Sohna Road", status:"open", createdAt: new Date(Date.now()-14400000).toISOString(), posterId:"demo" },
+        { id:"gig_d5", title:"WordPress Bug Fix", description:"Contact form kaam nahi kar raha simple blog site ka. Quick fix needed.", budget:500, category:"Tech Help", type:"remote", location:"Remote", status:"open", createdAt: new Date(Date.now()-18000000).toISOString(), posterId:"demo" },
+        { id:"gig_d6", title:"Furniture Assembly — IKEA", description:"2 wardrobes + 1 bed assemble karna hai. Tools apne laana.", budget:700, category:"Handyman", type:"hyperlocal", location:"Sector 45, Gurugram", status:"open", createdAt: new Date(Date.now()-21600000).toISOString(), posterId:"demo" },
+        { id:"gig_d7", title:"Dog Walking — Labrador", description:"Mera lab roz subah 7-8 baje walk chahta hai. 5 days a week.", budget:400, category:"Pet Care", type:"hyperlocal", location:"Golf Course Road", status:"open", createdAt: new Date(Date.now()-25200000).toISOString(), posterId:"demo" },
+        { id:"gig_d8", title:"React Developer — Landing Page", description:"Startup ka landing page banana hai React mein. 1 week deadline.", budget:4000, category:"Web Dev", type:"remote", location:"Remote", status:"open", createdAt: new Date(Date.now()-28800000).toISOString(), posterId:"demo" },
+        { id:"gig_d9", title:"Instagram Reels Editing", description:"5 reels edit karni hain already shot footage se. Trending style chahiye.", budget:1200, category:"Social Media", type:"remote", location:"Remote", status:"open", createdAt: new Date(Date.now()-32400000).toISOString(), posterId:"demo" }
+      ];
+      try { localStorage.setItem(GIGS_KEY, JSON.stringify(allGigs)); } catch(e){}
     }
 
-    function getCatLabel(val) {
-      var all   = CATS.hyperlocal.concat(CATS.remote);
-      var found = all.find(function (c) { return c.value === val; });
-      return found ? found.label : val;
-    }
+    /* ── URL params (from index.html search / category click) ── */
+    var urlParams  = new URLSearchParams(window.location.search);
+    var urlQ   = urlParams.get("q")   || "";
+    var urlCat = urlParams.get("cat") || "";
 
-    /* ═══════════════════════════════════════
-       SEARCH & SORT
-    ═══════════════════════════════════════ */
-    searchInput.addEventListener("input", function () {
-      searchQuery = searchInput.value.trim().toLowerCase();
-      render();
+    /* ── State ── */
+    var state = {
+      search:   urlQ,
+      sort:     "newest",
+      type:     "",
+      category: urlCat,
+      minBudget:"",
+      maxBudget:"",
+      page:     1,
+      perPage:  9,
+      view:     "grid"
+    };
+
+    /* ── Categories from data ── */
+    var CATS_QUICK = ["All","Hyperlocal","Remote","House Help","Errands","Design","Tech Help","Tutoring","Handyman","Web Dev","Pet Care","Social Media"];
+
+    /* Build category select in advanced panel */
+    var catSet = new Set();
+    allGigs.forEach(function(g){ if(g.category) catSet.add(g.category); });
+    var fpCatEl = document.getElementById("fpCat");
+    catSet.forEach(function(c){
+      var o = document.createElement("option");
+      o.value = c; o.textContent = c;
+      fpCatEl.appendChild(o);
     });
 
-    document.getElementById("sortSelect").addEventListener("change", function () {
-      currentSort = this.value;
-      render();
-    });
+    /* ── Populate search from URL ── */
+    if (urlQ)   document.getElementById("searchInput").value = urlQ;
+    if (urlCat) { state.category = urlCat; }
 
-    /* ═══════════════════════════════════════
-       DATA
-    ═══════════════════════════════════════ */
-    function getGigs()       { return JSON.parse(localStorage.getItem(GIG_KEY) || "[]"); }
-    function saveGigs(gigs)  { localStorage.setItem(GIG_KEY, JSON.stringify(gigs)); }
-
-    function getFilteredGigs() {
-      var gigs = getGigs();
-      var now  = Date.now();
-
-      // Remove vanished / completed
-      gigs = gigs.filter(function (g) {
-        if (g.status === "taken" && g.takenAt) {
-          return (now - new Date(g.takenAt).getTime()) < TAKEN_SHOW;
+    /* ── Quick filter chips ── */
+    var chipRow = document.getElementById("chipRow");
+    CATS_QUICK.forEach(function(cat){
+      var chip = document.createElement("button");
+      chip.className = "filter-chip" + (
+        cat === "All" && !state.category && !state.type ? " active" :
+        cat === state.category ? " active" :
+        cat === "Hyperlocal" && state.type === "hyperlocal" ? " active" :
+        cat === "Remote"     && state.type === "remote"     ? " active" : ""
+      );
+      chip.textContent = cat;
+      chip.dataset.cat = cat;
+      chip.addEventListener("click", function(){
+        if (cat === "All") {
+          state.category = ""; state.type = "";
+        } else if (cat === "Hyperlocal") {
+          state.type = state.type === "hyperlocal" ? "" : "hyperlocal";
+          state.category = "";
+        } else if (cat === "Remote") {
+          state.type = state.type === "remote" ? "" : "remote";
+          state.category = "";
+        } else {
+          state.category = state.category === cat ? "" : cat;
+          state.type = "";
         }
-        if (g.status === "completed") return false;
+        state.page = 1;
+        syncChips();
+        render();
+      });
+      chipRow.appendChild(chip);
+    });
+
+    function syncChips() {
+      chipRow.querySelectorAll(".filter-chip").forEach(function(chip){
+        var cat = chip.dataset.cat;
+        chip.classList.toggle("active",
+          (cat === "All"        && !state.category && !state.type) ||
+          (cat === "Hyperlocal" && state.type === "hyperlocal")    ||
+          (cat === "Remote"     && state.type === "remote")        ||
+          (cat === state.category && cat !== "All" && cat !== "Hyperlocal" && cat !== "Remote")
+        );
+      });
+    }
+
+    /* ── Filter panel toggle ── */
+    var filterPanel = document.getElementById("filterPanel");
+    document.getElementById("btnFilterToggle").addEventListener("click", function(){
+      var open = filterPanel.classList.toggle("open");
+      this.classList.toggle("active", open);
+    });
+
+    /* ── Apply / clear advanced filters ── */
+    document.getElementById("btnApplyFilters").addEventListener("click", function(){
+      state.category  = document.getElementById("fpCat").value;
+      state.type      = document.getElementById("fpType").value;
+      state.minBudget = document.getElementById("fpMin").value;
+      state.maxBudget = document.getElementById("fpMax").value;
+      state.page      = 1;
+      syncChips();
+      renderActiveFilters();
+      render();
+      filterPanel.classList.remove("open");
+      document.getElementById("btnFilterToggle").classList.remove("active");
+    });
+
+    document.getElementById("btnClearFilters").addEventListener("click", clearAllFilters);
+
+    function clearAllFilters() {
+      state.search = ""; state.type = ""; state.category = "";
+      state.minBudget = ""; state.maxBudget = "";
+      state.page = 1;
+      document.getElementById("searchInput").value = "";
+      document.getElementById("fpCat").value  = "";
+      document.getElementById("fpType").value = "";
+      document.getElementById("fpMin").value  = "";
+      document.getElementById("fpMax").value  = "";
+      syncChips();
+      renderActiveFilters();
+      render();
+    }
+    document.getElementById("btnResetSearch").addEventListener("click", clearAllFilters);
+
+    /* ── Search input ── */
+    var searchTimer;
+    document.getElementById("searchInput").addEventListener("input", function(){
+      clearTimeout(searchTimer);
+      var val = this.value;
+      searchTimer = setTimeout(function(){
+        state.search = val.trim();
+        state.page   = 1;
+        render();
+      }, 280);
+    });
+
+    /* ── Sort ── */
+    document.getElementById("sortSelect").addEventListener("change", function(){
+      state.sort = this.value;
+      state.page = 1;
+      render();
+    });
+
+    /* ── View toggle ── */
+    document.getElementById("btnGrid").addEventListener("click", function(){
+      state.view = "grid";
+      document.getElementById("gigsGrid").classList.remove("view-list");
+      this.classList.add("active");
+      document.getElementById("btnList").classList.remove("active");
+    });
+    document.getElementById("btnList").addEventListener("click", function(){
+      state.view = "list";
+      document.getElementById("gigsGrid").classList.add("view-list");
+      this.classList.add("active");
+      document.getElementById("btnGrid").classList.remove("active");
+    });
+
+    /* ── Active filter tags ── */
+    function renderActiveFilters() {
+      var container = document.getElementById("activeFilters");
+      container.innerHTML = "";
+      var tags = [];
+      if (state.category)  tags.push({ key:"category",  label:"📂 " + state.category });
+      if (state.type)      tags.push({ key:"type",      label: state.type === "hyperlocal" ? "📍 Hyperlocal" : "🌐 Remote" });
+      if (state.minBudget) tags.push({ key:"minBudget", label:"₹" + state.minBudget + " min" });
+      if (state.maxBudget) tags.push({ key:"maxBudget", label:"₹" + state.maxBudget + " max" });
+      if (state.search)    tags.push({ key:"search",    label:'🔍 "' + state.search + '"' });
+
+      tags.forEach(function(t){
+        var el = document.createElement("span");
+        el.className = "af-tag";
+        el.innerHTML = escH(t.label) +
+          '<button class="af-remove" title="Remove filter">✕</button>';
+        el.querySelector(".af-remove").addEventListener("click", function(){
+          state[t.key] = "";
+          if (t.key === "search") document.getElementById("searchInput").value = "";
+          if (t.key === "category") document.getElementById("fpCat").value = "";
+          if (t.key === "type")     document.getElementById("fpType").value = "";
+          if (t.key === "minBudget") document.getElementById("fpMin").value = "";
+          if (t.key === "maxBudget") document.getElementById("fpMax").value = "";
+          state.page = 1;
+          syncChips();
+          renderActiveFilters();
+          render();
+        });
+        container.appendChild(el);
+      });
+
+      /* Update filter badge */
+      var badge = document.getElementById("filterBadge");
+      var count = (state.category?1:0)+(state.type?1:0)+(state.minBudget?1:0)+(state.maxBudget?1:0);
+      badge.textContent = count;
+      badge.classList.toggle("hidden", count === 0);
+      document.getElementById("btnFilterToggle").classList.toggle("active", count > 0);
+    }
+
+    /* ══════════════════
+       FILTER + SORT
+    ══════════════════ */
+    function getFiltered() {
+      var q   = state.search.toLowerCase();
+      var min = state.minBudget ? parseFloat(state.minBudget) : null;
+      var max = state.maxBudget ? parseFloat(state.maxBudget) : null;
+
+      return allGigs.filter(function(g){
+        /* Search */
+        if (q) {
+          var hay = [(g.title||""),(g.description||""),(g.category||""),(g.location||"")].join(" ").toLowerCase();
+          if (!hay.includes(q)) return false;
+        }
+        /* Type chip */
+        if (state.type && g.type !== state.type) return false;
+        /* Category */
+        if (state.category && g.category !== state.category) return false;
+        /* Budget */
+        if (min !== null && (g.budget||0) < min) return false;
+        if (max !== null && (g.budget||0) > max) return false;
         return true;
       });
-
-      // Type
-      if (currentType !== "all") {
-        gigs = gigs.filter(function (g) { return g.type === currentType; });
-      }
-      // Category
-      if (currentCat !== "all") {
-        gigs = gigs.filter(function (g) { return g.category === currentCat; });
-      }
-      // Search
-      if (searchQuery) {
-        gigs = gigs.filter(function (g) {
-          return (
-            g.title.toLowerCase().includes(searchQuery) ||
-            (g.description  || "").toLowerCase().includes(searchQuery) ||
-            (g.location     || "").toLowerCase().includes(searchQuery) ||
-            (g.categoryLabel|| "").toLowerCase().includes(searchQuery)
-          );
-        });
-      }
-
-      // Sort
-      gigs.sort(function (a, b) {
-        if (currentSort === "newest")    return new Date(b.postedAt) - new Date(a.postedAt);
-        if (currentSort === "pay-high")  return b.pricePerHr - a.pricePerHr;
-        if (currentSort === "pay-low")   return a.pricePerHr - b.pricePerHr;
-        if (currentSort === "earn-high") return (b.pricePerHr * (1 - FEE_RATE)) - (a.pricePerHr * (1 - FEE_RATE));
-        return 0;
-      });
-
-      return gigs;
     }
 
-    /* ═══════════════════════════════════════
-       TIME AGO
-    ═══════════════════════════════════════ */
-    function timeAgo(isoStr) {
-      var diff = Math.floor((Date.now() - new Date(isoStr).getTime()) / 1000);
-      if (diff < 60)    return diff + "s ago";
-      if (diff < 3600)  return Math.floor(diff / 60) + "m ago";
-      if (diff < 86400) return Math.floor(diff / 3600) + "h ago";
-      return Math.floor(diff / 86400) + "d ago";
+    function getSorted(arr) {
+      var copy = arr.slice();
+      switch(state.sort) {
+        case "oldest":     copy.sort(function(a,b){ return new Date(a.createdAt)-new Date(b.createdAt); }); break;
+        case "budget-high":copy.sort(function(a,b){ return (b.budget||0)-(a.budget||0); }); break;
+        case "budget-low": copy.sort(function(a,b){ return (a.budget||0)-(b.budget||0); }); break;
+        case "earn-high":  copy.sort(function(a,b){ return ((b.budget||0)*(1-FEE_RATE))-((a.budget||0)*(1-FEE_RATE)); }); break;
+        default:           copy.sort(function(a,b){ return new Date(b.createdAt)-new Date(a.createdAt); }); break;
+      }
+      return copy;
     }
 
-    /* ═══════════════════════════════════════
-       RENDER ACTIVE FILTER TAGS
-    ═══════════════════════════════════════ */
-    function renderActiveFilters() {
-      var tags = [];
-      if (currentType !== "all") tags.push({
-        label: currentType === "hyperlocal" ? "📍 Hyperlocal" : "💻 Remote",
-        clear: function () { setType("all"); }
-      });
-      if (currentCat !== "all") tags.push({
-        label: getCatLabel(currentCat),
-        clear: function () { setCat("all"); }
-      });
-      if (searchQuery) tags.push({
-        label: '🔎 "' + searchQuery + '"',
-        clear: function () { searchInput.value = ""; searchQuery = ""; render(); }
-      });
+    /* ══════════════════
+       RENDER CARDS
+    ══════════════════ */
+    function makeCard(gig) {
+      var fee    = Math.round((gig.budget||0) * FEE_RATE);
+      var earn   = (gig.budget||0) - fee;
+      var isHyper = gig.type === "hyperlocal";
+      var isTaken = gig.status === "taken";
 
-      if (!tags.length) {
-        afEl.classList.remove("show");
-        afEl.innerHTML = "";
-        return;
+      return '<div class="gig-card' + (isTaken ? " taken" : "") + '" ' +
+               'onclick="window.location.href=\'gig-detail.html?id=' + escH(gig.id) + '\'">' +
+
+        '<div class="gig-card-left">' +
+
+          '<div class="gig-top-row">' +
+            '<span class="gig-type-tag ' + (isHyper ? "tag-hyperlocal" : "tag-remote") + '">' +
+              (isHyper ? "📍 Hyperlocal" : "🌐 Remote") +
+            '</span>' +
+            '<span class="gig-status-badge status-' + (gig.status||"open") + '">' +
+              (gig.status === "open" ? "✅ Open" : gig.status === "taken" ? "🔴 Taken" : "✔️ Done") +
+            '</span>' +
+          '</div>' +
+
+          '<div class="gig-card-title">' + escH(gig.title) + '</div>' +
+          '<div class="gig-card-desc line-clamp-2">' + escH(gig.description||"") + '</div>' +
+
+          '<div class="gig-card-meta">' +
+            '<span class="meta-chip">📍 ' + escH(gig.location||"Gurugram") + '</span>' +
+            '<span class="meta-chip">🕐 ' + timeAgo(gig.createdAt) + '</span>' +
+            (gig.category ? '<span class="meta-chip">🏷️ ' + escH(gig.category) + '</span>' : '') +
+          '</div>' +
+
+          '<div class="gig-earn-strip">' +
+            '<div><div class="earn-label">You Earn</div><div class="earn-val">₹' + earn.toLocaleString("en-IN") + '</div></div>' +
+            '<div style="text-align:right"><div class="earn-label">Budget</div><div class="budget-val">₹' + (gig.budget||0).toLocaleString("en-IN") + '</div></div>' +
+          '</div>' +
+
+        '</div>' +
+
+        '<div class="gig-card-right">' +
+          '<div class="gig-footer">' +
+            '<div class="poster-info">' +
+              '<div class="poster-av">' + escH(getUserInitials(gig.posterId)) + '</div>' +
+              '<span>' + escH(getUserName(gig.posterId)) + '</span>' +
+            '</div>' +
+            '<a href="gig-detail.html?id=' + escH(gig.id) + '" ' +
+               'class="btn btn-primary btn-sm" ' +
+               'onclick="event.stopPropagation()" ' +
+               'style="white-space:nowrap">' +
+              (isTaken ? "View" : "View Gig →") +
+            '</a>' +
+          '</div>' +
+        '</div>' +
+
+      '</div>';
+    }
+
+    /* ══════════════════
+       RENDER PAGINATION
+    ══════════════════ */
+    function renderPagination(total) {
+      var pg        = document.getElementById("pagination");
+      var totalPages = Math.ceil(total / state.perPage);
+      pg.innerHTML  = "";
+      if (totalPages <= 1) return;
+
+      /* Prev */
+      var prev = document.createElement("button");
+      prev.className = "pg-btn"; prev.textContent = "←";
+      prev.disabled = state.page === 1;
+      prev.addEventListener("click", function(){ state.page--; render(); window.scrollTo({top:0,behavior:"smooth"}); });
+      pg.appendChild(prev);
+
+      /* Page numbers */
+      for (var i = 1; i <= totalPages; i++) {
+        (function(n){
+          var btn = document.createElement("button");
+          btn.className = "pg-btn" + (n === state.page ? " active" : "");
+          btn.textContent = n;
+          btn.addEventListener("click", function(){ state.page = n; render(); window.scrollTo({top:0,behavior:"smooth"}); });
+          pg.appendChild(btn);
+        })(i);
       }
 
-      afEl.classList.add("show");
-      afEl.innerHTML = '<span style="font-size:.78rem;color:var(--gray-500);font-weight:600">Active:</span>';
-
-      tags.forEach(function (t) {
-        var chip = document.createElement("span");
-        chip.className = "af-chip";
-        chip.innerHTML = escHtml(t.label) + ' <button title="Remove">✕</button>';
-        chip.querySelector("button").addEventListener("click", t.clear);
-        afEl.appendChild(chip);
-      });
-
-      var clearAll = document.createElement("button");
-      clearAll.className   = "af-clear-all";
-      clearAll.textContent = "Clear All";
-      clearAll.addEventListener("click", function () {
-        setType("all");
-        setCat("all");
-        searchInput.value = "";
-        searchQuery = "";
-        render();
-      });
-      afEl.appendChild(clearAll);
+      /* Next */
+      var next = document.createElement("button");
+      next.className = "pg-btn"; next.textContent = "→";
+      next.disabled = state.page === totalPages;
+      next.addEventListener("click", function(){ state.page++; render(); window.scrollTo({top:0,behavior:"smooth"}); });
+      pg.appendChild(next);
     }
 
-    /* ═══════════════════════════════════════
-       RENDER
-    ═══════════════════════════════════════ */
+    /* ══════════════════
+       MAIN RENDER
+    ══════════════════ */
     function render() {
-      var gigs = getFilteredGigs();
+      var filtered = getFiltered();
+      var sorted   = getSorted(filtered);
+      var total    = sorted.length;
+      var start    = (state.page - 1) * state.perPage;
+      var paged    = sorted.slice(start, start + state.perPage);
+
+      /* Results count */
+      document.getElementById("resultsCount").innerHTML =
+        'Showing <strong>' + paged.length + '</strong> of <strong>' + total + '</strong> gigs';
+
+      /* Subtitle */
+      document.getElementById("browseSubtitle").textContent =
+        total + " gig" + (total !== 1 ? "s" : "") + " available";
+
+      var grid  = document.getElementById("gigsGrid");
+      var empty = document.getElementById("browseEmpty");
+
+      if (!paged.length) {
+        grid.innerHTML  = "";
+        grid.classList.add("hidden");
+        empty.classList.remove("hidden");
+      } else {
+        empty.classList.add("hidden");
+        grid.classList.remove("hidden");
+        grid.innerHTML = paged.map(makeCard).join("");
+      }
 
       renderActiveFilters();
-
-      var openCount = gigs.filter(function (g) { return g.status === "open"; }).length;
-      resultsCount.innerHTML =
-        "<strong>" + gigs.length + "</strong> gig" + (gigs.length !== 1 ? "s" : "") + " found" +
-        (openCount < gigs.length
-          ? " (<span style='color:var(--teal)'>" + openCount + " open</span>)"
-          : "");
-
-      if (gigs.length === 0) {
-        var hasFilters = currentType !== "all" || currentCat !== "all" || searchQuery;
-        gigGrid.innerHTML =
-          '<div class="empty-state">' +
-            '<div class="empty-icon">' + (hasFilters ? "🔍" : "📋") + '</div>' +
-            '<h3>' + (hasFilters ? "No gigs match your filters" : "No gigs yet!") + '</h3>' +
-            '<p>' + (hasFilters
-              ? "Try clearing a filter or broadening your search."
-              : "Be the first to post a gig in your area.") +
-            '</p>' +
-            (hasFilters
-              ? '<button class="btn-clear-filters" id="btnClearFilters">✕ Clear All Filters</button>'
-              : '<a href="post-gig.html" class="btn btn-primary" style="margin-top:16px;display:inline-block">+ Post a Gig</a>') +
-          '</div>';
-        var cf = document.getElementById("btnClearFilters");
-        if (cf) cf.addEventListener("click", function () {
-          setType("all"); setCat("all");
-          searchInput.value = ""; searchQuery = ""; render();
-        });
-        return;
-      }
-
-      gigGrid.className = "gig-grid";
-      gigGrid.innerHTML = "";
-      gigs.forEach(function (gig) { gigGrid.appendChild(buildCard(gig)); });
+      renderPagination(total);
     }
 
-    /* ═══════════════════════════════════════
-       BUILD CARD
-    ═══════════════════════════════════════ */
-    function buildCard(gig) {
-      var isTaken = gig.status === "taken";
-      var fee     = Math.round(gig.pricePerHr * FEE_RATE);
-      var earn    = gig.pricePerHr - fee;
-      var payIcon = gig.payType === "cash" ? "💵" : gig.payType === "wallet" ? "🔒" : "✅";
-
-      var card = document.createElement("div");
-      card.className     = "gig-card" + (isTaken ? " taken taken-flash" : "");
-      card.dataset.gigId = gig.id;
-
-      var barHtml = isTaken
-        ? '<div class="taken-bar show" id="bar_' + gig.id + '"><div class="taken-bar-inner" id="barInner_' + gig.id + '"></div></div>'
-        : "";
-
-      var typeTag = gig.type === "hyperlocal"
-        ? '<span class="gig-type-tag tag-hyperlocal">📍 Hyperlocal</span>'
-        : '<span class="gig-type-tag tag-remote">💻 Remote</span>';
-
-      var statusBadge = isTaken
-        ? '<span class="gig-status-badge badge-taken">🔒 Taken</span>'
-        : '<span class="gig-status-badge badge-open">🟢 Open</span>';
-
-      var actionBtn = isTaken
-        ? '<button class="btn-taken" disabled>🔒 Already Taken</button>'
-        : '<button class="btn-accept" data-id="' + gig.id + '">⚡ Accept Gig</button>';
-
-      card.innerHTML =
-        barHtml +
-        statusBadge +
-        typeTag +
-        '<div class="gig-cat">'        + escHtml(gig.categoryLabel || gig.category) + '</div>' +
-        '<div class="gig-title">'       + escHtml(gig.title) + '</div>' +
-        '<div class="gig-desc">'        + escHtml(gig.description || "") + '</div>' +
-        '<div class="gig-meta">' +
-          (gig.location ? '<span class="gig-meta-item">📍 ' + escHtml(gig.location) + '</span>' : '') +
-          '<span class="gig-meta-item">🕒 ' + timeAgo(gig.postedAt) + '</span>' +
-          '<span class="gig-meta-item">' + payIcon + ' ' + payLabel(gig.payType) + '</span>' +
-        '</div>' +
-        '<div class="gig-price-row">' +
-          '<span class="gig-price">₹' + gig.pricePerHr + '</span>' +
-          '<span class="gig-price-unit">/ hour</span>' +
-        '</div>' +
-        '<div class="gig-earn-strip">' +
-          '<span class="gig-earn-label">You receive (after 6% support fee)</span>' +
-          '<span class="gig-earn-val">₹' + earn + '/hr</span>' +
-        '</div>' +
-        actionBtn;
-
-      if (!isTaken) {
-        card.querySelector(".btn-accept").addEventListener("click", function () {
-          acceptGig(gig.id, card);
-        });
-      }
-
-      if (isTaken && gig.takenAt) {
-        var elapsed   = Date.now() - new Date(gig.takenAt).getTime();
-        var remaining = Math.max(0, TAKEN_SHOW - elapsed);
-        startCountdownBar(gig.id, remaining);
-      }
-
-      return card;
-    }
-
-    function payLabel(type) {
-      if (type === "cash")   return "Cash";
-      if (type === "wallet") return "Secure Wallet";
-      return "Pay After";
-    }
-
-    function escHtml(str) {
-      return String(str || "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;");
-    }
-
-    /* ═══════════════════════════════════════
-       ACCEPT GIG
-    ═══════════════════════════════════════ */
-    function acceptGig(gigId, card) {
-      var user = typeof getCurrentUser === "function" ? getCurrentUser() : null;
-      if (!user) {
-        if (typeof showToast === "function") showToast("Please log in to accept a gig.", "error");
-        setTimeout(function () { window.location.href = "login.html?redirect=browse.html"; }, 1200);
-        return;
-      }
-
-      var gigs = getGigs();
-      var gig  = gigs.find(function (g) { return g.id === gigId; });
-      if (!gig) return;
-
-      if (gig.posterId && user.id && gig.posterId === user.id) {
-        if (typeof showToast === "function") showToast("You can't accept your own gig!", "error");
-        return;
-      }
-      if (gig.status !== "open") {
-        if (typeof showToast === "function") showToast("This gig was just taken by someone else!", "error");
-        render();
-        return;
-      }
-
-      gig.status  = "taken";
-      gig.takenAt = new Date().toISOString();
-      gig.takenBy = user.id || user.name || "worker";
-      saveGigs(gigs);
-
-      card.classList.add("taken", "taken-flash");
-      var acceptBtn = card.querySelector(".btn-accept");
-      if (acceptBtn) acceptBtn.outerHTML = '<button class="btn-taken" disabled>🔒 Already Taken</button>';
-      var badge = card.querySelector(".gig-status-badge");
-      if (badge) { badge.className = "gig-status-badge badge-taken"; badge.textContent = "🔒 Taken"; }
-
-      var bar = document.createElement("div");
-      bar.className = "taken-bar show";
-      bar.id        = "bar_" + gigId;
-      bar.innerHTML = '<div class="taken-bar-inner" id="barInner_' + gigId + '"></div>';
-      card.insertBefore(bar, card.firstChild);
-
-      if (typeof showToast === "function") showToast("✅ Gig accepted! Check your dashboard.", "success");
-
-      setTimeout(function () {
-        window.location.href = "dashboard-worker.html?gigId=" + gigId;
-      }, 1800);
-
-      startCountdownBar(gigId, TAKEN_SHOW);
-      takenTimers[gigId] = setTimeout(function () {
-        var el = document.querySelector('[data-gig-id="' + gigId + '"]');
-        if (el) {
-          el.style.transition = "opacity .5s,transform .5s";
-          el.style.opacity    = "0";
-          el.style.transform  = "scale(.95)";
-          setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 500);
-        }
-        render();
-      }, TAKEN_SHOW);
-    }
-
-    /* ═══════════════════════════════════════
-       COUNTDOWN BAR
-    ═══════════════════════════════════════ */
-    function startCountdownBar(gigId, duration) {
-      setTimeout(function () {
-        var inner = document.getElementById("barInner_" + gigId);
-        if (!inner) return;
-        inner.style.transition = "width " + (duration / 1000) + "s linear";
-        inner.style.width      = "0%";
-      }, 50);
-    }
-
-    /* ── Auto refresh every 15s ── */
-    setInterval(function () { render(); }, 15000);
-
-    /* ── Multi-tab sync ── */
-    window.addEventListener("storage", function (e) {
-      if (e.key === GIG_KEY) render();
-    });
-
-    /* ── Init ── */
-    buildCatChips();
+    /* ── Initial render ── */
+    if (urlCat) { syncChips(); }
     render();
 
-  })();
+  });
   </script>
 </body>
 </html>
