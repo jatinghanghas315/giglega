@@ -3,294 +3,1400 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Post a Gig — GigLega</title>
-  <meta name="description" content="GigLega par apna gig post karo. Gurugram ke local workers se turant connect ho jao. Bilkul free." />
+  <title>Gig Complete — GigLega</title>
+  <meta name="description" content="Gig complete karo, payment release karo, rating do aur next steps dekho." />
   <link rel="stylesheet" href="styles.css" />
-  <script defer src="shared.js"></script>
+  <script src="shared.js"></script>
   <style>
-    .pg-wrap{max-width:720px;margin:0 auto;padding:32px 16px 80px}
-    .pg-title{font-size:1.7rem;font-weight:800;color:var(--primary);margin-bottom:4px}
-    .pg-sub{color:var(--gray-500);font-size:.95rem;margin-bottom:32px}
 
-    .form-card{background:var(--surface);border:1px solid var(--gray-200);border-radius:var(--radius);padding:28px 24px;margin-bottom:24px;box-shadow:var(--shadow-sm)}
-    .card-title{font-size:1.05rem;font-weight:700;color:var(--primary);margin-bottom:18px;display:flex;align-items:center;gap:8px}
+    /* ══════════════════════════════════
+       CSS VARIABLES (local overrides)
+    ══════════════════════════════════ */
+    :root {
+      --pg-green:  #059669;
+      --pg-amber:  #d97706;
+      --pg-red:    #dc2626;
+      --pg-purple: #7c3aed;
+    }
 
-    /* Type toggle */
-    .type-toggle{display:flex;gap:10px;margin-bottom:24px;flex-wrap:wrap}
-    .type-btn{flex:1;min-width:140px;padding:12px 16px;border-radius:var(--radius-sm);border:2px solid var(--gray-200);background:var(--surface);color:var(--gray-600);font-weight:600;font-size:.92rem;cursor:pointer;transition:all .2s;text-align:center}
-    .type-btn.active{border-color:var(--teal);background:var(--teal);color:#fff}
-    .type-btn:hover:not(.active){border-color:var(--teal);color:var(--teal)}
+    /* ══════════════════════════════════
+       PAGE WRAPPER
+    ══════════════════════════════════ */
+    .pg-wrapper {
+      min-height: 100vh;
+      background: var(--bg);
+    }
 
-    /* Fields */
-    .field{margin-bottom:20px}
-    .field label{display:block;font-weight:600;font-size:.9rem;color:var(--gray-700);margin-bottom:6px}
-    .field label .req{color:var(--danger)}
-    .field input,.field select,.field textarea{width:100%;padding:11px 14px;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);font-size:.93rem;background:var(--surface);color:var(--text);font-family:inherit;transition:border .2s;box-sizing:border-box}
-    .field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--teal)}
-    .field textarea{resize:vertical;min-height:100px}
-    .char-count{font-size:.78rem;color:var(--gray-400);text-align:right;margin-top:3px}
+    /* ══════════════════════════════════
+       HERO BANNER (dynamic by state)
+    ══════════════════════════════════ */
+    .pg-hero {
+      padding: 48px 20px 60px;
+      text-align: center;
+      position: relative; overflow: hidden;
+      transition: background .4s;
+    }
+    .pg-hero.state-complete {
+      background: linear-gradient(135deg, #064e3b 0%, #059669 50%, #0d9488 100%);
+    }
+    .pg-hero.state-pending {
+      background: linear-gradient(135deg, #78350f 0%, var(--pg-amber) 55%, #b45309 100%);
+    }
+    .pg-hero.state-dispute {
+      background: linear-gradient(135deg, #7f1d1d 0%, var(--pg-red) 55%, #b91c1c 100%);
+    }
+    .pg-hero.state-review {
+      background: linear-gradient(135deg, #1e1b4b 0%, var(--pg-purple) 55%, #4338ca 100%);
+    }
+    .pg-hero::before {
+      content: "";
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px);
+      background-size: 48px 48px; pointer-events: none;
+    }
+    .pg-hero::after {
+      content: "";
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 50% 100%, rgba(255,255,255,.07) 0%, transparent 65%);
+      pointer-events: none;
+    }
 
-    /* Location row */
-    .location-row{display:flex;gap:10px;align-items:flex-end}
-    .location-row .field{flex:1;margin-bottom:0}
-    .btn-gps{flex-shrink:0;padding:11px 16px;background:var(--teal);color:#fff;border:none;border-radius:var(--radius-sm);font-weight:700;font-size:.85rem;cursor:pointer;white-space:nowrap;transition:background .2s;display:flex;align-items:center;gap:6px}
-    .btn-gps:hover{background:var(--teal-dark)}
-    .btn-gps:disabled{opacity:.6;cursor:not-allowed}
-    .gps-status{font-size:.78rem;margin-top:6px;min-height:18px}
-    .gps-status.fetching{color:var(--teal)}
-    .gps-status.success{color:var(--success)}
-    .gps-status.error{color:var(--danger)}
+    .pg-hero-inner {
+      position: relative; z-index: 1;
+      max-width: 640px; margin: 0 auto;
+    }
 
-    /* Price suggest */
-    .price-suggest{background:var(--gray-50);border:1.5px solid var(--teal);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:16px}
-    .ps-label{font-size:.8rem;color:var(--teal);font-weight:700;text-transform:uppercase;letter-spacing:.5px}
-    .ps-value{font-size:1.4rem;font-weight:800;color:var(--primary);margin:2px 0}
-    .ps-range{font-size:.82rem;color:var(--gray-500)}
-    .ps-popular{font-size:.8rem;color:var(--accent);font-weight:600;margin-top:3px}
-    .ps-cap{font-size:.78rem;color:var(--danger);font-weight:600;margin-top:4px}
+    /* Animated check / icon */
+    .pg-status-icon {
+      width: 80px; height: 80px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.18);
+      border: 3px solid rgba(255,255,255,.35);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.2rem; margin: 0 auto 20px;
+      animation: popIn .5s cubic-bezier(.34,1.56,.64,1);
+    }
+    @keyframes popIn {
+      from { transform: scale(0); opacity: 0; }
+      to   { transform: scale(1); opacity: 1; }
+    }
 
-    .price-options{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
-    .price-chip{padding:8px 18px;border-radius:20px;border:1.5px solid var(--gray-200);background:var(--surface);color:var(--gray-600);font-weight:600;font-size:.88rem;cursor:pointer;transition:all .2s}
-    .price-chip.selected{border-color:var(--accent);background:var(--accent);color:#fff}
-    .price-chip:hover:not(.selected){border-color:var(--accent);color:var(--accent)}
+    .pg-hero-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(255,255,255,.15);
+      border: 1px solid rgba(255,255,255,.25);
+      border-radius: var(--radius-full);
+      padding: 4px 14px;
+      font-size: .74rem; font-weight: 700; color: rgba(255,255,255,.9);
+      margin-bottom: 14px;
+    }
 
-    .custom-price-wrap{display:flex;align-items:center;gap:10px;margin-bottom:8px}
-    .custom-price-wrap input{max-width:180px;padding:11px 14px;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);font-size:.93rem;background:var(--surface);color:var(--text);font-family:inherit;transition:border .2s;box-sizing:border-box}
-    .custom-price-wrap input:focus{outline:none;border-color:var(--teal)}
-    .custom-price-wrap span{font-weight:600;color:var(--gray-500);font-size:.9rem}
+    .pg-hero h1 {
+      font-size: clamp(1.5rem, 3.5vw, 2.4rem);
+      font-weight: 900; color: #fff;
+      line-height: 1.2; margin-bottom: 10px; letter-spacing: -.6px;
+    }
+    .pg-hero-sub {
+      font-size: .95rem; color: rgba(255,255,255,.75);
+      margin-bottom: 28px; line-height: 1.65;
+    }
 
-    /* Alerts */
-    .price-alert{border-radius:var(--radius-sm);padding:10px 14px;font-size:.85rem;margin-top:8px;display:none;line-height:1.5}
-    .price-alert.show{display:block}
-    .price-alert.warning{background:rgba(245,158,11,.1);border:1px solid var(--accent);color:#92400e}
-    .price-alert.error{background:rgba(239,68,68,.08);border:1px solid #fca5a5;color:#dc2626}
+    /* Gig ID pill */
+    .pg-gig-id {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(0,0,0,.18);
+      border: 1px solid rgba(255,255,255,.15);
+      border-radius: var(--radius-full);
+      padding: 7px 18px;
+      font-size: .82rem; font-weight: 700; color: rgba(255,255,255,.85);
+      letter-spacing: .3px;
+    }
+    .pg-gig-id span { color: rgba(255,255,255,.5); font-weight: 500; }
 
-    /* Earnings preview */
-    .earnings-preview{background:linear-gradient(135deg,var(--primary) 0%,var(--teal) 100%);border-radius:var(--radius-sm);padding:14px 18px;color:#fff;margin-top:12px;display:none}
-    .earnings-preview.show{display:block}
-    .ep-row{display:flex;justify-content:space-between;font-size:.88rem;margin-bottom:4px;opacity:.85}
-    .ep-row.total{font-weight:800;font-size:1rem;opacity:1;margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,.3)}
+    /* ══════════════════════════════════
+       STEP PROGRESS BAR
+    ══════════════════════════════════ */
+    .pg-steps-bar {
+      background: var(--surface);
+      border-bottom: 1.5px solid var(--gray-200);
+      padding: 16px 20px;
+      position: sticky; top: 0; z-index: 40;
+      box-shadow: var(--shadow-sm);
+    }
+    [data-theme=dark] .pg-steps-bar { border-color: var(--gray-700); }
 
-    /* Payment options */
-    .pay-options{display:flex;flex-direction:column;gap:10px}
-    .pay-option{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;border:2px solid var(--gray-200);border-radius:var(--radius-sm);cursor:pointer;transition:all .2s}
-    .pay-option.selected{border-color:var(--teal);background:rgba(13,148,136,.06)}
-    .pay-option input[type=radio]{margin-top:2px;accent-color:var(--teal);width:16px;height:16px;flex-shrink:0}
-    .pay-option-body .pay-title{font-weight:700;font-size:.93rem;color:var(--text)}
-    .pay-option-body .pay-desc{font-size:.81rem;color:var(--gray-500);margin-top:2px;line-height:1.4}
-    .pay-badge{font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:10px;margin-left:6px;background:var(--teal);color:#fff;vertical-align:middle}
+    .pg-steps-inner {
+      max-width: 700px; margin: 0 auto;
+      display: flex; align-items: center; gap: 0;
+    }
+    .pg-step {
+      display: flex; align-items: center; gap: 8px;
+      flex: 1;
+    }
+    .pg-step-circle {
+      width: 30px; height: 30px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .75rem; font-weight: 800; flex-shrink: 0;
+      border: 2px solid var(--gray-300);
+      background: var(--surface); color: var(--gray-400);
+      transition: all .3s;
+    }
+    .pg-step.done .pg-step-circle {
+      background: var(--success); border-color: var(--success); color: #fff;
+    }
+    .pg-step.active .pg-step-circle {
+      background: var(--primary); border-color: var(--primary); color: #fff;
+      box-shadow: 0 0 0 4px rgba(13,148,136,.15);
+    }
+    .pg-step-label {
+      font-size: .74rem; font-weight: 700; color: var(--gray-400);
+      white-space: nowrap;
+    }
+    .pg-step.done   .pg-step-label { color: var(--success); }
+    .pg-step.active .pg-step-label { color: var(--primary); }
 
-    .info-note{border-radius:var(--radius-sm);padding:10px 14px;font-size:.83rem;margin-top:10px;display:none;line-height:1.5}
-    .info-note.show{display:block}
-    .info-note.teal{background:rgba(13,148,136,.08);border:1px solid var(--teal);color:var(--gray-700)}
-    .info-note.amber{background:rgba(245,158,11,.1);border:1px solid var(--accent);color:var(--gray-700)}
+    .pg-step-line {
+      flex: 1; height: 2px; background: var(--gray-200);
+      margin: 0 6px; transition: background .3s;
+    }
+    .pg-step-line.done { background: var(--success); }
+    [data-theme=dark] .pg-step-line { background: var(--gray-700); }
 
-    /* Hidden */
-    #locationGroup{display:none}
-    #locationGroup.show{display:block}
+    @media(max-width:500px) {
+      .pg-step-label { display: none; }
+      .pg-step-circle { width: 26px; height: 26px; font-size: .7rem; }
+    }
 
-    /* Submit */
-    .submit-area{text-align:center;padding-top:8px}
-    .btn-post{background:linear-gradient(135deg,var(--primary) 0%,var(--teal) 100%);color:#fff;border:none;padding:15px 48px;border-radius:var(--radius-sm);font-size:1rem;font-weight:800;cursor:pointer;transition:transform .15s,box-shadow .15s;box-shadow:0 4px 14px rgba(13,148,136,.35)}
-    .btn-post:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(13,148,136,.45)}
-    .btn-post:disabled{opacity:.6;transform:none;cursor:not-allowed}
+    /* ══════════════════════════════════
+       MAIN LAYOUT
+    ══════════════════════════════════ */
+    .pg-body {
+      max-width: 900px; margin: 0 auto;
+      padding: 36px 20px 80px;
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 28px;
+      align-items: start;
+    }
+    @media(max-width:820px) { .pg-body { grid-template-columns: 1fr; } }
 
-    /* Dark mode */
-    [data-theme=dark] .price-suggest{background:var(--gray-800);border-color:var(--teal)}
-    [data-theme=dark] .price-chip{background:var(--gray-800);border-color:var(--gray-600);color:var(--gray-300)}
-    [data-theme=dark] .pay-option{border-color:var(--gray-600)}
-    [data-theme=dark] .pay-option.selected{background:rgba(13,148,136,.14);border-color:var(--teal)}
-    [data-theme=dark] .info-note.teal{color:var(--gray-300)}
-    [data-theme=dark] .info-note.amber{color:var(--gray-300)}
-    [data-theme=dark] .price-alert.warning{background:rgba(245,158,11,.1);color:#fcd34d}
-    [data-theme=dark] .price-alert.error{background:rgba(239,68,68,.1);color:#f87171;border-color:rgba(239,68,68,.3)}
-    [data-theme=dark] .form-card{border-color:var(--gray-700)}
-    [data-theme=dark] .type-btn{border-color:var(--gray-600);color:var(--gray-300);background:var(--gray-800)}
-    [data-theme=dark] .custom-price-wrap input{border-color:var(--gray-600);background:var(--gray-800);color:var(--text)}
-    [data-theme=dark] .ps-value{color:var(--teal)}
+    /* ══════════════════════════════════
+       CARDS — shared
+    ══════════════════════════════════ */
+    .pg-card {
+      background: var(--surface);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+    [data-theme=dark] .pg-card { border-color: var(--gray-700); }
+
+    .pg-card-header {
+      padding: 18px 22px 0;
+      display: flex; align-items: center;
+      justify-content: space-between; gap: 12px;
+    }
+    .pg-card-title {
+      font-size: 1rem; font-weight: 800; color: var(--primary);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .pg-card-body { padding: 16px 22px 22px; }
+
+    /* ══════════════════════════════════
+       GIG SUMMARY CARD
+    ══════════════════════════════════ */
+    .gig-summary-row {
+      display: flex; justify-content: space-between;
+      align-items: flex-start; gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--gray-100);
+      font-size: .88rem;
+    }
+    .gig-summary-row:last-child { border-bottom: none; }
+    [data-theme=dark] .gig-summary-row { border-color: var(--gray-700); }
+    .gsr-label { color: var(--gray-400); font-weight: 600; flex-shrink: 0; }
+    .gsr-value { font-weight: 700; color: var(--text); text-align: right; }
+    .gsr-value.green  { color: var(--pg-green); }
+    .gsr-value.amber  { color: var(--pg-amber); }
+    .gsr-value.red    { color: var(--pg-red); }
+
+    /* Participant row */
+    .participant-row {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--gray-100);
+    }
+    .participant-row:last-child { border-bottom: none; }
+    [data-theme=dark] .participant-row { border-color: var(--gray-700); }
+
+    .part-avatar {
+      width: 42px; height: 42px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--teal));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; color: #fff; font-weight: 700; flex-shrink: 0;
+    }
+    .part-name  { font-size: .9rem; font-weight: 700; color: var(--text); }
+    .part-role  { font-size: .74rem; color: var(--gray-400); font-weight: 600; }
+    .part-badge {
+      margin-left: auto;
+      font-size: .68rem; font-weight: 700;
+      padding: 3px 9px; border-radius: 6px;
+    }
+    .part-badge.poster { background: rgba(26,60,94,.1); color: var(--primary); }
+    .part-badge.worker { background: rgba(13,148,136,.1); color: var(--teal); }
+
+    /* ══════════════════════════════════
+       MARK COMPLETE SECTION
+    ══════════════════════════════════ */
+    .mark-complete-card {
+      background: linear-gradient(135deg, rgba(5,150,105,.05), rgba(13,148,136,.08));
+      border: 2px solid rgba(5,150,105,.2);
+      border-radius: var(--radius);
+      padding: 24px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .mc-icon { font-size: 2.8rem; margin-bottom: 12px; line-height: 1; }
+    .mc-title { font-size: 1.1rem; font-weight: 900; color: var(--primary); margin-bottom: 6px; }
+    .mc-sub   { font-size: .86rem; color: var(--gray-500); margin-bottom: 20px; line-height: 1.6; }
+
+    .btn-mark-complete {
+      display: inline-flex; align-items: center; gap: 9px;
+      padding: 14px 32px;
+      background: linear-gradient(135deg, #059669, #0d9488);
+      color: #fff; border: none; border-radius: var(--radius-sm);
+      font-weight: 900; font-size: 1rem; cursor: pointer;
+      font-family: var(--font);
+      box-shadow: 0 4px 16px rgba(5,150,105,.3);
+      transition: transform .2s, box-shadow .2s;
+      width: 100%; justify-content: center;
+    }
+    .btn-mark-complete:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(5,150,105,.38); }
+    .btn-mark-complete:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+
+    /* Checklist before marking complete */
+    .mc-checklist { margin-bottom: 20px; }
+    .mc-check-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 12px;
+      background: var(--surface);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+      margin-bottom: 8px;
+      cursor: pointer;
+      transition: border-color .18s;
+    }
+    .mc-check-item:hover { border-color: rgba(13,148,136,.3); }
+    [data-theme=dark] .mc-check-item { border-color: var(--gray-700); background: var(--gray-800); }
+    .mc-check-item.checked { border-color: var(--success); background: rgba(16,185,129,.04); }
+
+    .mcc-box {
+      width: 20px; height: 20px; border-radius: 5px;
+      border: 2px solid var(--gray-300); flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .75rem; transition: all .18s;
+    }
+    .mc-check-item.checked .mcc-box { background: var(--success); border-color: var(--success); color: #fff; }
+    .mcc-text { font-size: .86rem; font-weight: 600; color: var(--gray-600); }
+    .mc-check-item.checked .mcc-text { color: var(--success); }
+    [data-theme=dark] .mcc-text { color: var(--gray-400); }
+
+    /* ══════════════════════════════════
+       PAYMENT BREAKDOWN
+    ══════════════════════════════════ */
+    .payment-breakdown {
+      background: var(--gray-50);
+      border-radius: var(--radius-sm);
+      padding: 16px;
+      margin: 14px 0;
+    }
+    [data-theme=dark] .payment-breakdown { background: var(--gray-800); }
+
+    .pb-row {
+      display: flex; justify-content: space-between;
+      align-items: center;
+      padding: 7px 0;
+      font-size: .88rem;
+      border-bottom: 1px dashed var(--gray-200);
+    }
+    .pb-row:last-child { border-bottom: none; }
+    [data-theme=dark] .pb-row { border-color: var(--gray-700); }
+    .pb-label  { color: var(--gray-500); font-weight: 600; display: flex; align-items: center; gap: 6px; }
+    .pb-amount { font-weight: 700; color: var(--text); }
+    .pb-amount.deduct { color: var(--pg-red); }
+    .pb-amount.total  { color: var(--pg-green); font-size: 1.05rem; }
+
+    .pb-divider {
+      height: 1.5px;
+      background: var(--gray-200);
+      margin: 8px 0;
+    }
+    [data-theme=dark] .pb-divider { background: var(--gray-700); }
+
+    /* ══════════════════════════════════
+       RATING SECTION
+    ══════════════════════════════════ */
+    .rating-card {
+      background: var(--surface);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+    [data-theme=dark] .rating-card { border-color: var(--gray-700); }
+
+    .rating-card-header {
+      background: linear-gradient(135deg, rgba(26,60,94,.04), rgba(13,148,136,.06));
+      padding: 18px 22px;
+      border-bottom: 1.5px solid var(--gray-200);
+      display: flex; align-items: center; gap: 12px;
+    }
+    [data-theme=dark] .rating-card-header { border-color: var(--gray-700); }
+
+    .rch-icon {
+      width: 44px; height: 44px; border-radius: 12px;
+      background: linear-gradient(135deg, var(--primary), var(--teal));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem; flex-shrink: 0;
+    }
+    .rch-title { font-size: 1rem; font-weight: 800; color: var(--primary); }
+    .rch-sub   { font-size: .78rem; color: var(--gray-400); }
+
+    /* Star rating widget */
+    .star-rating-group { margin: 16px 0 12px; }
+    .srg-label {
+      font-size: .8rem; font-weight: 700;
+      color: var(--gray-500); margin-bottom: 8px;
+      text-transform: uppercase; letter-spacing: .4px;
+    }
+    .star-row {
+      display: flex; gap: 6px; align-items: center;
+      margin-bottom: 4px;
+    }
+    .star-btn {
+      background: none; border: none;
+      font-size: 1.8rem; cursor: pointer;
+      padding: 2px; line-height: 1;
+      transition: transform .12s;
+      filter: grayscale(1); opacity: .4;
+    }
+    .star-btn:hover, .star-btn.lit {
+      filter: none; opacity: 1;
+      transform: scale(1.15);
+    }
+    .star-label-text {
+      font-size: .82rem; font-weight: 700;
+      color: var(--teal); margin-left: 6px;
+      min-width: 80px; opacity: 0;
+      transition: opacity .2s;
+    }
+    .star-label-text.show { opacity: 1; }
+
+    /* Sub-ratings */
+    .sub-ratings { margin: 12px 0; }
+    .sub-rating-row {
+      display: flex; align-items: center; gap: 12px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--gray-100);
+    }
+    .sub-rating-row:last-child { border-bottom: none; }
+    [data-theme=dark] .sub-rating-row { border-color: var(--gray-700); }
+    .srr-label { font-size: .82rem; font-weight: 600; color: var(--gray-500); width: 110px; flex-shrink: 0; }
+    .srr-stars { display: flex; gap: 3px; }
+    .srr-star {
+      font-size: 1.1rem; cursor: pointer;
+      filter: grayscale(1); opacity: .35;
+      transition: filter .1s, opacity .1s, transform .1s;
+    }
+    .srr-star.lit { filter: none; opacity: 1; }
+    .srr-star:hover { transform: scale(1.2); }
+
+    /* Review text area */
+    .review-textarea {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+      background: var(--surface);
+      color: var(--text); font-family: var(--font);
+      font-size: .9rem; line-height: 1.65;
+      resize: vertical; min-height: 90px;
+      transition: border .2s;
+      box-sizing: border-box;
+    }
+    .review-textarea:focus { outline: none; border-color: var(--teal); }
+    [data-theme=dark] .review-textarea { border-color: var(--gray-600); background: var(--gray-800); }
+
+    .review-char-count {
+      font-size: .74rem; color: var(--gray-400);
+      text-align: right; margin-top: 4px;
+    }
+
+    /* Tag chips for review */
+    .review-tags { display: flex; flex-wrap: wrap; gap: 7px; margin: 12px 0; }
+    .review-tag {
+      padding: 5px 12px;
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-full);
+      font-size: .78rem; font-weight: 600;
+      color: var(--gray-500); cursor: pointer;
+      transition: all .15s; background: none;
+      font-family: var(--font);
+    }
+    .review-tag:hover { border-color: var(--teal); color: var(--teal); }
+    .review-tag.selected { background: rgba(13,148,136,.1); border-color: var(--teal); color: var(--teal); }
+    [data-theme=dark] .review-tag { border-color: var(--gray-600); }
+
+    .btn-submit-rating {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      width: 100%; padding: 13px;
+      background: linear-gradient(135deg, var(--primary), var(--teal));
+      color: #fff; border: none; border-radius: var(--radius-sm);
+      font-weight: 800; font-size: .95rem; cursor: pointer;
+      font-family: var(--font);
+      box-shadow: 0 3px 12px rgba(13,148,136,.2);
+      transition: opacity .2s, transform .2s;
+      margin-top: 16px;
+    }
+    .btn-submit-rating:hover { opacity: .9; transform: translateY(-1px); }
+    .btn-submit-rating:disabled { opacity: .55; cursor: not-allowed; transform: none; }
+
+    /* Rating submitted state */
+    .rating-submitted {
+      text-align: center; padding: 24px;
+      display: none;
+    }
+    .rating-submitted.show { display: block; animation: fadeSlide .3s ease; }
+    .rs-icon  { font-size: 2.6rem; margin-bottom: 10px; }
+    .rs-title { font-size: 1rem; font-weight: 800; color: var(--success); margin-bottom: 5px; }
+    .rs-sub   { font-size: .84rem; color: var(--gray-500); }
+
+    @keyframes fadeSlide {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: none; }
+    }
+
+    /* ══════════════════════════════════
+       SIDEBAR — right column
+    ══════════════════════════════════ */
+    .pg-sidebar {}
+
+    /* Timer card */
+    .timer-card {
+      background: var(--surface);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 20px;
+      text-align: center;
+      box-shadow: var(--shadow-sm);
+    }
+    [data-theme=dark] .timer-card { border-color: var(--gray-700); }
+
+    .tc-label  { font-size: .76rem; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--gray-400); margin-bottom: 8px; }
+    .tc-timer  {
+      font-size: 2rem; font-weight: 900; color: var(--primary);
+      font-variant-numeric: tabular-nums; letter-spacing: -.5px;
+      line-height: 1;
+    }
+    .tc-timer.urgent { color: var(--pg-red); animation: pulse 1s ease-in-out infinite; }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .6; } }
+    .tc-sub { font-size: .76rem; color: var(--gray-400); margin-top: 6px; line-height: 1.5; }
+
+    .tc-bar-wrap {
+      background: var(--gray-100);
+      border-radius: 4px; height: 5px; margin: 12px 0 6px; overflow: hidden;
+    }
+    [data-theme=dark] .tc-bar-wrap { background: var(--gray-700); }
+    .tc-bar {
+      height: 100%; border-radius: 4px;
+      background: linear-gradient(90deg, var(--primary), var(--teal));
+      transition: width .5s linear;
+    }
+    .tc-bar.urgent { background: var(--pg-red); }
+
+    /* Quick actions card */
+    .quick-actions-card {
+      background: var(--surface);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow-sm);
+    }
+    [data-theme=dark] .quick-actions-card { border-color: var(--gray-700); }
+
+    .qa-title {
+      font-size: .76rem; font-weight: 800;
+      text-transform: uppercase; letter-spacing: .5px;
+      color: var(--gray-400); padding: 14px 18px 8px;
+    }
+    .qa-btn {
+      display: flex; align-items: center; gap: 12px;
+      padding: 13px 18px;
+      border-bottom: 1px solid var(--gray-100);
+      background: none; border-left: none; border-right: none; border-top: none;
+      width: 100%; text-align: left; cursor: pointer;
+      font-family: var(--font);
+      transition: background .15s;
+    }
+    .qa-btn:last-child { border-bottom: none; }
+    [data-theme=dark] .qa-btn { border-color: var(--gray-700); }
+    .qa-btn:hover { background: rgba(13,148,136,.04); }
+
+    .qa-icon { font-size: 1.2rem; flex-shrink: 0; }
+    .qa-text { font-size: .88rem; font-weight: 600; color: var(--gray-600); }
+    .qa-arr  { margin-left: auto; color: var(--gray-300); font-size: .85rem; }
+    .qa-btn:hover .qa-arr { color: var(--teal); }
+
+    /* Earnings summary card */
+    .earnings-card {
+      background: linear-gradient(135deg, #0b2240 0%, var(--primary) 60%, #0d4f47 100%);
+      border-radius: var(--radius);
+      padding: 22px;
+      margin-bottom: 20px;
+      color: #fff; position: relative; overflow: hidden;
+    }
+    .earnings-card::before {
+      content: "";
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+      background-size: 36px 36px; pointer-events: none;
+    }
+    .ec-inner { position: relative; z-index: 1; }
+    .ec-label { font-size: .74rem; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: rgba(255,255,255,.6); margin-bottom: 4px; }
+    .ec-amount {
+      font-size: 2rem; font-weight: 900; color: #fff; line-height: 1;
+      margin-bottom: 2px;
+    }
+    .ec-amount span { font-size: 1rem; font-weight: 600; }
+    .ec-net   { font-size: .78rem; color: rgba(255,255,255,.65); margin-bottom: 16px; }
+
+    .ec-row {
+      display: flex; justify-content: space-between;
+      font-size: .82rem; color: rgba(255,255,255,.75);
+      padding: 5px 0;
+      border-bottom: 1px solid rgba(255,255,255,.1);
+    }
+    .ec-row:last-child { border-bottom: none; }
+    .ec-row strong { color: #fff; }
+
+    .btn-withdraw {
+      display: flex; align-items: center; justify-content: center; gap: 7px;
+      width: 100%; padding: 11px;
+      background: rgba(255,255,255,.15);
+      border: 1.5px solid rgba(255,255,255,.3);
+      border-radius: var(--radius-sm);
+      color: #fff; font-weight: 800; font-size: .88rem;
+      cursor: pointer; font-family: var(--font);
+      transition: background .2s;
+      margin-top: 16px;
+    }
+    .btn-withdraw:hover { background: rgba(255,255,255,.25); }
+
+    /* Dispute button */
+    .btn-raise-dispute {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      width: 100%; padding: 11px;
+      background: transparent;
+      border: 1.5px solid rgba(239,68,68,.3);
+      border-radius: var(--radius-sm);
+      color: var(--pg-red); font-weight: 700; font-size: .86rem;
+      cursor: pointer; font-family: var(--font);
+      transition: all .2s;
+    }
+    .btn-raise-dispute:hover { background: rgba(239,68,68,.06); border-color: var(--pg-red); }
+
+    /* ══════════════════════════════════
+       DISPUTE FLOW MODAL
+    ══════════════════════════════════ */
+    .modal-overlay {
+      position: fixed; inset: 0; z-index: 200;
+      background: rgba(0,0,0,.5);
+      backdrop-filter: blur(4px);
+      display: none; align-items: center; justify-content: center;
+      padding: 20px;
+    }
+    .modal-overlay.show { display: flex; }
+
+    .modal-box {
+      background: var(--surface);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius);
+      max-width: 520px; width: 100%;
+      box-shadow: var(--shadow-xl);
+      overflow: hidden;
+      animation: modalSlide .25s ease;
+    }
+    @keyframes modalSlide {
+      from { transform: translateY(24px); opacity: 0; }
+      to   { transform: none; opacity: 1; }
+    }
+    [data-theme=dark] .modal-box { border-color: var(--gray-700); }
+
+    .modal-header {
+      padding: 18px 22px;
+      border-bottom: 1.5px solid var(--gray-200);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    [data-theme=dark] .modal-header { border-color: var(--gray-700); }
+    .modal-title { font-size: 1rem; font-weight: 800; color: var(--primary); }
+    .modal-close {
+      background: none; border: none; cursor: pointer;
+      font-size: 1.2rem; color: var(--gray-400);
+      padding: 2px; transition: color .15s;
+    }
+    .modal-close:hover { color: var(--danger); }
+
+    .modal-body { padding: 22px; }
+
+    .dispute-type-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 10px; margin-bottom: 18px;
+    }
+    @media(max-width:400px) { .dispute-type-grid { grid-template-columns: 1fr; } }
+
+    .dispute-type-btn {
+      padding: 14px 12px;
+      border: 2px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+      background: none; cursor: pointer;
+      text-align: center; font-family: var(--font);
+      transition: all .18s;
+    }
+    .dispute-type-btn:hover { border-color: rgba(239,68,68,.4); }
+    .dispute-type-btn.selected { border-color: var(--pg-red); background: rgba(239,68,68,.05); }
+    [data-theme=dark] .dispute-type-btn { border-color: var(--gray-600); }
+
+    .dtb-icon  { font-size: 1.5rem; margin-bottom: 6px; line-height: 1; }
+    .dtb-label { font-size: .82rem; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+    .dtb-desc  { font-size: .72rem; color: var(--gray-400); line-height: 1.4; }
+
+    .dispute-desc-field {
+      width: 100%;
+      padding: 11px 13px;
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+      background: var(--surface); color: var(--text);
+      font-family: var(--font); font-size: .88rem;
+      line-height: 1.6; resize: vertical; min-height: 80px;
+      box-sizing: border-box; transition: border .2s;
+    }
+    .dispute-desc-field:focus { outline: none; border-color: var(--pg-red); }
+    [data-theme=dark] .dispute-desc-field { border-color: var(--gray-600); background: var(--gray-800); }
+
+    .modal-footer {
+      padding: 14px 22px;
+      border-top: 1.5px solid var(--gray-200);
+      display: flex; gap: 10px; justify-content: flex-end;
+    }
+    [data-theme=dark] .modal-footer { border-color: var(--gray-700); }
+
+    .btn-modal-cancel {
+      padding: 10px 20px; border-radius: var(--radius-sm);
+      border: 1.5px solid var(--gray-200);
+      background: none; color: var(--gray-500);
+      font-weight: 700; font-size: .86rem; cursor: pointer;
+      font-family: var(--font); transition: all .15s;
+    }
+    .btn-modal-cancel:hover { border-color: var(--gray-400); color: var(--gray-700); }
+    [data-theme=dark] .btn-modal-cancel { border-color: var(--gray-600); }
+
+    .btn-modal-submit {
+      padding: 10px 22px; border-radius: var(--radius-sm);
+      background: var(--pg-red); color: #fff;
+      font-weight: 700; font-size: .86rem; cursor: pointer;
+      border: none; font-family: var(--font);
+      transition: opacity .2s;
+    }
+    .btn-modal-submit:hover { opacity: .88; }
+    .btn-modal-submit:disabled { opacity: .5; cursor: not-allowed; }
+
+    /* ══════════════════════════════════
+       NEXT STEPS / WHAT'S NEXT
+    ══════════════════════════════════ */
+    .next-steps-card {
+      background: var(--surface);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+    [data-theme=dark] .next-steps-card { border-color: var(--gray-700); }
+
+    .nsc-header {
+      background: linear-gradient(135deg, rgba(26,60,94,.04), rgba(13,148,136,.06));
+      padding: 16px 20px;
+      border-bottom: 1.5px solid var(--gray-200);
+    }
+    [data-theme=dark] .nsc-header { border-color: var(--gray-700); }
+    .nsc-title { font-size: .96rem; font-weight: 800; color: var(--primary); }
+
+    .next-step-item {
+      display: flex; align-items: flex-start; gap: 14px;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--gray-100);
+    }
+    .next-step-item:last-child { border-bottom: none; }
+    [data-theme=dark] .next-step-item { border-color: var(--gray-700); }
+
+    .nsi-num {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--teal));
+      color: #fff; font-weight: 900; font-size: .76rem;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .nsi-title { font-size: .9rem; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+    .nsi-desc  { font-size: .8rem; color: var(--gray-500); line-height: 1.55; }
+
+    /* ══════════════════════════════════
+       POST-COMPLETION CONFETTI (CSS only)
+    ══════════════════════════════════ */
+    .confetti-wrap {
+      position: fixed; inset: 0; pointer-events: none; z-index: 500;
+      display: none;
+    }
+    .confetti-wrap.show { display: block; }
+
+    @keyframes confettiFall {
+      0%   { transform: translateY(-10px) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+    }
+    .confetti-piece {
+      position: absolute; top: -10px;
+      width: 10px; height: 10px;
+      animation: confettiFall linear forwards;
+    }
+
+    /* ══════════════════════════════════
+       STATE-SPECIFIC VIEWS
+    ══════════════════════════════════ */
+    .pg-view { display: none; }
+    .pg-view.active { display: block; }
+
+    /* ══════════════════════════════════
+       INFO BOX
+    ══════════════════════════════════ */
+    .pg-info-box {
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      padding: 12px 15px; margin: 12px 0;
+      font-size: .86rem; line-height: 1.65;
+    }
+    .pg-info-box.teal   { background: rgba(13,148,136,.07);  border-left: 3px solid var(--teal); }
+    .pg-info-box.warn   { background: rgba(245,158,11,.07);  border-left: 3px solid #f59e0b; }
+    .pg-info-box.danger { background: rgba(239,68,68,.06);   border-left: 3px solid var(--danger); color: var(--text); }
+    .pg-info-box.green  { background: rgba(16,185,129,.06);  border-left: 3px solid #059669; }
+
+    /* ══════════════════════════════════
+       SHARE CARD
+    ══════════════════════════════════ */
+    .share-card {
+      background: var(--surface);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 18px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow-sm);
+    }
+    [data-theme=dark] .share-card { border-color: var(--gray-700); }
+
+    .share-title { font-size: .86rem; font-weight: 800; color: var(--primary); margin-bottom: 4px; }
+    .share-sub   { font-size: .76rem; color: var(--gray-400); margin-bottom: 14px; line-height: 1.5; }
+
+    .share-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn-share {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 14px; border-radius: var(--radius-sm);
+      font-weight: 700; font-size: .8rem; cursor: pointer;
+      font-family: var(--font); border: 1.5px solid var(--gray-200);
+      background: none; color: var(--gray-600);
+      transition: all .15s;
+    }
+    .btn-share:hover { border-color: var(--teal); color: var(--teal); }
+    [data-theme=dark] .btn-share { border-color: var(--gray-600); }
+
   </style>
 </head>
 <body>
+  <!-- Confetti -->
+  <div class="confetti-wrap" id="confettiWrap"></div>
+
+  <!-- Dispute Modal -->
+  <div class="modal-overlay" id="disputeModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title">🚨 Dispute Raise Karo</div>
+        <button class="modal-close" id="modalClose">✕</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size:.86rem;color:var(--gray-500);margin-bottom:16px;line-height:1.6">
+          Issue clearly describe karo. Team <strong>5 business days</strong> mein review karegi.
+          Evidence — chat screenshots — attach karo support ticket mein.
+        </p>
+        <div style="font-size:.8rem;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px">Issue Type</div>
+        <div class="dispute-type-grid">
+          <button class="dispute-type-btn" data-type="payment">
+            <div class="dtb-icon">💸</div>
+            <div class="dtb-label">Payment Issue</div>
+            <div class="dtb-desc">Payment nahi mili ya wrong amount</div>
+          </button>
+          <button class="dispute-type-btn" data-type="quality">
+            <div class="dtb-icon">⭐</div>
+            <div class="dtb-label">Work Quality</div>
+            <div class="dtb-desc">Kaam described se alag ya incomplete</div>
+          </button>
+          <button class="dispute-type-btn" data-type="noshow">
+            <div class="dtb-icon">🚶</div>
+            <div class="dtb-label">No Show</div>
+            <div class="dtb-desc">Worker/Poster show hi nahi hua</div>
+          </button>
+          <button class="dispute-type-btn" data-type="safety">
+            <div class="dtb-icon">🛡️</div>
+            <div class="dtb-label">Safety Issue</div>
+            <div class="dtb-desc">Harassment, scam ya unsafe behavior</div>
+          </button>
+        </div>
+        <div style="font-size:.82rem;font-weight:700;color:var(--gray-500);margin-bottom:7px">Kya hua? (detail mein)</div>
+        <textarea class="dispute-desc-field" id="disputeDesc" placeholder="Issue clearly explain karo — date, time, amounts, aur jo hua sab likho…" maxlength="800"></textarea>
+        <div style="font-size:.72rem;color:var(--gray-400);text-align:right;margin-top:4px">
+          <span id="disputeCharCount">0</span>/800
+        </div>
+        <div class="pg-info-box warn" style="margin-top:14px">
+          ⚠️ Dispute raise karne ke baad payment temporarily hold mein jaati hai review ke liye.
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-modal-cancel" id="btnModalCancel">Cancel</button>
+        <button class="btn-modal-submit" id="btnDisputeSubmit" disabled>🚨 Submit Dispute</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="page-loader"></div>
   <div id="announce-bar"></div>
   <nav id="main-nav"></nav>
 
-  <main class="page-wrapper">
-    <div class="pg-wrap">
-      <h1 class="pg-title">📝 Kaam Post Karein!</h1>
-      <p class="pg-sub">Describe your task and get matched with a skilled worker near you.</p>
-      <nav id="breadcrumb" aria-label="breadcrumb"></nav>
+  <main class="pg-wrapper">
 
-      <form id="postGigForm" novalidate>
+    <!-- ══════════════════════════════════
+         DYNAMIC HERO
+    ══════════════════════════════════ -->
+    <div class="pg-hero state-pending" id="pgHero">
+      <div class="pg-hero-inner">
+        <div class="pg-status-icon" id="heroIcon">⏳</div>
+        <div class="pg-hero-badge" id="heroBadge">⏳ Awaiting Completion</div>
+        <h1 id="heroTitle">Kaam Complete Hua?</h1>
+        <p class="pg-hero-sub" id="heroSub">
+          Kaam ho gaya ho toh "Mark Complete" karo — payment release hogi aur
+          dono sides rating de sakenge.
+        </p>
+        <div class="pg-gig-id">
+          <span>GIG ID</span> #GL-2026-0314
+        </div>
+      </div>
+    </div>
 
-        <!-- CARD 1: Gig Details -->
-        <div class="form-card">
-          <div class="card-title">🗂️ What kind of help do you need?</div>
+    <!-- ══════════════════════════════════
+         STEP PROGRESS BAR
+    ══════════════════════════════════ -->
+    <div class="pg-steps-bar">
+      <div class="pg-steps-inner" id="stepsBar">
+        <div class="pg-step done" id="step1">
+          <div class="pg-step-circle">✓</div>
+          <div class="pg-step-label">Gig Posted</div>
+        </div>
+        <div class="pg-step-line done" id="line1"></div>
+        <div class="pg-step done" id="step2">
+          <div class="pg-step-circle">✓</div>
+          <div class="pg-step-label">Worker Hired</div>
+        </div>
+        <div class="pg-step-line done" id="line2"></div>
+        <div class="pg-step active" id="step3">
+          <div class="pg-step-circle">3</div>
+          <div class="pg-step-label">Mark Complete</div>
+        </div>
+        <div class="pg-step-line" id="line3"></div>
+        <div class="pg-step" id="step4">
+          <div class="pg-step-circle">4</div>
+          <div class="pg-step-label">Rate & Review</div>
+        </div>
+        <div class="pg-step-line" id="line4"></div>
+        <div class="pg-step" id="step5">
+          <div class="pg-step-circle">5</div>
+          <div class="pg-step-label">Payment Released</div>
+        </div>
+      </div>
+    </div>
 
-          <div class="type-toggle">
-            <button type="button" class="type-btn active" id="btnHyperlocal">
-              📍 Hyperlocal<br><small style="font-weight:400;font-size:.78rem">On-site / In-person work</small>
-            </button>
-            <button type="button" class="type-btn" id="btnRemote">
-              💻 Remote<br><small style="font-weight:400;font-size:.78rem">Online / Digital work</small>
-            </button>
-          </div>
+    <!-- ══════════════════════════════════
+         BODY
+    ══════════════════════════════════ -->
+    <div class="pg-body">
 
-          <div class="field">
-            <label for="gigCategory">Category <span class="req">*</span></label>
-            <select id="gigCategory" required>
-              <option value="">— Select a category —</option>
-            </select>
-          </div>
+      <!-- ── LEFT COLUMN ── -->
+      <div class="pg-left">
 
-          <div class="field">
-            <label for="gigTitle">Gig Title <span class="req">*</span></label>
-            <input type="text" id="gigTitle" maxlength="80"
-              placeholder="e.g. Ghar ki safai chahiye | Logo design | Wifi setup" required />
-            <div class="char-count"><span id="titleCount">0</span>/80</div>
-          </div>
+        <!-- Breadcrumb -->
+        <div id="breadcrumb" style="margin-bottom:20px"></div>
 
-          <div class="field">
-            <label for="gigDesc">Description <span class="req">*</span></label>
-            <textarea id="gigDesc" maxlength="500"
-              placeholder="Describe exactly what needs to be done, tools/skills needed, and any special requirements..." required></textarea>
-            <div class="char-count"><span id="descCount">0</span>/500</div>
-          </div>
+        <!-- ════ VIEW A: POSTER — mark complete ════ -->
+        <div class="pg-view active" id="viewPoster">
 
-          <!-- Location — Hyperlocal only -->
-          <div id="locationGroup">
-            <div class="card-title" style="font-size:.9rem;margin-bottom:12px">📍 Gig Location</div>
-            <div class="location-row">
-              <div class="field">
-                <label for="gigLocation">Address / Area <span class="req">*</span></label>
-                <input type="text" id="gigLocation"
-                  placeholder="e.g. Sector 45, Gurugram" />
-              </div>
-              <button type="button" class="btn-gps" id="btnGps">
-                🛰️ Fetch Location
-              </button>
+          <!-- Gig Summary -->
+          <div class="pg-card">
+            <div class="pg-card-header">
+              <div class="pg-card-title">📋 Gig Summary</div>
+              <span style="font-size:.74rem;font-weight:700;color:var(--teal);background:rgba(13,148,136,.1);padding:3px 9px;border-radius:6px">In Progress</span>
             </div>
-            <div class="gps-status" id="gpsStatus"></div>
-          </div>
-        </div>
-
-        <!-- CARD 2: Pricing -->
-        <div class="form-card">
-          <div class="card-title">💰 Set Your Budget (per hour)</div>
-
-          <div class="price-suggest" id="priceSuggestBox">
-            <div class="ps-label">✨ GigLega Suggested Price</div>
-            <div class="ps-value" id="suggestedPrice">₹—</div>
-            <div class="ps-range" id="suggestedRange">Select a category to see pricing</div>
-            <div class="ps-popular" id="popularPrice"></div>
-            <div class="ps-cap" id="priceCapLabel"></div>
-          </div>
-
-          <div style="font-size:.85rem;color:var(--gray-500);margin-bottom:10px">
-            You can adjust this price:
-          </div>
-          <div class="price-options" id="priceChips"></div>
-
-          <div class="custom-price-wrap">
-            <input type="number" id="customPrice" placeholder="Enter custom price" min="150" max="99999" />
-            <span>₹ / hour</span>
-          </div>
-
-          <!-- Warning: above range -->
-          <div class="price-alert warning" id="priceWarnHigh">
-            ⚠️ This price is above the typical range for this category. Workers may find it unusual. Are you sure?
-          </div>
-          <!-- Error: above hard cap -->
-          <div class="price-alert error" id="priceErrCap">
-            🚫 Maximum price for this category is <strong id="capValueLabel">₹0</strong>/hr. Please reduce your rate.
-          </div>
-          <!-- Error: below minimum -->
-          <div class="price-alert error" id="priceErrMin">
-            ⚠️ Minimum price for this gig type is <strong id="minValueLabel">₹150</strong>/hr. Please increase your rate.
+            <div class="pg-card-body">
+              <div class="gig-summary-row">
+                <span class="gsr-label">Gig Title</span>
+                <span class="gsr-value">Weekend Warehouse Packing Helper</span>
+              </div>
+              <div class="gig-summary-row">
+                <span class="gsr-label">Location</span>
+                <span class="gsr-value">📍 Sector 14, Gurugram</span>
+              </div>
+              <div class="gig-summary-row">
+                <span class="gsr-label">Date</span>
+                <span class="gsr-value">📅 March 14, 2026 • 9:00 AM – 5:00 PM</span>
+              </div>
+              <div class="gig-summary-row">
+                <span class="gsr-label">Agreed Budget</span>
+                <span class="gsr-value green">💰 ₹1,200</span>
+              </div>
+              <div class="gig-summary-row">
+                <span class="gsr-label">Platform Fee (6%)</span>
+                <span class="gsr-value">₹72</span>
+              </div>
+              <div class="gig-summary-row">
+                <span class="gsr-label">Worker Receives</span>
+                <span class="gsr-value green">₹1,128</span>
+              </div>
+            </div>
           </div>
 
-          <!-- Earnings preview -->
-          <div class="earnings-preview" id="earningsPreview">
-            <div class="ep-row"><span>Gig Price (per hour)</span><span id="ep-gig">₹0</span></div>
-            <div class="ep-row"><span>GigLega Support Fee (6%)</span><span id="ep-fee">–₹0</span></div>
-            <div class="ep-row total"><span>💸 Worker Receives</span><span id="ep-worker">₹0</span></div>
-          </div>
-        </div>
-
-        <!-- CARD 3: Payment -->
-        <div class="form-card">
-          <div class="card-title">💳 Payment Preference</div>
-          <div class="pay-options">
-
-            <label class="pay-option selected" id="payOptAfter">
-              <input type="radio" name="payType" value="after" checked />
-              <div class="pay-option-body">
-                <div class="pay-title">
-                  Pay After Completion <span class="pay-badge">Recommended</span>
+          <!-- Participants -->
+          <div class="pg-card">
+            <div class="pg-card-header">
+              <div class="pg-card-title">👥 Participants</div>
+            </div>
+            <div class="pg-card-body">
+              <div class="participant-row">
+                <div class="part-avatar">RK</div>
+                <div>
+                  <div class="part-name">Rahul Kumar <span style="font-size:.72rem;color:var(--teal)">⭐ 4.8</span></div>
+                  <div class="part-role">Gurugram, Haryana</div>
                 </div>
-                <div class="pay-desc">
-                  Pay the worker once the gig is done and you're satisfied.
-                  <em>"Kaam ho jaaye, fir paise."</em>
+                <span class="part-badge poster">Poster (You)</span>
+              </div>
+              <div class="participant-row">
+                <div class="part-avatar" style="background:linear-gradient(135deg,#059669,#0d9488)">AS</div>
+                <div>
+                  <div class="part-name">Arjun Singh <span style="font-size:.72rem;color:var(--teal)">⭐ 4.6</span></div>
+                  <div class="part-role">Gurugram, Haryana</div>
+                </div>
+                <span class="part-badge worker">Worker</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Mark Complete Card -->
+          <div class="mark-complete-card" id="markCompleteSection">
+            <div class="mc-icon">✅</div>
+            <div class="mc-title">Kaam Poora Hua — Confirm Karo</div>
+            <div class="mc-sub">
+              Neeche checklist complete karo aur "Mark Complete" dabao.
+              Payment worker ke wallet mein release ho jaayegi.
+            </div>
+
+            <div class="mc-checklist" id="mcChecklist">
+              <div class="mc-check-item" data-idx="0">
+                <div class="mcc-box"></div>
+                <div class="mcc-text">Kaam described scope ke according complete hua</div>
+              </div>
+              <div class="mc-check-item" data-idx="1">
+                <div class="mcc-box"></div>
+                <div class="mcc-text">Worker time pe aaya aur professionally behaved</div>
+              </div>
+              <div class="mc-check-item" data-idx="2">
+                <div class="mcc-box"></div>
+                <div class="mcc-text">Koi safety ya behavioral issue nahi tha</div>
+              </div>
+              <div class="mc-check-item" data-idx="3">
+                <div class="mcc-box"></div>
+                <div class="mcc-text">Agreed amount ₹1,200 release karne ke liye ready hoon</div>
+              </div>
+            </div>
+
+            <button class="btn-mark-complete" id="btnMarkComplete" disabled>
+              ✅ Mark as Complete & Release ₹1,128
+            </button>
+          </div>
+
+          <!-- Already completed state (hidden by default) -->
+          <div id="alreadyCompleted" style="display:none">
+            <div class="pg-info-box green">
+              ✅ <strong>Gig marked complete!</strong> Payment worker ke wallet mein release ho gayi. Ab rating do neeche.
+            </div>
+          </div>
+
+          <!-- Rating section (appears after complete) -->
+          <div class="rating-card" id="ratingSection" style="display:none">
+            <div class="rating-card-header">
+              <div class="rch-icon">⭐</div>
+              <div>
+                <div class="rch-title">Rate Arjun Singh</div>
+                <div class="rch-sub">Tumhara honest review community ke liye helpful hai</div>
+              </div>
+            </div>
+            <div style="padding:18px 22px 22px">
+
+              <!-- Main star rating -->
+              <div class="star-rating-group">
+                <div class="srg-label">Overall Rating</div>
+                <div class="star-row" id="mainStarRow">
+                  <button class="star-btn" data-val="1">⭐</button>
+                  <button class="star-btn" data-val="2">⭐</button>
+                  <button class="star-btn" data-val="3">⭐</button>
+                  <button class="star-btn" data-val="4">⭐</button>
+                  <button class="star-btn" data-val="5">⭐</button>
+                  <span class="star-label-text" id="starLabelText"></span>
                 </div>
               </div>
-            </label>
 
-            <label class="pay-option" id="payOptWallet">
-              <input type="radio" name="payType" value="wallet" />
-              <div class="pay-option-body">
-                <div class="pay-title">Secure Wallet Payment 🔒</div>
-                <div class="pay-desc">
-                  Money is held safely in the GigLega Wallet and released to the worker only after you confirm the job is done.
+              <!-- Sub-ratings -->
+              <div style="font-size:.8rem;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px">Specific Ratings</div>
+              <div class="sub-ratings">
+                <div class="sub-rating-row">
+                  <div class="srr-label">Punctuality</div>
+                  <div class="srr-stars" data-sub="punctuality">
+                    <span class="srr-star" data-val="1">⭐</span>
+                    <span class="srr-star" data-val="2">⭐</span>
+                    <span class="srr-star" data-val="3">⭐</span>
+                    <span class="srr-star" data-val="4">⭐</span>
+                    <span class="srr-star" data-val="5">⭐</span>
+                  </div>
+                </div>
+                <div class="sub-rating-row">
+                  <div class="srr-label">Work Quality</div>
+                  <div class="srr-stars" data-sub="quality">
+                    <span class="srr-star" data-val="1">⭐</span>
+                    <span class="srr-star" data-val="2">⭐</span>
+                    <span class="srr-star" data-val="3">⭐</span>
+                    <span class="srr-star" data-val="4">⭐</span>
+                    <span class="srr-star" data-val="5">⭐</span>
+                  </div>
+                </div>
+                <div class="sub-rating-row">
+                  <div class="srr-label">Communication</div>
+                  <div class="srr-stars" data-sub="communication">
+                    <span class="srr-star" data-val="1">⭐</span>
+                    <span class="srr-star" data-val="2">⭐</span>
+                    <span class="srr-star" data-val="3">⭐</span>
+                    <span class="srr-star" data-val="4">⭐</span>
+                    <span class="srr-star" data-val="5">⭐</span>
+                  </div>
                 </div>
               </div>
-            </label>
 
-            <label class="pay-option" id="payOptCash">
-              <input type="radio" name="payType" value="cash" />
-              <div class="pay-option-body">
-                <div class="pay-title">Cash Payment 💵</div>
-                <div class="pay-desc">
-                  Pay the worker directly in cash. A small GigLega support fee will be collected digitally after completion.
+              <!-- Quick tags -->
+              <div style="font-size:.8rem;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px">Quick Tags (Optional)</div>
+              <div class="review-tags" id="reviewTagsPositive">
+                <button class="review-tag" data-tag="punctual">⏰ Punctual</button>
+                <button class="review-tag" data-tag="hardworking">💪 Hardworking</button>
+                <button class="review-tag" data-tag="professional">👔 Professional</button>
+                <button class="review-tag" data-tag="trustworthy">🤝 Trustworthy</button>
+                <button class="review-tag" data-tag="skilled">🎯 Skilled</button>
+                <button class="review-tag" data-tag="quick">⚡ Quick Worker</button>
+              </div>
+
+              <!-- Review text -->
+              <div style="margin-top:14px">
+                <div style="font-size:.82rem;font-weight:700;color:var(--gray-500);margin-bottom:7px">Review Likho (Optional)</div>
+                <textarea class="review-textarea" id="reviewText"
+                  placeholder="Experience kaisa tha? Kya achha tha, kya improve kar sakte hain…"
+                  maxlength="400"></textarea>
+                <div class="review-char-count"><span id="reviewCharCount">0</span>/400 characters</div>
+              </div>
+
+              <button class="btn-submit-rating" id="btnSubmitRating" disabled>
+                ⭐ Submit Rating
+              </button>
+
+              <!-- Submitted state -->
+              <div class="rating-submitted" id="ratingSubmitted">
+                <div class="rs-icon">🎉</div>
+                <div class="rs-title">Rating Submit Ho Gayi!</div>
+                <div class="rs-sub">Shukriya! Tumhara review GigLega community ke liye valuable hai.</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+        <!-- /viewPoster -->
+
+        <!-- ════ VIEW B: WORKER — awaiting payment ════ -->
+        <div class="pg-view" id="viewWorker">
+
+          <div class="pg-card">
+            <div class="pg-card-header">
+              <div class="pg-card-title">📋 Completed Gig</div>
+              <span style="font-size:.74rem;font-weight:700;color:var(--pg-amber);background:rgba(245,158,11,.1);padding:3px 9px;border-radius:6px">Awaiting Payment</span>
+            </div>
+            <div class="pg-card-body">
+              <div class="gig-summary-row">
+                <span class="gsr-label">Gig Title</span>
+                <span class="gsr-value">Weekend Warehouse Packing Helper</span>
+              </div>
+              <div class="gig-summary-row">
+                <span class="gsr-label">Poster</span>
+                <span class="gsr-value">Rahul Kumar ⭐ 4.8</span>
+              </div>
+              <div class="gig-summary-row">
+                <span class="gsr-label">Date Worked</span>
+                <span class="gsr-value">📅 March 14, 2026</span>
+              </div>
+              <div class="gig-summary-row">
+                <span class="gsr-label">Agreed Budget</span>
+                <span class="gsr-value">₹1,200</span>
+              </div>
+              <div class="gig-summary-row">
+                <span class="gsr-label">Platform Fee (6%)</span>
+                <span class="gsr-value">– ₹72</span>
+              </div>
+              <div class="gig-summary-row">
+                <span class="gsr-label">You Receive</span>
+                <span class="gsr-value green" style="font-size:1.1rem">₹1,128 🎉</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="pg-info-box teal">
+            💡 <strong>Auto-Release:</strong> Poster ne abhi tak mark complete nahi kiya.
+            Agar 72 ghante mein nahi kiya toh payment automatically tumhare wallet mein
+            release ho jaayegi.
+          </div>
+
+          <!-- Worker rating section -->
+          <div class="rating-card">
+            <div class="rating-card-header">
+              <div class="rch-icon">⭐</div>
+              <div>
+                <div class="rch-title">Rate Rahul Kumar (Poster)</div>
+                <div class="rch-sub">Tumhara experience kaisa tha? Community ko batao.</div>
+              </div>
+            </div>
+            <div style="padding:18px 22px 22px">
+
+              <div class="star-rating-group">
+                <div class="srg-label">Overall Experience</div>
+                <div class="star-row" id="workerMainStarRow">
+                  <button class="star-btn" data-val="1">⭐</button>
+                  <button class="star-btn" data-val="2">⭐</button>
+                  <button class="star-btn" data-val="3">⭐</button>
+                  <button class="star-btn" data-val="4">⭐</button>
+                  <button class="star-btn" data-val="5">⭐</button>
+                  <span class="star-label-text" id="workerStarLabel"></span>
                 </div>
               </div>
-            </label>
 
+              <div class="sub-ratings">
+                <div class="sub-rating-row">
+                  <div class="srr-label">Clear Instructions</div>
+                  <div class="srr-stars" data-sub="clarity">
+                    <span class="srr-star" data-val="1">⭐</span>
+                    <span class="srr-star" data-val="2">⭐</span>
+                    <span class="srr-star" data-val="3">⭐</span>
+                    <span class="srr-star" data-val="4">⭐</span>
+                    <span class="srr-star" data-val="5">⭐</span>
+                  </div>
+                </div>
+                <div class="sub-rating-row">
+                  <div class="srr-label">Fair Payment</div>
+                  <div class="srr-stars" data-sub="fairpay">
+                    <span class="srr-star" data-val="1">⭐</span>
+                    <span class="srr-star" data-val="2">⭐</span>
+                    <span class="srr-star" data-val="3">⭐</span>
+                    <span class="srr-star" data-val="4">⭐</span>
+                    <span class="srr-star" data-val="5">⭐</span>
+                  </div>
+                </div>
+                <div class="sub-rating-row">
+                  <div class="srr-label">Safe Environment</div>
+                  <div class="srr-stars" data-sub="safety">
+                    <span class="srr-star" data-val="1">⭐</span>
+                    <span class="srr-star" data-val="2">⭐</span>
+                    <span class="srr-star" data-val="3">⭐</span>
+                    <span class="srr-star" data-val="4">⭐</span>
+                    <span class="srr-star" data-val="5">⭐</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="review-tags" id="workerReviewTags">
+                <button class="review-tag" data-tag="fair">⚖️ Fair Poster</button>
+                <button class="review-tag" data-tag="clear">📋 Clear Description</button>
+                <button class="review-tag" data-tag="ontime">⏰ Paid On Time</button>
+                <button class="review-tag" data-tag="respectful">🤝 Respectful</button>
+                <button class="review-tag" data-tag="wouldwork">🔁 Would Work Again</button>
+              </div>
+
+              <div style="margin-top:14px">
+                <textarea class="review-textarea" id="workerReviewText"
+                  placeholder="Poster ke baare mein likho — kya achha tha, kya improve ho sakta tha…"
+                  maxlength="400"></textarea>
+                <div class="review-char-count"><span id="workerCharCount">0</span>/400</div>
+              </div>
+
+              <button class="btn-submit-rating" id="btnWorkerRating" disabled>
+                ⭐ Submit Rating
+              </button>
+              <div class="rating-submitted" id="workerRatingSubmitted">
+                <div class="rs-icon">🎉</div>
+                <div class="rs-title">Rating Submit Ho Gayi!</div>
+                <div class="rs-sub">Shukriya Arjun! Tumhara review valuable hai.</div>
+              </div>
+            </div>
           </div>
 
-          <!-- Wallet note -->
-          <div class="info-note teal" id="walletNote">
-            🔒 <strong>How GigLega Wallet works:</strong> You pay now and the money is held securely. Once you tap <em>"Mark Complete"</em>, the worker's payout is instantly released to their GigLega balance. Neither side can be cheated.
-          </div>
+        </div>
+        <!-- /viewWorker -->
 
-          <!-- Cash note -->
-          <div class="info-note amber" id="cashNote">
-            💡 <strong>Cash gig flow:</strong> You pay the worker in cash on completion (e.g. ₹300). After marking complete, you'll receive a prompt to pay the GigLega support fee (<strong id="cashFeeLabel">₹18</strong>) via UPI/card. This keeps the platform running for everyone.
+      </div>
+      <!-- /pg-left -->
+
+      <!-- ── RIGHT SIDEBAR ── -->
+      <div class="pg-sidebar">
+
+        <!-- Auto-release timer -->
+        <div class="timer-card" id="timerCard">
+          <div class="tc-label">⏳ Auto-Release Timer</div>
+          <div class="tc-timer" id="countdownTimer">71:59:45</div>
+          <div class="tc-bar-wrap">
+            <div class="tc-bar" id="timerBar" style="width:99%"></div>
+          </div>
+          <div class="tc-sub">
+            Agar poster 72 ghante mein mark complete nahi karta,<br/>
+            payment automatically release hogi.
           </div>
         </div>
 
-        <!-- CARD 4: Contact -->
-        <div class="form-card">
-          <div class="card-title">📞 Your Contact Details</div>
-          <div class="field">
-            <label for="posterName">Your Name <span class="req">*</span></label>
-            <input type="text" id="posterName" placeholder="Enter your name" required />
-          </div>
-          <div class="field">
-            <label for="posterPhone">WhatsApp / Phone <span class="req">*</span></label>
-            <input type="tel" id="posterPhone" placeholder="+91 98765 43210" required />
+        <!-- Earnings / payment card -->
+        <div class="earnings-card" id="earningsCard">
+          <div class="ec-inner">
+            <div class="ec-label">💰 Payment Summary</div>
+            <div class="ec-amount"><span>₹</span>1,200</div>
+            <div class="ec-net">Agreed budget</div>
+            <div class="ec-row">
+              <span>Platform Fee (6%)</span>
+              <strong>– ₹72</strong>
+            </div>
+            <div class="ec-row">
+              <span>Worker Receives</span>
+              <strong>₹1,128</strong>
+            </div>
+            <div class="ec-row">
+              <span>Status</span>
+              <strong id="paymentStatus">⏳ Pending</strong>
+            </div>
+            <button class="btn-withdraw" id="btnWithdraw" style="display:none">
+              🏦 Withdraw to Bank / UPI
+            </button>
           </div>
         </div>
 
-        <!-- Submit -->
-        <div class="submit-area">
-          <button type="submit" class="btn-post" id="submitBtn">🚀 Post Gig Abhi!</button>
-          <p style="font-size:.8rem;color:var(--gray-400);margin-top:12px">
-            By posting, you agree to GigLega's
-            <a href="terms.html" style="color:var(--teal)">Terms</a> &
-            <a href="trust-safety.html" style="color:var(--teal)">Trust & Safety</a> guidelines.
-          </p>
+        <!-- Quick Actions -->
+        <div class="quick-actions-card">
+          <div class="qa-title">Quick Actions</div>
+          <button class="qa-btn" id="btnOpenChat">
+            <span class="qa-icon">💬</span>
+            <span class="qa-text">Open Chat</span>
+            <span class="qa-arr">›</span>
+          </button>
+          <button class="qa-btn" onclick="window.location.href='dashboard.html'">
+            <span class="qa-icon">📊</span>
+            <span class="qa-text">Go to Dashboard</span>
+            <span class="qa-arr">›</span>
+          </button>
+          <button class="qa-btn" onclick="window.location.href='browse.html'">
+            <span class="qa-icon">🔍</span>
+            <span class="qa-text">Browse More Gigs</span>
+            <span class="qa-arr">›</span>
+          </button>
+          <button class="qa-btn" onclick="window.location.href='post-gig-form.html'">
+            <span class="qa-icon">➕</span>
+            <span class="qa-text">Post Another Gig</span>
+            <span class="qa-arr">›</span>
+          </button>
+          <button class="qa-btn" id="btnOpenDispute" style="color:var(--pg-red)">
+            <span class="qa-icon">🚨</span>
+            <span class="qa-text" style="color:var(--pg-red)">Raise a Dispute</span>
+            <span class="qa-arr" style="color:var(--pg-red)">›</span>
+          </button>
         </div>
 
-      </form>
+        <!-- Next Steps -->
+        <div class="next-steps-card">
+          <div class="nsc-header">
+            <div class="nsc-title">🗺️ What's Next</div>
+          </div>
+          <div class="next-step-item">
+            <div class="nsi-num">1</div>
+            <div>
+              <div class="nsi-title">Mark Complete</div>
+              <div class="nsi-desc">Poster confirms kaam done — payment unlock hoti hai.</div>
+            </div>
+          </div>
+          <div class="next-step-item">
+            <div class="nsi-num">2</div>
+            <div>
+              <div class="nsi-title">Rate Each Other</div>
+              <div class="nsi-desc">Honest rating do — community build hoti hai.</div>
+            </div>
+          </div>
+          <div class="next-step-item">
+            <div class="nsi-num">3</div>
+            <div>
+              <div class="nsi-title">Withdraw Earnings</div>
+              <div class="nsi-desc">Wallet se bank ya UPI pe transfer karo.</div>
+            </div>
+          </div>
+          <div class="next-step-item">
+            <div class="nsi-num">4</div>
+            <div>
+              <div class="nsi-title">Next Gig!</div>
+              <div class="nsi-desc">Browse karo ya naya gig post karo.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Share card -->
+        <div class="share-card">
+          <div class="share-title">📣 GigLega Share Karo</div>
+          <div class="share-sub">Friends ko GigLega ke baare mein batao — unhe bhi gig milein!</div>
+          <div class="share-btns">
+            <button class="btn-share" id="btnShareWA">
+              💬 WhatsApp
+            </button>
+            <button class="btn-share" id="btnCopyLink">
+              🔗 Copy Link
+            </button>
+          </div>
+        </div>
+
+      </div>
+      <!-- /pg-sidebar -->
+
     </div>
   </main>
 
@@ -298,390 +1404,417 @@
   <div id="toast-container"></div>
 
   <script>
-  (function () {
+  document.addEventListener("DOMContentLoaded", function () {
 
-    /* ─────────────────────────────────────────
-       CATEGORY DATA
-       Each entry: value, label, min, suggested,
-       low (warn threshold), high (hard cap), popular
-    ───────────────────────────────────────── */
-    var CATS = {
-      hyperlocal: [
-        { value:"house-help",    label:"🧹 House Help (cleaning, organizing)", min:150, suggested:250, low:200, high:800,  popular:"₹230–₹270" },
-        { value:"errands",       label:"🛒 Errands (grocery pickup, delivery)", min:150, suggested:200, low:150, high:600,  popular:"₹180–₹220" },
-        { value:"moving-help",   label:"📦 Lifting / Moving Help",              min:300, suggested:350, low:300, high:900,  popular:"₹320–₹380" },
-        { value:"handyman",      label:"🔧 Handyman (basic repairs)",            min:300, suggested:400, low:350, high:1200, popular:"₹370–₹430" },
-        { value:"tech-help",     label:"💻 Tech Help (phone setup, wifi)",       min:300, suggested:350, low:300, high:1000, popular:"₹320–₹380" },
-        { value:"elderly-care",  label:"🧓 Elderly Assistance",                 min:150, suggested:300, low:250, high:800,  popular:"₹270–₹330" },
-        { value:"pet-care",      label:"🐕 Pet Care / Dog Walking",             min:150, suggested:250, low:200, high:700,  popular:"₹220–₹280" },
-        { value:"tutoring",      label:"📚 Study Help / Tutoring",              min:300, suggested:400, low:300, high:1200, popular:"₹350–₹450" },
-        { value:"event-help",    label:"🎉 Event Help",                          min:150, suggested:300, low:250, high:900,  popular:"₹270–₹330" },
-        { value:"gardening",     label:"🏡 Gardening",                           min:150, suggested:300, low:250, high:800,  popular:"₹270–₹330" },
-        { value:"deep-cleaning", label:"🧼 Deep Cleaning",                      min:300, suggested:450, low:400, high:1200, popular:"₹420–₹480" },
-        { value:"driver",        label:"🚗 Driver (short trips)",               min:300, suggested:400, low:350, high:1200, popular:"₹370–₹430" }
-      ],
-      remote: [
-        { value:"logo-design",     label:"🎨 Logo Design",           min:300, suggested:600, low:400, high:2000, popular:"₹500–₹700" },
-        { value:"video-editing",   label:"🎬 Video Editing",          min:300, suggested:500, low:350, high:2000, popular:"₹400–₹600" },
-        { value:"web-dev",         label:"🌐 Web Development",        min:300, suggested:700, low:500, high:3000, popular:"₹600–₹800" },
-        { value:"content-writing", label:"✍️ Content Writing",        min:150, suggested:300, low:200, high:1000, popular:"₹250–₹350" },
-        { value:"social-media",    label:"📱 Social Media Management",min:150, suggested:400, low:300, high:1500, popular:"₹350–₹450" },
-        { value:"data-entry",      label:"📊 Data Entry",             min:150, suggested:200, low:150, high:600,  popular:"₹180–₹220" },
-        { value:"graphic-design",  label:"🖼️ Graphic Design",         min:300, suggested:500, low:350, high:2000, popular:"₹400–₹600" },
-        { value:"voiceover",       label:"🎙️ Voiceover",              min:150, suggested:400, low:300, high:1500, popular:"₹350–₹450" },
-        { value:"translation",     label:"🌍 Translation",            min:150, suggested:350, low:250, high:1200, popular:"₹300–₹400" },
-        { value:"customer-support",label:"🎧 Customer Support",       min:150, suggested:250, low:200, high:800,  popular:"₹220–₹280" }
-      ]
-    };
+    /* ══════════════════════════════════
+       DEMO MODE — switch "poster" / "worker"
+       In real app this comes from URL params or session
+    ══════════════════════════════════ */
+    var params   = new URLSearchParams(window.location.search);
+    var userRole = params.get("role") || "poster"; // "poster" or "worker"
+    var gigState = params.get("state") || "pending"; // "pending","complete","disputed"
 
-    var FEE_RATE = 0.06;
-    var currentType = "hyperlocal";
-    var currentCat  = null;
-    var selectedPrice = 0;
-    var priceValid  = false;
+    /* Show correct view */
+    document.getElementById("viewPoster").classList.toggle("active", userRole === "poster");
+    document.getElementById("viewWorker").classList.toggle("active", userRole === "worker");
 
-    /* ── DOM refs ── */
-    var form         = document.getElementById("postGigForm");
-    var catSelect    = document.getElementById("gigCategory");
-    var titleInput   = document.getElementById("gigTitle");
-    var descInput    = document.getElementById("gigDesc");
-    var customInput  = document.getElementById("customPrice");
-    var locationGrp  = document.getElementById("locationGroup");
-    var gigLocInput  = document.getElementById("gigLocation");
-    var gpsBtn       = document.getElementById("btnGps");
-    var gpsStatus    = document.getElementById("gpsStatus");
-    var suggestedPriceEl = document.getElementById("suggestedPrice");
-    var suggestedRangeEl = document.getElementById("suggestedRange");
-    var popularPriceEl   = document.getElementById("popularPrice");
-    var priceCapLabelEl  = document.getElementById("priceCapLabel");
-    var priceChipsEl = document.getElementById("priceChips");
-    var earningsPreview  = document.getElementById("earningsPreview");
-    var walletNote   = document.getElementById("walletNote");
-    var cashNote     = document.getElementById("cashNote");
-    var cashFeeLabel = document.getElementById("cashFeeLabel");
-    var submitBtn    = document.getElementById("submitBtn");
-    var posterName   = document.getElementById("posterName");
-    var posterPhone  = document.getElementById("posterPhone");
-
-    /* ── Auto-fill from logged-in user ── */
-    if (typeof getCurrentUser === "function") {
-      var u = getCurrentUser();
-      if (u) {
-        if (u.name)  posterName.value  = u.name;
-        if (u.phone) posterPhone.value = u.phone;
-      }
+    /* Adjust hero for worker */
+    if (userRole === "worker") {
+      document.getElementById("heroIcon").textContent   = "💼";
+      document.getElementById("heroBadge").textContent  = "💼 Gig Completed — Awaiting Payment";
+      document.getElementById("heroTitle").textContent  = "Badiya Kaam Kiya! 🎉";
+      document.getElementById("heroSub").textContent    = "Poster ke confirm karte hi tumhara ₹1,128 wallet mein aa jaayega. Rating do neeche.";
+      document.getElementById("pgHero").className       = "pg-hero state-pending";
     }
 
     /* ── Breadcrumb ── */
     if (typeof buildBreadcrumb === "function") {
       buildBreadcrumb("breadcrumb", [
-        { label: "Home", href: "index.html" },
-        { label: "Post a Gig" }
+        { label: "Home",      href: "index.html" },
+        { label: "Dashboard", href: "dashboard.html" },
+        { label: "Post-Gig — #GL-2026-0314" }
       ]);
     }
 
-    /* ═══════════════════════════════════════
-       TYPE TOGGLE
-    ═══════════════════════════════════════ */
-    document.getElementById("btnHyperlocal").addEventListener("click", function () { setType("hyperlocal"); });
-    document.getElementById("btnRemote").addEventListener("click",     function () { setType("remote"); });
+    /* ══════════════════════════════════
+       CHECKLIST — Mark Complete
+    ══════════════════════════════════ */
+    var checks   = [false, false, false, false];
+    var checkEls = document.querySelectorAll(".mc-check-item");
+    var btnMC    = document.getElementById("btnMarkComplete");
 
-    function setType(type) {
-      currentType = type;
-      currentCat  = null;
-      document.getElementById("btnHyperlocal").classList.toggle("active", type === "hyperlocal");
-      document.getElementById("btnRemote").classList.toggle("active",     type === "remote");
-      locationGrp.classList.toggle("show", type === "hyperlocal");
-      buildCategorySelect();
-      resetPricing();
-    }
-
-    /* ═══════════════════════════════════════
-       CATEGORY SELECT
-    ═══════════════════════════════════════ */
-    function buildCategorySelect() {
-      catSelect.innerHTML = "<option value=''>— Select a category —</option>";
-      CATS[currentType].forEach(function (c) {
-        var opt = document.createElement("option");
-        opt.value = c.value;
-        opt.textContent = c.label;
-        catSelect.appendChild(opt);
-      });
-    }
-
-    catSelect.addEventListener("change", function () {
-      currentCat = CATS[currentType].find(function (c) { return c.value === catSelect.value; }) || null;
-      updatePricingUI();
-    });
-
-    /* ═══════════════════════════════════════
-       GPS LOCATION FETCH
-    ═══════════════════════════════════════ */
-    gpsBtn.addEventListener("click", function () {
-      if (!navigator.geolocation) {
-        showGpsStatus("error", "❌ Geolocation not supported on this device.");
-        return;
-      }
-      gpsBtn.disabled = true;
-      showGpsStatus("fetching", "🛰️ Fetching your location...");
-
-      navigator.geolocation.getCurrentPosition(
-        function (pos) {
-          var lat = pos.coords.latitude;
-          var lon = pos.coords.longitude;
-          showGpsStatus("fetching", "📡 Getting address...");
-
-          fetch(
-            "https://nominatim.openstreetmap.org/reverse?format=json&lat=" + lat + "&lon=" + lon,
-            { headers: { "Accept-Language": "en" } }
-          )
-          .then(function (r) { return r.json(); })
-          .then(function (data) {
-            var addr = data.address || {};
-            var parts = [
-              addr.neighbourhood || addr.suburb || addr.village || "",
-              addr.city_district || addr.county || "",
-              addr.city || addr.town || addr.state_district || "",
-              addr.state || ""
-            ].filter(Boolean);
-            var readable = parts.slice(0, 3).join(", ");
-            gigLocInput.value = readable || (lat.toFixed(4) + ", " + lon.toFixed(4));
-            showGpsStatus("success", "✅ Location fetched! You can edit it below.");
-            gpsBtn.disabled = false;
-          })
-          .catch(function () {
-            gigLocInput.value = lat.toFixed(5) + ", " + lon.toFixed(5);
-            showGpsStatus("success", "✅ Coordinates fetched. Edit address if needed.");
-            gpsBtn.disabled = false;
-          });
-        },
-        function (err) {
-          var msg = "❌ Could not fetch location.";
-          if (err.code === 1) msg = "❌ Location permission denied. Please allow access and retry.";
-          if (err.code === 2) msg = "❌ Location unavailable. Enter manually.";
-          showGpsStatus("error", msg);
-          gpsBtn.disabled = false;
-        },
-        { timeout: 10000 }
-      );
-    });
-
-    function showGpsStatus(type, msg) {
-      gpsStatus.className = "gps-status " + type;
-      gpsStatus.textContent = msg;
-    }
-
-    /* ═══════════════════════════════════════
-       PRICING
-    ═══════════════════════════════════════ */
-    function updatePricingUI() {
-      if (!currentCat) { resetPricing(); return; }
-      var c = currentCat;
-
-      suggestedPriceEl.textContent = "₹" + c.suggested + "/hr";
-      suggestedRangeEl.textContent = "Typical range: ₹" + c.low + " – ₹" + c.high;
-      popularPriceEl.textContent   = "🔥 Most users in your area pay " + c.popular;
-      priceCapLabelEl.textContent  = "🚫 Max allowed for this category: ₹" + c.high + "/hr";
-      document.getElementById("capValueLabel").textContent = "₹" + c.high;
-      document.getElementById("minValueLabel").textContent = "₹" + c.min;
-
-      // Build 3 chips
-      var opts = [c.low, c.suggested, Math.min(c.high, Math.round(c.suggested * 1.2))];
-      priceChipsEl.innerHTML = "";
-      opts.forEach(function (val) {
-        var chip = document.createElement("button");
-        chip.type = "button";
-        chip.className = "price-chip" + (val === c.suggested ? " selected" : "");
-        chip.textContent = "₹" + val + "/hr";
-        chip.addEventListener("click", function () {
-          document.querySelectorAll(".price-chip").forEach(function (ch) { ch.classList.remove("selected"); });
-          chip.classList.add("selected");
-          customInput.value = "";
-          setSelectedPrice(val);
-        });
-        priceChipsEl.appendChild(chip);
-      });
-
-      customInput.value = "";
-      setSelectedPrice(c.suggested);
-    }
-
-    function resetPricing() {
-      suggestedPriceEl.textContent = "₹—";
-      suggestedRangeEl.textContent = "Select a category to see pricing";
-      popularPriceEl.textContent   = "";
-      priceCapLabelEl.textContent  = "";
-      priceChipsEl.innerHTML       = "";
-      earningsPreview.classList.remove("show");
-      hideAllPriceAlerts();
-      selectedPrice = 0;
-      priceValid    = false;
-    }
-
-    customInput.addEventListener("input", function () {
-      var val = parseInt(customInput.value, 10);
-      if (!isNaN(val) && val > 0) {
-        document.querySelectorAll(".price-chip").forEach(function (ch) { ch.classList.remove("selected"); });
-        setSelectedPrice(val);
-      }
-    });
-
-    function setSelectedPrice(val) {
-      selectedPrice = val;
-      validatePrice();
-      updateEarningsPreview();
-      updatePaymentNotes();
-    }
-
-    function hideAllPriceAlerts() {
-      document.getElementById("priceWarnHigh").classList.remove("show");
-      document.getElementById("priceErrCap").classList.remove("show");
-      document.getElementById("priceErrMin").classList.remove("show");
-    }
-
-    function validatePrice() {
-      hideAllPriceAlerts();
-      priceValid = false;
-      if (!currentCat || !selectedPrice) return;
-
-      var c = currentCat;
-
-      if (selectedPrice < c.min) {
-        document.getElementById("priceErrMin").classList.add("show");
-        return;
-      }
-      if (selectedPrice > c.high) {
-        document.getElementById("priceErrCap").classList.add("show");
-        return;
-      }
-      if (selectedPrice > c.suggested * 1.5) {
-        document.getElementById("priceWarnHigh").classList.add("show");
-        // warning only — still valid
-      }
-      priceValid = true;
-    }
-
-    function updateEarningsPreview() {
-      if (!selectedPrice || !priceValid) { earningsPreview.classList.remove("show"); return; }
-      var fee    = Math.round(selectedPrice * FEE_RATE);
-      var worker = selectedPrice - fee;
-      document.getElementById("ep-gig").textContent    = "₹" + selectedPrice;
-      document.getElementById("ep-fee").textContent    = "–₹" + fee;
-      document.getElementById("ep-worker").textContent = "₹" + worker;
-      earningsPreview.classList.add("show");
-    }
-
-    /* ═══════════════════════════════════════
-       PAYMENT OPTIONS
-    ═══════════════════════════════════════ */
-    document.querySelectorAll('.pay-option input[type=radio]').forEach(function (radio) {
-      radio.addEventListener("change", function () {
-        document.querySelectorAll(".pay-option").forEach(function (el) { el.classList.remove("selected"); });
-        radio.closest(".pay-option").classList.add("selected");
-        updatePaymentNotes();
+    checkEls.forEach(function (el) {
+      el.addEventListener("click", function () {
+        var idx  = parseInt(el.dataset.idx);
+        checks[idx] = !checks[idx];
+        el.classList.toggle("checked", checks[idx]);
+        el.querySelector(".mcc-box").textContent = checks[idx] ? "✓" : "";
+        btnMC.disabled = !checks.every(Boolean);
       });
     });
 
-    function getPayType() {
-      var val = "after";
-      document.querySelectorAll('input[name="payType"]').forEach(function (r) { if (r.checked) val = r.value; });
-      return val;
+    /* ══════════════════════════════════
+       MARK COMPLETE FLOW
+    ══════════════════════════════════ */
+    var gigCompleted = gigState === "complete";
+
+    if (gigCompleted) {
+      triggerComplete(false); // no confetti on load
     }
 
-    function updatePaymentNotes() {
-      var payVal = getPayType();
-      walletNote.classList.toggle("show", payVal === "wallet");
-      if (payVal === "cash" && selectedPrice && priceValid) {
-        cashFeeLabel.textContent = "₹" + Math.round(selectedPrice * FEE_RATE);
-        cashNote.classList.add("show");
-      } else {
-        cashNote.classList.remove("show");
+    btnMC && btnMC.addEventListener("click", function () {
+      if (btnMC.disabled) return;
+      btnMC.disabled = true;
+      btnMC.innerHTML = "⏳ Processing…";
+      setTimeout(function () { triggerComplete(true); }, 1200);
+    });
+
+    function triggerComplete(withConfetti) {
+      /* Hero */
+      var hero = document.getElementById("pgHero");
+      hero.className = "pg-hero state-complete";
+      document.getElementById("heroIcon").textContent  = "🎉";
+      document.getElementById("heroBadge").textContent = "✅ Gig Successfully Completed";
+      document.getElementById("heroTitle").textContent = "Payment Released! 🎉";
+      document.getElementById("heroSub").textContent   = "₹1,128 Arjun Singh ke wallet mein transfer ho gayi. Ab rating do.";
+
+      /* Steps */
+      markStep(3, true);
+      markLine(3, true);
+
+      /* Mark complete section */
+      var mcs = document.getElementById("markCompleteSection");
+      if (mcs) mcs.style.display = "none";
+      var ac  = document.getElementById("alreadyCompleted");
+      if (ac) { ac.style.display = "block"; ac.style.animation = "fadeSlide .3s ease"; }
+
+      /* Show rating section */
+      var rs = document.getElementById("ratingSection");
+      if (rs) { rs.style.display = "block"; rs.style.animation = "fadeSlide .35s ease"; }
+
+      /* Payment card */
+      var ps = document.getElementById("paymentStatus");
+      if (ps) ps.innerHTML = "✅ Released";
+      var bw = document.getElementById("btnWithdraw");
+      if (bw) { bw.style.display = "flex"; }
+
+      /* Timer */
+      var tc = document.getElementById("timerCard");
+      if (tc) tc.style.display = "none";
+
+      /* Steps 4 → active */
+      markStep(4, false, true);
+
+      /* Confetti */
+      if (withConfetti) launchConfetti();
+
+      /* Toast */
+      if (typeof showToast === "function") {
+        showToast("✅ Gig complete! Payment released ₹1,128.", "success");
       }
     }
 
-    /* ═══════════════════════════════════════
-       CHAR COUNTERS
-    ═══════════════════════════════════════ */
-    titleInput.addEventListener("input", function () {
-      document.getElementById("titleCount").textContent = titleInput.value.length;
-    });
-    descInput.addEventListener("input", function () {
-      document.getElementById("descCount").textContent = descInput.value.length;
-    });
+    function markStep(num, done, active) {
+      var s = document.getElementById("step" + num);
+      if (!s) return;
+      s.classList.remove("done","active");
+      if (done)   { s.classList.add("done");   s.querySelector(".pg-step-circle").textContent = "✓"; }
+      if (active) { s.classList.add("active"); }
+    }
+    function markLine(num, done) {
+      var l = document.getElementById("line" + num);
+      if (l) l.classList.toggle("done", done);
+    }
 
-    /* ═══════════════════════════════════════
-       FORM SUBMIT
-    ═══════════════════════════════════════ */
-    form.addEventListener("submit", function (e) {
-      e.preventDefault();
-
-      if (!catSelect.value) {
-        showToast && showToast("Please select a category.", "error"); return;
+    /* ══════════════════════════════════
+       CONFETTI
+    ══════════════════════════════════ */
+    function launchConfetti() {
+      var wrap   = document.getElementById("confettiWrap");
+      wrap.classList.add("show");
+      var colors = ["#0d9488","#1a3c5e","#6ee7b7","#fbbf24","#a78bfa","#f87171"];
+      for (var i = 0; i < 80; i++) {
+        (function () {
+          var el = document.createElement("div");
+          el.className = "confetti-piece";
+          var size = 8 + Math.random() * 8;
+          var color = colors[Math.floor(Math.random() * colors.length)];
+          var left  = Math.random() * 100;
+          var dur   = 2.5 + Math.random() * 2.5;
+          var delay = Math.random() * 1.5;
+          el.style.cssText =
+            "left:" + left + "vw;" +
+            "width:" + size + "px;" +
+            "height:" + size + "px;" +
+            "background:" + color + ";" +
+            "border-radius:" + (Math.random() > .5 ? "50%" : "2px") + ";" +
+            "animation:confettiFall " + dur + "s " + delay + "s ease-in forwards;";
+          wrap.appendChild(el);
+        })();
       }
-      if (!titleInput.value.trim()) {
-        showToast && showToast("Please enter a gig title.", "error"); return;
-      }
-      if (!descInput.value.trim()) {
-        showToast && showToast("Please add a description.", "error"); return;
-      }
-      if (!selectedPrice || !priceValid) {
-        showToast && showToast("Please set a valid price within the allowed range.", "error"); return;
-      }
-      if (currentType === "hyperlocal" && !gigLocInput.value.trim()) {
-        showToast && showToast("Please enter your location for on-site gigs.", "error"); return;
-      }
-      if (!posterName.value.trim()) {
-        showToast && showToast("Please enter your name.", "error"); return;
-      }
-      var phoneVal = posterPhone.value.trim();
-      if (!phoneVal || !/^\+?[\d\s\-]{10,}$/.test(phoneVal)) {
-        showToast && showToast("Please enter a valid phone number.", "error"); return;
-      }
-
-      var payType = getPayType();
-      var fee     = Math.round(selectedPrice * FEE_RATE);
-      var worker  = selectedPrice - fee;
-
-      var gig = {
-        id:            "gig_" + Date.now(),
-        postedAt:      new Date().toISOString(),
-        status:        "open",
-        takenAt:       null,
-        takenBy:       null,
-        completedAt:   null,
-        type:          currentType,
-        category:      catSelect.value,
-        categoryLabel: catSelect.options[catSelect.selectedIndex].text,
-        title:         titleInput.value.trim(),
-        description:   descInput.value.trim(),
-        location:      currentType === "hyperlocal" ? gigLocInput.value.trim() : "Remote",
-        pricePerHr:    selectedPrice,
-        platformFee:   fee,
-        workerPay:     worker,
-        payType:       payType,
-        posterName:    posterName.value.trim(),
-        posterPhone:   phoneVal,
-        posterId:      (typeof getCurrentUser === "function" && getCurrentUser()) ? getCurrentUser().id : null
-      };
-
-      var key  = (typeof GL !== "undefined" && GL.STORAGE_KEY_GIGS) ? GL.STORAGE_KEY_GIGS : "gl_gigs";
-      var gigs = JSON.parse(localStorage.getItem(key) || "[]");
-      gigs.unshift(gig);
-      localStorage.setItem(key, JSON.stringify(gigs));
-
-      if (typeof setButtonLoading === "function") setButtonLoading(submitBtn, true, "Posting...");
       setTimeout(function () {
-        if (typeof setButtonLoading === "function") setButtonLoading(submitBtn, false);
-        if (typeof showToast === "function") showToast("🎉 Gig posted successfully!", "success");
-        setTimeout(function () { window.location.href = "browse.html"; }, 1200);
-      }, 900);
+        wrap.classList.remove("show");
+        wrap.innerHTML = "";
+      }, 5000);
+    }
+
+    /* ══════════════════════════════════
+       COUNTDOWN TIMER (72h auto-release)
+    ══════════════════════════════════ */
+    var totalSecs  = 72 * 3600;
+    var elapsed    = 15;          // demo: 15 seconds already passed
+    var remaining  = totalSecs - elapsed;
+    var timerEl    = document.getElementById("countdownTimer");
+    var timerBar   = document.getElementById("timerBar");
+
+    function fmtTime(s) {
+      var h = Math.floor(s / 3600);
+      var m = Math.floor((s % 3600) / 60);
+      var sec = s % 60;
+      return pad(h) + ":" + pad(m) + ":" + pad(sec);
+    }
+    function pad(n) { return n < 10 ? "0" + n : n; }
+
+    function tickTimer() {
+      if (remaining <= 0) {
+        if (timerEl) timerEl.textContent = "00:00:00";
+        return;
+      }
+      remaining--;
+      if (timerEl) {
+        timerEl.textContent = fmtTime(remaining);
+        timerEl.classList.toggle("urgent", remaining < 3600);
+      }
+      if (timerBar) {
+        var pct = (remaining / totalSecs) * 100;
+        timerBar.style.width = pct + "%";
+        timerBar.classList.toggle("urgent", remaining < 3600);
+      }
+    }
+    tickTimer();
+    var timerInterval = setInterval(tickTimer, 1000);
+
+    /* ══════════════════════════════════
+       STAR RATING — poster rating worker
+    ══════════════════════════════════ */
+    var STAR_LABELS = ["","Bahut Kharab 😞","Kharab 😕","Theek Hai 😐","Achha 😊","Bahut Achha 🤩"];
+    var mainRating  = 0;
+    var workerMainRating = 0;
+
+    function initStarRow(rowId, labelId, onSet) {
+      var row   = document.getElementById(rowId);
+      if (!row) return;
+      var stars = row.querySelectorAll(".star-btn");
+      var label = document.getElementById(labelId);
+      stars.forEach(function (btn) {
+        btn.addEventListener("mouseover", function () {
+          var v = parseInt(btn.dataset.val);
+          stars.forEach(function (s) {
+            s.classList.toggle("lit", parseInt(s.dataset.val) <= v);
+          });
+          if (label) { label.textContent = STAR_LABELS[v]; label.classList.add("show"); }
+        });
+        btn.addEventListener("mouseleave", function () {
+          stars.forEach(function (s) {
+            s.classList.toggle("lit", parseInt(s.dataset.val) <= (onSet() || 0));
+          });
+          if (label) {
+            label.textContent = STAR_LABELS[onSet() || 0];
+            label.classList.toggle("show", (onSet() || 0) > 0);
+          }
+        });
+        btn.addEventListener("click", function () {
+          var v = parseInt(btn.dataset.val);
+          stars.forEach(function (s) { s.classList.toggle("lit", parseInt(s.dataset.val) <= v); });
+          if (label) { label.textContent = STAR_LABELS[v]; label.classList.add("show"); }
+          updateRatingBtn(v, btn.closest(".rating-card") || btn.closest(".pg-view"));
+          if (rowId === "mainStarRow")       mainRating = v;
+          if (rowId === "workerMainStarRow") workerMainRating = v;
+        });
+      });
+    }
+
+    function updateRatingBtn(val, container) {
+      var btn = container && (container.querySelector("#btnSubmitRating") || container.querySelector("#btnWorkerRating"));
+      if (btn) btn.disabled = val < 1;
+    }
+
+    initStarRow("mainStarRow",       "starLabelText",    function () { return mainRating; });
+    initStarRow("workerMainStarRow", "workerStarLabel",  function () { return workerMainRating; });
+
+    /* Sub-ratings */
+    document.querySelectorAll(".srr-stars").forEach(function (group) {
+      var stars = group.querySelectorAll(".srr-star");
+      stars.forEach(function (star) {
+        star.addEventListener("click", function () {
+          var v = parseInt(star.dataset.val);
+          stars.forEach(function (s) { s.classList.toggle("lit", parseInt(s.dataset.val) <= v); });
+        });
+        star.addEventListener("mouseover", function () {
+          var v = parseInt(star.dataset.val);
+          stars.forEach(function (s) { s.classList.toggle("lit", parseInt(s.dataset.val) <= v); });
+        });
+        star.addEventListener("mouseleave", function () {
+          var lit = group.querySelectorAll(".srr-star.lit").length;
+          stars.forEach(function (s) { s.classList.toggle("lit", parseInt(s.dataset.val) <= lit); });
+        });
+      });
     });
 
-    /* ── Init ── */
-    buildCategorySelect();
-    setType("hyperlocal");
+    /* Review tags */
+    function initTags(containerId) {
+      var c = document.getElementById(containerId);
+      if (!c) return;
+      c.querySelectorAll(".review-tag").forEach(function (tag) {
+        tag.addEventListener("click", function () {
+          tag.classList.toggle("selected");
+        });
+      });
+    }
+    initTags("reviewTagsPositive");
+    initTags("workerReviewTags");
 
-  })();
+    /* Char counter */
+    function initCharCount(textareaId, countId) {
+      var ta = document.getElementById(textareaId);
+      var ct = document.getElementById(countId);
+      if (!ta || !ct) return;
+      ta.addEventListener("input", function () {
+        ct.textContent = ta.value.length;
+      });
+    }
+    initCharCount("reviewText",       "reviewCharCount");
+    initCharCount("workerReviewText", "workerCharCount");
+
+    /* Submit rating */
+    function initRatingSubmit(btnId, submittedId) {
+      var btn = document.getElementById(btnId);
+      var sub = document.getElementById(submittedId);
+      if (!btn || !sub) return;
+      btn.addEventListener("click", function () {
+        btn.disabled = true;
+        btn.innerHTML = "⏳ Submitting…";
+        setTimeout(function () {
+          btn.style.display = "none";
+          sub.classList.add("show");
+          markStep(4, true);
+          markLine(4, true);
+          markStep(5, true);
+          if (typeof showToast === "function") {
+            showToast("⭐ Rating submit ho gayi! Shukriya.", "success");
+          }
+        }, 1000);
+      });
+    }
+    initRatingSubmit("btnSubmitRating", "ratingSubmitted");
+    initRatingSubmit("btnWorkerRating", "workerRatingSubmitted");
+
+    /* ══════════════════════════════════
+       DISPUTE MODAL
+    ══════════════════════════════════ */
+    var disputeModal = document.getElementById("disputeModal");
+    var selectedType = null;
+
+    function openDispute() { disputeModal.classList.add("show"); }
+    function closeDispute() { disputeModal.classList.remove("show"); }
+
+    document.getElementById("btnOpenDispute").addEventListener("click", openDispute);
+    document.getElementById("modalClose").addEventListener("click", closeDispute);
+    document.getElementById("btnModalCancel").addEventListener("click", closeDispute);
+    disputeModal.addEventListener("click", function (e) {
+      if (e.target === disputeModal) closeDispute();
+    });
+
+    document.querySelectorAll(".dispute-type-btn").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        document.querySelectorAll(".dispute-type-btn").forEach(function (b) { b.classList.remove("selected"); });
+        btn.classList.add("selected");
+        selectedType = btn.dataset.type;
+        checkDisputeSubmit();
+      });
+    });
+
+    var disputeDesc  = document.getElementById("disputeDesc");
+    var disputeCount = document.getElementById("disputeCharCount");
+    var btnDSubmit   = document.getElementById("btnDisputeSubmit");
+
+    disputeDesc.addEventListener("input", function () {
+      disputeCount.textContent = disputeDesc.value.length;
+      checkDisputeSubmit();
+    });
+
+    function checkDisputeSubmit() {
+      btnDSubmit.disabled = !(selectedType && disputeDesc.value.trim().length >= 20);
+    }
+
+    btnDSubmit.addEventListener("click", function () {
+      btnDSubmit.disabled = true;
+      btnDSubmit.textContent = "⏳ Submitting…";
+      setTimeout(function () {
+        closeDispute();
+        /* Update hero */
+        var hero = document.getElementById("pgHero");
+        hero.className = "pg-hero state-dispute";
+        document.getElementById("heroIcon").textContent  = "🚨";
+        document.getElementById("heroBadge").textContent = "🚨 Dispute Under Review";
+        document.getElementById("heroTitle").textContent = "Dispute Filed — Review Mein Hai";
+        document.getElementById("heroSub").textContent   = "Team 5 business days mein review karegi. Payment hold mein hai tab tak.";
+        if (typeof showToast === "function") {
+          showToast("🚨 Dispute submitted! Team review karegi.", "warning");
+        }
+      }, 1200);
+    });
+
+    /* ══════════════════════════════════
+       WITHDRAW BUTTON
+    ══════════════════════════════════ */
+    var btnW = document.getElementById("btnWithdraw");
+    if (btnW) {
+      btnW.addEventListener("click", function () {
+        window.location.href = "dashboard.html#wallet";
+      });
+    }
+
+    /* ══════════════════════════════════
+       CHAT BUTTON
+    ══════════════════════════════════ */
+    document.getElementById("btnOpenChat").addEventListener("click", function () {
+      window.location.href = "dashboard.html#chat";
+    });
+
+    /* ══════════════════════════════════
+       SHARE BUTTONS
+    ══════════════════════════════════ */
+    document.getElementById("btnShareWA").addEventListener("click", function () {
+      var text = encodeURIComponent("GigLega pe kaam mila — tum bhi try karo! 🚀 giglega.in");
+      window.open("https://wa.me/?text=" + text, "_blank");
+    });
+    document.getElementById("btnCopyLink").addEventListener("click", function () {
+      navigator.clipboard && navigator.clipboard.writeText("https://giglega.in").then(function () {
+        if (typeof showToast === "function") showToast("🔗 Link copied!", "success");
+      });
+    });
+
+    /* ══════════════════════════════════
+       URL HASH HANDLING
+    ══════════════════════════════════ */
+    var hash = window.location.hash;
+    if (hash === "#rate") {
+      setTimeout(function () {
+        var rs = document.getElementById("ratingSection");
+        if (rs) rs.scrollIntoView({ behavior: "smooth" });
+      }, 400);
+    }
+    if (hash === "#dispute") {
+      setTimeout(openDispute, 600);
+    }
+
+    /* Clean up timer on unload */
+    window.addEventListener("beforeunload", function () {
+      clearInterval(timerInterval);
+    });
+
+  });
   </script>
 </body>
 </html>
