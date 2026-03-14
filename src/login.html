@@ -396,7 +396,7 @@
     if (!redirectTo || /login|signup/i.test(redirectTo)) redirectTo = "index.html";
 
     /* ✅ Already logged in — go to destination immediately */
-    var alreadyIn = getCurrentUser ? getCurrentUser() : safeParseUser();
+    var alreadyIn = (typeof getCurrentUser === "function") ? getCurrentUser() : safeParseUser();
     if (alreadyIn) { window.location.replace(redirectTo); return; }
 
     var DEMO_OTP    = "1234";
@@ -415,6 +415,10 @@
       try { var u = JSON.parse(localStorage.getItem(USER_KEY)||"null"); return (u&&u.id)?u:null; } catch(e){return null;}
     }
     function getUsers()      { try { return JSON.parse(localStorage.getItem(USERS_KEY)||"[]"); } catch(e){ return []; } }
+    function toast(msg, type) {
+      if (typeof showToast === "function") { showToast(msg, type || "info"); return; }
+      try { console.log("[GigLega]", msg); } catch (e) {}
+    }
     function saveUsers(arr)  { localStorage.setItem(USERS_KEY, JSON.stringify(arr)); }
     function saveUser(u)     { localStorage.setItem(USER_KEY, JSON.stringify(u)); }
     function isEmail(v)      { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim()); }
@@ -609,7 +613,7 @@
         document.getElementById("panelRegister").style.display   = "none";
         document.getElementById("authTabs").style.display         = "none";
         document.getElementById("registerSuccess").classList.add("show");
-        showToast("🎉 Welcome to GigLega, " + name + "!", "success");
+        toast("🎉 Welcome to GigLega, " + name + "!", "success");
                 setTimeout(function(){ window.location.replace(prefRole === "poster" ? "dashboard-client.html" : "dashboard-worker.html"); }, 1800);
       }, 1000);
     }
@@ -706,14 +710,14 @@
         clearInterval(otpTimer);
         [1,2,3].forEach(function(i){ document.getElementById("fStep"+i).style.display="none"; });
         document.getElementById("forgotSuccess").classList.add("show");
-        showToast("✅ Password reset successful!", "success");
+        toast("✅ Password reset successful!", "success");
         setTimeout(function(){ window.location.replace(redirectTo); }, 1800);
       }, 900);
     });
 
     /* Google (demo) */
     document.getElementById("btnGoogleLogin").addEventListener("click", function(){
-      showToast("Google login coming soon! Use email/phone for now.", "warning");
+      toast("Google login coming soon! Use email/phone for now.", "warning");
     });
 
   });
