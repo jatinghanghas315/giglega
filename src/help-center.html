@@ -1,1231 +1,1436 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Help Center — GigLega</title>
-    <meta
-      name="description"
-      content="GigLega Help Center — platform use karne mein koi problem? Yahan sab answers milenge."
-    />
-    <link rel="stylesheet" href="styles.css" />
-    <script defer src="shared.js"></script>
-
-    <style>
-      /* ── Page ─────────────────────────────────── */
-      .help-wrap {
-        padding: clamp(28px,5vw,52px) 0 clamp(56px,8vw,88px);
-      }
-
-      /* ── Hero ─────────────────────────────────── */
-      .help-hero {
-        text-align: center;
-        padding: clamp(36px,6vw,64px) clamp(16px,4vw,40px);
-        border-radius: 28px;
-        background: linear-gradient(135deg,#f0fdfa 0%,#eff6ff 60%,#fdf4ff 100%);
-        border: 1px solid var(--border);
-        margin-bottom: clamp(32px,5vw,52px);
-      }
-
-      .help-hero h1 {
-        margin: 12px 0 12px;
-        font-size: clamp(1.9rem,4vw,2.9rem);
-        letter-spacing: -0.04em;
-      }
-
-      .help-hero p {
-        margin: 0 auto 28px;
-        max-width: 48ch;
-        color: var(--text-muted);
-        font-size: 1rem;
-        line-height: 1.65;
-      }
-
-      /* ── Search bar ───────────────────────────── */
-      .help-search-wrap {
-        max-width: 540px;
-        margin: 0 auto;
-        position: relative;
-      }
-
-      .help-search-wrap input {
-        width: 100%;
-        padding: 15px 50px 15px 18px;
-        border: 2px solid var(--border);
-        border-radius: 16px;
-        font-size: 1rem;
-        font-family: inherit;
-        background: #fff;
-        color: var(--text);
-        outline: none;
-        box-shadow: 0 4px 20px rgba(13,148,136,0.08);
-        transition: border-color 0.18s, box-shadow 0.18s;
-      }
-
-      .help-search-wrap input:focus {
-        border-color: var(--teal);
-        box-shadow: 0 0 0 4px rgba(13,148,136,0.1);
-      }
-
-      .help-search-icon {
-        position: absolute;
-        right: 16px;
-        top: 50%;
-        transform: translateY(-50%);
-        font-size: 1.1rem;
-        pointer-events: none;
-      }
-
-      .search-results-count {
-        text-align: center;
-        margin-top: 12px;
-        font-size: 0.88rem;
-        color: var(--text-muted);
-        font-weight: 600;
-        min-height: 20px;
-      }
-
-      /* ── Quick stats ──────────────────────────── */
-      .help-stats {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 20px;
-        justify-content: center;
-        margin-top: 22px;
-        font-size: 0.85rem;
-        color: var(--text-muted);
-        font-weight: 700;
-      }
-
-      .help-stats span {
-        display: flex;
-        align-items: center;
-        gap: 5px;
-      }
-
-      /* ── Category cards grid ──────────────────── */
-      .categories-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(200px,1fr));
-        gap: 14px;
-        margin-bottom: clamp(36px,5vw,56px);
-      }
-
-      .cat-card {
-        padding: 22px 18px;
-        border: 1.5px solid var(--border);
-        border-radius: 20px;
-        background: #fff;
-        cursor: pointer;
-        text-align: center;
-        transition: border-color 0.16s, box-shadow 0.16s, transform 0.16s;
-        user-select: none;
-      }
-
-      .cat-card:hover {
-        border-color: var(--teal);
-        box-shadow: 0 4px 18px rgba(13,148,136,0.1);
-        transform: translateY(-2px);
-      }
-
-      .cat-card.active {
-        border-color: var(--teal);
-        background: rgba(13,148,136,0.05);
-      }
-
-      .cat-icon { font-size: 2rem; margin-bottom: 8px; }
-      .cat-title { font-size: 0.97rem; font-weight: 800; margin-bottom: 4px; }
-      .cat-count { font-size: 0.8rem; color: var(--text-muted); }
-
-      /* ── FAQ section ──────────────────────────── */
-      .faq-section-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        flex-wrap: wrap;
-        gap: 12px;
-        margin-bottom: 18px;
-      }
-
-      .faq-section-header h2 {
-        margin: 0;
-        font-size: 1.3rem;
-        letter-spacing: -0.02em;
-      }
-
-      .faq-section-header p {
-        margin: 4px 0 0;
-        font-size: 0.88rem;
-        color: var(--text-muted);
-      }
-
-      /* ── Accordion ────────────────────────────── */
-      .help-accordion { display: grid; gap: 10px; }
-
-      .acc-item {
-        border: 1px solid var(--border);
-        border-radius: 16px;
-        background: #fff;
-        overflow: hidden;
-        transition: box-shadow 0.16s;
-      }
-
-      .acc-item:hover { box-shadow: 0 3px 12px rgba(13,148,136,0.07); }
-
-      .acc-item[data-category] { transition: opacity 0.2s; }
-      .acc-item.hidden-faq     { display: none; }
-
-      .acc-header {
-        padding: 16px 20px;
-        display: flex;
-        align-items: flex-start;
-        justify-content: space-between;
-        gap: 12px;
-        cursor: pointer;
-        user-select: none;
-        font-weight: 700;
-        font-size: 0.97rem;
-        line-height: 1.4;
-        transition: background 0.14s;
-      }
-
-      .acc-header:hover { background: #f8fafc; }
-
-      .acc-header-left {
-        display: flex;
-        align-items: flex-start;
-        gap: 12px;
-        flex: 1;
-      }
-
-      .acc-cat-dot {
-        width: 8px; height: 8px;
-        border-radius: 50%;
-        flex-shrink: 0;
-        margin-top: 6px;
-      }
-
-      .acc-toggle {
-        font-size: 1.2rem;
-        font-weight: 700;
-        color: var(--teal);
-        flex-shrink: 0;
-        transition: transform 0.22s;
-        line-height: 1;
-        margin-top: 2px;
-      }
-
-      .acc-item.open .acc-toggle { transform: rotate(45deg); }
-
-      .acc-body {
-        max-height: 0;
-        overflow: hidden;
-        transition: max-height 0.32s ease, padding 0.2s;
-        padding: 0 20px;
-        color: var(--text-muted);
-        font-size: 0.92rem;
-        line-height: 1.75;
-      }
-
-      .acc-item.open .acc-body {
-        max-height: 600px;
-        padding: 0 20px 18px;
-      }
-
-      .acc-body p  { margin: 0 0 10px; }
-      .acc-body p:last-child { margin-bottom: 0; }
-      .acc-body ul { margin: 8px 0; padding-left: 18px; }
-      .acc-body li { margin-bottom: 5px; }
-      .acc-body a  { color: var(--teal); font-weight: 600; text-decoration: none; }
-      .acc-body a:hover { text-decoration: underline; }
-
-      .acc-body .tip-box {
-        margin: 10px 0;
-        padding: 10px 14px;
-        border-radius: 10px;
-        background: rgba(13,148,136,0.05);
-        border: 1px solid rgba(13,148,136,0.18);
-        font-size: 0.88rem;
-      }
-
-      .acc-body .tip-box strong { color: var(--teal); }
-
-      /* ── Was helpful row ──────────────────────── */
-      .acc-footer {
-        display: none;
-        padding: 10px 20px 14px;
-        font-size: 0.82rem;
-        color: var(--text-muted);
-        align-items: center;
-        gap: 10px;
-        border-top: 1px solid var(--border);
-        flex-wrap: wrap;
-      }
-
-      .acc-item.open .acc-footer { display: flex; }
-
-      .helpful-btn {
-        padding: 4px 12px;
-        border-radius: 99px;
-        border: 1px solid var(--border);
-        background: #fff;
-        font-size: 0.8rem;
-        font-weight: 700;
-        cursor: pointer;
-        transition: background 0.14s, border-color 0.14s;
-      }
-
-      .helpful-btn:hover { background: #f0fdf4; border-color: #16a34a; color: #16a34a; }
-      .helpful-btn.nope:hover { background: #fef2f2; border-color: #dc2626; color: #dc2626; }
-
-      /* ── No results ───────────────────────────── */
-      .no-results {
-        text-align: center;
-        padding: 48px 24px;
-        border: 1.5px dashed var(--border);
-        border-radius: 18px;
-        background: #fafafa;
-        display: none;
-      }
-
-      .no-results.visible { display: block; }
-      .no-results .nr-icon { font-size: 2.5rem; margin-bottom: 12px; }
-      .no-results h3 { margin: 0 0 8px; }
-      .no-results p  { margin: 0 0 20px; color: var(--text-muted); font-size: 0.9rem; }
-
-      /* ── Still need help ──────────────────────── */
-      .still-help {
-        margin-top: clamp(36px,5vw,56px);
-        padding: clamp(28px,4vw,44px);
-        border-radius: 26px;
-        background: linear-gradient(135deg,#f0fdfa 0%,#eff6ff 100%);
-        border: 1px solid rgba(13,148,136,0.2);
-        text-align: center;
-      }
-
-      .still-help h2 { margin: 0 0 8px; font-size: 1.4rem; letter-spacing: -0.03em; }
-      .still-help p  { margin: 0 0 28px; color: var(--text-muted); font-size: 0.95rem; line-height: 1.65; }
-
-      .contact-options {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(180px,1fr));
-        gap: 14px;
-        max-width: 600px;
-        margin: 0 auto;
-      }
-
-      .contact-opt {
-        padding: 18px 14px;
-        border: 1.5px solid rgba(13,148,136,0.2);
-        border-radius: 18px;
-        background: #fff;
-        text-decoration: none;
-        color: var(--text);
-        transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
-        text-align: center;
-      }
-
-      .contact-opt:hover {
-        border-color: var(--teal);
-        box-shadow: 0 4px 16px rgba(13,148,136,0.12);
-        transform: translateY(-2px);
-      }
-
-      .contact-opt-icon { font-size: 1.8rem; margin-bottom: 8px; }
-      .contact-opt strong { display: block; font-size: 0.92rem; margin-bottom: 3px; }
-      .contact-opt span { font-size: 0.8rem; color: var(--text-muted); }
-
-      /* ── Category color dots ──────────────────── */
-      .dot-getting-started { background: #10b981; }
-      .dot-workers         { background: #3b82f6; }
-      .dot-clients         { background: #8b5cf6; }
-      .dot-payments        { background: #f59e0b; }
-      .dot-account         { background: #ef4444; }
-      .dot-safety          { background: #0ea5e9; }
-      .dot-technical       { background: #6366f1; }
-    </style>
-  </head>
-
-  <body>
-    <div id="announce-bar"></div>
-    <div id="navbar"></div>
-
-    <main>
-      <div class="help-wrap">
-        <div class="container">
-
-          <div id="helpBreadcrumb" class="fade-up" style="margin-bottom:18px;"></div>
-
-          <!-- ══ HERO ══ -->
-          <div class="help-hero fade-up">
-            <span class="badge badge-teal">🆘 Help Center</span>
-            <h1>Kaise Help Kar Sakte Hain?</h1>
-            <p>GigLega use karne mein koi bhi sawaal ho — yahan search karo ya category choose karo.</p>
-
-            <div class="help-search-wrap">
-              <input
-                type="search"
-                id="helpSearch"
-                placeholder="e.g. apply kaise karein, payment, account delete..."
-                autocomplete="off"
-                maxlength="100"
-              />
-              <span class="help-search-icon">🔍</span>
-            </div>
-            <div class="search-results-count" id="searchCount"></div>
-
-            <div class="help-stats">
-              <span>📋 35+ Articles</span>
-              <span>⚡ Instant Answers</span>
-              <span>💬 WhatsApp Support</span>
-            </div>
-          </div>
-
-          <!-- ══ CATEGORIES ══ -->
-          <div class="fade-up" style="margin-bottom:20px;">
-            <div class="categories-grid" id="categoriesGrid">
-
-              <div class="cat-card active" data-filter="all">
-                <div class="cat-icon">📚</div>
-                <div class="cat-title">Sab Dekho</div>
-                <div class="cat-count">35 articles</div>
-              </div>
-
-              <div class="cat-card" data-filter="getting-started">
-                <div class="cat-icon">🚀</div>
-                <div class="cat-title">Getting Started</div>
-                <div class="cat-count">6 articles</div>
-              </div>
-
-              <div class="cat-card" data-filter="workers">
-                <div class="cat-icon">💼</div>
-                <div class="cat-title">Workers</div>
-                <div class="cat-count">8 articles</div>
-              </div>
-
-              <div class="cat-card" data-filter="clients">
-                <div class="cat-icon">🏢</div>
-                <div class="cat-title">Clients</div>
-                <div class="cat-count">7 articles</div>
-              </div>
-
-              <div class="cat-card" data-filter="payments">
-                <div class="cat-icon">💸</div>
-                <div class="cat-title">Payments</div>
-                <div class="cat-count">5 articles</div>
-              </div>
-
-              <div class="cat-card" data-filter="account">
-                <div class="cat-icon">👤</div>
-                <div class="cat-title">Account</div>
-                <div class="cat-count">5 articles</div>
-              </div>
-
-              <div class="cat-card" data-filter="safety">
-                <div class="cat-icon">🛡️</div>
-                <div class="cat-title">Safety & Trust</div>
-                <div class="cat-count">4 articles</div>
-              </div>
-
-            </div>
-          </div>
-
-          <!-- ══ FAQ ARTICLES ══ -->
-          <div class="faq-section-header fade-up">
-            <div>
-              <h2 id="faqSectionTitle">📚 Sab Articles</h2>
-              <p id="faqSectionSub">Sab categories ke common sawaal</p>
-            </div>
-            <button class="btn btn-outline btn-sm" id="expandAllBtn">Sab Kholna</button>
-          </div>
-
-          <div class="help-accordion fade-up" id="helpAccordion">
-
-            <!-- ────────── GETTING STARTED ────────── -->
-            <div class="acc-item" data-category="getting-started">
-              <div class="acc-header">
-                <div class="acc-header-left">
-                  <span class="acc-cat-dot dot-getting-started"></span>
-                  GigLega kya hai aur kaise kaam karta hai?
-                </div>
-                <span class="acc-toggle">+</span>
-              </div>
-              <div class="acc-body">
-                <p>GigLega Gurugram ka <strong>#1 hyperlocal gig platform</strong> hai jahan local workers aur clients directly connect hote hain — bina kisi middleman ke.</p>
-                <ul>
-                  <li><strong>Workers</strong> available gigs browse karte hain aur apply karte hain</li>
-                  <li><strong>Clients</strong> job post karte hain aur suitable workers dhundte hain</li>
-                  <li>Dono ke liye platform 100% free hai abhi Beta phase mein</li>
-                </ul>
-                <div class="tip-box"><strong>Pro tip:</strong> Register karo → Profile complete karo → Browse/Post karo → Connect ho jao. Bas itna simple hai!</div>
-              </div>
-              <div class="acc-footer">
-                Kya yeh helpful tha?
-                <button class="helpful-btn" onclick="markHelpful(this, true)">👍 Haan</button>
-                <button class="helpful-btn nope" onclick="markHelpful(this, false)">👎 Nahi</button>
-              </div>
-            </div>
-
-            <div class="acc-item" data-category="getting-started">
-              <div class="acc-header">
-                <div class="acc-header-left">
-                  <span class="acc-cat-dot dot-getting-started"></span>
-                  Account kaise banate hain?
-                </div>
-                <span class="acc-toggle">+</span>
-              </div>
-              <div class="acc-body">
-                <p>Account banana 1 minute se kam mein ho jaata hai:</p>
-                <ul>
-                  <li><a href="signup.html">signup.html</a> par jao</li>
-                  <li>Apna naam, email, phone aur password dalo</li>
-                  <li>Role choose karo — <strong>Worker</strong> (kaam dhundna) ya <strong>Client</strong> (kaam karwana)</li>
-                  <li>"Create Free Account" button press karo</li>
-                </ul>
-                <div class="tip-box"><strong>Note:</strong> Abhi email verification nahi hai Beta mein — direct access milta hai register karte hi.</div>
-              </div>
-              <div class="acc-footer">
-                Kya yeh helpful tha?
-                <button class="helpful-btn" onclick="markHelpful(this, true)">👍 Haan</button>
-                <button class="helpful-btn nope" onclick="markHelpful(this, false)">👎 Nahi</button>
-              </div>
-            </div>
-
-            <div class="acc-item" data-category="getting-started">
-              <div class="acc-header">
-                <div class="acc-header-left">
-                  <span class="acc-cat-dot dot-getting-started"></span>
-                  GigLega free hai kya — koi hidden charges?
-                </div>
-                <span class="acc-toggle">+</span>
-              </div>
-              <div class="acc-body">
-                <p><strong>Haan, bilkul free hai!</strong> Koi hidden charges nahi hain:</p>
-                <ul>
-                  <li>Workers ke liye register karna — Free ✅</li>
-                  <li>Gigs browse aur apply karna — Free ✅</li>
-                  <li>Clients ke liye gig post karna — Free ✅ (Beta)</li>
-                  <li>Platform use karna — Free ✅</li>
-                </ul>
-                <p>GigLega platform fees ya commission nahi leta. Payment seedha worker aur client ke beech hoti hai.</p>
-                <div class="tip-box"><strong>Future mein:</strong> Premium features aane par optional paid plans introduce ho sakte hain — lekin basic features free rahenge.</div>
-              </div>
-              <div class="acc-footer">
-                Kya yeh helpful tha?
-                <button class="helpful-btn" onclick="markHelpful(this, true)">👍 Haan</button>
-                <button class="helpful-btn nope" onclick="markHelpful(this, false)">👎 Nahi</button>
-              </div>
-            </div>
-
-            <div class="acc-item" data-category="getting-started">
-              <div class="acc-header">
-                <div class="acc-header-left">
-                  <span class="acc-cat-dot dot-getting-started"></span>
-                  GigLega kaunse cities mein available hai?
-                </div>
-                <span class="acc-toggle">+</span>
-              </div>
-              <div class="acc-body">
-                <p>Abhi GigLega <strong>Gurugram, Haryana</strong> mein officially launch hua hai.</p>
-                <p>Jald aane wali cities:</p>
-                <ul>
-                  <li>🔜 Delhi (NCR)</li>
-                  <li>🔜 Noida</li>
-                  <li>🔜 Faridabad</li>
-                  <li>🔜 Ghaziabad</li>
-                </ul>
-                <div class="tip-box"><strong>Updates ke liye:</strong> Instagram follow karo ya WhatsApp par subscribe karo — launch hone par pehle batayenge!</div>
-              </div>
-              <div class="acc-footer">
-                Kya yeh helpful tha?
-                <button class="helpful-btn" onclick="markHelpful(this, true)">👍 Haan</button>
-                <button class="helpful-btn nope" onclick="markHelpful(this, false)">👎 Nahi</button>
-              </div>
-            </div>
-
-            <div class="acc-item" data-category="getting-started">
-              <div class="acc-header">
-                <div class="acc-header-left">
-                  <span class="acc-cat-dot dot-getting-started"></span>
-                  Worker aur Client mein kya fark hai?
-                </div>
-                <span class="acc-toggle">+</span>
-              </div>
-              <div class="acc-body">
-                <table style="width:100%;border-collapse:collapse;font-size:.88rem;">
-                  <tr style="background:#f8fafc;">
-                    <th style="padding:8px 12px;text-align:left;border:1px solid var(--border);">Feature</th>
-                    <th style="padding:8px 12px;text-align:left;border:1px solid var(--border);">Worker 💼</th>
-                    <th style="padding:8px 12px;text-align:left;border:1px solid var(--border);">Client 🏢</th>
-                  </tr>
-                  <tr>
-                    <td style="padding:8px 12px;border:1px solid var(--border);">Goal</td>
-                    <td style="padding:8px 12px;border:1px solid var(--border);">Kaam dhundna</td>
-                    <td style="padding:8px 12px;border:1px solid var(--border);">Kaam karwana</td>
-                  </tr>
-                  <tr style="background:#fafafa;">
-                    <td style="padding:8px 12px;border:1px solid var(--border);">Action</td>
-                    <td style="padding:8px 12px;border:1px solid var(--border);">Gigs apply karna</td>
-                    <td style="padding:8px 12px;border:1px solid var(--border);">Gigs post karna</td>
-                  </tr>
-                  <tr>
-                    <td style="padding:8px 12px;border:1px solid var(--border);">Dashboard</td>
-                    <td style="padding:8px 12px;border:1px solid var(--border);">Applications track</td>
-                    <td style="padding:8px 12px;border:1px solid var(--border);">Gigs + applicants manage</td>
-                  </tr>
-                </table>
-                <div class="tip-box" style="margin-top:12px;"><strong>Switch kar sakte ho:</strong> Dashboard ke Settings mein "Switch Role" option milega — Worker ↔ Client언제든지.</div>
-              </div>
-              <div class="acc-footer">
-                Kya yeh helpful tha?
-                <button class="helpful-btn" onclick="markHelpful(this, true)">👍 Haan</button>
-                <button class="helpful-btn nope" onclick="markHelpful(this, false)">👎 Nahi</button>
-              </div>
-            </div>
-
-            <!-- ────────── WORKERS ────────── -->
-            <div class="acc-item" data-category="workers">
-              <div class="acc-header">
-                <div class="acc-header-left">
-                  <span class="acc-cat-dot dot-workers"></span>
-                  Gig ke liye apply kaise karein?
-                </div>
-                <span class="acc-toggle">+</span>
-              </div>
-              <div class="acc-body">
-                <ol>
-                  <li><a href="browse.html">Browse Gigs</a> page par jao</li>
-                  <li>Apni category aur location filter karo</li>
-                  <li>Interesting gig pe click karo — detail page khulega</li>
-                  <li>"Apply Now" button press karo</li>
-                  <li>Apna naam, phone aur short message dalo</li>
-                  <li>Submit karo — client ko notification jaayegi</li>
-                </ol>
-                <div class="tip-box"><strong>Better chances ke liye:</strong> Message field mein apna relevant experience briefly mention karo — generic "apply kar raha hoon" se zyada effective hota hai.</div>
-              </div>
-              <div class="acc-footer">
-                Kya yeh helpful tha?
-                <button class="helpful-btn" onclick="markHelpful(this, true)">👍 Haan</button>
-                <button class="helpful-btn nope" onclick="markHelpful(this, false)">👎 Nahi</button>
-              </div>
-            </div>
-
-            <div class="acc-item" data-category="workers">
-              <div class="acc-header">
-                <div class="acc-header-left">
-                  <span class="acc-cat-dot dot-workers"></span>
-                  Apply karne ke baad kya hoga?
-                </div>
-                <span class="acc-toggle">+</span>
-              </div>
-              <div class="acc-body">
-                <p>Apply karne ke baad:</p>
-                <ul>
-                  <li>Aapki application client ke dashboard mein dikhai deti hai</li>
-                  <li>Client aapko <strong>directly phone/WhatsApp</strong> karta hai — jo number diya hai usi par</li>
-                  <li>Urgent gigs mein usually <strong>1-24 ghante</strong> mein contact hota hai</li>
-                  <li>Agar koi response na aaye toh aap gig detail page par jaake client se directly contact kar sakte ho</li>
-                </ul>
-                <p>Dashboard mein <strong>"My Applications"</strong> section mein apni saari applications track kar sakte ho.</p>
-              </div>
-              <div class="acc-footer">
-                Kya yeh helpful tha?
-                <button class="helpful-btn" onclick="markHelpful(this, true)">👍 Haan</button>
-                <button class="helpful-btn nope" onclick="markHelpful(this, false)">👎 Nahi</button>
-              </div>
-            </div>
-
-            <div class="acc-item" data-category="workers">
-              <div class="acc-header">
-                <div class="acc-header-left">
-                  <span class="acc-cat-dot dot-workers"></span>
-                  Profile complete karna kyun zarooori hai?
-                </div>
-                <span class="acc-toggle">+</span>
-              </div>
-              <div class="acc-body">
-                <p>Complete profile se aapke chances significantly improve hote hain kyunki:</p>
-                <ul>
-                  <li>Clients pehle complete profiles wale workers pe trust karte hain</li>
-                  <li>Skills mention karne se relevant gigs zyada milte hain</li>
-                  <li>Bio se client samajhta hai ki tum suitable candidate ho</li>
-                  <li>Location se local gigs matching improve hoti hai</li>
-                </ul>
-                <p>Profile mein yeh fill karo: <strong>Name, Phone, Location, Bio, Skills</strong> — 100% completion ke liye.</p>
-                <div class="tip-box"><strong>Quick tip:</strong> Dashboard → Edit Profile mein jao aur 2 minute mein complete karo.</div>
-              </div>
-              <div class="acc-footer">
-                Kya yeh helpful tha?
-                <button class="helpful-btn" onclick="markHelpful(this, true)">👍 Haan</button>
-                <button class="helpful-btn nope" onclick="markHelpful(this, false)">👎 Nahi</button>
-              </div>
-            </div>
-
-            <div class="acc-item" data-category="workers">
-              <div class="acc-header">
-                <div class="acc-header-left">
-                  <span class="acc-cat-dot dot-workers"></span>
-                  Ek hi gig par baar baar apply kar sakte hain?
-                </div>
-                <span class="acc-toggle">+</span>
-              </div>
-              <div class="acc-body">
-                <p>Technically aap multiple baar apply kar sakte ho lekin yeh recommended nahi hai:</p>
-                <ul>
-                  <li>Client ko spam lagta hai — reject karne ke chances badh jaate hain</li>
-                  <li>Ek thoughtful application zyada effective hai</li>
-                  <li>Agar pehli application mein kuch choot gayi ho toh contact form se update bhej sakte ho</li>
-                </ul>
-                <div class="tip-box"><strong>Better approach:</strong> Ek strong message likho pehli baar mein — experience, availability aur contact clearly mention karo.</div>
-              </div>
-              <div class="acc-footer">
-                Kya yeh helpful tha?
-                <button class="helpful-btn" onclick="markHelpful(this, true)">👍 Haan</button>
-                <button class="helpful-btn nope" onclick="markHelpful(this, false)">👎 Nahi</button>
-              </div>
-            </div>
-
-            <div class="acc-item" data-category="workers">
-              <div class="acc-header">
-                <div class="acc-header-left">
-                  <span class="acc-cat-dot dot-workers"></span>
-                  Koi gig fake lage toh kya karein?
-                </div>
-                <span class="acc-toggle">+</span>
-              </div>
-              <div class="acc-body">
-                <p>Agar koi gig suspicious lage — advance fee maange, unrealistic salary ho, ya personal financial info maange — toh:</p>
-                <ul>
-                  <li>Apply <strong>mat karo</strong></li>
-                  <li>Gig detail page par "Report" button use karo</li>
-                  <li>Humein WhatsApp karo: <a href="https://wa.me/919319635257" target="_blank" rel="noopener">+91 93196 35257</a></li>
-                  <li>Screenshot ke saath report karo</li>
-                </ul>
-                <div class="tip-box"><strong>Red flags:</strong> Advance payment maangna, interview fee, unrealistic salaries (₹5000/day for basic work), vague job descriptions.</div>
-              </div>
-              <div class="acc-footer">
-                Kya yeh helpful tha?
-                <button class="helpful-btn" onclick="markHelpful(this, true)">👍 Haan</button>
-                <button class="helpful-btn nope" onclick="markHelpful(this, false)">👎 Nahi</button>
-              </div>
-            </div>
-
-            <!-- ────────── CLIENTS ────────── -->
-            <div class="acc-item" data-category="clients">
-              <div class="acc-header">
-                <div class="acc-header-left">
-                  <span class="acc-cat-dot dot-clients"></span>
-                  Gig post kaise karein?
-                </div>
-                <span class="acc-toggle">+</span>
-              </div>
-              <div class="acc-body">
-                <ol>
-                  <li>Login karo (account nahi hai toh pehle banao)</li>
-                  <li><a href="post-gig.html">Post a Gig</a> page par jao</li>
-                  <li>Title, category, description fill karo</li>
-                  <li>Budget aur type (per hour/day/project) set karo</li>
-                  <li>Location aur urgency set karo</li>
-                  <li>"Post Gig" press karo — turant live ho jaayega</li>
-                </ol>
-                <div class="tip-box"><strong>Better responses ke liye:</strong> Clear description likho — exactly kya kaam hai, kab chahiye, aur payment kab milega. Zyada detail = better applicants.</div>
-              </div>
-              <div class="acc-footer">
-                Kya yeh helpful tha?
-                <button class="helpful-btn" onclick="markHelpful(this, true)">👍 Haan</button>
-                <button class="helpful-btn nope" onclick="markHelpful(this, false)">👎 Nahi</button>
-              </div>
-            </div>
-
-            <div class="acc-item" data-category="clients">
-              <div class="acc-header">
-                <div class="acc-header-left">
-                  <span class="acc-cat-dot dot-clients"></span>
-                  Applications kahan dikhti hain?
-                </div>
-                <span class="acc-toggle">+</span>
-              </div>
-              <div class="acc-body">
-                <p>Applications manage karne ke 2 jagah hain:</p>
-                <ul>
-                  <li><strong>Dashboard → My Posted Gigs:</strong> Har gig pe click karo — uski saari applications expand ho jaayengi</li>
-                  <li><strong>Dashboard → All Applications:</strong> Flat list mein saari incoming applications ek saath</li>
-                </ul>
-                <p>Har applicant ka naam, phone aur message dikh ta hai. <strong>Contact</strong> button se directly WhatsApp karo.</p>
-              </div>
-              <div class="acc-footer">
-                Kya yeh helpful tha?
-                <button class="helpful-btn" onclick="markHelpful(this, true)">👍 Haan</button>
-                <button class="helpful-btn nope" onclick="markHelpful(this, false)">👎 Nahi</button>
-              </div>
-            </div>
-
-            <div class="acc-item" data-category="clients">
-              <div class="acc-header">
-                <div class="acc-header-left">
-                  <span class="acc-cat-dot dot-clients"></span>
-                  Gig close ya edit kaise karein?
-                </div>
-                <span class="acc-toggle">+</span>
-              </div>
-              <div class="acc-body">
-                <p><strong>Gig close karna:</strong></p>
-                <ul>
-                  <li>Dashboard → My Posted Gigs par jao</li>
-                  <li>Gig ke "Close Gig" button press karo</li>
-                  <li>Closed gig browse page mein nahi dikhegi — workers apply nahi kar sakte</li>
-                  <li>"Reopen" button se wapas active kar sakte ho</li>
-                </ul>
-                <div class="tip-box"><strong>Kaam ho gaya?</strong> Gig hire ho jane ke baad close karo taaki extra applications na aayein.</div>
-              </div>
-              <div class="acc-footer">
-                Kya yeh helpful tha?
-                <button class="helpful-btn" onclick="markHelpful(this, true)">👍 Haan</button>
-                <button class="helpful-btn nope" onclick="markHelpful(this, false)">👎 Nahi</button>
-              </div>
-            </div>
-
-            <div class="acc-item" data-category="clients">
-              <div class="acc-header">
-                <div class="acc-header-left">
-                  <span class="acc-cat-dot dot-clients"></span>
-                  Ek saath kitne gigs post kar sakte hain?
-                </div>
-                <span class="acc-toggle">+</span>
-              </div>
-              <div class="acc-body">
-                <p>Beta phase mein koi strict limit nahi hai — aap multiple gigs post kar sakte ho.</p>
-                <p>Lekin recommend karte hain ki:</p>
-                <ul>
-                  <li>Sirf genuine, active requirements post karo</li>
-                  <li>Purani ya filled positions ko close karo</li>
-                  <li>Spam posting account suspension ka reason ban sakti hai</li>
-                </ul>
-              </div>
-              <div class="acc-footer">
-                Kya yeh helpful tha?
-                <button class="helpful-btn" onclick="markHelpful(this, true)">👍 Haan</button>
-                <button class="helpful-btn nope" onclick="markHelpful(this, false)">👎 Nahi</button>
-              </div>
-            </div>
-
-            <!-- ────────── PAYMENTS ────────── -->
-            <div class="acc-item" data-category="payments">
-              <div class="acc-header">
-                <div class="acc-header-left">
-                  <span class="acc-cat-dot dot-payments"></span>
-                  Payment kaise hoti hai?
-                </div>
-                <span class="acc-toggle">+</span>
-              </div>
-              <div class="acc-body">
-                <p>GigLega <strong>payment process nahi karta</strong> — yeh ek connection platform hai.</p>
-                <p>Payment client aur worker ke beech directly hoti hai:</p>
-                <ul>
-                  <li>💵 Cash (in hand)</li>
-                  <li>📱 UPI (PhonePe, GPay, Paytm)</li>
-                  <li>🏦 Bank Transfer / NEFT</li>
-                  <li>Jo bhi dono parties agree karein</li>
-                </ul>
-                <div class="tip-box"><strong>Safe rahne ke liye:</strong> Kaam start karne se pehle payment terms — amount, timing, mode — clearly agree kar lo. Writing mein (WhatsApp pe) confirm karo.</div>
-              </div>
-              <div class="acc-footer">
-                Kya yeh helpful tha?
-                <button class="helpful-btn" onclick="markHelpful(this, true)">👍 Haan</button>
-                <button class="helpful-btn nope" onclick="markHelpful(this, false)">👎 Nahi</button>
-              </div>
-            </div>
-
-            <div class="acc-item" data-category="payments">
-              <div class="acc-header">
-                <div class="acc-header-left">
-                  <span class="acc-cat-dot dot-payments"></span>
-                  Client ne payment nahi ki — kya karein?
-                </div>
-                <span class="acc-toggle">+</span>
-              </div>
-              <div class="acc-body">
-                <p>Yeh unfortunate situation mein:</p>
-                <ul>
-                  <li>Pehle client se directly contact karo — politely remind karo</li>
-                  <li>WhatsApp messages ko evidence ke roop mein save karo</li>
-                  <li>GigLega ko report karo — <a href="contact.html">contact form</a> ya WhatsApp</li>
-                  <li>Hum mediation karenge lekin legally enforce nahi kar sakte</li>
-                  <li>Agar amount significant hai — consumer court ya local police se help lo</li>
-                </ul>
-                <div class="tip-box"><strong>Prevention best:</strong> Agar possible ho toh advance ya partial payment pehle lo. Small tasks ke liye kaam pura hone ke baad turant payment lo.</div>
-              </div>
-              <div class="acc-footer">
-                Kya yeh helpful tha?
-                <button class="helpful-btn" onclick="markHelpful(this, true)">👍 Haan</button>
-                <button class="helpful-btn nope" onclick="markHelpful(this, false)">👎 Nahi</button>
-              </div>
-            </div>
-
-            <div class="acc-item" data-category="payments">
-              <div class="acc-header">
-                <div class="acc-header-left">
-                  <span class="acc-cat-dot dot-payments"></span>
-                  GigLega koi commission leta hai?
-                </div>
-                <span class="acc-toggle">+</span>
-              </div>
-              <div class="acc-body">
-                <p><strong>Nahi — abhi GigLega koi commission nahi leta.</strong></p>
-                <p>Jo bhi payment client deta hai — 100% worker ko milti hai. GigLega beech mein kuch nahi kaata.</p>
-                <p>Future mein optional premium features aa sakte hain — lekin basic platform use free rahega.</p>
-              </div>
-              <div class="acc-footer">
-                Kya yeh helpful tha?
-                <button class="helpful-btn" onclick="markHelpful(this, true)">👍 Haan</button>
-                <button class="helpful-btn nope" onclick="markHelpful(this, false)">👎 Nahi</button>
-              </div>
-            </div>
-
-            <!-- ────────── ACCOUNT ────────── -->
-            <div class="acc-item" data-category="account">
-              <div class="acc-header">
-                <div class="acc-header-left">
-                  <span class="acc-cat-dot dot-account"></span>
-                  Password bhool gaya — reset kaise karein?
-                </div>
-                <span class="acc-toggle">+</span>
-              </div>
-              <div class="acc-body">
-                <p>Beta phase mein automatic password reset feature abhi nahi hai.</p>
-                <p>Password reset ke liye:</p>
-                <ul>
-                  <li>WhatsApp karo: <a href="https://wa.me/919319635257" target="_blank" rel="noopener">+91 93196 35257</a></li>
-                  <li>Registered email aur phone number batao verification ke liye</li>
-                  <li>Hum manually help karenge</li>
-                </ul>
-                <div class="tip-box"><strong>Easier solution:</strong> Browser mein localStorage clear karo aur new account banao — Beta mein data migration simple hai.</div>
-              </div>
-              <div class="acc-footer">
-                Kya yeh helpful tha?
-                <button class="helpful-btn" onclick="markHelpful(this, true)">👍 Haan</button>
-                <button class="helpful-btn nope" onclick="markHelpful(this, false)">👎 Nahi</button>
-              </div>
-            </div>
-
-            <div class="acc-item" data-category="account">
-              <div class="acc-header">
-                <div class="acc-header-left">
-                  <span class="acc-cat-dot dot-account"></span>
-                  Account delete kaise karein?
-                </div>
-                <span class="acc-toggle">+</span>
-              </div>
-              <div class="acc-body">
-                <p>Account delete karne ke 2 ways hain:</p>
-                <p><strong>Option 1 — Self delete (Beta):</strong></p>
-                <ul>
-                  <li>Browser DevTools kholna (F12)</li>
-                  <li>Application → LocalStorage → giglega.in → Clear All</li>
-                  <li>Yeh saara data instantly delete kar deta hai</li>
-                </ul>
-                <p><strong>Option 2 — Request karo:</strong></p>
-                <ul>
-                  <li>Email: <a href="mailto:Giglega.official@gmail.com">Giglega.official@gmail.com</a></li>
-                  <li>Subject: "Account Deletion Request"</li>
-                  <li>Hum 7 business days mein process karenge</li>
-                </ul>
-              </div>
-              <div class="acc-footer">
-                Kya yeh helpful tha?
-                <button class="helpful-btn" onclick="markHelpful(this, true)">👍 Haan</button>
-                <button class="helpful-btn nope" onclick="markHelpful(this, false)">👎 Nahi</button>
-              </div>
-            </div>
-
-            <div class="acc-item" data-category="account">
-              <div class="acc-header">
-                <div class="acc-header-left">
-                  <span class="acc-cat-dot dot-account"></span>
-                  Worker se Client role switch kaise karein?
-                </div>
-                <span class="acc-toggle">+</span>
-              </div>
-              <div class="acc-body">
-                <p>Role switch karna easy hai:</p>
-                <ul>
-                  <li>Dashboard par jao</li>
-                  <li>Settings tab kholna</li>
-                  <li>"Switch to Client" ya "Switch to Worker" button press karo</li>
-                  <li>Automatically dusre dashboard par redirect ho jaoge</li>
-                </ul>
-                <p>Dono roles pe kaam kar sakte ho — Worker hote hue gig bhi post kar sakte ho agar role switch karo.</p>
-              </div>
-              <div class="acc-footer">
-                Kya yeh helpful tha?
-                <button class="helpful-btn" onclick="markHelpful(this, true)">👍 Haan</button>
-                <button class="helpful-btn nope" onclick="markHelpful(this, false)">👎 Nahi</button>
-              </div>
-            </div>
-
-            <!-- ────────── SAFETY ────────── -->
-            <div class="acc-item" data-category="safety">
-              <div class="acc-header">
-                <div class="acc-header-left">
-                  <span class="acc-cat-dot dot-safety"></span>
-                  Platform safe hai? Personal info kaun dekh sakta hai?
-                </div>
-                <span class="acc-toggle">+</span>
-              </div>
-              <div class="acc-body">
-                <p>Aapki personal info kab visible hoti hai:</p>
-                <ul>
-                  <li><strong>Phone number:</strong> Sirf tab jab aap kisi gig par apply karte ho — uss gig ke client ko visible hota hai</li>
-                  <li><strong>Email:</strong> Public profile mein visible nahi — sirf aapko dikh ti hai dashboard mein</li>
-                  <li><strong>Public profile:</strong> Naam, role, location, bio, skills — sab dekh sakte hain</li>
-                </ul>
-                <div class="tip-box"><strong>Tip:</strong> Sirf genuine gigs par apply karo. Unknown clients se milne ka plan ho toh public jagah milo.</div>
-              </div>
-              <div class="acc-footer">
-                Kya yeh helpful tha?
-                <button class="helpful-btn" onclick="markHelpful(this, true)">👍 Haan</button>
-                <button class="helpful-btn nope" onclick="markHelpful(this, false)">👎 Nahi</button>
-              </div>
-            </div>
-
-            <div class="acc-item" data-category="safety">
-              <div class="acc-header">
-                <div class="acc-header-left">
-                  <span class="acc-cat-dot dot-safety"></span>
-                  Suspicious user ya fraud report kaise karein?
-                </div>
-                <span class="acc-toggle">+</span>
-              </div>
-              <div class="acc-body">
-                <p>Kisi bhi fraud ya suspicious activity ke liye:</p>
-                <ul>
-                  <li>💬 WhatsApp: <a href="https://wa.me/919319635257" target="_blank" rel="noopener">+91 93196 35257</a> — fastest</li>
-                  <li>📧 Email: <a href="mailto:Giglega.official@gmail.com">Giglega.official@gmail.com</a></li>
-                  <li>📋 <a href="contact.html">Contact Form</a> — detailed report</li>
-                </ul>
-                <p>Report mein include karo: User name/ID, gig link, screenshot, kya hua briefly.</p>
-                <p>Hum <strong>24 ghante</strong> mein investigate karenge.</p>
-              </div>
-              <div class="acc-footer">
-                Kya yeh helpful tha?
-                <button class="helpful-btn" onclick="markHelpful(this, true)">👍 Haan</button>
-                <button class="helpful-btn nope" onclick="markHelpful(this, false)">👎 Nahi</button>
-              </div>
-            </div>
-
-            <!-- ────────── TECHNICAL ────────── -->
-            <div class="acc-item" data-category="technical">
-              <div class="acc-header">
-                <div class="acc-header-left">
-                  <span class="acc-cat-dot dot-technical"></span>
-                  Data ek device se dusre device par kyun nahi dikh raha?
-                </div>
-                <span class="acc-toggle">+</span>
-              </div>
-              <div class="acc-body">
-                <p>Yeh Beta phase ki limitation hai — GigLega abhi <strong>localStorage</strong> use karta hai.</p>
-                <p>Matlab aapka data sirf us device aur browser mein save hota hai jahan register kiya.</p>
-                <ul>
-                  <li>Mobile par kiya tha → Desktop par nahi dikhega</li>
-                  <li>Chrome mein kiya tha → Firefox mein nahi dikhega</li>
-                </ul>
-                <div class="tip-box"><strong>Solution coming soon:</strong> Backend server launch hone par cross-device sync automatically kaam karega — sab devices par ek account!</div>
-              </div>
-              <div class="acc-footer">
-                Kya yeh helpful tha?
-                <button class="helpful-btn" onclick="markHelpful(this, true)">👍 Haan</button>
-                <button class="helpful-btn nope" onclick="markHelpful(this, false)">👎 Nahi</button>
-              </div>
-            </div>
-
-            <div class="acc-item" data-category="technical">
-              <div class="acc-header">
-                <div class="acc-header-left">
-                  <span class="acc-cat-dot dot-technical"></span>
-                  Page load nahi ho raha / website broken dikh rahi hai
-                </div>
-                <span class="acc-toggle">+</span>
-              </div>
-              <div class="acc-body">
-                <p>Yeh steps try karo order mein:</p>
-                <ol>
-                  <li>Page hard refresh karo — <strong>Ctrl+Shift+R</strong> (Windows) ya <strong>Cmd+Shift+R</strong> (Mac)</li>
-                  <li>Browser cache clear karo</li>
-                  <li>Different browser mein try karo</li>
-                  <li>Internet connection check karo</li>
-                  <li>Incognito/private mode mein try karo</li>
-                </ol>
-                <p>Agar phir bhi issue ho toh screenshot ke saath WhatsApp karo — hum fix karenge!</p>
-              </div>
-              <div class="acc-footer">
-                Kya yeh helpful tha?
-                <button class="helpful-btn" onclick="markHelpful(this, true)">👍 Haan</button>
-                <button class="helpful-btn nope" onclick="markHelpful(this, false)">👎 Nahi</button>
-              </div>
-            </div>
-
-          </div>
-
-          <!-- No results -->
-          <div class="no-results" id="noResults">
-            <div class="nr-icon">🔍</div>
-            <h3>Koi article nahi mila</h3>
-            <p id="noResultsText">Is topic ke baare mein directly humse poochho — hum help karenge!</p>
-            <a
-              href="https://wa.me/919319635257"
-              target="_blank"
-              rel="noopener"
-              class="btn btn-primary"
-            >
-              💬 WhatsApp Karo
-            </a>
-          </div>
-
-          <!-- ══ STILL NEED HELP ══ -->
-          <div class="still-help fade-up">
-            <span style="font-size:2.2rem;">🤝</span>
-            <h2>Abhi Bhi Sawaal Hai?</h2>
-            <p>
-              Help Center mein answer nahi mila? Humari team se directly baat karo —
-              hum usually <strong>15 minutes</strong> mein reply karte hain WhatsApp par!
-            </p>
-            <div class="contact-options">
-              <a
-                href="https://wa.me/919319635257?text=Hi%20GigLega!%20Help%20Center%20se%20aa%20raha%20hoon%20-%20kuch%20poochna%20tha."
-                target="_blank"
-                rel="noopener"
-                class="contact-opt"
-              >
-                <div class="contact-opt-icon">💬</div>
-                <strong>WhatsApp</strong>
-                <span>~15 min reply</span>
-              </a>
-              <a href="contact.html" class="contact-opt">
-                <div class="contact-opt-icon">📋</div>
-                <strong>Contact Form</strong>
-                <span>~24 hrs reply</span>
-              </a>
-              <a href="mailto:Giglega.official@gmail.com" class="contact-opt">
-                <div class="contact-opt-icon">✉️</div>
-                <strong>Email</strong>
-                <span>~24 hrs reply</span>
-              </a>
-            </div>
-          </div>
-
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Help Center — GigLega</title>
+  <meta name="description" content="GigLega Help Center — gig posting, payment, safety, aur account se related saare sawaalon ke jawab yahan hain." />
+  <link rel="stylesheet" href="styles.css" />
+  <script src="shared.js"></script>
+  <style>
+
+    /* ══════════════════════════════════
+       HERO / SEARCH
+    ══════════════════════════════════ */
+    .hc-hero {
+      background: linear-gradient(135deg, #0b2240 0%, var(--primary) 55%, #0d4f47 100%);
+      padding: 64px 20px 80px;
+      text-align: center; color: #fff;
+      position: relative; overflow: hidden;
+    }
+    .hc-hero::before {
+      content: "";
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse at 15% 60%, rgba(13,148,136,.25) 0%, transparent 55%),
+        radial-gradient(ellipse at 85% 20%, rgba(99,102,241,.12) 0%, transparent 50%);
+      pointer-events: none;
+    }
+    .hc-hero::after {
+      content: "";
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+      background-size: 54px 54px;
+      pointer-events: none;
+    }
+    .hc-hero-inner { position: relative; z-index: 1; max-width: 680px; margin: 0 auto; }
+
+    .hc-eyebrow {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: rgba(255,255,255,.12);
+      border: 1px solid rgba(255,255,255,.2);
+      border-radius: var(--radius-full);
+      padding: 5px 16px;
+      font-size: .76rem; font-weight: 700; color: rgba(255,255,255,.9);
+      margin-bottom: 18px;
+    }
+    .hc-hero h1 {
+      font-size: clamp(1.7rem, 4vw, 2.8rem);
+      font-weight: 900; color: #fff;
+      line-height: 1.2; margin-bottom: 12px; letter-spacing: -.8px;
+    }
+    .hc-hero h1 span { color: #6ee7b7; }
+    .hc-hero-sub {
+      font-size: .95rem; color: rgba(255,255,255,.75);
+      margin-bottom: 32px; line-height: 1.65;
+    }
+
+    /* Search bar */
+    .hc-search-wrap {
+      position: relative; max-width: 560px; margin: 0 auto 28px;
+    }
+    .hc-search-icon {
+      position: absolute; left: 16px; top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.1rem; pointer-events: none; z-index: 2;
+    }
+    .hc-search-input {
+      width: 100%;
+      padding: 16px 56px 16px 48px;
+      border: 2px solid rgba(255,255,255,.25);
+      border-radius: var(--radius);
+      background: rgba(255,255,255,.1);
+      backdrop-filter: blur(12px);
+      color: #fff;
+      font-size: 1rem;
+      font-family: var(--font);
+      transition: border .2s, background .2s;
+      box-sizing: border-box;
+    }
+    .hc-search-input::placeholder { color: rgba(255,255,255,.55); }
+    .hc-search-input:focus {
+      outline: none;
+      border-color: rgba(255,255,255,.7);
+      background: rgba(255,255,255,.15);
+    }
+    .hc-search-clear {
+      position: absolute; right: 16px; top: 50%;
+      transform: translateY(-50%);
+      background: rgba(255,255,255,.2);
+      border: none; border-radius: 50%;
+      width: 26px; height: 26px;
+      color: #fff; font-size: .8rem;
+      cursor: pointer; display: none;
+      align-items: center; justify-content: center;
+      transition: background .2s;
+    }
+    .hc-search-clear:hover { background: rgba(255,255,255,.35); }
+    .hc-search-clear.show { display: flex; }
+
+    /* Popular searches */
+    .hc-popular {
+      display: flex; align-items: center;
+      justify-content: center; gap: 8px; flex-wrap: wrap;
+    }
+    .hc-popular-label { font-size: .74rem; color: rgba(255,255,255,.55); font-weight: 600; }
+    .hc-popular-tag {
+      display: inline-block;
+      background: rgba(255,255,255,.12);
+      border: 1px solid rgba(255,255,255,.2);
+      border-radius: var(--radius-full);
+      padding: 4px 12px;
+      font-size: .76rem; font-weight: 600;
+      color: rgba(255,255,255,.85);
+      cursor: pointer; transition: background .15s;
+    }
+    .hc-popular-tag:hover { background: rgba(255,255,255,.22); }
+
+    /* ══════════════════════════════════
+       SEARCH RESULTS OVERLAY
+    ══════════════════════════════════ */
+    .search-results-panel {
+      position: absolute;
+      top: calc(100% + 8px); left: 0; right: 0;
+      background: var(--surface);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-lg);
+      max-height: 360px; overflow-y: auto;
+      z-index: 100;
+      display: none;
+    }
+    .search-results-panel.show { display: block; }
+    [data-theme=dark] .search-results-panel { border-color: var(--gray-700); }
+
+    .sr-item {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 13px 16px;
+      border-bottom: 1px solid var(--gray-100);
+      cursor: pointer; transition: background .15s;
+    }
+    .sr-item:last-child { border-bottom: none; }
+    .sr-item:hover { background: rgba(13,148,136,.05); }
+    [data-theme=dark] .sr-item { border-color: var(--gray-700); }
+    [data-theme=dark] .sr-item:hover { background: rgba(13,148,136,.07); }
+
+    .sr-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+    .sr-title { font-size: .88rem; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+    .sr-cat   { font-size: .74rem; color: var(--teal); font-weight: 600; }
+    .sr-empty { padding: 24px; text-align: center; color: var(--gray-400); font-size: .88rem; }
+
+    /* ══════════════════════════════════
+       STATS BAR
+    ══════════════════════════════════ */
+    .hc-stats {
+      background: var(--surface);
+      border-bottom: 1.5px solid var(--gray-200);
+      padding: 22px 20px;
+    }
+    .hc-stats-inner {
+      max-width: 900px; margin: 0 auto;
+      display: grid; grid-template-columns: repeat(4,1fr);
+      gap: 16px; text-align: center;
+    }
+    @media(max-width:580px){ .hc-stats-inner { grid-template-columns: repeat(2,1fr); } }
+    .hc-stat-num { font-size: 1.5rem; font-weight: 900; color: var(--primary); line-height: 1; }
+    .hc-stat-lbl { font-size: .73rem; color: var(--gray-400); font-weight: 600; margin-top: 3px; }
+    [data-theme=dark] .hc-stats { border-color: var(--gray-700); }
+
+    /* ══════════════════════════════════
+       MAIN LAYOUT
+    ══════════════════════════════════ */
+    .hc-body {
+      max-width: 1100px; margin: 0 auto;
+      padding: 40px 20px 80px;
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      gap: 32px;
+      align-items: start;
+    }
+    @media(max-width:820px){ .hc-body { grid-template-columns: 1fr; } }
+
+    /* ══════════════════════════════════
+       SIDEBAR NAV
+    ══════════════════════════════════ */
+    .hc-nav {
+      position: sticky; top: 80px;
+    }
+    @media(max-width:820px){ .hc-nav { position: static; } }
+
+    .hc-nav-title {
+      font-size: .72rem; font-weight: 800;
+      text-transform: uppercase; letter-spacing: .6px;
+      color: var(--gray-400); margin-bottom: 12px; padding: 0 4px;
+    }
+    .hc-nav-item {
+      display: flex; align-items: center; gap: 9px;
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      font-size: .88rem; font-weight: 600;
+      color: var(--gray-600);
+      cursor: pointer; transition: var(--transition);
+      border: none; background: none; width: 100%; text-align: left;
+      font-family: var(--font);
+    }
+    .hc-nav-item:hover  { background: rgba(13,148,136,.06); color: var(--teal); }
+    .hc-nav-item.active { background: rgba(13,148,136,.1);  color: var(--primary); font-weight: 800; }
+    [data-theme=dark] .hc-nav-item { color: var(--gray-400); }
+    [data-theme=dark] .hc-nav-item:hover  { color: var(--teal); }
+    [data-theme=dark] .hc-nav-item.active { color: var(--teal); }
+
+    .hc-nav-count {
+      margin-left: auto;
+      background: var(--gray-200);
+      border-radius: 20px;
+      font-size: .68rem; font-weight: 700;
+      padding: 1px 7px; color: var(--gray-500);
+    }
+    .hc-nav-item.active .hc-nav-count {
+      background: rgba(13,148,136,.15); color: var(--teal);
+    }
+    [data-theme=dark] .hc-nav-count { background: var(--gray-700); }
+
+    .hc-nav-divider {
+      height: 1px; background: var(--gray-200);
+      margin: 12px 0;
+    }
+    [data-theme=dark] .hc-nav-divider { background: var(--gray-700); }
+
+    /* Still need help card */
+    .hc-still-help {
+      margin-top: 20px;
+      background: linear-gradient(135deg, rgba(26,60,94,.05), rgba(13,148,136,.08));
+      border: 1.5px solid rgba(13,148,136,.15);
+      border-radius: var(--radius-sm);
+      padding: 16px;
+      text-align: center;
+    }
+    .hc-still-help-icon { font-size: 1.8rem; margin-bottom: 8px; }
+    .hc-still-help h4   { font-size: .86rem; font-weight: 800; color: var(--primary); margin-bottom: 4px; }
+    .hc-still-help p    { font-size: .76rem; color: var(--gray-500); margin-bottom: 12px; line-height: 1.5; }
+    .btn-hc-contact {
+      display: block; width: 100%;
+      padding: 9px 14px;
+      background: linear-gradient(135deg, var(--primary), var(--teal));
+      color: #fff; border: none; border-radius: var(--radius-sm);
+      font-weight: 700; font-size: .82rem; cursor: pointer;
+      text-decoration: none; text-align: center;
+      font-family: var(--font);
+      transition: opacity .2s;
+    }
+    .btn-hc-contact:hover { opacity: .88; text-decoration: none; color: #fff; }
+
+    /* ══════════════════════════════════
+       MAIN CONTENT
+    ══════════════════════════════════ */
+    .hc-content {}
+
+    /* Category header */
+    .hc-cat-header {
+      display: flex; align-items: center; gap: 14px;
+      margin-bottom: 28px; padding-bottom: 18px;
+      border-bottom: 1.5px solid var(--gray-200);
+    }
+    [data-theme=dark] .hc-cat-header { border-color: var(--gray-700); }
+
+    .hc-cat-icon {
+      width: 52px; height: 52px; border-radius: 14px;
+      background: linear-gradient(135deg, var(--primary), var(--teal));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem; flex-shrink: 0;
+    }
+    .hc-cat-title { font-size: 1.3rem; font-weight: 900; color: var(--primary); margin-bottom: 3px; }
+    .hc-cat-sub   { font-size: .84rem; color: var(--gray-400); }
+
+    /* Category grid (overview) */
+    .hc-overview-grid {
+      display: grid;
+      grid-template-columns: repeat(3,1fr);
+      gap: 18px; margin-bottom: 36px;
+    }
+    @media(max-width:680px){ .hc-overview-grid { grid-template-columns: repeat(2,1fr); } }
+    @media(max-width:420px){ .hc-overview-grid { grid-template-columns: 1fr; } }
+
+    .hc-cat-card {
+      background: var(--surface);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 22px 18px;
+      cursor: pointer;
+      transition: transform .2s, box-shadow .2s, border-color .2s;
+      box-shadow: var(--shadow-sm);
+    }
+    .hc-cat-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); border-color: rgba(13,148,136,.3); }
+    [data-theme=dark] .hc-cat-card { border-color: var(--gray-700); background: var(--gray-800); }
+
+    .hcc-icon  { font-size: 1.8rem; margin-bottom: 10px; line-height: 1; }
+    .hcc-title { font-size: .93rem; font-weight: 800; color: var(--primary); margin-bottom: 4px; }
+    .hcc-count { font-size: .76rem; color: var(--gray-400); font-weight: 600; }
+
+    /* Articles list */
+    .hc-section-title {
+      font-size: 1rem; font-weight: 800;
+      color: var(--primary); margin: 28px 0 16px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .hc-section-title::after {
+      content: ""; flex: 1; height: 1px;
+      background: var(--gray-200);
+    }
+    [data-theme=dark] .hc-section-title::after { background: var(--gray-700); }
+
+    .hc-articles { display: flex; flex-direction: column; gap: 10px; }
+
+    .hc-article-item {
+      display: flex; align-items: center;
+      justify-content: space-between; gap: 12px;
+      background: var(--surface);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+      padding: 15px 18px;
+      cursor: pointer;
+      transition: border-color .2s, box-shadow .2s, background .15s;
+      text-decoration: none;
+    }
+    .hc-article-item:hover { border-color: rgba(13,148,136,.3); box-shadow: var(--shadow-sm); background: rgba(13,148,136,.02); }
+    [data-theme=dark] .hc-article-item { border-color: var(--gray-700); background: var(--gray-800); }
+
+    .hai-left  { display: flex; align-items: center; gap: 12px; }
+    .hai-icon  { font-size: 1.2rem; flex-shrink: 0; }
+    .hai-title { font-size: .9rem; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+    .hai-meta  { font-size: .73rem; color: var(--gray-400); }
+    .hai-arr   { color: var(--gray-300); font-size: .9rem; flex-shrink: 0; transition: color .2s; }
+    .hc-article-item:hover .hai-arr { color: var(--teal); }
+
+    .hai-badge {
+      font-size: .68rem; font-weight: 700;
+      padding: 2px 8px; border-radius: 6px;
+      white-space: nowrap; margin-left: 8px;
+    }
+    .hai-badge.new     { background: rgba(16,185,129,.1); color: #059669; }
+    .hai-badge.popular { background: rgba(245,158,11,.1);  color: #b45309; }
+    .hai-badge.updated { background: rgba(99,102,241,.1);  color: #4338ca; }
+
+    /* Article detail view */
+    .hc-article-detail { display: none; }
+    .hc-article-detail.show { display: block; animation: fadeSlide .25s ease; }
+    @keyframes fadeSlide { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+    .had-back {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: none; border: none;
+      font-size: .84rem; font-weight: 700;
+      color: var(--teal); cursor: pointer;
+      margin-bottom: 22px; padding: 0;
+      font-family: var(--font);
+      transition: gap .15s;
+    }
+    .had-back:hover { gap: 10px; }
+
+    .had-category {
+      font-size: .74rem; font-weight: 800;
+      text-transform: uppercase; letter-spacing: .5px;
+      color: var(--teal); margin-bottom: 8px;
+    }
+    .had-title {
+      font-size: 1.4rem; font-weight: 900;
+      color: var(--primary); margin-bottom: 8px; line-height: 1.3;
+    }
+    .had-meta {
+      font-size: .78rem; color: var(--gray-400);
+      margin-bottom: 24px; display: flex; gap: 16px; flex-wrap: wrap;
+    }
+
+    .had-body {
+      font-size: .92rem; color: var(--gray-600);
+      line-height: 1.85;
+    }
+    .had-body h3 {
+      font-size: 1.02rem; font-weight: 800;
+      color: var(--primary); margin: 22px 0 10px;
+    }
+    .had-body h3:first-child { margin-top: 0; }
+    .had-body p  { margin-bottom: 14px; }
+    .had-body ul, .had-body ol {
+      padding-left: 22px; margin-bottom: 14px;
+    }
+    .had-body li { margin-bottom: 7px; line-height: 1.65; }
+    .had-body strong { color: var(--text); }
+    .had-body .tip-box {
+      background: rgba(13,148,136,.07);
+      border-left: 3px solid var(--teal);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      padding: 12px 16px;
+      margin: 16px 0;
+      font-size: .88rem;
+    }
+    .had-body .warn-box {
+      background: rgba(245,158,11,.07);
+      border-left: 3px solid #f59e0b;
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      padding: 12px 16px;
+      margin: 16px 0;
+      font-size: .88rem;
+    }
+    .had-body .danger-box {
+      background: rgba(239,68,68,.06);
+      border-left: 3px solid var(--danger);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      padding: 12px 16px;
+      margin: 16px 0;
+      font-size: .88rem;
+    }
+    [data-theme=dark] .had-body { color: var(--gray-400); }
+
+    /* Helpful feedback */
+    .had-helpful {
+      margin-top: 32px;
+      padding: 20px;
+      background: var(--gray-50);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+      text-align: center;
+    }
+    [data-theme=dark] .had-helpful { background: var(--gray-800); border-color: var(--gray-700); }
+    .had-helpful p { font-size: .9rem; font-weight: 700; color: var(--text); margin-bottom: 14px; }
+    .had-helpful-btns { display: flex; gap: 10px; justify-content: center; }
+    .btn-helpful {
+      padding: 9px 22px; border-radius: var(--radius-sm);
+      border: 1.5px solid var(--gray-200);
+      background: var(--surface); font-weight: 700;
+      font-size: .84rem; cursor: pointer;
+      font-family: var(--font); transition: all .18s;
+      color: var(--gray-600);
+    }
+    .btn-helpful:hover { border-color: var(--teal); color: var(--teal); }
+    .btn-helpful.voted { border-color: var(--success); color: var(--success); background: rgba(16,185,129,.07); }
+    [data-theme=dark] .btn-helpful { border-color: var(--gray-700); }
+
+    /* Related articles */
+    .had-related { margin-top: 28px; }
+    .had-related-title { font-size: .84rem; font-weight: 800; text-transform: uppercase; letter-spacing: .5px; color: var(--gray-400); margin-bottom: 12px; }
+    .had-related-list { display: flex; flex-direction: column; gap: 8px; }
+    .had-related-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 11px 14px;
+      background: var(--surface);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+      cursor: pointer; transition: all .18s;
+      text-decoration: none;
+    }
+    .had-related-item:hover { border-color: var(--teal); color: var(--teal); }
+    [data-theme=dark] .had-related-item { border-color: var(--gray-700); background: var(--gray-800); }
+    .hri-icon  { font-size: .95rem; flex-shrink: 0; }
+    .hri-title { font-size: .84rem; font-weight: 600; color: var(--gray-600); }
+    .had-related-item:hover .hri-title { color: var(--teal); }
+
+    /* ══════════════════════════════════
+       SEARCH RESULTS VIEW
+    ══════════════════════════════════ */
+    .hc-search-view { display: none; }
+    .hc-search-view.show { display: block; }
+
+    .hc-search-header {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 24px;
+    }
+    .hc-search-back {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: none; border: none;
+      font-size: .84rem; font-weight: 700;
+      color: var(--teal); cursor: pointer; padding: 0;
+      font-family: var(--font); transition: gap .15s;
+    }
+    .hc-search-back:hover { gap: 10px; }
+    .hc-search-query { font-size: 1.1rem; font-weight: 800; color: var(--primary); }
+    .hc-search-count { font-size: .84rem; color: var(--gray-400); margin-top: 2px; }
+
+    /* ══════════════════════════════════
+       CONTACT SUPPORT BAR (bottom)
+    ══════════════════════════════════ */
+    .hc-support-bar {
+      background: linear-gradient(135deg, rgba(26,60,94,.04), rgba(13,148,136,.06));
+      border: 1.5px solid rgba(13,148,136,.15);
+      border-radius: var(--radius);
+      padding: 28px 32px;
+      display: flex; align-items: center;
+      justify-content: space-between; gap: 24px;
+      flex-wrap: wrap;
+      margin-top: 48px;
+    }
+    .hcsb-left h3 { font-size: 1.05rem; font-weight: 800; color: var(--primary); margin-bottom: 4px; }
+    .hcsb-left p  { font-size: .86rem; color: var(--gray-500); line-height: 1.55; }
+    .hcsb-btns { display: flex; gap: 10px; flex-wrap: wrap; }
+    .btn-hcsb {
+      padding: 10px 20px; border-radius: var(--radius-sm);
+      font-weight: 700; font-size: .86rem;
+      cursor: pointer; font-family: var(--font);
+      transition: all .2s;
+      display: inline-flex; align-items: center; gap: 7px;
+      text-decoration: none;
+    }
+    .btn-hcsb-primary {
+      background: linear-gradient(135deg, var(--primary), var(--teal));
+      color: #fff; border: none;
+      box-shadow: 0 3px 12px rgba(13,148,136,.25);
+    }
+    .btn-hcsb-primary:hover { box-shadow: 0 5px 18px rgba(13,148,136,.35); transform: translateY(-1px); color: #fff; text-decoration: none; }
+    .btn-hcsb-outline {
+      background: transparent; color: var(--primary);
+      border: 1.5px solid var(--primary);
+    }
+    .btn-hcsb-outline:hover { background: rgba(26,60,94,.05); text-decoration: none; color: var(--primary); }
+
+  </style>
+</head>
+<body>
+  <div id="page-loader"></div>
+  <div id="announce-bar"></div>
+  <nav id="main-nav"></nav>
+
+  <main>
+
+    <!-- ══════════════════════════════════
+         HERO + SEARCH
+    ══════════════════════════════════ -->
+    <section class="hc-hero">
+      <div class="hc-hero-inner">
+        <div class="hc-eyebrow">❓ Help Center</div>
+        <h1>Kaise Kar Sakte Hain<br/><span>Hum Madad?</span></h1>
+        <p class="hc-hero-sub">1000+ articles — gig posting se lekar payment tak sab covered hai.</p>
+
+        <div class="hc-search-wrap">
+          <span class="hc-search-icon">🔍</span>
+          <input type="text" class="hc-search-input" id="hcSearchInput"
+            placeholder="Search karo — e.g. payment, gig post, account, safety…"
+            autocomplete="off" />
+          <button class="hc-search-clear" id="hcSearchClear" type="button">✕</button>
+          <div class="search-results-panel" id="searchDropdown"></div>
+        </div>
+
+        <div class="hc-popular">
+          <span class="hc-popular-label">Popular:</span>
+          <span class="hc-popular-tag" data-q="payment">💰 Payment</span>
+          <span class="hc-popular-tag" data-q="gig post karna">📋 Gig Post</span>
+          <span class="hc-popular-tag" data-q="account verify">✅ Verification</span>
+          <span class="hc-popular-tag" data-q="safety scam">🚫 Scam</span>
+          <span class="hc-popular-tag" data-q="fee">💳 Platform Fee</span>
+          <span class="hc-popular-tag" data-q="cancel gig">❌ Cancel</span>
         </div>
       </div>
-    </main>
+    </section>
 
-    <footer id="footer"></footer>
+    <!-- ══════════════════════════════════
+         STATS BAR
+    ══════════════════════════════════ -->
+    <div class="hc-stats">
+      <div class="hc-stats-inner">
+        <div>
+          <div class="hc-stat-num">35+</div>
+          <div class="hc-stat-lbl">Help Articles</div>
+        </div>
+        <div>
+          <div class="hc-stat-num">6</div>
+          <div class="hc-stat-lbl">Categories</div>
+        </div>
+        <div>
+          <div class="hc-stat-num">4–6h</div>
+          <div class="hc-stat-lbl">Support Response</div>
+        </div>
+        <div>
+          <div class="hc-stat-num">Hindi</div>
+          <div class="hc-stat-lbl">& English Support</div>
+        </div>
+      </div>
+    </div>
 
-    <script>
-      /* ── Category filter ─────────────────────── */
-      var allItems = document.querySelectorAll(".acc-item[data-category]");
+    <!-- ══════════════════════════════════
+         MAIN BODY
+    ══════════════════════════════════ -->
+    <div class="hc-body">
 
-      document.querySelectorAll(".cat-card").forEach(function (card) {
-        card.addEventListener("click", function () {
-          var filter = card.getAttribute("data-filter");
+      <!-- ── SIDEBAR ── -->
+      <aside class="hc-nav">
+        <div class="hc-nav-title">Categories</div>
+        <button class="hc-nav-item active" data-cat="overview">🏠 Overview <span class="hc-nav-count">All</span></button>
+        <button class="hc-nav-item" data-cat="getting-started">🚀 Getting Started <span class="hc-nav-count">6</span></button>
+        <button class="hc-nav-item" data-cat="post">📋 Posting Gigs <span class="hc-nav-count">6</span></button>
+        <button class="hc-nav-item" data-cat="payment" id="navPayment">💰 Payments <span class="hc-nav-count">6</span></button>
+        <button class="hc-nav-item" data-cat="account">👤 Account <span class="hc-nav-count">6</span></button>
+        <button class="hc-nav-item" data-cat="safety" id="navSafety">🛡️ Safety <span class="hc-nav-count">6</span></button>
+        <button class="hc-nav-item" data-cat="fee" id="navFee">💳 Fees & Pricing <span class="hc-nav-count">5</span></button>
 
-          document.querySelectorAll(".cat-card").forEach(function (c) {
-            c.classList.remove("active");
-          });
-          card.classList.add("active");
+        <div class="hc-nav-divider"></div>
+        <button class="hc-nav-item" data-cat="overview" id="navAll">📑 All Articles</button>
 
-          var title = card.querySelector(".cat-title").textContent;
-          document.getElementById("faqSectionTitle").textContent =
-            filter === "all" ? "📚 Sab Articles" : card.querySelector(".cat-icon").textContent + " " + title;
-          document.getElementById("faqSectionSub").textContent =
-            filter === "all" ? "Sab categories ke common sawaal" : title + " se related sawaal";
+        <div class="hc-still-help">
+          <div class="hc-still-help-icon">💬</div>
+          <h4>Still Need Help?</h4>
+          <p>Article nahi mila? Hamari team se seedha baat karo.</p>
+          <a href="contact.html" class="btn-hc-contact">📩 Contact Support</a>
+        </div>
+      </aside>
 
-          var visible = 0;
-          allItems.forEach(function (item) {
-            var show = filter === "all" || item.getAttribute("data-category") === filter;
-            item.classList.toggle("hidden-faq", !show);
-            if (show) visible++;
-          });
+      <!-- ── CONTENT ── -->
+      <div class="hc-content" id="hcContent">
 
-          document.getElementById("noResults").classList.toggle("visible", visible === 0);
-          document.getElementById("helpSearch").value = "";
-          document.getElementById("searchCount").textContent = "";
-        });
-      });
+        <!-- Breadcrumb inside content -->
+        <div id="breadcrumb" style="margin-bottom:20px"></div>
 
-      /* ── Search ──────────────────────────────── */
-      document.getElementById("helpSearch").addEventListener("input", function () {
-        var q = this.value.trim().toLowerCase();
+        <!-- SEARCH RESULTS VIEW -->
+        <div class="hc-search-view" id="hcSearchView">
+          <div class="hc-search-header">
+            <button class="hc-search-back" id="btnSearchBack">← Back</button>
+          </div>
+          <div class="hc-search-query" id="srQueryLabel"></div>
+          <div class="hc-search-count" id="srCountLabel"></div>
+          <div class="hc-articles" id="srResultsList" style="margin-top:18px"></div>
+        </div>
 
-        document.querySelectorAll(".cat-card").forEach(function (c) {
-          c.classList.remove("active");
-        });
-        document.querySelector(".cat-card[data-filter='all']").classList.add("active");
+        <!-- ARTICLE DETAIL VIEW -->
+        <div class="hc-article-detail" id="hcArticleDetail">
+          <button class="had-back" id="btnArticleBack">← Back to articles</button>
+          <div class="had-category" id="adCategory"></div>
+          <div class="had-title"   id="adTitle"></div>
+          <div class="had-meta"    id="adMeta"></div>
+          <div class="had-body"    id="adBody"></div>
+          <div class="had-helpful">
+            <p>Kya yeh article helpful tha?</p>
+            <div class="had-helpful-btns">
+              <button class="btn-helpful" id="btnHelpYes">👍 Yes, helpful</button>
+              <button class="btn-helpful" id="btnHelpNo">👎 No, not really</button>
+            </div>
+          </div>
+          <div class="had-related">
+            <div class="had-related-title">Related Articles</div>
+            <div class="had-related-list" id="adRelated"></div>
+          </div>
+        </div>
 
-        var visible = 0;
-        allItems.forEach(function (item) {
-          var text = item.textContent.toLowerCase();
-          var show = !q || text.includes(q);
-          item.classList.toggle("hidden-faq", !show);
-          if (show) visible++;
-          if (show && q) item.classList.add("open");
-        });
+        <!-- CATEGORY / OVERVIEW VIEW -->
+        <div id="hcCategoryView">
+          <!-- dynamically rendered -->
+        </div>
 
-        var countEl = document.getElementById("searchCount");
-        if (q) {
-          countEl.textContent = visible + " article" + (visible !== 1 ? "s" : "") + " mile";
-        } else {
-          countEl.textContent = "";
-        }
+      </div>
+    </div>
 
-        document.getElementById("noResults").classList.toggle("visible", visible === 0);
-        if (visible === 0) {
-          document.getElementById("noResultsText").textContent =
-            '"' + this.value.trim() + '" ke baare mein directly humse poochho!';
-        }
+    <!-- Support bar -->
+    <div style="max-width:1100px;margin:0 auto;padding:0 20px 60px">
+      <div class="hc-support-bar">
+        <div class="hcsb-left">
+          <h3>🤔 Apna jawab nahi mila?</h3>
+          <p>Haari support team 4–6 ghante mein reply karti hai — Hindi aur English dono mein.</p>
+        </div>
+        <div class="hcsb-btns">
+          <a href="contact.html" class="btn-hcsb btn-hcsb-primary">📩 Contact Us</a>
+          <a href="trust-safety.html#reportForm" class="btn-hcsb btn-hcsb-outline">🚨 Report Issue</a>
+        </div>
+      </div>
+    </div>
 
-        document.getElementById("faqSectionTitle").textContent = q
-          ? '🔍 "' + this.value.trim() + '" Results'
-          : "📚 Sab Articles";
-        document.getElementById("faqSectionSub").textContent = q
-          ? visible + " matching articles"
-          : "Sab categories ke common sawaal";
-      });
+  </main>
 
-      /* ── Accordion ───────────────────────────── */
-      document.querySelectorAll(".acc-header").forEach(function (header) {
-        header.addEventListener("click", function () {
-          var item = header.closest(".acc-item");
-          item.classList.toggle("open");
-        });
-      });
+  <footer id="main-footer"></footer>
+  <div id="toast-container"></div>
 
-      /* ── Expand all ──────────────────────────── */
-      var expandBtn = document.getElementById("expandAllBtn");
-      var expanded  = false;
+  <script>
+  /* ═══════════════════════════════════════════════════════════
+     HELP CENTER DATA
+  ═══════════════════════════════════════════════════════════ */
+  var HC_DATA = {
 
-      expandBtn.addEventListener("click", function () {
-        expanded = !expanded;
-        document.querySelectorAll(".acc-item:not(.hidden-faq)").forEach(function (item) {
-          item.classList.toggle("open", expanded);
-        });
-        expandBtn.textContent = expanded ? "Sab Bandh Karo" : "Sab Kholna";
-      });
+    categories: [
+      { id: "getting-started", icon: "🚀", title: "Getting Started",  desc: "Platform pe pehle kadam — signup se gig tak." },
+      { id: "post",            icon: "📋", title: "Posting Gigs",     desc: "Achha gig kaise post karein aur kaise fill karein." },
+      { id: "payment",         icon: "💰", title: "Payments",         desc: "Payment flow, disputes aur refund policy." },
+      { id: "account",         icon: "👤", title: "Account",          desc: "Profile, settings, verification aur privacy." },
+      { id: "safety",          icon: "🛡️", title: "Safety",           desc: "Safe raho — scam, report aur tips." },
+      { id: "fee",             icon: "💳", title: "Fees & Pricing",   desc: "Platform fee, plans aur billing." }
+    ],
 
-      /* ── Helpful feedback ────────────────────── */
-      function markHelpful(btn, wasHelpful) {
-        var footer = btn.closest(".acc-footer");
-        footer.innerHTML =
-          wasHelpful
-            ? '✅ Shukriya! Helpful tha. <a href="browse.html" style="color:var(--teal);font-weight:700;font-size:0.82rem;">Browse Gigs →</a>'
-            : '🙏 Samajh aata hai. <a href="contact.html" style="color:var(--teal);font-weight:700;font-size:0.82rem;">Humse directly poochho →</a>';
+    articles: [
+
+      /* ── GETTING STARTED ── */
+      {
+        id: "gs1", cat: "getting-started", icon: "📱",
+        title: "GigLega pe Account Kaise Banayein",
+        badge: "popular",
+        meta: "2 min read · Updated Mar 2026",
+        related: ["gs2","gs3","ac1"],
+        body: `
+          <h3>Step 1 — Sign Up Page Kholo</h3>
+          <p>Homepage pe jaao aur top-right mein <strong>"Sign Up"</strong> button click karo. Mobile number ya email se register kar sakte ho.</p>
+          <h3>Step 2 — OTP Verify Karo</h3>
+          <p>Mobile number enter karne ke baad ek 6-digit OTP aayega. OTP enter karo — tumhara basic account ban jaayega.</p>
+          <h3>Step 3 — Profile Complete Karo</h3>
+          <p>Naam, location (city level), aur profile photo add karo. Zyada complete profile = zyada trust = zyada gigs.</p>
+          <div class="tip-box">💡 <strong>Pro Tip:</strong> Profile 100% complete karne pe "Complete Profile" badge milta hai jo listings mein standout karta hai.</div>
+          <h3>Step 4 — Worker ya Poster?</h3>
+          <p>Account do tarah use kar sakte ho — <strong>Worker</strong> (kaam dhundhna) ya <strong>Poster</strong> (kaam post karna). Ek hi account se dono kaam karta hai.</p>
+        `
+      },
+      {
+        id: "gs2", cat: "getting-started", icon: "🔍",
+        title: "Gig Browse Karna — Kaise Kaam Karta Hai",
+        badge: "new",
+        meta: "3 min read · Updated Mar 2026",
+        related: ["gs3","post1","ac1"],
+        body: `
+          <h3>Browse Page</h3>
+          <p>Top navigation mein "Browse Gigs" click karo — tumhe sab listed gigs dikhenge latest first.</p>
+          <h3>Filters Use Karo</h3>
+          <ul>
+            <li><strong>Category</strong> — Delivery, Cleaning, Teaching, etc.</li>
+            <li><strong>Location</strong> — Apne area ke gigs filter karo</li>
+            <li><strong>Budget</strong> — Minimum earning set karo</li>
+            <li><strong>Duration</strong> — 1-day, weekly ya ongoing</li>
+          </ul>
+          <h3>Gig Detail Kaise Dekhen</h3>
+          <p>Kisi bhi gig card pe click karo — full details khulenge: scope, budget, location map, poster ratings aur requirements.</p>
+          <div class="tip-box">💡 Poster ki rating aur reviews zaroor dekho before applying — 4.0+ rating wale posters generally reliable hote hain.</div>
+          <h3>Apply Karna</h3>
+          <p>Gig page pe "Apply Now" button hai — click karo, short message likho aur submit karo. Poster 24 ghante mein accept/reject karega.</p>
+        `
+      },
+      {
+        id: "gs3", cat: "getting-started", icon: "✅",
+        title: "Pehla Gig Accept Hone Ke Baad Kya Karna Hai",
+        badge: null,
+        meta: "3 min read · Updated Mar 2026",
+        related: ["gs2","pay1","ts2"],
+        body: `
+          <h3>Confirmation Message</h3>
+          <p>Gig accept hone pe notification aur in-app message aata hai. Poster ka contact aur gig details confirm hote hain.</p>
+          <h3>Pre-Gig Checklist</h3>
+          <ul>
+            <li>Exact location aur timing confirm karo in chat</li>
+            <li>Required tools ya equipment clarify karo</li>
+            <li>Payment method confirm karo (platform ke through)</li>
+            <li>Public meeting point prefer karo pehli baar</li>
+          </ul>
+          <div class="warn-box">⚠️ Gig se pehle koi advance payment mat do ya lo — platform ke through gig complete hone ke baad payment hoti hai.</div>
+          <h3>Gig Ke Dauraan</h3>
+          <p>Koi issue ho toh in-app chat use karo. Emergency mein "Report" option available hai gig page pe.</p>
+          <h3>Completion</h3>
+          <p>Kaam complete hone ke baad poster "Mark Complete" karega — payment release hogi aur dono rating de sakte hain.</p>
+        `
+      },
+      {
+        id: "gs4", cat: "getting-started", icon: "⭐",
+        title: "Rating System Kaise Kaam Karta Hai",
+        badge: null,
+        meta: "2 min read · Updated Mar 2026",
+        related: ["gs1","ac2","ts1"],
+        body: `
+          <h3>Rating Kab Milti Hai</h3>
+          <p>Har completed gig ke baad dono parties — worker aur poster — ek doosre ko 1–5 stars de sakte hain aur optional review likh sakte hain.</p>
+          <h3>Rating Ka Impact</h3>
+          <ul>
+            <li>4.5+ rating — "Top Rated" badge</li>
+            <li>Below 3.0 — profile pe warning indicator</li>
+            <li>Consistently low ratings — account review ho sakta hai</li>
+          </ul>
+          <div class="tip-box">💡 Honest reviews likho — community ke liye helpful hai. Fake reviews platform violation hai.</div>
+          <h3>Rating Kaise Improve Karein</h3>
+          <p>Punctual raho, described kaam karo, aur professional communication rakho. Simple cheezein jo big difference create karti hain.</p>
+        `
+      },
+      {
+        id: "gs5", cat: "getting-started", icon: "📲",
+        title: "In-App Chat Kaise Use Karein",
+        badge: null,
+        meta: "2 min read · Updated Mar 2026",
+        related: ["gs3","ts1","ts2"],
+        body: `
+          <h3>Chat Access</h3>
+          <p>Gig accept hone ke baad Messages icon se chat access karo. Saari conversation in-app honi chahiye for safety aur dispute resolution.</p>
+          <h3>Chat Features</h3>
+          <ul>
+            <li>Text messages — unlimited</li>
+            <li>Image share karo (screenshots, location photos)</li>
+            <li>Gig details reference karo conversation mein</li>
+          </ul>
+          <div class="warn-box">⚠️ Koi bhi tumse platform chhod ke WhatsApp ya outside contact karne ko kahe toh red flag hai — report karo.</div>
+          <h3>Chat History</h3>
+          <p>Saari chat history 90 days tak saved rehti hai. Dispute case mein yeh evidence use hoti hai.</p>
+        `
+      },
+      {
+        id: "gs6", cat: "getting-started", icon: "🏅",
+        title: "Trust Badges Kaise Earn Karein",
+        badge: "new",
+        meta: "2 min read · Updated Mar 2026",
+        related: ["gs1","ac1","gs4"],
+        body: `
+          <h3>Available Badges</h3>
+          <ul>
+            <li>✅ <strong>Phone Verified</strong> — Signup pe automatically</li>
+            <li>📧 <strong>Email Verified</strong> — Settings mein email verify karo</li>
+            <li>🏅 <strong>Gig Veteran</strong> — 5+ gigs complete karo</li>
+            <li>⭐ <strong>Top Rated</strong> — 4.5+ rating with 10+ reviews</li>
+            <li>🚀 <strong>Power Poster</strong> — 10+ gigs posted, 90%+ fill rate</li>
+          </ul>
+          <div class="tip-box">💡 Multiple badges wale users 40% faster gigs fill karte hain — worth investing time in.</div>
+          <h3>Badges Kahan Dikhte Hain</h3>
+          <p>Tumhari profile pe aur gig application mein. Posters badge dekh ke preferentially trust karte hain.</p>
+        `
+      },
+
+      /* ── POSTING GIGS ── */
+      {
+        id: "post1", cat: "post", icon: "✏️",
+        title: "Perfect Gig Kaise Post Karein",
+        badge: "popular",
+        meta: "4 min read · Updated Mar 2026",
+        related: ["post2","post3","fee1"],
+        body: `
+          <h3>Gig Post Karne Ke Liye Kya Chahiye</h3>
+          <ul>
+            <li>Verified account (phone OTP)</li>
+            <li>Clear gig description</li>
+            <li>Realistic budget</li>
+            <li>Accurate location</li>
+          </ul>
+          <h3>Title — Pehla Impression</h3>
+          <p>Title specific aur action-oriented hona chahiye. Bad: "Helper Chahiye". Good: "Weekend Warehouse Packing Helper — DLF Phase 2, ₹800/day".</p>
+          <h3>Description Mein Kya Likho</h3>
+          <ul>
+            <li>Exactly kya kaam karna hai (step by step)</li>
+            <li>Skills ya experience required</li>
+            <li>Timing — date, time, duration</li>
+            <li>Location — exact area ya landmark</li>
+            <li>Payment — total ya per hour/day</li>
+          </ul>
+          <div class="tip-box">💡 Zyada detail = better applications. Vague gigs pe unqualified workers apply karte hain.</div>
+          <h3>Budget Realistic Rakhein</h3>
+          <p>Market rate se bahut kam budget pe quality workers nahi milte. NCR mein general helpers ₹500–₹800/day expect karte hain.</p>
+        `
+      },
+      {
+        id: "post2", cat: "post", icon: "📍",
+        title: "Location Settings — Gig Kahan Dikhega",
+        badge: null,
+        meta: "2 min read · Updated Mar 2026",
+        related: ["post1","post3","gs2"],
+        body: `
+          <h3>Location Kaise Set Karein</h3>
+          <p>Gig post karte waqt location field mein apna area type karo — suggestion list se select karo ya map pe pin drop karo.</p>
+          <h3>Location Privacy</h3>
+          <p>Exact address publicly visible nahi hoti — sirf area/neighborhood dikhta hai. Worker ko accept hone ke baad exact location share karo in chat.</p>
+          <div class="tip-box">💡 Specific area likhna better results deta hai — "Gurugram" se better hai "Sector 14, Gurugram near Huda City Centre".</div>
+          <h3>Multiple Locations</h3>
+          <p>Agar alag jagah kaam hai toh separate gigs post karo — ek gig ek location ke liye best practice hai.</p>
+        `
+      },
+      {
+        id: "post3", cat: "post", icon: "🔄",
+        title: "Gig Edit, Pause Ya Delete Karna",
+        badge: null,
+        meta: "2 min read · Updated Mar 2026",
+        related: ["post1","post4","ac3"],
+        body: `
+          <h3>Gig Edit Karna</h3>
+          <p>Dashboard → My Gigs → Edit button. Title, description, budget aur timing update kar sakte ho. Published gig ko edit karne pe re-review hoti hai (auto-approved usually).</p>
+          <h3>Gig Pause Karna</h3>
+          <p>Temporarily applications rokni hain? Pause karo — gig browse mein nahi dikhega but saved rehega. Unpause anytime.</p>
+          <h3>Gig Delete Karna</h3>
+          <p>Delete permanent hai. Agar already applications hain toh workers ko notification bhejni chahiye reason ke saath — professional practice hai.</p>
+          <div class="warn-box">⚠️ Accepted gig cancel karne pe rating pe impact padta hai — responsible posting karo.</div>
+        `
+      },
+      {
+        id: "post4", cat: "post", icon: "👥",
+        title: "Multiple Workers Hire Karna — Ek Gig Se",
+        badge: "new",
+        meta: "3 min read · Updated Mar 2026",
+        related: ["post1","post5","fee1"],
+        body: `
+          <h3>Positions Field</h3>
+          <p>Gig post karte waqt "No. of positions" field mein 1 se zyada number dal sakte ho — platform multiple applications collect karega.</p>
+          <h3>Applications Review Karna</h3>
+          <p>Dashboard pe sab applications sorted by rating aur distance milti hain. Multiple accept kar sakte ho positions ke anusaar.</p>
+          <div class="tip-box">💡 Zyada workers chahiye? Enterprise plan mein bulk posting available hai — ek baar mein 50+ gigs post karo.</div>
+          <h3>Payment Multiple Workers Ko</h3>
+          <p>Har worker ka payment separately process hota hai — individual confirmation ke baad platform fee calculate hoti hai.</p>
+        `
+      },
+      {
+        id: "post5", cat: "post", icon: "📊",
+        title: "Gig Performance Track Karna",
+        badge: null,
+        meta: "2 min read · Updated Mar 2026",
+        related: ["post1","post4","fee3"],
+        body: `
+          <h3>Dashboard Analytics</h3>
+          <p>Dashboard pe apne gigs ka performance dekh sakte ho — views, applications, fill rate aur avg. response time.</p>
+          <h3>Key Metrics</h3>
+          <ul>
+            <li><strong>Views</strong> — Kitne logon ne gig dekha</li>
+            <li><strong>Applications</strong> — Kitne ne apply kiya</li>
+            <li><strong>Fill Rate</strong> — Kitne gigs successfully filled</li>
+            <li><strong>Avg. Rating Received</strong> — As a poster</li>
+          </ul>
+          <div class="tip-box">💡 Low fill rate? Title aur budget review karo — yeh do cheezein sabse zyada impact karti hain.</div>
+        `
+      },
+      {
+        id: "post6", cat: "post", icon: "🚫",
+        title: "Gig Post Karne Ki Guidelines — Kya Allow Nahi Hai",
+        badge: null,
+        meta: "3 min read · Updated Mar 2026",
+        related: ["ts1","ts3","post1"],
+        body: `
+          <h3>Prohibited Gig Types</h3>
+          <ul>
+            <li>Illegal activities — kisi bhi tarah ka</li>
+            <li>Adult content ya services</li>
+            <li>Pyramid schemes ya MLM recruitment</li>
+            <li>Misleading ya bait-and-switch gigs</li>
+            <li>Off-platform payment force karne wali gigs</li>
+          </ul>
+          <h3>Content Guidelines</h3>
+          <p>Description professional honi chahiye. Offensive language, discriminatory requirements (based on caste, religion, gender) strictly banned hain.</p>
+          <div class="danger-box">🚫 Guidelines violate karne pe gig remove aur account warning milegi. Repeated violations pe permanent ban.</div>
+          <h3>Reporting Suspicious Gigs</h3>
+          <p>Koi suspicious gig dikhein toh gig page pe "Report" button use karo — safety team 24h mein review karegi.</p>
+        `
+      },
+
+      /* ── PAYMENTS ── */
+      {
+        id: "pay1", cat: "payment", icon: "💸",
+        title: "Payment Kab Aur Kaise Milti Hai",
+        badge: "popular",
+        meta: "3 min read · Updated Mar 2026",
+        related: ["pay2","pay3","fee1"],
+        body: `
+          <h3>Payment Flow</h3>
+          <ol>
+            <li>Poster gig post karta hai with budget</li>
+            <li>Worker accept karta hai aur kaam complete karta hai</li>
+            <li>Poster "Mark Complete" karta hai</li>
+            <li>Platform fee (6%) deduct hoti hai</li>
+            <li>Net amount worker ke wallet mein credited</li>
+            <li>Wallet se bank account withdraw karo</li>
+          </ol>
+          <h3>Withdrawal Time</h3>
+          <p>Wallet se bank account mein transfer 24–48 ghante mein hota hai — working days. UPI instant transfer bhi available hai.</p>
+          <div class="tip-box">💡 Minimum withdrawal amount ₹200 hai. Isse kam amount ke liye wait karo jab tak wallet balance badhta nahi.</div>
+          <h3>Payment Methods</h3>
+          <p>Bank transfer (NEFT/IMPS), UPI — dono options available hain. Card payments coming soon.</p>
+        `
+      },
+      {
+        id: "pay2", cat: "payment", icon: "⚠️",
+        title: "Payment Issue Hai — Kya Karna Hai",
+        badge: null,
+        meta: "3 min read · Updated Mar 2026",
+        related: ["pay1","pay4","ts1"],
+        body: `
+          <h3>Pehle In Cheezein Check Karo</h3>
+          <ul>
+            <li>Poster ne "Mark Complete" kiya hai? (required for payment release)</li>
+            <li>Bank details correct hain wallet mein?</li>
+            <li>Minimum withdrawal amount (₹200) puri ho gayi?</li>
+            <li>48 ghante wait kiya? (processing time)</li>
+          </ul>
+          <h3>Agar Ab Bhi Issue Hai</h3>
+          <p>Contact karo <a href="contact.html" style="color:var(--teal)">support team</a> ko — Ticket type: "Payment Issue". Include karo: Gig ID, transaction date, amount expected.</p>
+          <div class="danger-box">🚫 Platform ke bahar kiye gaye payments ke liye GigLega responsible nahi hai — hamesha in-platform pay karo.</div>
+          <h3>Dispute Timeline</h3>
+          <p>Payment disputes 48 ghante mein resolve hoti hain normally. Complex cases 5–7 business days le sakte hain.</p>
+        `
+      },
+      {
+        id: "pay3", cat: "payment", icon: "↩️",
+        title: "Refund Policy — Kab Aur Kaise",
+        badge: null,
+        meta: "3 min read · Updated Mar 2026",
+        related: ["pay1","pay2","fee2"],
+        body: `
+          <h3>Refund Scenarios</h3>
+          <ul>
+            <li><strong>Worker kaam se pehle cancel kare</strong> → Full refund to poster</li>
+            <li><strong>Poster gig cancel kare before worker starts</strong> → No charge to poster</li>
+            <li><strong>Kaam aadha ho</strong> → Partial refund (case-by-case review)</li>
+            <li><strong>Kaam complete ho jaaye</strong> → Refund generally not possible</li>
+          </ul>
+          <div class="tip-box">💡 Dispute file karo 48 ghante ke andar gig completion ke — baad mein claims accepted nahi hote.</div>
+          <h3>Refund Process</h3>
+          <p>Support se contact karo "Payment Issue" category se. Refund approved hone pe original payment method pe 3–5 business days mein credit hota hai.</p>
+          <h3>Platform Fee Refund</h3>
+          <p>Worker cancel kare toh platform fee bhi fully refund hoti hai. Poster cancel kare aur kaam shuru ho chuka ho toh platform fee retain hoti hai.</p>
+        `
+      },
+      {
+        id: "pay4", cat: "payment", icon: "🏦",
+        title: "Bank Account Ya UPI Add Karna",
+        badge: null,
+        meta: "2 min read · Updated Mar 2026",
+        related: ["pay1","ac3","fee1"],
+        body: `
+          <h3>Bank Account Add Karna</h3>
+          <p>Dashboard → Wallet → Payout Settings → Add Bank Account. Account number, IFSC aur account holder name daalna hoga.</p>
+          <h3>UPI Add Karna</h3>
+          <p>Wallet settings mein UPI ID daalo — verify hogi ek small test transaction se (auto-refunded).</p>
+          <div class="warn-box">⚠️ Sirf apna account add karo — third party accounts ke liye payouts allowed nahi hain security reasons se.</div>
+          <h3>Multiple Payout Methods</h3>
+          <p>Ek bank account + ek UPI — dono add kar sakte ho. Withdrawal ke waqt choose karo kaunsa use karna hai.</p>
+        `
+      },
+      {
+        id: "pay5", cat: "payment", icon: "📄",
+        title: "Payment History Aur Receipts Kahan Dekhen",
+        badge: null,
+        meta: "2 min read · Updated Mar 2026",
+        related: ["pay1","ac3","fee2"],
+        body: `
+          <h3>Transaction History</h3>
+          <p>Dashboard → Wallet → Transaction History. Sab payments, withdrawals aur platform fees listed hain with dates aur gig references.</p>
+          <h3>Receipt Download</h3>
+          <p>Har transaction ke saath download button hai — PDF receipt available hai GST purposes ke liye (Business/Enterprise plan).</p>
+          <div class="tip-box">💡 Monthly export karo apni earnings ka — tax filing ke liye useful hai freelancers ke liye.</div>
+          <h3>Tax Information</h3>
+          <p>GigLega TDS deduct nahi karta currently (below threshold). Apne accountant se freelance income reporting ke baare mein poochho.</p>
+        `
+      },
+      {
+        id: "pay6", cat: "payment", icon: "🔐",
+        title: "Payment Security — Apna Paisa Safe Kaise Rakhein",
+        badge: "updated",
+        meta: "3 min read · Updated Mar 2026",
+        related: ["ts1","ts3","pay2"],
+        body: `
+          <h3>Golden Rule</h3>
+          <p>GigLega ke bahar <strong>kabhi bhi</strong> payment mat karo ya kisi ko mat karne do — nahi toh GigLega koi protection nahi de sakta.</p>
+          <h3>OTP Safety</h3>
+          <p>Apna payment OTP, UPI PIN ya bank password kisi ke saath share mat karo — GigLega team kabhi nahi maangti.</p>
+          <div class="danger-box">🚫 Koi bole "verification ke liye ₹1 bhejo" — yeh 100% scam hai. Turant report karo.</div>
+          <h3>Secure Transactions</h3>
+          <ul>
+            <li>Sirf platform wallet use karo</li>
+            <li>Suspicious transaction dikhein toh immediately report karo</li>
+            <li>Payment complete hone ke baad confirm karo wallet mein</li>
+          </ul>
+        `
+      },
+
+      /* ── ACCOUNT ── */
+      {
+        id: "ac1", cat: "account", icon: "✏️",
+        title: "Profile Edit Karna — Name, Photo, Bio",
+        badge: null,
+        meta: "2 min read · Updated Mar 2026",
+        related: ["ac2","gs1","gs6"],
+        body: `
+          <h3>Profile Edit Kaise Karein</h3>
+          <p>Dashboard → Profile → Edit Profile. Naam, photo, bio, skills aur location update kar sakte ho.</p>
+          <h3>Profile Photo Tips</h3>
+          <ul>
+            <li>Clear, front-facing photo use karo</li>
+            <li>Professional ya casual — both fine, but clear face</li>
+            <li>Group photos ya logo avoid karo</li>
+            <li>Max 5MB, JPG/PNG format</li>
+          </ul>
+          <div class="tip-box">💡 Profile photo wale users ko 3x zyada applications milti hain — zaroor add karo.</div>
+          <h3>Skills Section</h3>
+          <p>Apni top 5 skills add karo — search results mein help karta hai aur relevant gig posters tumhe find kar sakte hain.</p>
+        `
+      },
+      {
+        id: "ac2", cat: "account", icon: "🔔",
+        title: "Notifications Settings Manage Karna",
+        badge: null,
+        meta: "2 min read · Updated Mar 2026",
+        related: ["ac1","ac3","gs5"],
+        body: `
+          <h3>Notification Types</h3>
+          <ul>
+            <li>New gig applications (poster)</li>
+            <li>Application accepted/rejected (worker)</li>
+            <li>Payment credited/withdrawn</li>
+            <li>New messages in chat</li>
+            <li>Rating received</li>
+            <li>Platform announcements</li>
+          </ul>
+          <h3>Kaise Off Karein</h3>
+          <p>Dashboard → Settings → Notifications. Individually toggle kar sakte ho ya sab off kar sakte ho.</p>
+          <div class="tip-box">💡 Kum se kum payment aur message notifications on rakhein — important actions miss ho sakte hain warna.</div>
+        `
+      },
+      {
+        id: "ac3", cat: "account", icon: "🔒",
+        title: "Password Aur Security Settings",
+        badge: null,
+        meta: "3 min read · Updated Mar 2026",
+        related: ["ac1","pay4","ts1"],
+        body: `
+          <h3>Password Change Karna</h3>
+          <p>Dashboard → Settings → Security → Change Password. Current password + new password required.</p>
+          <h3>Strong Password Tips</h3>
+          <ul>
+            <li>Minimum 8 characters</li>
+            <li>Mix of uppercase, lowercase, numbers</li>
+            <li>Same password dusri sites pe use mat karo</li>
+          </ul>
+          <h3>Account Recovery</h3>
+          <p>Password bhool gaye? Login page pe "Forgot Password" → registered mobile/email pe reset link/OTP aayega.</p>
+          <div class="danger-box">🚫 Apna password kisi ke saath share mat karo — GigLega support bhi kabhi nahi maangta.</div>
+        `
+      },
+      {
+        id: "ac4", cat: "account", icon: "🗑️",
+        title: "Account Delete Ya Deactivate Karna",
+        badge: null,
+        meta: "2 min read · Updated Mar 2026",
+        related: ["ac3","ac1","pay5"],
+        body: `
+          <h3>Deactivation (Temporary)</h3>
+          <p>Dashboard → Settings → Account → Deactivate. Profile hide ho jaayega — gigs accept nahi ho sakti. Reactivate anytime by logging in.</p>
+          <h3>Account Delete (Permanent)</h3>
+          <p>Dashboard → Settings → Account → Delete Account. Sab data 30 din mein permanently removed. Yeh action undo nahi ho sakta.</p>
+          <div class="warn-box">⚠️ Delete karne se pehle pending payments withdraw kar lo aur active gigs cancel kar do.</div>
+          <h3>Data After Deletion</h3>
+          <p>Personal data delete hota hai. Anonymised transaction records (legally required) 7 years ke liye retain karte hain — Indian tax law compliance.</p>
+        `
+      },
+      {
+        id: "ac5", cat: "account", icon: "📧",
+        title: "Email Verify Karna — Step by Step",
+        badge: null,
+        meta: "1 min read · Updated Mar 2026",
+        related: ["gs1","gs6","ac1"],
+        body: `
+          <h3>Email Verification Steps</h3>
+          <ol>
+            <li>Dashboard → Settings → Email</li>
+            <li>Email address enter karo</li>
+            <li>Inbox mein verification link aayega</li>
+            <li>Link click karo — automatically verified</li>
+          </ol>
+          <div class="tip-box">💡 Email verify karne pe "Email Verified" badge milta hai — trust score badhta hai.</div>
+          <h3>Email Nahi Aaya?</h3>
+          <p>Spam/Junk folder check karo. 5 min wait karo. Phir bhi nahi aaya toh "Resend" button click karo ya support se contact karo.</p>
+        `
+      },
+      {
+        id: "ac6", cat: "account", icon: "🔄",
+        title: "Account Ka Data Download Karna (DPDP Act)",
+        badge: "new",
+        meta: "2 min read · Updated Mar 2026",
+        related: ["ac4","ac3","pay5"],
+        body: `
+          <h3>Apna Data Download Karo</h3>
+          <p>India ke Digital Personal Data Protection Act ke under tumhara right hai apna data request karne ka.</p>
+          <h3>How to Request</h3>
+          <p>Dashboard → Settings → Privacy → Download My Data. Request process hogi aur 7 business days mein email pe ZIP file milega.</p>
+          <h3>Data File Mein Kya Hoga</h3>
+          <ul>
+            <li>Profile information</li>
+            <li>Gig history (posted aur applied)</li>
+            <li>Payment records</li>
+            <li>Ratings received aur given</li>
+          </ul>
+          <div class="tip-box">💡 Saal mein 2 baar data download request kar sakte ho — account delete karne se pehle zaroor karo.</div>
+        `
+      },
+
+      /* ── SAFETY ── */
+      {
+        id: "ts1", cat: "safety", icon: "🚩",
+        title: "Scam Kaise Pehchane — Red Flags",
+        badge: "popular",
+        meta: "3 min read · Updated Mar 2026",
+        related: ["ts2","ts3","pay6"],
+        body: `
+          <h3>Top 5 Red Flags</h3>
+          <ul>
+            <li>🔴 Advance payment demand — platform se bahar</li>
+            <li>🔴 "Too good to be true" budget</li>
+            <li>🔴 "WhatsApp pe aao" — off-platform push</li>
+            <li>🔴 Aadhaar / OTP / bank details maangna</li>
+            <li>🔴 New profile + urgency + high pay combination</li>
+          </ul>
+          <div class="danger-box">🚫 Inme se koi bhi dikhne pe — gig se hat jao aur immediately report karo. Safety team 24h mein action leti hai.</div>
+          <h3>Golden Safety Rule</h3>
+          <p>GigLega ke andar karo sab kuch — payment, communication, confirmation. Platform ke bahar kuch bhi karo toh protection khatam.</p>
+        `
+      },
+      {
+        id: "ts2", cat: "safety", icon: "🚨",
+        title: "Kisi Ko Report Kaise Karein",
+        badge: null,
+        meta: "2 min read · Updated Mar 2026",
+        related: ["ts1","ts3","ts4"],
+        body: `
+          <h3>Report Karne Ke Tarike</h3>
+          <ol>
+            <li><strong>Profile se</strong> — User profile pe "Report" button</li>
+            <li><strong>Gig se</strong> — Gig page pe "Report Gig"</li>
+            <li><strong>Chat se</strong> — Chat mein "…" menu → Report</li>
+            <li><strong>Trust & Safety page se</strong> — Detailed form <a href="trust-safety.html#reportForm" style="color:var(--teal)">yahan</a></li>
+          </ol>
+          <h3>Kya Include Karein</h3>
+          <ul>
+            <li>User ID ya Gig ID</li>
+            <li>Exactly kya hua (detail mein)</li>
+            <li>Screenshots agar possible ho</li>
+            <li>Severity level</li>
+          </ul>
+          <div class="tip-box">💡 Report anonymous hai — reported user ko kabhi pata nahi chalta ki kisne report kiya.</div>
+        `
+      },
+      {
+        id: "ts3", cat: "safety", icon: "🤝",
+        title: "Safe Meeting Tips — First Time Milna",
+        badge: null,
+        meta: "3 min read · Updated Mar 2026",
+        related: ["ts1","ts2","gs3"],
+        body: `
+          <h3>Location Choice</h3>
+          <ul>
+            <li>Public place choose karo — cafe, mall, metro station</li>
+            <li>Pehli baar kisi ke ghar/closed space pe mat jao</li>
+            <li>Daytime meeting prefer karo</li>
+          </ul>
+          <h3>Before Meeting</h3>
+          <ul>
+            <li>Kisi family member ya friend ko batao kahan ja rahe ho</li>
+            <li>Poster/worker profile screenshot save karo</li>
+            <li>Meeting confirm karo day before</li>
+          </ul>
+          <div class="tip-box">💡 GigLega pe ratings aur reviews se bahut kuch pata chalta hai — 20+ reviews wale users generally safe hote hain.</div>
+          <h3>During the Gig</h3>
+          <p>Uncomfortable feel karo toh politely leave karo — safety first, always. In-app report baad mein kar sakte ho.</p>
+        `
+      },
+      {
+        id: "ts4", cat: "safety", icon: "🛡️",
+        title: "Platform Ke Safety Features Kya Hain",
+        badge: null,
+        meta: "2 min read · Updated Mar 2026",
+        related: ["ts1","ts2","gs6"],
+        body: `
+          <h3>Built-in Safety Features</h3>
+          <ul>
+            <li>✅ Phone OTP verification — mandatory signup</li>
+            <li>💬 In-app chat — sab communication logged</li>
+            <li>⭐ Ratings system — community self-policing</li>
+            <li>🚨 One-tap reporting — any page se</li>
+            <li>🔒 Location privacy — sirf area visible, exact address nahi</li>
+            <li>📋 Dispute resolution — 48h SLA</li>
+          </ul>
+          <div class="tip-box">💡 Verified badges wale users pe zyada trust karo — multiple checks pass kar chuke hote hain.</div>
+          <h3>What We Monitor</h3>
+          <p>Platform pe automated aur manual monitoring hoti hai suspicious patterns ke liye — scam attempts, fake gigs, payment fraud.</p>
+        `
+      },
+      {
+        id: "ts5", cat: "safety", icon: "👩",
+        title: "Women Workers Ke Liye Safety Tips",
+        badge: "new",
+        meta: "3 min read · Updated Mar 2026",
+        related: ["ts1","ts3","ts2"],
+        body: `
+          <h3>Gig Choose Karte Waqt</h3>
+          <ul>
+            <li>Poster ki rating aur previous workers ke reviews dekho</li>
+            <li>Daytime gigs prefer karo pehle kuch baar</li>
+            <li>Group gigs ya established businesses prefer karein</li>
+          </ul>
+          <h3>Safety Network</h3>
+          <ul>
+            <li>Kisi trusted person ko full gig details bhejo before jaane se</li>
+            <li>Location share karo real-time (WhatsApp Live Location)</li>
+            <li>Check-in karo midway through gig</li>
+          </ul>
+          <div class="tip-box">💡 GigLega "Women-Verified Poster" badge launch kar raha hai — Q2 2026 mein. Watch this space.</div>
+          <h3>Emergency Contacts</h3>
+          <ul>
+            <li>Women Helpline: 1091</li>
+            <li>Police: 100</li>
+            <li>GigLega Urgent: safety@giglega.in</li>
+          </ul>
+        `
+      },
+      {
+        id: "ts6", cat: "safety", icon: "🔐",
+        title: "Account Hack Ya Unauthorized Access — Kya Karein",
+        badge: null,
+        meta: "2 min read · Updated Mar 2026",
+        related: ["ac3","ts2","pay2"],
+        body: `
+          <h3>Signs Of Unauthorized Access</h3>
+          <ul>
+            <li>Login notification from unknown device/location</li>
+            <li>Gigs posted ya applications sent jo tumne nahi kiye</li>
+            <li>Wallet balance change unexpectedly</li>
+            <li>Profile details changed</li>
+          </ul>
+          <h3>Turant Kya Karein</h3>
+          <ol>
+            <li>Password immediately change karo</li>
+            <li>All devices se logout karo (Settings → Security)</li>
+            <li>Payout bank details verify karo</li>
+            <li>Support ko report karo — <a href="contact.html" style="color:var(--teal)">contact page</a></li>
+          </ol>
+          <div class="danger-box">🚫 Koi suspicious transaction hua ho toh 24h ke andar report karo — baad mein reversal mushkil hota hai.</div>
+        `
+      },
+
+      /* ── FEES ── */
+      {
+        id: "fee1", cat: "fee", icon: "💳",
+        title: "Platform Fee Kya Hai — Explained",
+        badge: "popular",
+        meta: "3 min read · Updated Mar 2026",
+        related: ["fee2","fee3","pay1"],
+        body: `
+          <h3>GigLega Ki Fee Structure</h3>
+          <p>GigLega worker ki earnings se <strong>6% platform fee</strong> leta hai. Poster ke liye koi listing fee nahi — gig post karna free hai.</p>
+          <h3>Example</h3>
+          <p>Ek gig ka budget ₹1000 hai:</p>
+          <ul>
+            <li>Worker ko milega: ₹940 (₹1000 - ₹60 fee)</li>
+            <li>GigLega fee: ₹60 (6%)</li>
+            <li>Poster se charge: ₹0 additional</li>
+          </ul>
+          <div class="tip-box">💡 Business plan (₹2,999/month) pe fee 4% ho jaati hai — zyada gigs karne walon ke liye quickly recover ho jaata hai.</div>
+          <h3>Kab Deduct Hoti Hai</h3>
+          <p>Gig complete mark hone ke baad automatically deduct hoti hai — worker ko net amount milta hai. Transparent breakdown wallet history mein dikhti hai.</p>
+        `
+      },
+      {
+        id: "fee2", cat: "fee", icon: "📊",
+        title: "Plans Comparison — Starter vs Business vs Enterprise",
+        badge: "updated",
+        meta: "3 min read · Updated Mar 2026",
+        related: ["fee1","fee3","post4"],
+        body: `
+          <h3>Starter Plan — Free</h3>
+          <ul>
+            <li>5 active gigs at a time</li>
+            <li>6% platform fee</li>
+            <li>Basic chat aur browse</li>
+            <li>Individual users ke liye perfect</li>
+          </ul>
+          <h3>Business Plan — ₹2,999/month</h3>
+          <ul>
+            <li>50 active gigs</li>
+            <li>4% platform fee (save 33%)</li>
+            <li>Analytics dashboard</li>
+            <li>3 team members</li>
+            <li>Annual plan pe 20% off = ₹2,399/month</li>
+          </ul>
+          <h3>Enterprise — Custom</h3>
+          <ul>
+            <li>Unlimited gigs</li>
+            <li>3–4% negotiated fee</li>
+            <li>Dedicated account manager</li>
+            <li>Bulk CSV posting</li>
+            <li>API access (Q3 2026)</li>
+          </ul>
+          <p>Plans compare karne ke liye <a href="enterprise.html#pricing" style="color:var(--teal)">Enterprise page</a> dekho.</p>
+        `
+      },
+      {
+        id: "fee3", cat: "fee", icon: "🧮",
+        title: "Business Plan Ki Value Calculate Karna",
+        badge: null,
+        meta: "2 min read · Updated Mar 2026",
+        related: ["fee1","fee2","post4"],
+        body: `
+          <h3>Break-Even Calculation</h3>
+          <p>Business plan mein 4% fee hai vs 6% (Starter). 2% savings per gig.</p>
+          <p><strong>Formula:</strong> Break-even = ₹2,999 ÷ 2% = ₹1,49,950 total gig value/month</p>
+          <div class="tip-box">💡 Agar monthly gig value ₹1.5 lakh+ hai, Business plan automatically profitable ho jaata hai.</div>
+          <h3>Additional Savings</h3>
+          <ul>
+            <li>Analytics se better decisions = higher fill rate</li>
+            <li>Priority listing = faster fills</li>
+            <li>3 team members = operations scale</li>
+          </ul>
+        `
+      },
+      {
+        id: "fee4", cat: "fee", icon: "🔄",
+        title: "Plan Upgrade Ya Downgrade Karna",
+        badge: null,
+        meta: "2 min read · Updated Mar 2026",
+        related: ["fee1","fee2","ac3"],
+        body: `
+          <h3>Upgrade Karna</h3>
+          <p>Dashboard → Billing → Upgrade Plan. Immediate effect — current billing cycle mein pro-rated charge hoga.</p>
+          <h3>Downgrade Karna</h3>
+          <p>Downgrade next billing cycle se effective hoga. Active gigs jo new plan limit se zyada hain — paused ho jayenge (deleted nahi).</p>
+          <div class="tip-box">💡 Annual plan pe upgrade karo 20% bachao — monthly se annual switch anytime kar sakte ho.</div>
+          <h3>Cancel Karna</h3>
+          <p>Anytime cancel kar sakte ho — no lock-in (monthly plan). Billing cycle end pe Starter plan mein auto-downgrade hota hai.</p>
+        `
+      },
+      {
+        id: "fee5", cat: "fee", icon: "🧾",
+        title: "GST Aur Invoice — Business Ke Liye",
+        badge: "new",
+        meta: "2 min read · Updated Mar 2026",
+        related: ["fee1","pay5","ac6"],
+        body: `
+          <h3>GST On Platform Fee</h3>
+          <p>Platform fee pe 18% GST applicable hai (SAC code 998314 — Online marketplace services). Yeh platform fee ke upar additional hai.</p>
+          <h3>GST Invoice Download</h3>
+          <p>Dashboard → Wallet → Transaction History → Download Invoice. Business/Enterprise plan users ke liye GST invoice available hai.</p>
+          <div class="tip-box">💡 GST number add karo company settings mein — GSTIN wali invoices milenge jo ITC claim karne mein help karengi.</div>
+          <h3>GSTIN Add Karna</h3>
+          <p>Dashboard → Settings → Business → GSTIN. Verified hone ke baad sab future invoices mein automatically include hoga.</p>
+        `
       }
 
-      /* ── Boot ────────────────────────────────── */
-      document.addEventListener("DOMContentLoaded", function () {
-        buildBreadcrumb("helpBreadcrumb", [
-          { label: "Home", href: "index.html" },
-          { label: "Help Center" }
-        ]);
-      });
-    </script>
-  </body>
-</html>
+    ] // end articles
+  };
+
+  /* ═══════════════════════════════════════════════════════════
+     APP LOGIC
+  ═══════════════════════════════════════════════════════════ */
+  document.addEventListener("DOMContentLoaded", function () {
+
+    var currentCat     = "overview";
+    var currentArticle = null;
+
+    /* ── Breadcrumb ── */
+    if (typeof buildBreadcrumb === "function") {
+      buildBreadcrumb("breadcrumb", [
+        { label: "Home", href: "
