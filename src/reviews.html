@@ -3,945 +3,1896 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Reviews — GigLega</title>
-
-  <script src="shared.js"></script>
+  <title>Reviews & Ratings — GigLega</title>
+  <meta name="description" content="GigLega Reviews — apni ratings dekho, client feedback manage karo, trust build karo." />
   <link rel="stylesheet" href="styles.css" />
-
+  <script src="shared.js"></script>
   <style>
-    .reviews-wrap { max-width: 900px; margin: 0 auto; padding: 28px 16px 80px; }
 
-    /* ── Profile summary card ── */
-    .profile-card {
-      background: var(--surface);
-      border: 1.5px solid var(--gray-200);
-      border-radius: var(--radius);
-      padding: 24px;
-      display: flex;
-      align-items: center;
-      gap: 20px;
-      flex-wrap: wrap;
-      margin-bottom: 24px;
-      box-shadow: var(--shadow-sm);
-    }
-    .profile-avatar {
-      width: 72px; height: 72px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--primary), var(--teal));
-      color: #fff;
-      font-size: 1.6rem;
-      font-weight: 900;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      box-shadow: 0 4px 14px rgba(13,148,136,.3);
-    }
-    .profile-info { flex: 1; min-width: 0; }
-    .profile-name { font-size: 1.1rem; font-weight: 900; color: var(--primary); margin-bottom: 3px; }
-    .profile-role { font-size: .82rem; color: var(--gray-500); margin-bottom: 8px; }
-    .profile-badges { display: flex; gap: 8px; flex-wrap: wrap; }
-    .profile-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 4px 12px;
-      border-radius: 14px;
-      font-size: .75rem;
-      font-weight: 700;
-    }
-    .badge-verified { background: rgba(16,185,129,.1); color: var(--success); }
-    .badge-top      { background: rgba(245,158,11,.1);  color: #b45309; }
-    .badge-new      { background: rgba(13,148,136,.1);  color: var(--teal); }
+    /* ══════════════════════════════════
+       WRAPPER
+    ══════════════════════════════════ */
+    .rv-wrapper { min-height: 100vh; background: var(--bg); }
 
-    /* ── Rating hero ── */
-    .rating-hero {
-      background: linear-gradient(135deg, var(--primary) 0%, var(--teal) 100%);
-      border-radius: var(--radius);
-      padding: 28px;
-      color: #fff;
-      margin-bottom: 24px;
+    /* ══════════════════════════════════
+       HERO
+    ══════════════════════════════════ */
+    .rv-hero {
+      background: linear-gradient(135deg, #0b1e35 0%, #1a3c5e 40%, #064e3b 100%);
+      padding: 36px 20px 80px;
+      position: relative; overflow: hidden;
+    }
+    .rv-hero::before {
+      content: "";
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse at 10% 85%, rgba(13,148,136,.22) 0%, transparent 50%),
+        radial-gradient(ellipse at 88% 15%, rgba(245,158,11,.08) 0%, transparent 50%);
+      pointer-events: none;
+    }
+    .rv-hero::after {
+      content: "";
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+      background-size: 52px 52px; pointer-events: none;
+    }
+    .rv-hero-inner {
+      max-width: 1100px; margin: 0 auto;
+      position: relative; z-index: 1;
       display: grid;
-      grid-template-columns: auto 1fr;
-      gap: 28px;
-      align-items: center;
+      grid-template-columns: 1fr auto;
+      gap: 32px; align-items: center;
     }
-    @media (max-width: 560px) { .rating-hero { grid-template-columns: 1fr; text-align: center; } }
-    .rating-big { text-align: center; }
-    .rating-number {
-      font-size: clamp(3rem, 8vw, 4.5rem);
-      font-weight: 900;
-      line-height: 1;
-      color: #fff;
-    }
-    .rating-stars-big { font-size: 1.4rem; margin: 6px 0; letter-spacing: 2px; }
-    .rating-total { font-size: .82rem; opacity: .7; }
+    @media(max-width:768px) { .rv-hero-inner { grid-template-columns: 1fr; } }
 
-    /* Breakdown bars */
-    .rating-breakdown { }
-    .breakdown-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 8px;
+    /* Left: Score */
+    .rv-score-block {}
+    .rvs-tag {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(255,255,255,.1);
+      border: 1px solid rgba(255,255,255,.15);
+      border-radius: var(--radius-full);
+      padding: 4px 14px;
+      font-size: .72rem; font-weight: 700;
+      color: rgba(255,255,255,.75);
+      text-transform: uppercase; letter-spacing: .5px;
+      margin-bottom: 16px;
     }
-    .breakdown-row:last-child { margin-bottom: 0; }
-    .breakdown-label { font-size: .78rem; opacity: .85; white-space: nowrap; min-width: 36px; text-align: right; }
-    .breakdown-bar-wrap {
-      flex: 1;
-      height: 7px;
-      background: rgba(255,255,255,.2);
-      border-radius: 4px;
-      overflow: hidden;
-    }
-    .breakdown-bar-fill {
-      height: 100%;
-      background: #fff;
-      border-radius: 4px;
-      transition: width .6s ease;
-    }
-    .breakdown-count { font-size: .75rem; opacity: .7; min-width: 20px; }
-
-    /* ── Stats row ── */
-    .stats-row {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-      gap: 14px;
-      margin-bottom: 24px;
-    }
-    .stat-card {
-      background: var(--surface);
-      border: 1.5px solid var(--gray-200);
-      border-radius: var(--radius);
-      padding: 16px 18px;
-      box-shadow: var(--shadow-sm);
-      text-align: center;
-    }
-    .stat-icon { font-size: 1.4rem; margin-bottom: 6px; display: block; }
-    .stat-val  { font-size: 1.3rem; font-weight: 800; color: var(--primary); }
-    .stat-val.green { color: var(--success); }
-    .stat-val.amber { color: var(--accent); }
-    .stat-lbl  { font-size: .73rem; color: var(--gray-400); margin-top: 3px; }
-
-    /* ── Controls ── */
-    .controls-bar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 12px;
+    .rvs-main {
+      display: flex; align-items: flex-end; gap: 20px; flex-wrap: wrap;
       margin-bottom: 18px;
     }
-    .filter-chips { display: flex; gap: 7px; flex-wrap: wrap; }
-    .chip {
-      padding: 6px 14px;
-      border-radius: 16px;
-      border: 1.5px solid var(--gray-200);
-      font-size: .78rem;
-      font-weight: 700;
-      color: var(--gray-500);
-      cursor: pointer;
-      background: transparent;
-      white-space: nowrap;
-      transition: all .2s;
-      font-family: var(--font);
+    .rvs-big-score {
+      font-size: clamp(3.5rem, 8vw, 5.5rem);
+      font-weight: 900; color: #fff;
+      letter-spacing: -2px; line-height: 1;
     }
-    .chip.active { border-color: var(--teal); background: rgba(13,148,136,.08); color: var(--teal); }
-    .chip:hover:not(.active) { border-color: var(--gray-400); color: var(--gray-700); }
+    .rvs-big-score span { font-size: 40%; color: rgba(255,255,255,.5); font-weight: 700; }
+    .rvs-stars-col {}
+    .rvs-stars {
+      font-size: 1.6rem; line-height: 1; margin-bottom: 6px; letter-spacing: 2px;
+    }
+    .rvs-count {
+      font-size: .88rem; color: rgba(255,255,255,.6); font-weight: 600;
+    }
+    .rvs-count strong { color: rgba(255,255,255,.9); }
 
-    .sort-select {
-      padding: 7px 12px;
-      border: 1.5px solid var(--gray-200);
+    /* Star breakdown bars */
+    .rvs-breakdown {
+      display: flex; flex-direction: column; gap: 6px;
+      max-width: 340px;
+    }
+    .rvs-bar-row {
+      display: flex; align-items: center; gap: 10px; cursor: pointer;
+      transition: opacity .15s;
+    }
+    .rvs-bar-row:hover { opacity: .8; }
+    .rvs-star-label {
+      font-size: .76rem; font-weight: 800; color: rgba(255,255,255,.75);
+      width: 36px; flex-shrink: 0; display: flex; align-items: center; gap: 3px;
+    }
+    .rvs-bar-track {
+      flex: 1; height: 7px; background: rgba(255,255,255,.12);
+      border-radius: 4px; overflow: hidden;
+    }
+    .rvs-bar-fill {
+      height: 100%; border-radius: 4px;
+      background: linear-gradient(90deg, #fbbf24, #f59e0b);
+      transition: width .8s cubic-bezier(.34,1.56,.64,1);
+    }
+    .rvs-bar-count {
+      font-size: .72rem; font-weight: 700; color: rgba(255,255,255,.55);
+      width: 28px; text-align: right; flex-shrink: 0;
+    }
+
+    /* Right: badges */
+    .rv-trust-badges {
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    @media(max-width:768px) { .rv-trust-badges { flex-direction: row; flex-wrap: wrap; } }
+    .rtb-card {
+      background: rgba(255,255,255,.1);
+      border: 1px solid rgba(255,255,255,.15);
       border-radius: var(--radius-sm);
-      font-size: .82rem;
-      font-family: var(--font);
-      background: var(--surface);
-      color: var(--text);
-      cursor: pointer;
+      padding: 12px 18px;
+      text-align: center; min-width: 130px;
     }
-    .sort-select:focus { outline: none; border-color: var(--teal); }
+    .rtb-icon  { font-size: 1.5rem; line-height: 1; margin-bottom: 5px; }
+    .rtb-val   { font-size: 1.2rem; font-weight: 900; color: #fff; line-height: 1; margin-bottom: 3px; }
+    .rtb-label { font-size: .68rem; font-weight: 700; color: rgba(255,255,255,.6); text-transform: uppercase; letter-spacing: .3px; }
 
-    /* ── Review cards ── */
-    .review-card {
+    /* ══════════════════════════════════
+       STATS STRIP
+    ══════════════════════════════════ */
+    .rv-stats-strip {
+      max-width: 1100px; margin: -44px auto 0;
+      padding: 0 20px; position: relative; z-index: 10;
+    }
+    .rv-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+    }
+    @media(max-width:900px) { .rv-stats-grid { grid-template-columns: repeat(3,1fr); } }
+    @media(max-width:520px) { .rv-stats-grid { grid-template-columns: repeat(2,1fr); } }
+
+    .rv-stat {
       background: var(--surface);
       border: 1.5px solid var(--gray-200);
       border-radius: var(--radius);
-      padding: 20px;
-      margin-bottom: 12px;
-      box-shadow: var(--shadow-sm);
-      transition: border .2s;
+      padding: 16px 14px;
+      box-shadow: var(--shadow);
+      text-align: center;
+      position: relative; overflow: hidden;
+      transition: transform .2s;
     }
-    .review-card:hover { border-color: rgba(13,148,136,.3); }
-    .review-card.highlighted { border-color: var(--teal); background: rgba(13,148,136,.02); }
+    .rv-stat:hover { transform: translateY(-2px); }
+    [data-theme=dark] .rv-stat { border-color: var(--gray-700); }
+    .rv-stat::before {
+      content: ""; position: absolute;
+      top: 0; left: 0; right: 0; height: 3px;
+    }
+    .rv-stat:nth-child(1)::before { background: linear-gradient(90deg,#f59e0b,#fbbf24); }
+    .rv-stat:nth-child(2)::before { background: linear-gradient(90deg,#059669,#34d399); }
+    .rv-stat:nth-child(3)::before { background: linear-gradient(90deg,var(--primary),var(--teal)); }
+    .rv-stat:nth-child(4)::before { background: linear-gradient(90deg,#7c3aed,#a78bfa); }
+    .rv-stat:nth-child(5)::before { background: linear-gradient(90deg,#dc2626,#f87171); }
 
-    .review-head {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 12px;
-      flex-wrap: wrap;
+    .rvst-icon  { font-size: 1.3rem; margin-bottom: 5px; line-height: 1; }
+    .rvst-val   { font-size: 1.3rem; font-weight: 900; color: var(--primary); line-height: 1; margin-bottom: 3px; letter-spacing: -.3px; }
+    .rvst-label { font-size: .65rem; font-weight: 700; text-transform: uppercase; letter-spacing: .3px; color: var(--gray-400); }
+
+    /* ══════════════════════════════════
+       TAB BAR
+    ══════════════════════════════════ */
+    .rv-tabs-bar {
+      background: var(--surface);
+      border-bottom: 1.5px solid var(--gray-200);
+      position: sticky; top: 0; z-index: 40;
+      box-shadow: var(--shadow-sm);
+      margin-top: 28px;
     }
-    .reviewer-info { display: flex; align-items: center; gap: 11px; }
-    .reviewer-avatar {
-      width: 42px; height: 42px;
-      border-radius: 50%;
-      background: var(--primary);
-      color: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: .85rem;
-      font-weight: 700;
+    [data-theme=dark] .rv-tabs-bar { border-color: var(--gray-700); }
+    .rv-tabs-inner {
+      max-width: 1100px; margin: 0 auto;
+      padding: 0 20px; display: flex;
+      align-items: center; justify-content: space-between;
+      gap: 12px; flex-wrap: wrap;
+    }
+    .rv-tabs-left { display: flex; overflow-x: auto; }
+    .rv-tabs-left::-webkit-scrollbar { display: none; }
+
+    .rv-tab {
+      display: flex; align-items: center; gap: 6px;
+      padding: 14px 16px;
+      font-size: .86rem; font-weight: 700;
+      color: var(--gray-500); cursor: pointer;
+      border-bottom: 2.5px solid transparent;
+      white-space: nowrap; background: none;
+      border-left: none; border-right: none; border-top: none;
+      font-family: var(--font);
+      transition: color .15s, border-color .15s;
       flex-shrink: 0;
     }
-    .reviewer-name  { font-size: .9rem; font-weight: 700; color: var(--text); margin-bottom: 2px; }
-    .reviewer-role  { font-size: .75rem; color: var(--gray-400); }
+    .rv-tab:hover  { color: var(--primary); }
+    .rv-tab.active { color: var(--primary); border-bottom-color: var(--teal); }
+    [data-theme=dark] .rv-tab { color: var(--gray-400); }
+    .rv-tab-badge {
+      font-size: .62rem; font-weight: 900;
+      padding: 2px 6px; border-radius: 8px;
+      background: var(--gray-200); color: var(--gray-600);
+    }
+    [data-theme=dark] .rv-tab-badge { background: var(--gray-700); color: var(--gray-300); }
 
-    /* Star rating */
-    .star-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-    .stars { font-size: .95rem; letter-spacing: 1px; }
-    .star-num { font-size: .82rem; font-weight: 700; color: var(--accent); }
-    .review-date { font-size: .74rem; color: var(--gray-400); }
-
-    /* Review body */
-    .review-gig-tag {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 4px 10px;
-      background: var(--gray-100);
-      border-radius: 8px;
-      font-size: .75rem;
-      font-weight: 600;
-      color: var(--gray-600);
-      margin-bottom: 10px;
-      text-decoration: none;
+    .rv-tabs-right {
+      display: flex; gap: 8px; padding: 8px 0; flex-shrink: 0;
     }
-    .review-gig-tag:hover { background: rgba(13,148,136,.1); color: var(--teal); text-decoration: none; }
-    .review-text {
-      font-size: .88rem;
-      color: var(--gray-700);
-      line-height: 1.7;
-      margin-bottom: 12px;
-    }
-    .review-text.collapsed {
-      display: -webkit-box;
-      -webkit-line-clamp: 3;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-    }
-    .btn-read-more {
-      background: none;
-      border: none;
-      color: var(--teal);
-      font-size: .8rem;
-      font-weight: 700;
-      cursor: pointer;
-      padding: 0;
-      font-family: var(--font);
-      margin-bottom: 10px;
-      display: block;
-    }
-
-    /* Skill tags */
-    .skill-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
-    .skill-tag {
-      padding: 3px 10px;
-      background: rgba(13,148,136,.08);
-      color: var(--teal);
-      border-radius: 8px;
-      font-size: .72rem;
-      font-weight: 700;
-    }
-
-    /* Helpful */
-    .review-foot {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 8px;
-      padding-top: 12px;
-      border-top: 1px solid var(--gray-100);
-    }
-    .helpful-row { display: flex; align-items: center; gap: 8px; font-size: .78rem; color: var(--gray-500); }
-    .btn-helpful {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      padding: 4px 12px;
+    .btn-rv-action {
+      padding: 7px 14px; border-radius: var(--radius-sm);
       border: 1.5px solid var(--gray-200);
-      border-radius: 12px;
-      font-size: .75rem;
-      font-weight: 700;
-      color: var(--gray-500);
-      background: transparent;
-      cursor: pointer;
-      font-family: var(--font);
-      transition: all .2s;
+      background: none; color: var(--gray-600);
+      font-size: .78rem; font-weight: 700;
+      cursor: pointer; font-family: var(--font);
+      transition: all .15s; white-space: nowrap;
     }
-    .btn-helpful:hover,
-    .btn-helpful.active { border-color: var(--success); color: var(--success); background: rgba(16,185,129,.06); }
-    .review-type-badge {
-      font-size: .68rem;
-      font-weight: 700;
-      padding: 3px 9px;
-      border-radius: 8px;
-      text-transform: uppercase;
-      letter-spacing: .4px;
-    }
-    .type-worker { background: rgba(13,148,136,.1); color: var(--teal); }
-    .type-poster { background: rgba(26,60,94,.1); color: var(--primary); }
+    .btn-rv-action:hover { border-color: var(--teal); color: var(--teal); }
+    [data-theme=dark] .btn-rv-action { border-color: var(--gray-600); color: var(--gray-400); }
 
-    /* ── Write a review ── */
-    .write-card {
+    /* ══════════════════════════════════
+       BODY LAYOUT
+    ══════════════════════════════════ */
+    .rv-body {
+      max-width: 1100px; margin: 0 auto;
+      padding: 28px 20px 80px;
+    }
+    .rv-panel { display: none; }
+    .rv-panel.active { display: block; }
+
+    .rv-two-col {
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 24px; align-items: start;
+    }
+    @media(max-width:900px) { .rv-two-col { grid-template-columns: 1fr; } }
+
+    /* ══════════════════════════════════
+       CARD BASE
+    ══════════════════════════════════ */
+    .rv-card {
       background: var(--surface);
       border: 1.5px solid var(--gray-200);
       border-radius: var(--radius);
-      overflow: hidden;
-      margin-bottom: 24px;
       box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      margin-bottom: 20px;
     }
-    .write-card-header {
+    [data-theme=dark] .rv-card { border-color: var(--gray-700); }
+
+    .rv-card-header {
       padding: 16px 20px;
       border-bottom: 1.5px solid var(--gray-100);
-      font-size: .95rem;
-      font-weight: 800;
+      background: linear-gradient(135deg, rgba(26,60,94,.03), rgba(13,148,136,.04));
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 12px; flex-wrap: wrap;
+    }
+    [data-theme=dark] .rv-card-header { border-color: var(--gray-700); }
+    .rv-card-title {
+      font-size: .92rem; font-weight: 800; color: var(--primary);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .btn-rvc-action {
+      padding: 6px 14px; border-radius: var(--radius-sm);
+      border: 1.5px solid var(--gray-200);
+      background: none; color: var(--gray-600);
+      font-size: .76rem; font-weight: 700;
+      cursor: pointer; font-family: var(--font);
+      transition: all .15s; white-space: nowrap;
+    }
+    .btn-rvc-action:hover { border-color: var(--teal); color: var(--teal); }
+    [data-theme=dark] .btn-rvc-action { border-color: var(--gray-600); color: var(--gray-400); }
+    .rv-card-body { padding: 20px; }
+
+    /* ══════════════════════════════════
+       INFO BOX
+    ══════════════════════════════════ */
+    .rv-info-box {
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      padding: 11px 14px; margin-bottom: 18px;
+      font-size: .85rem; line-height: 1.65;
+    }
+    .rv-info-box.teal   { background: rgba(13,148,136,.07); border-left: 3px solid var(--teal); }
+    .rv-info-box.green  { background: rgba(16,185,129,.06); border-left: 3px solid #059669; }
+    .rv-info-box.amber  { background: rgba(245,158,11,.07); border-left: 3px solid #f59e0b; }
+
+    /* ══════════════════════════════════
+       REVIEW CARD
+    ══════════════════════════════════ */
+    .review-item {
+      padding: 20px;
+      border-bottom: 1.5px solid var(--gray-100);
+      transition: background .15s;
+    }
+    .review-item:last-child { border-bottom: none; }
+    .review-item:hover { background: rgba(13,148,136,.02); }
+    [data-theme=dark] .review-item { border-color: var(--gray-700); }
+
+    .ri-top {
+      display: flex; align-items: flex-start;
+      justify-content: space-between; gap: 14px; flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+    .ri-left {
+      display: flex; align-items: flex-start; gap: 12px; flex: 1; min-width: 0;
+    }
+    .ri-avatar {
+      width: 44px; height: 44px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; font-weight: 900; color: #fff;
+      flex-shrink: 0;
+    }
+    .ri-info {}
+    .ri-name  { font-size: .92rem; font-weight: 800; color: var(--text); margin-bottom: 3px; }
+    .ri-meta  { font-size: .74rem; color: var(--gray-400); font-weight: 600; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .ri-gig-tag {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: rgba(13,148,136,.08);
+      border: 1px solid rgba(13,148,136,.15);
+      border-radius: 5px; padding: 2px 8px;
+      font-size: .68rem; font-weight: 800; color: var(--teal);
+    }
+
+    .ri-right { text-align: right; flex-shrink: 0; }
+    .ri-stars  { font-size: 1rem; letter-spacing: 1px; margin-bottom: 3px; line-height: 1; }
+    .ri-date   { font-size: .72rem; color: var(--gray-400); font-weight: 600; }
+
+    /* Review body */
+    .ri-body { margin-bottom: 12px; }
+    .ri-text {
+      font-size: .88rem; color: var(--gray-600);
+      line-height: 1.75; font-style: italic;
+      position: relative; padding-left: 14px;
+    }
+    .ri-text::before {
+      content: '"';
+      position: absolute; left: 0; top: -3px;
+      font-size: 1.6rem; color: rgba(13,148,136,.3);
+      font-style: normal; line-height: 1;
+    }
+    [data-theme=dark] .ri-text { color: var(--gray-400); }
+
+    /* Skill tags */
+    .ri-skills {
+      display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px;
+    }
+    .ri-skill-tag {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px 10px; border-radius: 5px;
+      font-size: .7rem; font-weight: 700;
+      background: rgba(26,60,94,.06);
       color: var(--primary);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      cursor: pointer;
-      justify-content: space-between;
+      border: 1px solid rgba(26,60,94,.1);
     }
-    .write-card-body { padding: 20px; display: none; }
-    .write-card-body.open { display: block; }
+    [data-theme=dark] .ri-skill-tag { background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.1); }
 
-    /* Star picker */
-    .star-picker { display: flex; gap: 6px; margin-bottom: 16px; }
-    .star-pick {
-      font-size: 1.8rem;
-      cursor: pointer;
-      transition: transform .15s;
-      line-height: 1;
-      color: var(--gray-300);
-      background: none;
-      border: none;
-      padding: 0;
+    /* Attribute ratings */
+    .ri-attributes {
+      display: grid; grid-template-columns: repeat(4,1fr);
+      gap: 10px; margin-top: 12px;
     }
-    .star-pick:hover,
-    .star-pick.active { color: var(--accent); transform: scale(1.15); }
+    @media(max-width:600px) { .ri-attributes { grid-template-columns: repeat(2,1fr); } }
+    .ri-attr {
+      background: var(--bg);
+      border: 1px solid var(--gray-200);
+      border-radius: 8px;
+      padding: 8px 10px; text-align: center;
+    }
+    [data-theme=dark] .ri-attr { background: var(--gray-800); border-color: var(--gray-600); }
+    .ria-label { font-size: .66rem; font-weight: 700; color: var(--gray-400); text-transform: uppercase; letter-spacing: .3px; margin-bottom: 4px; }
+    .ria-stars { font-size: .82rem; }
+    .ria-score { font-size: .78rem; font-weight: 900; color: var(--primary); margin-top: 2px; }
 
-    .form-field { margin-bottom: 14px; }
-    .form-field label { display: block; font-size: .83rem; font-weight: 600; color: var(--gray-700); margin-bottom: 5px; }
-    .form-field input,
-    .form-field select,
-    .form-field textarea {
-      width: 100%;
+    /* Reply section */
+    .ri-reply-wrap {
+      margin-top: 14px; padding-top: 14px;
+      border-top: 1px dashed var(--gray-200);
+    }
+    [data-theme=dark] .ri-reply-wrap { border-color: var(--gray-700); }
+    .ri-reply-existing {
+      display: flex; gap: 10px; align-items: flex-start;
+    }
+    .ri-reply-avatar {
+      width: 30px; height: 30px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--teal));
+      display: flex; align-items: center; justify-content: center;
+      font-size: .7rem; font-weight: 900; color: #fff; flex-shrink: 0;
+    }
+    .ri-reply-bubble {
+      background: rgba(13,148,136,.06);
+      border: 1px solid rgba(13,148,136,.15);
+      border-radius: 0 10px 10px 10px;
+      padding: 10px 14px; flex: 1;
+    }
+    .ri-reply-tag  { font-size: .7rem; font-weight: 800; color: var(--teal); margin-bottom: 4px; }
+    .ri-reply-text { font-size: .84rem; color: var(--gray-600); line-height: 1.6; }
+    [data-theme=dark] .ri-reply-text { color: var(--gray-400); }
+
+    /* Reply form */
+    .ri-reply-form { display: flex; gap: 8px; align-items: flex-end; }
+    .ri-reply-form textarea {
+      flex: 1; padding: 9px 12px;
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+      background: var(--surface); color: var(--text);
+      font-family: var(--font); font-size: .85rem;
+      line-height: 1.5; resize: none; height: 58px;
+      transition: border .2s, box-shadow .2s;
+    }
+    .ri-reply-form textarea:focus {
+      outline: none; border-color: var(--teal);
+      box-shadow: 0 0 0 3px rgba(13,148,136,.1);
+    }
+    [data-theme=dark] .ri-reply-form textarea { border-color: var(--gray-600); background: var(--gray-800); }
+    .btn-ri-reply {
+      padding: 9px 16px; border-radius: var(--radius-sm);
+      background: linear-gradient(135deg, var(--primary), var(--teal));
+      border: none; color: #fff;
+      font-size: .8rem; font-weight: 800;
+      cursor: pointer; font-family: var(--font);
+      white-space: nowrap; flex-shrink: 0;
+      transition: opacity .15s;
+    }
+    .btn-ri-reply:hover { opacity: .88; }
+
+    .btn-toggle-reply {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 5px 12px; border-radius: var(--radius-sm);
+      border: 1.5px solid rgba(13,148,136,.25);
+      background: rgba(13,148,136,.05); color: var(--teal);
+      font-size: .74rem; font-weight: 700;
+      cursor: pointer; font-family: var(--font);
+      transition: all .15s; margin-top: 8px;
+    }
+    .btn-toggle-reply:hover { background: rgba(13,148,136,.12); border-color: var(--teal); }
+
+    /* ══════════════════════════════════
+       FILTER / SORT ROW
+    ══════════════════════════════════ */
+    .rv-filter-row {
+      display: flex; align-items: center; gap: 8px;
+      flex-wrap: wrap; padding: 14px 20px;
+      border-bottom: 1.5px solid var(--gray-100);
+    }
+    [data-theme=dark] .rv-filter-row { border-color: var(--gray-700); }
+    .rv-filter-chip {
+      padding: 6px 14px; border-radius: var(--radius-full);
+      border: 1.5px solid var(--gray-200);
+      background: none; color: var(--gray-500);
+      font-size: .76rem; font-weight: 700;
+      cursor: pointer; font-family: var(--font);
+      transition: all .15s; white-space: nowrap;
+    }
+    .rv-filter-chip:hover { border-color: var(--teal); color: var(--teal); }
+    .rv-filter-chip.active {
+      background: rgba(13,148,136,.08);
+      border-color: rgba(13,148,136,.3); color: var(--teal);
+    }
+    [data-theme=dark] .rv-filter-chip { border-color: var(--gray-600); color: var(--gray-400); }
+
+    .rv-sort-select {
+      margin-left: auto; padding: 6px 10px;
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+      background: var(--surface); color: var(--text);
+      font-family: var(--font); font-size: .78rem;
+      cursor: pointer; flex-shrink: 0;
+    }
+    .rv-sort-select:focus { outline: none; border-color: var(--teal); }
+    [data-theme=dark] .rv-sort-select { border-color: var(--gray-600); background: var(--gray-800); }
+
+    /* ══════════════════════════════════
+       WRITE REVIEW PANEL
+    ══════════════════════════════════ */
+    .wr-hero {
+      background: linear-gradient(135deg, rgba(13,148,136,.06), rgba(5,150,105,.04));
+      border: 1.5px solid rgba(13,148,136,.2);
+      border-radius: var(--radius);
+      padding: 24px; margin-bottom: 20px;
+    }
+    .wr-title { font-size: 1rem; font-weight: 900; color: var(--primary); margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
+    .wr-sub   { font-size: .84rem; color: var(--gray-400); margin-bottom: 20px; line-height: 1.6; }
+
+    /* Search gig to review */
+    .wr-gig-search {
+      display: flex; gap: 10px; margin-bottom: 16px; align-items: flex-end;
+    }
+    .wr-gig-search > div { flex: 1; }
+
+    .ff-label {
+      font-size: .78rem; font-weight: 700;
+      color: var(--gray-600); display: block; margin-bottom: 6px;
+    }
+    [data-theme=dark] .ff-label { color: var(--gray-400); }
+    .ff-input, .ff-select {
       padding: 10px 13px;
       border: 1.5px solid var(--gray-200);
       border-radius: var(--radius-sm);
-      font-size: .88rem;
-      font-family: var(--font);
       background: var(--surface);
       color: var(--text);
-      transition: border .2s;
-      box-sizing: border-box;
+      font-family: var(--font); font-size: .9rem;
+      transition: border .2s, box-shadow .2s;
+      width: 100%; box-sizing: border-box;
     }
-    .form-field input:focus,
-    .form-field select:focus,
-    .form-field textarea:focus { outline: none; border-color: var(--teal); box-shadow: 0 0 0 3px rgba(13,148,136,.1); }
-    .form-field textarea { resize: vertical; min-height: 100px; line-height: 1.6; }
-    .char-count { font-size: .73rem; color: var(--gray-400); text-align: right; margin-top: 4px; }
+    .ff-input:focus, .ff-select:focus {
+      outline: none; border-color: var(--teal);
+      box-shadow: 0 0 0 3px rgba(13,148,136,.1);
+    }
+    [data-theme=dark] .ff-input,
+    [data-theme=dark] .ff-select { border-color: var(--gray-600); background: var(--gray-800); }
 
-    /* Skill chips selector */
-    .skill-selector { display: flex; flex-wrap: wrap; gap: 7px; }
-    .skill-opt {
-      padding: 5px 13px;
-      border: 1.5px solid var(--gray-200);
-      border-radius: 14px;
-      font-size: .78rem;
-      font-weight: 700;
-      color: var(--gray-500);
-      cursor: pointer;
-      background: transparent;
-      transition: all .2s;
-      font-family: var(--font);
+    /* Star picker */
+    .star-picker {
+      display: flex; gap: 8px; margin-bottom: 16px;
     }
-    .skill-opt.selected { border-color: var(--teal); background: rgba(13,148,136,.08); color: var(--teal); }
+    .sp-star {
+      font-size: 2rem; cursor: pointer;
+      filter: grayscale(1) opacity(.3);
+      transition: filter .15s, transform .15s;
+      user-select: none;
+    }
+    .sp-star.active, .sp-star:hover {
+      filter: none;
+      transform: scale(1.15);
+    }
+    .sp-star.hovered { filter: none; }
+    .sp-label {
+      display: flex; align-items: center;
+      font-size: .84rem; font-weight: 700; color: var(--gray-500);
+      margin-left: 6px;
+    }
+
+    /* Attribute star pickers */
+    .attr-grid {
+      display: grid; grid-template-columns: repeat(2,1fr); gap: 14px;
+      margin-bottom: 16px;
+    }
+    @media(max-width:540px) { .attr-grid { grid-template-columns: 1fr; } }
+    .attr-item {}
+    .attr-label { font-size: .78rem; font-weight: 700; color: var(--gray-600); margin-bottom: 6px; }
+    [data-theme=dark] .attr-label { color: var(--gray-400); }
+    .attr-stars { display: flex; gap: 4px; }
+    .attr-star {
+      font-size: 1.2rem; cursor: pointer;
+      filter: grayscale(1) opacity(.3);
+      transition: filter .15s;
+      user-select: none;
+    }
+    .attr-star.active { filter: none; }
+
+    .wr-tags-row {
+      display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px;
+    }
+    .wr-tag {
+      padding: 6px 14px; border-radius: var(--radius-full);
+      border: 1.5px solid var(--gray-200);
+      background: none; color: var(--gray-500);
+      font-size: .76rem; font-weight: 700;
+      cursor: pointer; font-family: var(--font);
+      transition: all .15s;
+    }
+    .wr-tag:hover { border-color: var(--teal); color: var(--teal); }
+    .wr-tag.selected {
+      background: rgba(13,148,136,.08);
+      border-color: rgba(13,148,136,.3); color: var(--teal);
+    }
+    [data-theme=dark] .wr-tag { border-color: var(--gray-600); color: var(--gray-400); }
+
+    .ff-textarea {
+      padding: 11px 13px;
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+      background: var(--surface); color: var(--text);
+      font-family: var(--font); font-size: .9rem;
+      line-height: 1.65; resize: vertical; min-height: 100px;
+      width: 100%; box-sizing: border-box;
+      transition: border .2s, box-shadow .2s;
+    }
+    .ff-textarea:focus {
+      outline: none; border-color: var(--teal);
+      box-shadow: 0 0 0 3px rgba(13,148,136,.1);
+    }
+    [data-theme=dark] .ff-textarea { border-color: var(--gray-600); background: var(--gray-800); }
+
+    .wr-char-count {
+      font-size: .72rem; font-weight: 600; color: var(--gray-400);
+      text-align: right; margin-top: 4px;
+    }
 
     .btn-submit-review {
-      width: 100%;
-      padding: 12px;
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 12px 28px; border-radius: var(--radius-sm);
       background: linear-gradient(135deg, var(--primary), var(--teal));
-      color: #fff;
-      border: none;
-      border-radius: var(--radius-sm);
-      font-size: .9rem;
-      font-weight: 800;
-      cursor: pointer;
-      font-family: var(--font);
+      border: none; color: #fff;
+      font-size: .92rem; font-weight: 800;
+      cursor: pointer; font-family: var(--font);
+      box-shadow: 0 3px 12px rgba(13,148,136,.25);
       transition: all .2s;
-      box-shadow: 0 3px 10px rgba(13,148,136,.3);
     }
-    .btn-submit-review:hover { opacity: .88; transform: translateY(-1px); }
-    .btn-submit-review:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+    .btn-submit-review:hover { box-shadow: 0 5px 18px rgba(13,148,136,.35); transform: translateY(-1px); }
 
-    /* ── Empty ── */
-    .reviews-empty {
-      text-align: center;
-      padding: 56px 20px;
-      color: var(--gray-400);
+    /* ══════════════════════════════════
+       ANALYTICS TAB
+    ══════════════════════════════════ */
+    .rating-trend {
+      display: flex; align-items: flex-end;
+      gap: 4px; height: 80px; padding: 0 4px;
+    }
+    .rt-bar {
+      flex: 1; border-radius: 4px 4px 0 0;
+      position: relative; cursor: pointer;
+      transition: opacity .15s;
+    }
+    .rt-bar:hover { opacity: .8; }
+    .rt-bar-fill {
+      width: 100%; border-radius: 4px 4px 0 0;
+      background: linear-gradient(180deg, #fbbf24, #f59e0b);
+      position: absolute; bottom: 0;
+      transition: height .6s cubic-bezier(.34,1.56,.64,1);
+    }
+    .rt-bar.current .rt-bar-fill { background: linear-gradient(180deg, #6ee7b7, var(--teal)); }
+
+    .analytics-grid {
+      display: grid; grid-template-columns: repeat(2,1fr); gap: 14px;
+      margin-bottom: 20px;
+    }
+    @media(max-width:500px) { .analytics-grid { grid-template-columns: 1fr; } }
+    .an-card {
       background: var(--surface);
-      border: 1.5px dashed var(--gray-200);
-      border-radius: var(--radius);
-    }
-    .reviews-empty .ei { font-size: 2.8rem; margin-bottom: 12px; display: block; }
-    .reviews-empty h3  { font-size: 1rem; font-weight: 800; color: var(--primary); margin-bottom: 6px; }
-    .reviews-empty p   { font-size: .85rem; line-height: 1.6; }
-
-    /* ── Load more ── */
-    .btn-load-more {
-      width: 100%;
-      padding: 12px;
-      background: transparent;
       border: 1.5px solid var(--gray-200);
-      border-radius: var(--radius-sm);
-      font-size: .88rem;
-      font-weight: 700;
-      color: var(--gray-600);
-      cursor: pointer;
-      font-family: var(--font);
-      transition: all .2s;
-      margin-top: 8px;
+      border-radius: var(--radius);
+      padding: 16px; text-align: center;
+      box-shadow: var(--shadow-sm);
     }
-    .btn-load-more:hover { border-color: var(--teal); color: var(--teal); }
+    [data-theme=dark] .an-card { border-color: var(--gray-700); }
+    .an-icon  { font-size: 1.6rem; margin-bottom: 6px; }
+    .an-val   { font-size: 1.4rem; font-weight: 900; color: var(--primary); margin-bottom: 3px; }
+    .an-label { font-size: .7rem; font-weight: 700; color: var(--gray-400); text-transform: uppercase; letter-spacing: .3px; }
+    .an-trend { font-size: .72rem; font-weight: 700; margin-top: 4px; }
+    .an-trend.up   { color: #059669; }
+    .an-trend.down { color: var(--danger); }
+    .an-trend.flat { color: var(--gray-400); }
 
-    /* Dark mode */
-    [data-theme="dark"] .profile-card  { border-color: var(--gray-700); }
-    [data-theme="dark"] .stat-card     { border-color: var(--gray-700); }
-    [data-theme="dark"] .review-card   { border-color: var(--gray-700); }
-    [data-theme="dark"] .review-foot   { border-color: var(--gray-800); }
-    [data-theme="dark"] .write-card    { border-color: var(--gray-700); }
-    [data-theme="dark"] .write-card-header { border-color: var(--gray-700); }
-    [data-theme="dark"] .review-gig-tag{ background: var(--gray-800); color: var(--gray-400); }
-    [data-theme="dark"] .review-text   { color: var(--gray-300); }
-    [data-theme="dark"] .chip          { border-color: var(--gray-700); color: var(--gray-400); }
-    [data-theme="dark"] .form-field label { color: var(--gray-300); }
-    [data-theme="dark"] .form-field input,
-    [data-theme="dark"] .form-field select,
-    [data-theme="dark"] .form-field textarea { background: var(--gray-800); border-color: var(--gray-600); }
-    [data-theme="dark"] .star-pick     { color: var(--gray-600); }
-    [data-theme="dark"] .reviews-empty { border-color: var(--gray-700); }
-    [data-theme="dark"] .btn-load-more { border-color: var(--gray-700); color: var(--gray-400); }
-    [data-theme="dark"] .sort-select   { background: var(--gray-800); border-color: var(--gray-700); }
+    /* Attribute donut-style bar */
+    .attr-analysis {
+      display: flex; flex-direction: column; gap: 12px;
+    }
+    .aa-row {
+      display: flex; align-items: center; gap: 12px;
+    }
+    .aa-label { font-size: .84rem; font-weight: 700; color: var(--text); width: 130px; flex-shrink: 0; }
+    .aa-track { flex: 1; height: 10px; background: var(--gray-100); border-radius: 5px; overflow: hidden; }
+    [data-theme=dark] .aa-track { background: var(--gray-700); }
+    .aa-fill  { height: 100%; border-radius: 5px; transition: width .8s ease; }
+    .aa-score { font-size: .82rem; font-weight: 900; color: var(--primary); width: 34px; text-align: right; flex-shrink: 0; }
+    .aa-stars { font-size: .76rem; flex-shrink: 0; }
+
+    /* ══════════════════════════════════
+       SIDEBAR
+    ══════════════════════════════════ */
+    .rv-sidebar-card {
+      background: var(--surface);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+    [data-theme=dark] .rv-sidebar-card { border-color: var(--gray-700); }
+    .rsc-header {
+      padding: 14px 16px;
+      border-bottom: 1.5px solid var(--gray-100);
+      font-size: .88rem; font-weight: 800; color: var(--primary);
+      display: flex; align-items: center; gap: 7px;
+    }
+    [data-theme=dark] .rsc-header { border-color: var(--gray-700); }
+    .rsc-body { padding: 16px; }
+
+    .stat-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 9px 0; border-bottom: 1px solid var(--gray-100);
+      font-size: .84rem;
+    }
+    .stat-row:last-child { border-bottom: none; }
+    [data-theme=dark] .stat-row { border-color: var(--gray-700); }
+    .sr-lbl { color: var(--gray-400); font-weight: 600; }
+    .sr-val { font-weight: 800; color: var(--text); }
+    .sr-val.gold    { color: #d97706; }
+    .sr-val.green   { color: #059669; }
+    .sr-val.primary { color: var(--primary); }
+
+    /* Achievement badges */
+    .badge-grid {
+      display: grid; grid-template-columns: repeat(3,1fr); gap: 8px;
+    }
+    .badge-item {
+      background: var(--bg);
+      border: 1.5px solid var(--gray-200);
+      border-radius: 10px;
+      padding: 10px 6px; text-align: center;
+      transition: transform .15s;
+    }
+    .badge-item:hover { transform: scale(1.04); }
+    [data-theme=dark] .badge-item { border-color: var(--gray-700); background: var(--gray-800); }
+    .badge-item.earned { border-color: rgba(245,158,11,.3); background: rgba(245,158,11,.05); }
+    .bi-icon  { font-size: 1.4rem; margin-bottom: 4px; line-height: 1; }
+    .bi-label { font-size: .62rem; font-weight: 800; color: var(--gray-500); line-height: 1.3; }
+    .badge-item.earned .bi-label { color: #d97706; }
+
+    /* ══════════════════════════════════
+       EMPTY STATE
+    ══════════════════════════════════ */
+    .rv-empty {
+      text-align: center; padding: 56px 24px;
+      display: none; flex-direction: column;
+      align-items: center; gap: 12px;
+    }
+    .rv-empty.visible { display: flex; }
+    .rve-icon  { font-size: 3.4rem; }
+    .rve-title { font-size: 1rem; font-weight: 800; color: var(--primary); }
+    .rve-sub   { font-size: .86rem; color: var(--gray-400); line-height: 1.7; max-width: 280px; }
+
+    /* ══════════════════════════════════
+       PENDING REVIEW REQUEST
+    ══════════════════════════════════ */
+    .pending-review-card {
+      background: linear-gradient(135deg, rgba(245,158,11,.06), rgba(217,119,6,.03));
+      border: 1.5px solid rgba(245,158,11,.25);
+      border-radius: var(--radius);
+      padding: 16px; margin-bottom: 12px;
+      display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    }
+    .prc-icon {
+      width: 44px; height: 44px; border-radius: 12px;
+      background: rgba(245,158,11,.1);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem; flex-shrink: 0;
+    }
+    .prc-info { flex: 1; min-width: 0; }
+    .prc-title { font-size: .9rem; font-weight: 800; color: #92400e; margin-bottom: 3px; }
+    [data-theme=dark] .prc-title { color: #fbbf24; }
+    .prc-sub   { font-size: .78rem; color: #d97706; font-weight: 600; }
+    .prc-actions { display: flex; gap: 7px; flex-shrink: 0; }
+    .btn-prc-rate {
+      padding: 8px 18px; border-radius: var(--radius-sm);
+      background: linear-gradient(135deg, #d97706, #f59e0b);
+      border: none; color: #fff;
+      font-size: .8rem; font-weight: 800;
+      cursor: pointer; font-family: var(--font);
+      transition: opacity .15s;
+    }
+    .btn-prc-rate:hover { opacity: .88; }
+    .btn-prc-later {
+      padding: 8px 14px; border-radius: var(--radius-sm);
+      border: 1.5px solid rgba(217,119,6,.3);
+      background: none; color: #d97706;
+      font-size: .8rem; font-weight: 700;
+      cursor: pointer; font-family: var(--font);
+    }
+
+    /* ══════════════════════════════════
+       TOAST
+    ══════════════════════════════════ */
+    .rv-toast {
+      position: fixed; bottom: 28px; left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--primary); color: #fff;
+      padding: 10px 22px; border-radius: var(--radius-full);
+      font-size: .84rem; font-weight: 700;
+      opacity: 0; transition: all .3s;
+      pointer-events: none; z-index: 200;
+      white-space: nowrap; box-shadow: var(--shadow-md);
+    }
+    .rv-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
   </style>
 </head>
 <body>
 
+  <div id="page-loader"></div>
   <div id="announce-bar"></div>
   <nav id="main-nav"></nav>
 
-  <main>
-    <div class="reviews-wrap">
+  <div class="rv-toast" id="rvToast"></div>
 
-      <nav id="breadcrumb"></nav>
+  <main class="rv-wrapper">
 
-      <!-- Profile Card -->
-      <div class="profile-card" id="profileCard"></div>
-
-      <!-- Rating Hero -->
-      <div class="rating-hero" id="ratingHero"></div>
-
-      <!-- Stats Row -->
-      <div class="stats-row" id="statsRow"></div>
-
-      <!-- Write a Review (collapsible) -->
-      <div class="write-card" id="writeCard"></div>
-
-      <!-- Controls -->
-      <div class="controls-bar">
-        <div class="filter-chips" id="filterChips">
-          <button class="chip active" data-filter="all">All Reviews</button>
-          <button class="chip" data-filter="5">⭐⭐⭐⭐⭐ 5 Star</button>
-          <button class="chip" data-filter="4">⭐⭐⭐⭐ 4 Star</button>
-          <button class="chip" data-filter="worker">As Worker</button>
-          <button class="chip" data-filter="poster">As Poster</button>
+    <!-- ══════════════════════════════════
+         HERO
+    ══════════════════════════════════ -->
+    <section class="rv-hero">
+      <div class="rv-hero-inner">
+        <div class="rv-score-block">
+          <div class="rvs-tag">⭐ Reviews & Ratings</div>
+          <div class="rvs-main">
+            <div class="rvs-big-score">4.8<span>/5</span></div>
+            <div class="rvs-stars-col">
+              <div class="rvs-stars">⭐⭐⭐⭐⭐</div>
+              <div class="rvs-count">Based on <strong>14 reviews</strong> · Top Rated Worker 🏆</div>
+            </div>
+          </div>
+          <div class="rvs-breakdown" id="rvsBreakdown"></div>
         </div>
-        <select class="sort-select" id="sortSelect">
-          <option value="newest">Newest First</option>
-          <option value="highest">Highest Rating</option>
-          <option value="lowest">Lowest Rating</option>
-          <option value="helpful">Most Helpful</option>
-        </select>
+        <div class="rv-trust-badges">
+          <div class="rtb-card">
+            <div class="rtb-icon">🏆</div>
+            <div class="rtb-val">Top Rated</div>
+            <div class="rtb-label">Worker Badge</div>
+          </div>
+          <div class="rtb-card">
+            <div class="rtb-icon">✅</div>
+            <div class="rtb-val">100%</div>
+            <div class="rtb-label">Job Success</div>
+          </div>
+          <div class="rtb-card">
+            <div class="rtb-icon">⚡</div>
+            <div class="rtb-val">Fast</div>
+            <div class="rtb-label">Response Time</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════
+         STATS STRIP
+    ══════════════════════════════════ -->
+    <div class="rv-stats-strip">
+      <div class="rv-stats-grid">
+        <div class="rv-stat">
+          <div class="rvst-icon">⭐</div>
+          <div class="rvst-val">4.8</div>
+          <div class="rvst-label">Avg Rating</div>
+        </div>
+        <div class="rv-stat">
+          <div class="rvst-icon">📋</div>
+          <div class="rvst-val">14</div>
+          <div class="rvst-label">Total Reviews</div>
+        </div>
+        <div class="rv-stat">
+          <div class="rvst-icon">💬</div>
+          <div class="rvst-val">12</div>
+          <div class="rvst-label">Responded</div>
+        </div>
+        <div class="rv-stat">
+          <div class="rvst-icon">🔥</div>
+          <div class="rvst-val">9</div>
+          <div class="rvst-label">5-Star Gigs</div>
+        </div>
+        <div class="rv-stat">
+          <div class="rvst-icon">📈</div>
+          <div class="rvst-val">+0.3</div>
+          <div class="rvst-label">This Month</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════
+         TAB BAR
+    ══════════════════════════════════ -->
+    <div class="rv-tabs-bar">
+      <div class="rv-tabs-inner">
+        <div class="rv-tabs-left" id="rvTabs">
+          <button class="rv-tab active" data-tab="received">⭐ Received <span class="rv-tab-badge">14</span></button>
+          <button class="rv-tab" data-tab="given">📝 Given <span class="rv-tab-badge">11</span></button>
+          <button class="rv-tab" data-tab="write">✍️ Write Review</button>
+          <button class="rv-tab" data-tab="analytics">📊 Analytics</button>
+        </div>
+        <div class="rv-tabs-right">
+          <button class="btn-rv-action" onclick="showToast('Downloading review report…')">📥 Export</button>
+          <button class="btn-rv-action" onclick="showToast('Review link copied!')">🔗 Share Profile</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════
+         BODY
+    ══════════════════════════════════ -->
+    <div class="rv-body">
+
+      <!-- ════ RECEIVED REVIEWS ════ -->
+      <div class="rv-panel active" id="panel-received">
+        <div class="rv-two-col">
+          <div>
+
+            <!-- Pending review requests -->
+            <div id="pendingReviews">
+              <div class="pending-review-card">
+                <div class="prc-icon">⏳</div>
+                <div class="prc-info">
+                  <div class="prc-title">Sanjay Traders se review ka wait hai</div>
+                  <div class="prc-sub">Grocery Delivery Gig — Mar 13 · Client ne abhi tak review nahi diya</div>
+                </div>
+                <div class="prc-actions">
+                  <button class="btn-prc-rate" onclick="showToast('Reminder bhej diya client ko!')">📩 Remind Client</button>
+                  <button class="btn-prc-later" onclick="this.closest('.pending-review-card').remove()">Later</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Filter row -->
+            <div class="rv-card">
+              <div class="rv-filter-row">
+                <button class="rv-filter-chip active" data-rv-filter="all">All (14)</button>
+                <button class="rv-filter-chip" data-rv-filter="5">⭐⭐⭐⭐⭐ 5 Star (9)</button>
+                <button class="rv-filter-chip" data-rv-filter="4">⭐⭐⭐⭐ 4 Star (4)</button>
+                <button class="rv-filter-chip" data-rv-filter="3">⭐⭐⭐ 3 Star (1)</button>
+                <select class="rv-sort-select" onchange="showToast('Sorted!')">
+                  <option>Latest First</option>
+                  <option>Highest First</option>
+                  <option>Lowest First</option>
+                  <option>Most Helpful</option>
+                </select>
+              </div>
+
+              <!-- Review 1 — 5 star -->
+              <div class="review-item" data-rating="5">
+                <div class="ri-top">
+                  <div class="ri-left">
+                    <div class="ri-avatar" style="background:linear-gradient(135deg,#059669,#34d399)">RK</div>
+                    <div class="ri-info">
+                      <div class="ri-name">Rahul Kumar</div>
+                      <div class="ri-meta">
+                        Warehouse Owner · Mar 14, 2026
+                        <span class="ri-gig-tag">📦 Warehouse Packing</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="ri-right">
+                    <div class="ri-stars">⭐⭐⭐⭐⭐</div>
+                    <div class="ri-date">5.0 / 5.0</div>
+                  </div>
+                </div>
+                <div class="ri-body">
+                  <div class="ri-text">
+                    Bahut hi badhiya kaam kiya Arjun ne. Puri mehnat se warehouse ka saman pack kiya — ek bhi item break nahi hua. Samay pe aaya, bina kahein kaam karta raha. Definitely aage bhi rakhenge!
+                  </div>
+                  <div class="ri-attributes">
+                    <div class="ri-attr">
+                      <div class="ria-label">Punctuality</div>
+                      <div class="ria-stars">⭐⭐⭐⭐⭐</div>
+                      <div class="ria-score">5.0</div>
+                    </div>
+                    <div class="ri-attr">
+                      <div class="ria-label">Quality</div>
+                      <div class="ria-stars">⭐⭐⭐⭐⭐</div>
+                      <div class="ria-score">5.0</div>
+                    </div>
+                    <div class="ri-attr">
+                      <div class="ria-label">Communication</div>
+                      <div class="ria-stars">⭐⭐⭐⭐⭐</div>
+                      <div class="ria-score">5.0</div>
+                    </div>
+                    <div class="ri-attr">
+                      <div class="ria-label">Rehire</div>
+                      <div class="ria-stars">⭐⭐⭐⭐⭐</div>
+                      <div class="ria-score">5.0</div>
+                    </div>
+                  </div>
+                  <div class="ri-skills">
+                    <span class="ri-skill-tag">✅ Hardworking</span>
+                    <span class="ri-skill-tag">⏰ Punctual</span>
+                    <span class="ri-skill-tag">💪 Strong</span>
+                    <span class="ri-skill-tag">🤝 Professional</span>
+                  </div>
+                </div>
+                <div class="ri-reply-wrap">
+                  <div class="ri-reply-existing">
+                    <div class="ri-reply-avatar">AS</div>
+                    <div class="ri-reply-bubble">
+                      <div class="ri-reply-tag">Your Reply · Mar 14</div>
+                      <div class="ri-reply-text">Shukriya Rahul bhai! Kaam accha laga. Agle baar bhi zaroor aaunga 🙏</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Review 2 — 5 star -->
+              <div class="review-item" data-rating="5">
+                <div class="ri-top">
+                  <div class="ri-left">
+                    <div class="ri-avatar" style="background:linear-gradient(135deg,#7c3aed,#a78bfa)">KS</div>
+                    <div class="ri-info">
+                      <div class="ri-name">Kavya Sharma</div>
+                      <div class="ri-meta">
+                        Event Organizer · Mar 13, 2026
+                        <span class="ri-gig-tag">🎪 Event Setup</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="ri-right">
+                    <div class="ri-stars">⭐⭐⭐⭐⭐</div>
+                    <div class="ri-date">5.0 / 5.0</div>
+                  </div>
+                </div>
+                <div class="ri-body">
+                  <div class="ri-text">
+                    Excellent work! Arjun ne DLF Cyber Hub event ka poora setup akele manage kar diya. Tables, chairs, banners — sab perfectly lagaye. Very responsible and professional worker. Highly recommended!
+                  </div>
+                  <div class="ri-attributes">
+                    <div class="ri-attr">
+                      <div class="ria-label">Punctuality</div>
+                      <div class="ria-stars">⭐⭐⭐⭐⭐</div>
+                      <div class="ria-score">5.0</div>
+                    </div>
+                    <div class="ri-attr">
+                      <div class="ria-label">Quality</div>
+                      <div class="ria-stars">⭐⭐⭐⭐⭐</div>
+                      <div class="ria-score">5.0</div>
+                    </div>
+                    <div class="ri-attr">
+                      <div class="ria-label">Communication</div>
+                      <div class="ria-stars">⭐⭐⭐⭐⭐</div>
+                      <div class="ria-score">5.0</div>
+                    </div>
+                    <div class="ri-attr">
+                      <div class="ria-label">Rehire</div>
+                      <div class="ria-stars">⭐⭐⭐⭐⭐</div>
+                      <div class="ria-score">5.0</div>
+                    </div>
+                  </div>
+                  <div class="ri-skills">
+                    <span class="ri-skill-tag">🎯 Detail-oriented</span>
+                    <span class="ri-skill-tag">💪 Efficient</span>
+                    <span class="ri-skill-tag">🤝 Responsible</span>
+                  </div>
+                </div>
+                <div class="ri-reply-wrap">
+                  <div class="ri-reply-existing">
+                    <div class="ri-reply-avatar">AS</div>
+                    <div class="ri-reply-bubble">
+                      <div class="ri-reply-tag">Your Reply · Mar 13</div>
+                      <div class="ri-reply-text">Thank you Kavya ji! Event bahut acha raha — agle baar bhi available hoon 😊</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Review 3 — 5 star (Mohan Das) -->
+              <div class="review-item" data-rating="5">
+                <div class="ri-top">
+                  <div class="ri-left">
+                    <div class="ri-avatar" style="background:linear-gradient(135deg,#0891b2,#67e8f9)">MD</div>
+                    <div class="ri-info">
+                      <div class="ri-name">Mohan Das</div>
+                      <div class="ri-meta">
+                        Homeowner · Mar 5, 2026
+                        <span class="ri-gig-tag">🚛 Office Relocation</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="ri-right">
+                    <div class="ri-stars">⭐⭐⭐⭐⭐</div>
+                    <div class="ri-date">5.0 / 5.0</div>
+                  </div>
+                </div>
+                <div class="ri-body">
+                  <div class="ri-text">
+                    Excellent work, very careful with furniture! Arjun ne office ka poora furniture shift kiya bina ek scratch ke. Physical kaam bahut achhe se kiya. Naya office 4 ghante mein ready tha — kaam ka banda hai.
+                  </div>
+                  <div class="ri-skills">
+                    <span class="ri-skill-tag">🪑 Furniture Care</span>
+                    <span class="ri-skill-tag">⚡ Fast</span>
+                    <span class="ri-skill-tag">💪 Strong</span>
+                    <span class="ri-skill-tag">✅ Reliable</span>
+                  </div>
+                </div>
+                <div class="ri-reply-wrap">
+                  <div class="ri-reply-existing">
+                    <div class="ri-reply-avatar">AS</div>
+                    <div class="ri-reply-bubble">
+                      <div class="ri-reply-tag">Your Reply · Mar 5</div>
+                      <div class="ri-reply-text">Bahut shukriya Mohan ji! Furniture shift karna mujhe pasand hai — sab safe rakhna priority hai 🙏</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Review 4 — 4 star -->
+              <div class="review-item" data-rating="4">
+                <div class="ri-top">
+                  <div class="ri-left">
+                    <div class="ri-avatar" style="background:linear-gradient(135deg,#d97706,#fbbf24)">PS</div>
+                    <div class="ri-info">
+                      <div class="ri-name">Priya Singh</div>
+                      <div class="ri-meta">
+                        Shop Owner · Feb 28, 2026
+                        <span class="ri-gig-tag">🛵 Grocery Delivery</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="ri-right">
+                    <div class="ri-stars">⭐⭐⭐⭐</div>
+                    <div class="ri-date">4.0 / 5.0</div>
+                  </div>
+                </div>
+                <div class="ri-body">
+                  <div class="ri-text">
+                    Accha kaam kiya — sab deliveries time pe ki. Ek baar rasta thoda galat gaya lekin khud se sahi kar liya. Communication acchi thi. Next time again hire karungi.
+                  </div>
+                  <div class="ri-attributes">
+                    <div class="ri-attr">
+                      <div class="ria-label">Punctuality</div>
+                      <div class="ria-stars">⭐⭐⭐⭐</div>
+                      <div class="ria-score">4.0</div>
+                    </div>
+                    <div class="ri-attr">
+                      <div class="ria-label">Quality</div>
+                      <div class="ria-stars">⭐⭐⭐⭐</div>
+                      <div class="ria-score">4.0</div>
+                    </div>
+                    <div class="ri-attr">
+                      <div class="ria-label">Communication</div>
+                      <div class="ria-stars">⭐⭐⭐⭐⭐</div>
+                      <div class="ria-score">5.0</div>
+                    </div>
+                    <div class="ri-attr">
+                      <div class="ria-label">Rehire</div>
+                      <div class="ria-stars">⭐⭐⭐⭐</div>
+                      <div class="ria-score">4.0</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="ri-reply-wrap">
+                  <button class="btn-toggle-reply" onclick="toggleReplyForm(this)">✏️ Reply to Review</button>
+                  <div class="ri-reply-form" style="display:none; margin-top:10px">
+                    <textarea placeholder="Priya ji ko politely reply karo…"></textarea>
+                    <button class="btn-ri-reply" onclick="submitReply(this)">📩 Reply</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Review 5 — 5 star -->
+              <div class="review-item" data-rating="5">
+                <div class="ri-top">
+                  <div class="ri-left">
+                    <div class="ri-avatar" style="background:linear-gradient(135deg,#059669,#6ee7b7)">AT</div>
+                    <div class="ri-info">
+                      <div class="ri-name">Amit Thakur</div>
+                      <div class="ri-meta">
+                        Office Manager · Feb 20, 2026
+                        <span class="ri-gig-tag">🎪 Event Setup</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="ri-right">
+                    <div class="ri-stars">⭐⭐⭐⭐⭐</div>
+                    <div class="ri-date">5.0 / 5.0</div>
+                  </div>
+                </div>
+                <div class="ri-body">
+                  <div class="ri-text">
+                    One of the best gig workers I've hired on GigLega! Arjun understood the requirements instantly and delivered beyond expectations. Will definitely hire again for our quarterly events.
+                  </div>
+                  <div class="ri-skills">
+                    <span class="ri-skill-tag">🌟 Outstanding</span>
+                    <span class="ri-skill-tag">💡 Smart Worker</span>
+                    <span class="ri-skill-tag">🤝 Team Player</span>
+                  </div>
+                </div>
+                <div class="ri-reply-wrap">
+                  <div class="ri-reply-existing">
+                    <div class="ri-reply-avatar">AS</div>
+                    <div class="ri-reply-bubble">
+                      <div class="ri-reply-tag">Your Reply · Feb 20</div>
+                      <div class="ri-reply-text">Thank you so much Amit sir! It was a pleasure working with your team. Looking forward to the next event 🙏</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Review 6 — 4 star -->
+              <div class="review-item" data-rating="4">
+                <div class="ri-top">
+                  <div class="ri-left">
+                    <div class="ri-avatar" style="background:linear-gradient(135deg,#dc2626,#f87171)">RV</div>
+                    <div class="ri-info">
+                      <div class="ri-name">Ravi Verma</div>
+                      <div class="ri-meta">
+                        Shopkeeper · Feb 14, 2026
+                        <span class="ri-gig-tag">🚛 Home Shifting</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="ri-right">
+                    <div class="ri-stars">⭐⭐⭐⭐</div>
+                    <div class="ri-date">4.5 / 5.0</div>
+                  </div>
+                </div>
+                <div class="ri-body">
+                  <div class="ri-text">
+                    Shifting thodi der se shuru hui lekin baad mein bahut tezi se kaam hua. Sab saman safe aaya. Mehnat karta hai — accha banda hai. Phone pe baat bhi acchi thi.
+                  </div>
+                </div>
+                <div class="ri-reply-wrap">
+                  <div class="ri-reply-existing">
+                    <div class="ri-reply-avatar">AS</div>
+                    <div class="ri-reply-bubble">
+                      <div class="ri-reply-tag">Your Reply · Feb 14</div>
+                      <div class="ri-reply-text">Shukriya Ravi bhai! Late hone ke liye maafi — agli baar aur jaldi aaunga. Saman safe deliver karna meri zimmedari thi 🙏</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Review 7 — 3 star -->
+              <div class="review-item" data-rating="3">
+                <div class="ri-top">
+                  <div class="ri-left">
+                    <div class="ri-avatar" style="background:linear-gradient(135deg,#6b7280,#9ca3af)">SK</div>
+                    <div class="ri-info">
+                      <div class="ri-name">Suresh Kumar</div>
+                      <div class="ri-meta">
+                        Retailer · Feb 5, 2026
+                        <span class="ri-gig-tag">📦 Stock Management</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="ri-right">
+                    <div class="ri-stars">⭐⭐⭐</div>
+                    <div class="ri-date">3.0 / 5.0</div>
+                  </div>
+                </div>
+                <div class="ri-body">
+                  <div class="ri-text">
+                    Theek tha kaam — na bura na bahut accha. Thodi aur mehnat ki zarurat thi counting mein. Baaki physical kaam theek kiya. Next time zyada dhyan dena.
+                  </div>
+                </div>
+                <div class="ri-reply-wrap">
+                  <div class="ri-reply-existing">
+                    <div class="ri-reply-avatar">AS</div>
+                    <div class="ri-reply-bubble">
+                      <div class="ri-reply-tag">Your Reply · Feb 5</div>
+                      <div class="ri-reply-text">Feedback ke liye shukriya Suresh ji. Aapki baat sahi hai — counting mein aur dhyan dunga. Improve karta rahunga 🙏</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Load more -->
+              <div style="padding:16px 20px;text-align:center;border-top:1.5px solid var(--gray-100)">
+                <button class="btn-rvc-action" onclick="showToast('Loading more reviews…')">📋 7 Aur Reviews Load Karo →</button>
+              </div>
+
+              <!-- Empty -->
+              <div class="rv-empty" id="rvEmpty">
+                <div class="rve-icon">⭐</div>
+                <div class="rve-title">Koi review nahi is filter mein</div>
+                <div class="rve-sub">All tab pe switch karo — wahan sab reviews hain.</div>
+              </div>
+
+            </div>
+
+          </div>
+
+          <!-- SIDEBAR -->
+          <div>
+
+            <!-- Score summary -->
+            <div class="rv-sidebar-card">
+              <div class="rsc-header">⭐ Score Breakdown</div>
+              <div class="rsc-body">
+                <div class="stat-row">
+                  <span class="sr-lbl">Overall Rating</span>
+                  <span class="sr-val gold">⭐ 4.8 / 5.0</span>
+                </div>
+                <div class="stat-row">
+                  <span class="sr-lbl">Punctuality</span>
+                  <span class="sr-val">4.9</span>
+                </div>
+                <div class="stat-row">
+                  <span class="sr-lbl">Work Quality</span>
+                  <span class="sr-val">4.8</span>
+                </div>
+                <div class="stat-row">
+                  <span class="sr-lbl">Communication</span>
+                  <span class="sr-val">4.9</span>
+                </div>
+                <div class="stat-row">
+                  <span class="sr-lbl">Rehire Rate</span>
+                  <span class="sr-val green">92%</span>
+                </div>
+                <div class="stat-row">
+                  <span class="sr-lbl">Response Rate</span>
+                  <span class="sr-val primary">86%</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Achievements -->
+            <div class="rv-sidebar-card">
+              <div class="rsc-header">🏆 Badges Earned</div>
+              <div class="rsc-body">
+                <div class="badge-grid">
+                  <div class="badge-item earned">
+                    <div class="bi-icon">🏆</div>
+                    <div class="bi-label">Top Rated</div>
+                  </div>
+                  <div class="badge-item earned">
+                    <div class="bi-icon">⚡</div>
+                    <div class="bi-label">Fast Worker</div>
+                  </div>
+                  <div class="badge-item earned">
+                    <div class="bi-icon">💪</div>
+                    <div class="bi-label">10+ Gigs</div>
+                  </div>
+                  <div class="badge-item earned">
+                    <div class="bi-icon">⭐</div>
+                    <div class="bi-label">5-Star Club</div>
+                  </div>
+                  <div class="badge-item earned">
+                    <div class="bi-icon">🤝</div>
+                    <div class="bi-label">Reliable</div>
+                  </div>
+                  <div class="badge-item" style="opacity:.4">
+                    <div class="bi-icon">💎</div>
+                    <div class="bi-label">Elite (Soon)</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tips -->
+            <div class="rv-info-box teal" style="border-radius:var(--radius)">
+              💡 <strong>Pro Tip:</strong> Har review ka reply dene se client trust 3x badhta hai — aur search ranking bhi improve hoti hai GigLega pe!
+            </div>
+
+            <!-- Quick links -->
+            <div class="rv-sidebar-card">
+              <div class="rsc-header">⚡ Quick Links</div>
+              <a href="profile.html" style="display:flex;align-items:center;gap:10px;padding:11px 16px;border-bottom:1px solid var(--gray-100);cursor:pointer;text-decoration:none;transition:background .15s" onmouseover="this.style.background='rgba(13,148,136,.04)'" onmouseout="this.style.background=''">
+                <span>👤</span><span style="font-size:.84rem;font-weight:700;color:var(--text);flex:1">My Profile</span><span style="color:var(--gray-400)">→</span>
+              </a>
+              <a href="wallet.html" style="display:flex;align-items:center;gap:10px;padding:11px 16px;border-bottom:1px solid var(--gray-100);cursor:pointer;text-decoration:none;transition:background .15s" onmouseover="this.style.background='rgba(13,148,136,.04)'" onmouseout="this.style.background=''">
+                <span>💳</span><span style="font-size:.84rem;font-weight:700;color:var(--text);flex:1">Wallet</span><span style="color:var(--gray-400)">→</span>
+              </a>
+              <a href="browse.html" style="display:flex;align-items:center;gap:10px;padding:11px 16px;cursor:pointer;text-decoration:none;transition:background .15s" onmouseover="this.style.background='rgba(13,148,136,.04)'" onmouseout="this.style.background=''">
+                <span>🔍</span><span style="font-size:.84rem;font-weight:700;color:var(--text);flex:1">Browse Gigs</span><span style="color:var(--gray-400)">→</span>
+              </a>
+            </div>
+
+          </div>
+        </div>
       </div>
 
-      <!-- Review list -->
-      <div id="reviewList"></div>
-      <button class="btn-load-more" id="btnLoadMore" style="display:none">Load More Reviews</button>
+      <!-- ════ GIVEN REVIEWS ════ -->
+      <div class="rv-panel" id="panel-given">
+        <div class="rv-info-box teal">
+          📝 <strong>Tumne 11 clients ko review diya hai.</strong> Honest reviews se dusre workers ko sahi clients milte hain — community ki madad karo!
+        </div>
 
-    </div>
+        <div class="rv-card">
+          <div class="rv-card-header">
+            <div class="rv-card-title">📝 Reviews Given by You (11)</div>
+            <button class="btn-rvc-action" onclick="openTab('write')">✍️ New Review</button>
+          </div>
+
+          <!-- Given review 1 -->
+          <div class="review-item">
+            <div class="ri-top">
+              <div class="ri-left">
+                <div class="ri-avatar" style="background:linear-gradient(135deg,#059669,#34d399)">RK</div>
+                <div class="ri-info">
+                  <div class="ri-name">Rahul Kumar <span style="font-size:.72rem;font-weight:600;color:var(--gray-400)">(Client)</span></div>
+                  <div class="ri-meta">
+                    Warehouse Owner · Mar 14, 2026
+                    <span class="ri-gig-tag">📦 Warehouse Packing</span>
+                  </div>
+                </div>
+              </div>
+              <div class="ri-right">
+                <div class="ri-stars">⭐⭐⭐⭐⭐</div>
+                <div class="ri-date">5.0 / 5.0</div>
+              </div>
+            </div>
+            <div class="ri-body">
+              <div class="ri-text">
+                Bahut accha client! Payment time pe ki, kaam ka environment safe tha. Instructions clear thi. Zaroor aage bhi kaam karunga. Highly recommended client on GigLega!
+              </div>
+              <div class="ri-skills">
+                <span class="ri-skill-tag">💰 Timely Payment</span>
+                <span class="ri-skill-tag">📋 Clear Instructions</span>
+                <span class="ri-skill-tag">🤝 Respectful</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Given review 2 -->
+          <div class="review-item">
+            <div class="ri-top">
+              <div class="ri-left">
+                <div class="ri-avatar" style="background:linear-gradient(135deg,#7c3aed,#a78bfa)">KS</div>
+                <div class="ri-info">
+                  <div class="ri-name">Kavya Sharma <span style="font-size:.72rem;font-weight:600;color:var(--gray-400)">(Client)</span></div>
+                  <div class="ri-meta">
+                    Event Organizer · Mar 13, 2026
+                    <span class="ri-gig-tag">🎪 Event Setup</span>
+                  </div>
+                </div>
+              </div>
+              <div class="ri-right">
+                <div class="ri-stars">⭐⭐⭐⭐⭐</div>
+                <div class="ri-date">5.0 / 5.0</div>
+              </div>
+            </div>
+            <div class="ri-body">
+              <div class="ri-text">
+                Amazing client to work with! Event bahut well-organized tha. Kavya ji ne kaam se pehle poori jankari di — koi confusion nahi tha. Kaam ke baad extra tip bhi mili 😊 Definitely aaunga agle event pe!
+              </div>
+              <div class="ri-skills">
+                <span class="ri-skill-tag">🌟 Great Client</span>
+                <span class="ri-skill-tag">💰 Bonus</span>
+                <span class="ri-skill-tag">📋 Organized</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Given review 3 -->
+          <div class="review-item">
+            <div class="ri-top">
+              <div class="ri-left">
+                <div class="ri-avatar" style="background:linear-gradient(135deg,#d97706,#fbbf24)">PS</div>
+                <div class="ri-info">
+                  <div class="ri-name">Priya Singh <span style="font-size:.72rem;font-weight:600;color:var(--gray-400)">(Client)</span></div>
+                  <div class="ri-meta">
+                    Shop Owner · Feb 28, 2026
+                    <span class="ri-gig-tag">🛵 Grocery Delivery</span>
+                  </div>
+                </div>
+              </div>
+              <div class="ri-right">
+                <div class="ri-stars">⭐⭐⭐⭐</div>
+                <div class="ri-date">4.0 / 5.0</div>
+              </div>
+            </div>
+            <div class="ri-body">
+              <div class="ri-text">
+                Theek client — kaam clear tha. Ek baar address change kiya last moment pe jo thoda problem tha. Baaki sab theek raha. Payment bhi time pe aayi. Recommend karunga.
+              </div>
+            </div>
+          </div>
+
+          <div style="padding:16px 20px;text-align:center;border-top:1.5px solid var(--gray-100)">
+            <button class="btn-rvc-action" onclick="showToast('Loading more…')">📋 8 Aur Reviews Load Karo →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════ WRITE REVIEW ════ -->
+      <div class="rv-panel" id="panel-write">
+
+        <div class="rv-info-box green">
+          ✅ <strong>Sirf completed gigs pe review de sakte hain.</strong> Honest feedback se poora GigLega community better banta hai!
+        </div>
+
+        <!-- Pending review requests -->
+        <div style="margin-bottom:20px">
+          <div style="font-size:.8rem;font-weight:800;text-transform:uppercase;letter-spacing:.4px;color:var(--gray-400);margin-bottom:10px">
+            ⏳ Pending Reviews (2)
+          </div>
+          <div class="pending-review-card">
+            <div class="prc-icon">📦</div>
+            <div class="prc-info">
+              <div class="prc-title">Rahul Kumar ko rate karo — Warehouse Packing</div>
+              <div class="prc-sub">Mar 14, 2026 · ₹1,128 received · Gurugram</div>
+            </div>
+            <div class="prc-actions">
+              <button class="btn-prc-rate" onclick="prefillReview('Rahul Kumar','Warehouse Packing')">⭐ Rate Now</button>
+            </div>
+          </div>
+          <div class="pending-review-card">
+            <div class="prc-icon">🛵</div>
+            <div class="prc-info">
+              <div class="prc-title">Sanjay Traders ko rate karo — Grocery Delivery</div>
+              <div class="prc-sub">Mar 13, 2026 · ₹1,504 received · Sector 29</div>
+            </div>
+            <div class="prc-actions">
+              <button class="btn-prc-rate" onclick="prefillReview('Sanjay Traders','Grocery Delivery')">⭐ Rate Now</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Write form -->
+        <div class="wr-hero" id="writeReviewForm">
+          <div class="wr-title">✍️ Naya Review Likho</div>
+          <div class="wr-sub">Client ke baare mein honest feedback do — isse dusre workers ko sahi decision lene mein madad milti hai.</div>
+
+          <!-- Gig selector -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px">
+            <div>
+              <label class="ff-label">Client ka Naam <span style="color:var(--danger)">*</span></label>
+              <input class="ff-input" type="text" id="reviewClientName" placeholder="e.g. Rahul Kumar" />
+            </div>
+            <div>
+              <label class="ff-label">Gig Type <span style="color:var(--danger)">*</span></label>
+              <select class="ff-select" id="reviewGigType">
+                <option value="">Select Gig…</option>
+                <option>📦 Warehouse Packing</option>
+                <option>🚛 Relocation / Moving</option>
+                <option>🛵 Delivery</option>
+                <option>🎪 Event Setup</option>
+                <option>🏠 Home Cleaning</option>
+                <option>🔧 Repair / Maintenance</option>
+                <option>📋 Other</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Overall star rating -->
+          <div style="margin-bottom:18px">
+            <label class="ff-label">Overall Rating <span style="color:var(--danger)">*</span></label>
+            <div style="display:flex;align-items:center;gap:8px;margin-top:4px">
+              <div class="star-picker" id="starPicker">
+                <span class="sp-star" data-val="1">⭐</span>
+                <span class="sp-star" data-val="2">⭐</span>
+                <span class="sp-star" data-val="3">⭐</span>
+                <span class="sp-star" data-val="4">⭐</span>
+                <span class="sp-star" data-val="5">⭐</span>
+              </div>
+              <div class="sp-label" id="starLabel">Rating chunna zaroori hai</div>
+            </div>
+          </div>
+
+          <!-- Attribute ratings -->
+          <div style="margin-bottom:18px">
+            <label class="ff-label">Detailed Ratings</label>
+            <div class="attr-grid">
+              <div class="attr-item">
+                <div class="attr-label">💰 Payment Speed</div>
+                <div class="attr-stars" data-attr="payment">
+                  <span class="attr-star" data-val="1">⭐</span>
+                  <span class="attr-star" data-val="2">⭐</span>
+                  <span class="attr-star" data-val="3">⭐</span>
+                  <span class="attr-star" data-val="4">⭐</span>
+                  <span class="attr-star" data-val="5">⭐</span>
+                </div>
+              </div>
+              <div class="attr-item">
+                <div class="attr-label">📋 Clear Instructions</div>
+                <div class="attr-stars" data-attr="instructions">
+                  <span class="attr-star" data-val="1">⭐</span>
+                  <span class="attr-star" data-val="2">⭐</span>
+                  <span class="attr-star" data-val="3">⭐</span>
+                  <span class="attr-star" data-val="4">⭐</span>
+                  <span class="attr-star" data-val="5">⭐</span>
+                </div>
+              </div>
+              <div class="attr-item">
+                <div class="attr-label">🤝 Respectfulness</div>
+                <div class="attr-stars" data-attr="respect">
+                  <span class="attr-star" data-val="1">⭐</span>
+                  <span class="attr-star" data-val="2">⭐</span>
+                  <span class="attr-star" data-val="3">⭐</span>
+                  <span class="attr-star" data-val="4">⭐</span>
+                  <span class="attr-star" data-val="5">⭐</span>
+                </div>
+              </div>
+              <div class="attr-item">
+                <div class="attr-label">🔄 Work Again?</div>
+                <div class="attr-stars" data-attr="rehire">
+                  <span class="attr-star" data-val="1">⭐</span>
+                  <span class="attr-star" data-val="2">⭐</span>
+                  <span class="attr-star" data-val="3">⭐</span>
+                  <span class="attr-star" data-val="4">⭐</span>
+                  <span class="attr-star" data-val="5">⭐</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick tag labels -->
+          <div style="margin-bottom:18px">
+            <label class="ff-label">Quick Tags (optional)</label>
+            <div class="wr-tags-row" id="wrTagsRow">
+              <button class="wr-tag" onclick="toggleTag(this)">💰 Timely Payment</button>
+              <button class="wr-tag" onclick="toggleTag(this)">📋 Clear Brief</button>
+              <button class="wr-tag" onclick="toggleTag(this)">🤝 Respectful</button>
+              <button class="wr-tag" onclick="toggleTag(this)">⚡ Quick Response</button>
+              <button class="wr-tag" onclick="toggleTag(this)">🌟 Great Client</button>
+              <button class="wr-tag" onclick="toggleTag(this)">🏠 Safe Worksite</button>
+              <button class="wr-tag" onclick="toggleTag(this)">🍴 Khana/Chai diya</button>
+              <button class="wr-tag" onclick="toggleTag(this)">😤 Rude Behaviour</button>
+              <button class="wr-tag" onclick="toggleTag(this)">💸 Late Payment</button>
+              <button class="wr-tag" onclick="toggleTag(this)">📞 Poor Communication</button>
+            </div>
+          </div>
+
+          <!-- Review text -->
+          <div style="margin-bottom:18px">
+            <label class="ff-label">Detailed Review <span style="color:var(--danger)">*</span></label>
+            <textarea
+              class="ff-textarea"
+              id="reviewText"
+              placeholder="Client ke baare mein apna experience share karo — payment, kaam ka environment, instructions, behaviour… Jo bhi relevant lage likho. Min 30 characters."
+              oninput="updateCharCount(this)"
+              maxlength="600"
+            ></textarea>
+            <div class="wr-char-count"><span id="charCount">0</span> / 600 characters · Min 30 required</div>
+          </div>
+
+          <!-- Recommend toggle -->
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:22px;padding:12px 14px;background:var(--bg);border-radius:var(--radius-sm);border:1.5px solid var(--gray-200)">
+            <input type="checkbox" id="recommendToggle" checked style="width:18px;height:18px;accent-color:var(--teal);cursor:pointer" />
+            <label for="recommendToggle" style="font-size:.88rem;font-weight:700;color:var(--text);cursor:pointer">
+              👍 Mein is client ko dusre workers ko recommend karta hoon
+            </label>
+          </div>
+
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+            <button class="btn-submit-review" onclick="submitReview()">⭐ Review Submit Karo</button>
+            <button class="btn-rvc-action" onclick="clearReviewForm()">🗑️ Clear Form</button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ════ ANALYTICS ════ -->
+      <div class="rv-panel" id="panel-analytics">
+        <div class="rv-two-col">
+          <div>
+
+            <!-- KPI cards -->
+            <div class="analytics-grid">
+              <div class="an-card">
+                <div class="an-icon">⭐</div>
+                <div class="an-val">4.8</div>
+                <div class="an-label">Avg Rating</div>
+                <div class="an-trend up">↑ +0.3 vs last month</div>
+              </div>
+              <div class="an-card">
+                <div class="an-icon">📋</div>
+                <div class="an-val">14</div>
+                <div class="an-label">Total Reviews</div>
+                <div class="an-trend up">↑ +4 this month</div>
+              </div>
+              <div class="an-card">
+                <div class="an-icon">💬</div>
+                <div class="an-val">86%</div>
+                <div class="an-label">Response Rate</div>
+                <div class="an-trend up">↑ Good</div>
+              </div>
+              <div class="an-card">
+                <div class="an-icon">🔄</div>
+                <div class="an-val">92%</div>
+                <div class="an-label">Rehire Intent</div>
+                <div class="an-trend up">↑ Excellent</div>
+              </div>
+            </div>
+
+            <!-- Trend chart -->
+            <div class="rv-card">
+              <div class="rv-card-header">
+                <div class="rv-card-title">📈 Rating Trend — 2026</div>
+              </div>
+              <div class="rv-card-body">
+                <div style="display:flex;gap:4px;height:100px;align-items:flex-end;margin-bottom:8px" id="ratingTrendChart"></div>
+                <div style="display:flex;justify-content:space-between;font-size:.72rem;color:var(--gray-400);font-weight:600;padding:0 2px">
+                  <span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span>
+                  <span>May</span><span>Jun</span><span>Jul</span><span>Aug</span>
+                  <span>Sep</span><span>Oct</span><span>Nov</span><span>Dec</span>
+                </div>
+                <div style="display:flex;gap:6px;margin-top:12px;font-size:.76rem;font-weight:700;color:var(--gray-400);flex-wrap:wrap">
+                  <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:3px;background:#f59e0b;display:inline-block"></span> Monthly avg</span>
+                  <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:3px;background:var(--teal);display:inline-block"></span> Current month</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Attribute analysis -->
+            <div class="rv-card">
+              <div class="rv-card-header">
+                <div class="rv-card-title">🗂️ Performance Breakdown</div>
+              </div>
+              <div class="rv-card-body">
+                <div class="attr-analysis" id="attrAnalysis"></div>
+              </div>
+            </div>
+
+            <!-- Word cloud / top keywords -->
+            <div class="rv-card">
+              <div class="rv-card-header">
+                <div class="rv-card-title">💬 Top Feedback Keywords</div>
+                <span style="font-size:.76rem;color:var(--gray-400);font-weight:700">From all reviews</span>
+              </div>
+              <div class="rv-card-body">
+                <div style="display:flex;flex-wrap:wrap;gap:8px" id="keywordCloud"></div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Analytics sidebar -->
+          <div>
+
+            <div class="rv-sidebar-card">
+              <div class="rsc-header">🏆 Rank on GigLega</div>
+              <div class="rsc-body">
+                <div style="text-align:center;padding:12px 0 16px">
+                  <div style="font-size:2.4rem;font-weight:900;color:#d97706">Top 8%</div>
+                  <div style="font-size:.76rem;font-weight:700;color:var(--gray-400);margin-top:4px">Workers in Gurugram</div>
+                </div>
+                <div class="stat-row">
+                  <span class="sr-lbl">Gurugram Rank</span>
+                  <span class="sr-val gold">#12 / 148</span>
+                </div>
+                <div class="stat-row">
+                  <span class="sr-lbl">Category Rank</span>
+                  <span class="sr-val">#3 — Packing</span>
+                </div>
+                <div class="stat-row">
+                  <span class="sr-lbl">Profile Views</span>
+                  <span class="sr-val primary">248 this month</span>
+                </div>
+                <div class="stat-row">
+                  <span class="sr-lbl">Search Appearances</span>
+                  <span class="sr-val">412</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="rv-info-box amber" style="border-radius:var(--radius)">
+              🎯 <strong>Top 5% mein jaane ke liye</strong> — 3 aur 5-star reviews chahiye. Ek aur gig complete karo is hafte!
+            </div>
+
+            <div class="rv-sidebar-card">
+              <div class="rsc-header">📊 Review Distribution</div>
+              <div class="rsc-body" id="reviewDistSidebar"></div>
+            </div>
+
+            <div class="rv-sidebar-card">
+              <div class="rsc-header">💡 Improvement Tips</div>
+              <div class="rsc-body" style="padding:0">
+                <div style="padding:11px 16px;border-bottom:1px solid var(--gray-100);font-size:.82rem;color:var(--text);line-height:1.5">
+                  <strong style="color:var(--teal)">⏰ Punctuality:</strong> Always 10 min pehle pahuncho — clients isse bahut appreciate karte hain.
+                </div>
+                <div style="padding:11px 16px;border-bottom:1px solid var(--gray-100);font-size:.82rem;color:var(--text);line-height:1.5">
+                  <strong style="color:var(--teal)">💬 Communication:</strong> Gig confirm hone ke baad client ko ek confirmation message bhejo.
+                </div>
+                <div style="padding:11px 16px;font-size:.82rem;color:var(--text);line-height:1.5">
+                  <strong style="color:var(--teal)">📸 Proof:</strong> Kaam complete hone ke baad photo bhejo — trust 2x badhta hai!
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /rv-body -->
   </main>
 
-  <footer id="main-footer"></footer>
-  <div id="toast-container"></div>
-
   <script>
-  (function () {
 
-    /* ── Auth ── */
-    var user = (function () {
-      try {
-        var u = JSON.parse(localStorage.getItem("gl_user") || "null");
-        return (u && u.id) ? u : null;
-      } catch(e) { return null; }
-    })();
-    if (!user) { window.location.href = "login.html?redirect=reviews.html"; return; }
+    /* ══════════════════════════════════
+       HERO BREAKDOWN BARS
+    ══════════════════════════════════ */
+    const STAR_DATA = [
+      { star: 5, count: 9,  pct: 64 },
+      { star: 4, count: 4,  pct: 29 },
+      { star: 3, count: 1,  pct: 7  },
+      { star: 2, count: 0,  pct: 0  },
+      { star: 1, count: 0,  pct: 0  },
+    ];
 
-    /* ── URL param — whose reviews? default = logged in user ── */
-    var params     = new URLSearchParams(window.location.search);
-    var targetId   = params.get("uid") || user.id;
-    var isOwnPage  = targetId === user.id;
-
-    /* ── Breadcrumb ── */
-    if (typeof buildBreadcrumb === "function") {
-      buildBreadcrumb("breadcrumb", [
-        { label: "Home",    href: "index.html" },
-        { label: "Profile", href: "profile.html" },
-        { label: "Reviews" }
-      ]);
-    }
-
-    /* ── Storage ── */
-    var REVIEW_KEY = "gl_reviews_" + targetId;
-    function getReviews()   { return JSON.parse(localStorage.getItem(REVIEW_KEY) || "[]"); }
-    function saveReviews(r) { localStorage.setItem(REVIEW_KEY, JSON.stringify(r)); }
-
-    /* ── Seed demo reviews ── */
-    (function seed() {
-      if (getReviews().length) return;
-      var now = Date.now();
-      saveReviews([
-        {
-          id:"r1", rating:5, type:"worker",
-          reviewer:"Priya Mehta", reviewerInitials:"PM", reviewerRole:"Poster · DLF Phase 2",
-          gigTitle:"Office Cleaning — DLF Phase 2",
-          text:"Absolutely fantastic work! Arrived on time, completed everything thoroughly and even cleaned areas I didn't ask for. Will definitely hire again. Very professional attitude.",
-          skills:["Punctual","Professional","Hard Working"],
-          helpful:8, helpedByMe:false,
-          date: new Date(now - 86400000).toISOString()
-        },
-        {
-          id:"r2", rating:5, type:"worker",
-          reviewer:"Rahul Sharma", reviewerInitials:"RS", reviewerRole:"Poster · Sector 45",
-          gigTitle:"Delivery — Sector 45 to Cyber City",
-          text:"Super fast delivery! Package arrived in perfect condition. Rahul was very communicative throughout and kept me updated at every step. Highly recommended.",
-          skills:["Fast","Reliable","Communicative"],
-          helpful:5, helpedByMe:false,
-          date: new Date(now - 172800000).toISOString()
-        },
-        {
-          id:"r3", rating:4, type:"worker",
-          reviewer:"Sneha T.", reviewerInitials:"ST", reviewerRole:"Poster · Sector 29",
-          gigTitle:"Data Entry Task — 200 Records",
-          text:"Good work overall. Data was entered accurately with zero errors. Took slightly longer than expected but quality was excellent. Would hire again for similar tasks.",
-          skills:["Accurate","Detail Oriented"],
-          helpful:3, helpedByMe:false,
-          date: new Date(now - 259200000).toISOString()
-        },
-        {
-          id:"r4", rating:5, type:"poster",
-          reviewer:"Amit Kumar", reviewerInitials:"AK", reviewerRole:"Worker · Gurugram",
-          gigTitle:"Photography — Product Shoot",
-          text:"Great poster! Very clear instructions, payment released immediately after completion. Professional communication and fair pay. Would love to work with again.",
-          skills:["Fair Pay","Clear Instructions","Fast Payment"],
-          helpful:6, helpedByMe:false,
-          date: new Date(now - 345600000).toISOString()
-        },
-        {
-          id:"r5", rating:4, type:"worker",
-          reviewer:"Vikram S.", reviewerInitials:"VS", reviewerRole:"Poster · MG Road",
-          gigTitle:"Event Setup — Corporate Event",
-          text:"Worked very hard throughout the 6-hour event. Helped with setup, managed tables and assisted guests politely. Minor issue with timing at start but resolved quickly.",
-          skills:["Hard Working","Team Player","Polite"],
-          helpful:2, helpedByMe:false,
-          date: new Date(now - 432000000).toISOString()
-        },
-        {
-          id:"r6", rating:3, type:"worker",
-          reviewer:"Neha G.", reviewerInitials:"NG", reviewerRole:"Poster · Sohna Road",
-          gigTitle:"Tutoring — Class 10 Maths",
-          text:"Teaching was okay. Explained concepts clearly but was late on two occasions. Students found the sessions helpful overall. Needs to improve punctuality.",
-          skills:["Knowledgeable"],
-          helpful:1, helpedByMe:false,
-          date: new Date(now - 518400000).toISOString()
-        }
-      ]);
+    (function buildBreakdown() {
+      const c = document.getElementById("rvsBreakdown");
+      if (!c) return;
+      c.innerHTML = STAR_DATA.map(d => `
+        <div class="rvs-bar-row" onclick="filterByStars(${d.star})">
+          <div class="rvs-star-label">⭐ ${d.star}</div>
+          <div class="rvs-bar-track">
+            <div class="rvs-bar-fill" style="width:${d.pct}%"></div>
+          </div>
+          <div class="rvs-bar-count">${d.count}</div>
+        </div>`).join("");
     })();
 
-    /* ── Helpers ── */
-    function escH(s) { return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
-    function starsHtml(n) {
-      var s = "";
-      for (var i = 1; i <= 5; i++) s += i <= n ? "⭐" : "☆";
-      return s;
-    }
-    function timeAgo(iso) {
-      var d = Math.floor((Date.now() - new Date(iso).getTime()) / 86400000);
-      if (d === 0) return "Today";
-      if (d === 1) return "Yesterday";
-      if (d < 30)  return d + " days ago";
-      if (d < 365) return Math.floor(d/30) + " months ago";
-      return Math.floor(d/365) + " year ago";
+    /* ══════════════════════════════════
+       TAB SYSTEM
+    ══════════════════════════════════ */
+    function openTab(name) {
+      document.querySelectorAll(".rv-tab").forEach(t => t.classList.remove("active"));
+      document.querySelectorAll(".rv-panel").forEach(p => p.classList.remove("active"));
+      const tab   = document.querySelector(`.rv-tab[data-tab="${name}"]`);
+      const panel = document.getElementById(`panel-${name}`);
+      if (tab)   tab.classList.add("active");
+      if (panel) panel.classList.add("active");
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
-    /* ── Compute stats ── */
-    function computeStats(reviews) {
-      if (!reviews.length) return { avg:0, total:0, dist:{5:0,4:0,3:0,2:0,1:0}, worker:0, poster:0, helpful:0 };
-      var dist = {5:0,4:0,3:0,2:0,1:0};
-      var sum  = 0, worker = 0, poster = 0, helpful = 0;
-      reviews.forEach(function(r) {
-        sum += r.rating;
-        dist[r.rating] = (dist[r.rating]||0) + 1;
-        if (r.type === "worker") worker++;
-        else poster++;
-        helpful += (r.helpful||0);
-      });
-      return {
-        avg:    (sum / reviews.length).toFixed(1),
-        total:  reviews.length,
-        dist:   dist,
-        worker: worker,
-        poster: poster,
-        helpful:helpful
-      };
-    }
-
-    /* ── Render profile card ── */
-    function renderProfile() {
-      var initials = (user.name || "U").split(" ").map(function(w){ return w[0]; }).join("").toUpperCase().slice(0,2);
-      document.getElementById("profileCard").innerHTML =
-        '<div class="profile-avatar">' + initials + '</div>' +
-        '<div class="profile-info">' +
-          '<div class="profile-name">' + escH(user.name || "My Profile") + '</div>' +
-          '<div class="profile-role">📍 Gurugram, Haryana · GigLega Member</div>' +
-          '<div class="profile-badges">' +
-            '<span class="profile-badge badge-verified">✅ Verified</span>' +
-            '<span class="profile-badge badge-top">🏆 Top Rated</span>' +
-            '<span class="profile-badge badge-new">⚡ Active</span>' +
-          '</div>' +
-        '</div>' +
-        (isOwnPage ? '<a href="profile.html" class="btn btn-sm btn-outline">Edit Profile →</a>' : '');
-    }
-
-    /* ── Render rating hero ── */
-    function renderRatingHero(stats) {
-      var total = stats.total || 1;
-      var bars  = [5,4,3,2,1].map(function(n) {
-        var pct = Math.round(((stats.dist[n]||0) / total) * 100);
-        return '<div class="breakdown-row">' +
-          '<div class="breakdown-label">' + n + '★</div>' +
-          '<div class="breakdown-bar-wrap"><div class="breakdown-bar-fill" style="width:' + pct + '%"></div></div>' +
-          '<div class="breakdown-count">' + (stats.dist[n]||0) + '</div>' +
-        '</div>';
-      }).join("");
-
-      document.getElementById("ratingHero").innerHTML =
-        '<div class="rating-big">' +
-          '<div class="rating-number">' + stats.avg + '</div>' +
-          '<div class="rating-stars-big">' + starsHtml(Math.round(stats.avg)) + '</div>' +
-          '<div class="rating-total">' + stats.total + ' review' + (stats.total !== 1 ? "s" : "") + '</div>' +
-        '</div>' +
-        '<div class="rating-breakdown">' + bars + '</div>';
-    }
-
-    /* ── Render stats row ── */
-    function renderStats(stats) {
-      document.getElementById("statsRow").innerHTML =
-        '<div class="stat-card"><span class="stat-icon">⭐</span><div class="stat-val green">' + stats.avg + '</div><div class="stat-lbl">Avg Rating</div></div>' +
-        '<div class="stat-card"><span class="stat-icon">📋</span><div class="stat-val">'       + stats.total  + '</div><div class="stat-lbl">Total Reviews</div></div>' +
-        '<div class="stat-card"><span class="stat-icon">🔧</span><div class="stat-val">'       + stats.worker + '</div><div class="stat-lbl">As Worker</div></div>' +
-        '<div class="stat-card"><span class="stat-icon">📢</span><div class="stat-val">'       + stats.poster + '</div><div class="stat-lbl">As Poster</div></div>' +
-        '<div class="stat-card"><span class="stat-icon">👍</span><div class="stat-val amber">' + stats.helpful+ '</div><div class="stat-lbl">Helpful Votes</div></div>';
-    }
-
-    /* ── Render write form (only own page) ── */
-    var selectedStars  = 0;
-    var selectedSkills = [];
-
-    function renderWriteCard() {
-      if (!isOwnPage) {
-        /* On other user's page — show write form */
-        document.getElementById("writeCard").innerHTML =
-          '<div class="write-card-header" id="writeToggle">✍️ Write a Review <span id="writeArrow">▼</span></div>' +
-          '<div class="write-card-body" id="writeBody">' +
-            '<div style="margin-bottom:14px;font-size:.84rem;color:var(--gray-500)">Share your experience working with this person.</div>' +
-            '<div class="form-field"><label>Your Rating <span style="color:var(--danger)">*</span></label>' +
-              '<div class="star-picker" id="starPicker">' +
-                [1,2,3,4,5].map(function(n){ return '<button class="star-pick" data-star="' + n + '">★</button>'; }).join("") +
-              '</div>' +
-            '</div>' +
-            '<div class="form-field"><label>Gig Title</label><input type="text" id="reviewGig" placeholder="Which gig was this for?" /></div>' +
-            '<div class="form-field"><label>Your Review <span style="color:var(--danger)">*</span></label><textarea id="reviewText" maxlength="500" placeholder="Describe your experience honestly..."></textarea><div class="char-count" id="reviewCharCount">0/500</div></div>' +
-            '<div class="form-field"><label>Skills Demonstrated</label>' +
-              '<div class="skill-selector" id="skillSelector">' +
-                ["Punctual","Reliable","Professional","Hard Working","Communicative","Fast","Accurate","Creative","Team Player","Polite"].map(function(s){
-                  return '<button class="skill-opt" data-skill="' + s + '">' + s + '</button>';
-                }).join("") +
-              '</div>' +
-            '</div>' +
-            '<div class="form-field"><label>Review Type</label><select id="reviewType"><option value="worker">As Worker (they worked for me)</option><option value="poster">As Poster (I worked for them)</option></select></div>' +
-            '<button class="btn-submit-review" id="btnSubmitReview" disabled>Submit Review</button>' +
-          '</div>';
-        bindWriteForm();
-      } else {
-        document.getElementById("writeCard").style.display = "none";
-      }
-    }
-
-    function bindWriteForm() {
-      /* Toggle open/close */
-      document.getElementById("writeToggle").addEventListener("click", function() {
-        var body  = document.getElementById("writeBody");
-        var arrow = document.getElementById("writeArrow");
-        body.classList.toggle("open");
-        arrow.textContent = body.classList.contains("open") ? "▲" : "▼";
-      });
-
-      /* Star picker */
-      document.getElementById("starPicker").addEventListener("click", function(e) {
-        var btn = e.target.closest(".star-pick");
-        if (!btn) return;
-        selectedStars = parseInt(btn.dataset.star);
-        document.querySelectorAll(".star-pick").forEach(function(b, i) {
-          b.classList.toggle("active", i < selectedStars);
-        });
-        checkSubmit();
-      });
-
-      /* Char counter */
-      document.getElementById("reviewText").addEventListener("input", function() {
-        var len = this.value.length;
-        document.getElementById("reviewCharCount").textContent = len + "/500";
-        checkSubmit();
-      });
-
-      /* Skill selector */
-      document.getElementById("skillSelector").addEventListener("click", function(e) {
-        var btn = e.target.closest(".skill-opt");
-        if (!btn) return;
-        var skill = btn.dataset.skill;
-        if (selectedSkills.includes(skill)) {
-          selectedSkills = selectedSkills.filter(function(s){ return s !== skill; });
-          btn.classList.remove("selected");
-        } else if (selectedSkills.length < 5) {
-          selectedSkills.push(skill);
-          btn.classList.add("selected");
-        }
-      });
-
-      /* Submit check */
-      function checkSubmit() {
-        var txt = (document.getElementById("reviewText").value || "").trim();
-        document.getElementById("btnSubmitReview").disabled = !(selectedStars > 0 && txt.length >= 10);
-      }
-
-      /* Submit */
-      document.getElementById("btnSubmitReview").addEventListener("click", function() {
-        var text = document.getElementById("reviewText").value.trim();
-        var gig  = document.getElementById("reviewGig").value.trim();
-        var type = document.getElementById("reviewType").value;
-        var btn  = this;
-
-        btn.disabled    = true;
-        btn.textContent = "⏳ Submitting...";
-
-        var initials = (user.name || "U").split(" ").map(function(w){ return w[0]; }).join("").toUpperCase().slice(0,2);
-        var review = {
-          id:               "r_" + Date.now(),
-          rating:           selectedStars,
-          type:             type,
-          reviewer:         user.name || "Anonymous",
-          reviewerInitials: initials,
-          reviewerRole:     "GigLega User",
-          gigTitle:         gig || "Gig on GigLega",
-          text:             text,
-          skills:           selectedSkills.slice(),
-          helpful:          0,
-          helpedByMe:       false,
-          date:             new Date().toISOString()
-        };
-
-        setTimeout(function() {
-          var reviews = getReviews();
-          reviews.unshift(review);
-          saveReviews(reviews);
-          btn.textContent = "Submit Review";
-          document.getElementById("writeBody").classList.remove("open");
-          document.getElementById("writeArrow").textContent = "▼";
-          selectedStars  = 0;
-          selectedSkills = [];
-          document.getElementById("reviewText").value = "";
-          document.getElementById("reviewGig").value  = "";
-          document.querySelectorAll(".star-pick").forEach(function(b){ b.classList.remove("active"); });
-          document.querySelectorAll(".skill-opt").forEach(function(b){ b.classList.remove("selected"); });
-          render();
-          if (typeof showToast === "function") showToast("✅ Review submitted! Thank you.", "success");
-        }, 800);
-      });
-    }
-
-    /* ── Render review list ── */
-    var currentFilter = "all";
-    var currentSort   = "newest";
-    var showCount     = 5;
-
-    function applyFilterSort(reviews) {
-      var filtered = reviews.filter(function(r) {
-        if (currentFilter === "all")    return true;
-        if (currentFilter === "worker") return r.type === "worker";
-        if (currentFilter === "poster") return r.type === "poster";
-        return r.rating === parseInt(currentFilter);
-      });
-      filtered.sort(function(a, b) {
-        if (currentSort === "newest")  return new Date(b.date) - new Date(a.date);
-        if (currentSort === "highest") return b.rating - a.rating;
-        if (currentSort === "lowest")  return a.rating - b.rating;
-        if (currentSort === "helpful") return (b.helpful||0) - (a.helpful||0);
-        return 0;
-      });
-      return filtered;
-    }
-
-    function renderReviews(reviews) {
-      var list     = document.getElementById("reviewList");
-      var filtered = applyFilterSort(reviews);
-      var visible  = filtered.slice(0, showCount);
-      var loadMore = document.getElementById("btnLoadMore");
-
-      if (!filtered.length) {
-        list.innerHTML =
-          '<div class="reviews-empty"><span class="ei">⭐</span><h3>No reviews yet</h3><p>Reviews will appear here after completing gigs.</p></div>';
-        loadMore.style.display = "none";
-        return;
-      }
-
-      list.innerHTML = visible.map(function(r) {
-        var skillTags = (r.skills||[]).map(function(s){ return '<span class="skill-tag">' + escH(s) + '</span>'; }).join("");
-        var isLong    = (r.text||"").length > 180;
-
-        return '<div class="review-card' + (r.rating === 5 ? " highlighted" : "") + '" data-id="' + r.id + '">' +
-          '<div class="review-head">' +
-            '<div class="reviewer-info">' +
-              '<div class="reviewer-avatar" style="background:' + avatarColor(r.reviewerInitials) + '">' + escH(r.reviewerInitials||"?") + '</div>' +
-              '<div>' +
-                '<div class="reviewer-name">' + escH(r.reviewer) + '</div>' +
-                '<div class="reviewer-role">' + escH(r.reviewerRole||"") + '</div>' +
-              '</div>' +
-            '</div>' +
-            '<div style="text-align:right">' +
-              '<div class="star-row">' +
-                '<span class="stars">' + starsHtml(r.rating) + '</span>' +
-                '<span class="star-num">' + r.rating + '.0</span>' +
-              '</div>' +
-              '<div class="review-date">' + timeAgo(r.date) + '</div>' +
-            '</div>' +
-          '</div>' +
-          '<div class="review-gig-tag">📋 ' + escH(r.gigTitle||"Gig on GigLega") + '</div>' +
-          '<div class="review-text' + (isLong ? " collapsed" : "") + '" id="rt_' + r.id + '">' + escH(r.text) + '</div>' +
-          (isLong ? '<button class="btn-read-more" data-id="' + r.id + '">Read more ▼</button>' : '') +
-          (skillTags ? '<div class="skill-tags">' + skillTags + '</div>' : '') +
-          '<div class="review-foot">' +
-            '<div class="helpful-row">' +
-              'Helpful? ' +
-              '<button class="btn-helpful' + (r.helpedByMe ? " active" : "") + '" data-helpful="' + r.id + '">👍 ' + (r.helpful||0) + '</button>' +
-            '</div>' +
-            '<span class="review-type-badge ' + (r.type==="worker" ? "type-worker" : "type-poster") + '">' +
-              (r.type === "worker" ? "🔧 Worker" : "📢 Poster") +
-            '</span>' +
-          '</div>' +
-        '</div>';
-      }).join("");
-
-      loadMore.style.display = filtered.length > showCount ? "block" : "none";
-      loadMore.textContent   = "Load More (" + (filtered.length - showCount) + " remaining)";
-      bindReviewActions();
-    }
-
-    function avatarColor(initials) {
-      var colors = ["#1a3c5e","#0d9488","#7c3aed","#db2777","#ea580c","#16a34a","#2563eb"];
-      var idx    = (initials || "A").charCodeAt(0) % colors.length;
-      return colors[idx];
-    }
-
-    function bindReviewActions() {
-      /* Read more */
-      document.querySelectorAll(".btn-read-more").forEach(function(btn) {
-        btn.addEventListener("click", function() {
-          var el = document.getElementById("rt_" + btn.dataset.id);
-          el.classList.toggle("collapsed");
-          btn.textContent = el.classList.contains("collapsed") ? "Read more ▼" : "Show less ▲";
-        });
-      });
-
-      /* Helpful */
-      document.querySelectorAll(".btn-helpful").forEach(function(btn) {
-        btn.addEventListener("click", function() {
-          var id      = btn.dataset.helpful;
-          var reviews = getReviews();
-          var r       = reviews.find(function(x){ return x.id === id; });
-          if (!r) return;
-          if (r.helpedByMe) {
-            r.helpful--;
-            r.helpedByMe = false;
-          } else {
-            r.helpful++;
-            r.helpedByMe = true;
-          }
-          saveReviews(reviews);
-          render();
-        });
-      });
-    }
-
-    /* ── Filter & sort bindings ── */
-    document.getElementById("filterChips").addEventListener("click", function(e) {
-      var chip = e.target.closest(".chip");
-      if (!chip) return;
-      currentFilter = chip.dataset.filter;
-      showCount     = 5;
-      document.querySelectorAll(".chip").forEach(function(c){ c.classList.remove("active"); });
-      chip.classList.add("active");
-      render();
+    document.querySelectorAll(".rv-tab").forEach(btn => {
+      btn.addEventListener("click", () => openTab(btn.dataset.tab));
     });
 
-    document.getElementById("sortSelect").addEventListener("change", function() {
-      currentSort = this.value;
-      render();
+    /* ══════════════════════════════════
+       REVIEW FILTER (by star)
+    ══════════════════════════════════ */
+    document.querySelectorAll(".rv-filter-chip").forEach(btn => {
+      btn.addEventListener("click", function() {
+        document.querySelectorAll(".rv-filter-chip").forEach(b => b.classList.remove("active"));
+        this.classList.add("active");
+        const f = this.dataset.rvFilter;
+        filterReviews(f);
+      });
     });
 
-    /* ── Load more ── */
-    document.getElementById("btnLoadMore").addEventListener("click", function() {
-      showCount += 5;
-      render();
-    });
-
-    /* ── Main render ── */
-    function render() {
-      var reviews = getReviews();
-      var stats   = computeStats(reviews);
-      renderProfile();
-      renderRatingHero(stats);
-      renderStats(stats);
-      renderWriteCard();
-      renderReviews(reviews);
+    function filterReviews(f) {
+      const items = document.querySelectorAll(".review-item[data-rating]");
+      let vis = 0;
+      items.forEach(item => {
+        const show = f === "all" || item.dataset.rating === f;
+        item.style.display = show ? "" : "none";
+        if (show) vis++;
+      });
+      const empty = document.getElementById("rvEmpty");
+      if (empty) empty.classList.toggle("visible", vis === 0);
     }
 
-    render();
+    function filterByStars(star) {
+      openTab("received");
+      document.querySelectorAll(".rv-filter-chip").forEach(b => b.classList.remove("active"));
+      const chip = document.querySelector(`.rv-filter-chip[data-rv-filter="${star}"]`);
+      if (chip) chip.classList.add("active");
+      filterReviews(String(star));
+    }
 
-  })();
-  </script>
+    /* ══════════════════════════════════
+       REPLY TOGGLE
+    ══════════════════════════════════ */
+    function toggleReplyForm(btn) {
+      const form = btn.nextElementSibling;
+      const open = form.style.display === "flex";
+      form.style.display = open ? "none" : "flex";
+      btn.textContent = open ? "✏️ Reply to Review" : "✕ Cancel Reply";
+    }
 
-</body>
-</html>
+    function submitReply(btn) {
+      const wrap = btn.closest(".ri-reply-wrap");
+      const ta   = wrap.querySelector("textarea");
+      const val  = ta.value.trim();
+      if (!val) { showToast("⚠️ Reply likhna zaroori hai!"); return; }
+
+      const now = new Date();
+      const dateStr = now.toLocaleDateString("en-IN", { day:"numeric", month:"short", year:"numeric" });
+
+      wrap.innerHTML = `
+        <div class="ri-reply-existing">
+          <div class="ri-reply-avatar">AS</div>
+          <div class="ri-reply-bubble">
+            <div class="ri-reply-tag">Your Reply · ${dateStr}</div>
+            <div class="ri-reply-text">${val}</div>
+          </div>
+        </div>`;
+      showToast("✅ Reply submit ho gayi!");
+    }
+
+    /* ══════════════════════════════════
+       STAR PICKER (write review)
+    ══════════════════════════════════ */
+    let selectedStars = 0;
+    const starLabels = ["","Bahut Bura 😞","Theek Nahi 😕","Average 😐","Accha 😊","Excellent! 🌟"];
+
+    document.querySelectorAll("#starPicker .sp-star").forEach(star => {
+      star.addEventListener("mouseenter", function() {
+        const v = parseInt(this.dataset.val);
+        document.querySelectorAll("#starPicker .sp-star").forEach((s,i) => {
+          s.classList.toggle("hovered", i < v);
+        });
+        document.getElementById("starLabel").textContent = starLabels[v];
+      });
+      star.addEventListener("mouseleave", () => {
+        document.querySelectorAll("#starPicker .sp-star").forEach((s,i) => {
+          s.classList.remove("hovered");
+          s.classList.toggle("active", i < selectedStars);
+        });
+        document.getElementById("starLabel").textContent = selectedStars ? starLabels[selectedStars] : "Rating chunna zaroori hai";
+      });
+      star.addEventListener("click", function() {
+        selectedStars = parseInt(this.dataset.val);
+        document.querySelectorAll("#starPicker .sp-star").forEach((s,i) => {
+          s.classList.toggle("active", i < selectedStars);
+        });
+        document.getElementById("starLabel").textContent = starLabels[selectedStars];
+      });
+    });
+
+    /* ══════════════════════════════════
+       ATTRIBUTE STARS (write review)
+    ══════════════════════════════════ */
+    document.querySelectorAll(".attr-stars").forEach(group => {
+      let sel = 0;
+      group.querySelectorAll(".attr-star").forEach(star => {
+        star.addEventListener("click", function() {
+          sel = parseInt(this.dataset.val);
+          group.querySelectorAll(".attr-star").forEach((s,i) => {
+            s.classList.toggle("active", i < sel);
+          });
