@@ -4,437 +4,2004 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Worker Dashboard — GigLega</title>
-  <meta name="description" content="GigLega worker dashboard — apni earnings track karo aur gigs manage karo." />
+  <meta name="description" content="GigLega worker dashboard — apne gigs dekho, applications track karo, earnings manage karo." />
   <link rel="stylesheet" href="styles.css" />
   <script src="shared.js"></script>
   <style>
-    .dash-wrap{max-width:1000px;margin:0 auto;padding:28px 16px 80px}
 
-    /* ── Top bar ── */
-    .dash-topbar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:24px}
-    .dash-greeting h1{font-size:1.4rem;font-weight:800;color:var(--primary);margin-bottom:2px}
-    .dash-greeting p{font-size:.85rem;color:var(--gray-500)}
-    .btn-switch-role{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border:1.5px solid var(--teal);border-radius:var(--radius-sm);background:transparent;color:var(--teal);font-weight:700;font-size:.83rem;cursor:pointer;transition:all .2s}
-    .btn-switch-role:hover{background:var(--teal);color:#fff}
+    /* ══════════════════════════════════
+       WRAPPER
+    ══════════════════════════════════ */
+    .wd-wrapper { min-height: 100vh; background: var(--bg); }
 
-    /* ── Stats row ── */
-    .stats-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px;margin-bottom:24px}
-    .stat-card{background:var(--surface);border:1.5px solid var(--gray-200);border-radius:var(--radius);padding:18px 20px;box-shadow:var(--shadow-sm)}
-    .stat-label{font-size:.75rem;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
-    .stat-value{font-size:1.6rem;font-weight:800;color:var(--primary)}
-    .stat-sub{font-size:.75rem;color:var(--gray-400);margin-top:3px}
-    .stat-card.teal .stat-value{color:var(--teal)}
-    .stat-card.amber .stat-value{color:var(--accent)}
+    /* ══════════════════════════════════
+       HERO
+    ══════════════════════════════════ */
+    .wd-hero {
+      background: linear-gradient(135deg, #064e3b 0%, #059669 50%, #0d4f47 100%);
+      padding: 32px 20px 56px;
+      position: relative; overflow: hidden;
+    }
+    .wd-hero::before {
+      content: "";
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse at 18% 70%, rgba(110,231,183,.18) 0%, transparent 50%),
+        radial-gradient(ellipse at 82% 15%, rgba(245,158,11,.08) 0%, transparent 50%);
+      pointer-events: none;
+    }
+    .wd-hero::after {
+      content: "";
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+      background-size: 52px 52px; pointer-events: none;
+    }
+    .wd-hero-inner {
+      position: relative; z-index: 1;
+      max-width: 1200px; margin: 0 auto;
+      display: flex; align-items: flex-start;
+      justify-content: space-between; gap: 20px; flex-wrap: wrap;
+    }
 
-    /* ── Wallet card ── */
-    .wallet-card{background:linear-gradient(135deg,var(--primary) 0%,var(--teal) 100%);border-radius:var(--radius);padding:24px;color:#fff;margin-bottom:24px;box-shadow:0 4px 18px rgba(13,148,136,.3)}
-    .wallet-top{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;margin-bottom:20px}
-    .wallet-label{font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;opacity:.75}
-    .wallet-amount{font-size:2.4rem;font-weight:800;margin-top:4px}
-    .wallet-sub{font-size:.8rem;opacity:.7;margin-top:2px}
-    .btn-withdraw{background:#fff;color:var(--primary);border:none;padding:10px 22px;border-radius:var(--radius-sm);font-weight:800;font-size:.88rem;cursor:pointer;transition:opacity .2s}
-    .btn-withdraw:hover{opacity:.88}
-    .wallet-breakdown{display:flex;gap:24px;flex-wrap:wrap}
-    .wallet-item{display:flex;flex-direction:column;gap:2px}
-    .wallet-item-label{font-size:.72rem;opacity:.7}
-    .wallet-item-value{font-size:1rem;font-weight:700}
+    .wd-greeting {
+      font-size: .78rem; font-weight: 700;
+      color: rgba(255,255,255,.6);
+      text-transform: uppercase; letter-spacing: .6px;
+      margin-bottom: 8px;
+    }
+    .wd-hero-name {
+      font-size: clamp(1.4rem, 3vw, 2rem);
+      font-weight: 900; color: #fff;
+      line-height: 1.2; margin-bottom: 6px; letter-spacing: -.4px;
+    }
+    .wd-hero-name span { color: #6ee7b7; }
+    .wd-hero-sub {
+      font-size: .88rem; color: rgba(255,255,255,.65);
+      margin-bottom: 18px; line-height: 1.6;
+    }
+    .wd-hero-chips {
+      display: flex; flex-wrap: wrap; gap: 8px;
+    }
+    .wd-hero-chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(255,255,255,.12);
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: var(--radius-full);
+      padding: 5px 13px;
+      font-size: .76rem; font-weight: 700; color: rgba(255,255,255,.9);
+    }
 
-    /* ── Section ── */
-    .section{margin-bottom:28px}
-    .section-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px}
-    .section-title{font-size:1rem;font-weight:700;color:var(--primary)}
-    .section-link{font-size:.82rem;color:var(--teal);font-weight:600;text-decoration:none}
-    .section-link:hover{text-decoration:underline}
+    .wd-hero-right {
+      display: flex; flex-direction: column;
+      align-items: flex-end; gap: 12px; flex-shrink: 0;
+    }
+    .wd-avatar-wrap {
+      display: flex; align-items: center; gap: 13px;
+    }
+    .wd-avatar {
+      width: 58px; height: 58px; border-radius: 50%;
+      background: linear-gradient(135deg, #6ee7b7, #059669);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem; font-weight: 900; color: #fff;
+      border: 3px solid rgba(255,255,255,.25); flex-shrink: 0;
+    }
+    .wd-av-name   { font-size: .96rem; font-weight: 800; color: #fff; }
+    .wd-av-rating {
+      display: flex; align-items: center; gap: 5px;
+      font-size: .78rem; color: rgba(255,255,255,.7); font-weight: 600;
+    }
+    .wd-av-rating strong { color: #fbbf24; }
 
-    /* ── Gig list ── */
-    .gig-list{display:flex;flex-direction:column;gap:12px}
-    .gig-item{background:var(--surface);border:1.5px solid var(--gray-200);border-radius:var(--radius);padding:16px 18px;box-shadow:var(--shadow-sm);display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap}
-    .gig-item-left{flex:1;min-width:200px}
-    .gig-item-title{font-size:.95rem;font-weight:700;color:var(--text);margin-bottom:5px}
-    .gig-item-meta{display:flex;flex-wrap:wrap;gap:8px}
-    .gig-item-chip{font-size:.73rem;color:var(--gray-500);display:flex;align-items:center;gap:3px}
-    .gig-item-right{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
-    .gig-earn{font-size:1rem;font-weight:800;color:var(--teal)}
-    .gig-earn-sub{font-size:.72rem;color:var(--gray-400)}
+    /* availability toggle */
+    .avail-toggle {
+      display: inline-flex; align-items: center; gap: 9px;
+      background: rgba(255,255,255,.12);
+      border: 1.5px solid rgba(255,255,255,.22);
+      border-radius: var(--radius-full);
+      padding: 7px 16px;
+      cursor: pointer; font-family: var(--font);
+      transition: background .2s;
+    }
+    .avail-toggle:hover { background: rgba(255,255,255,.2); }
+    .avail-dot {
+      width: 9px; height: 9px; border-radius: 50%;
+      background: #6ee7b7;
+      animation: availPulse 1.8s ease-in-out infinite;
+    }
+    @keyframes availPulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.8)} }
+    .avail-dot.offline { background: #9ca3af; animation: none; }
+    .avail-text { font-size: .82rem; font-weight: 700; color: rgba(255,255,255,.9); }
 
-    /* Status badges */
-    .s-badge{font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:10px}
-    .s-open{background:rgba(16,185,129,.1);color:#059669}
-    .s-taken{background:rgba(245,158,11,.1);color:#b45309}
-    .s-completed{background:rgba(107,114,128,.1);color:#374151}
+    .btn-browse-gigs {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 12px 24px;
+      background: rgba(255,255,255,.15);
+      border: 1.5px solid rgba(255,255,255,.3);
+      border-radius: var(--radius-sm);
+      color: #fff; font-weight: 800; font-size: .92rem;
+      cursor: pointer; font-family: var(--font);
+      transition: background .2s; text-decoration: none;
+    }
+    .btn-browse-gigs:hover { background: rgba(255,255,255,.25); color: #fff; text-decoration: none; }
 
-    /* ── Empty state ── */
-    .empty-box{text-align:center;padding:40px 24px;color:var(--gray-400);background:var(--surface);border:1.5px dashed var(--gray-200);border-radius:var(--radius)}
-    .empty-box .ei{font-size:2.5rem;margin-bottom:10px}
-    .empty-box p{font-size:.88rem;line-height:1.6}
+    /* ══════════════════════════════════
+       STATS STRIP
+    ══════════════════════════════════ */
+    .wd-stats-strip {
+      max-width: 1200px; margin: -28px auto 0;
+      padding: 0 20px; position: relative; z-index: 10;
+    }
+    .wd-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 14px;
+    }
+    @media(max-width:900px) { .wd-stats-grid { grid-template-columns: repeat(3,1fr); } }
+    @media(max-width:560px) { .wd-stats-grid { grid-template-columns: repeat(2,1fr); } }
 
-    /* ── Withdraw modal ── */
-    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9000;display:none;align-items:center;justify-content:center;padding:16px}
-    .modal-overlay.show{display:flex}
-    .modal-box{background:var(--surface);border-radius:var(--radius);padding:28px;max-width:420px;width:100%;box-shadow:0 8px 40px rgba(0,0,0,.2)}
-    .modal-title{font-size:1.1rem;font-weight:800;color:var(--primary);margin-bottom:6px}
-    .modal-sub{font-size:.83rem;color:var(--gray-500);margin-bottom:20px;line-height:1.5}
-    .modal-field{margin-bottom:16px}
-    .modal-field label{display:block;font-weight:600;font-size:.85rem;color:var(--gray-700);margin-bottom:6px}
-    .modal-field input{width:100%;padding:11px 14px;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);font-size:.93rem;background:var(--surface);color:var(--text);font-family:inherit;box-sizing:border-box;transition:border .2s}
-    .modal-field input:focus{outline:none;border-color:var(--teal)}
-    .modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
-    .btn-cancel-modal{padding:10px 20px;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);background:transparent;color:var(--gray-600);font-weight:600;font-size:.88rem;cursor:pointer}
-    .btn-confirm-withdraw{padding:10px 24px;background:var(--teal);color:#fff;border:none;border-radius:var(--radius-sm);font-weight:700;font-size:.88rem;cursor:pointer}
-    .withdraw-success{text-align:center;padding:20px 0;display:none}
-    .withdraw-success .ws-icon{font-size:3rem;margin-bottom:10px}
-    .withdraw-success h4{font-size:1rem;font-weight:700;color:var(--success);margin-bottom:6px}
-    .withdraw-success p{font-size:.83rem;color:var(--gray-500)}
+    .wstat-card {
+      background: var(--surface);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 18px 16px;
+      box-shadow: var(--shadow);
+      position: relative; overflow: hidden;
+      transition: transform .2s, box-shadow .2s;
+    }
+    .wstat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+    [data-theme=dark] .wstat-card { border-color: var(--gray-700); }
+    .wstat-card::before {
+      content: ""; position: absolute;
+      top: 0; left: 0; right: 0; height: 3px;
+    }
+    .wstat-card.c1::before { background: linear-gradient(90deg, #059669, #34d399); }
+    .wstat-card.c2::before { background: linear-gradient(90deg, var(--primary), var(--teal)); }
+    .wstat-card.c3::before { background: linear-gradient(90deg, #7c3aed, #a78bfa); }
+    .wstat-card.c4::before { background: linear-gradient(90deg, #d97706, #fbbf24); }
+    .wstat-card.c5::before { background: linear-gradient(90deg, #dc2626, #f87171); }
 
-    /* Dark mode */
-    [data-theme=dark] .stat-card{border-color:var(--gray-700)}
-    [data-theme=dark] .gig-item{border-color:var(--gray-700)}
-    [data-theme=dark] .empty-box{border-color:var(--gray-700)}
-    [data-theme=dark] .modal-box{background:var(--gray-900)}
-    [data-theme=dark] .modal-field input{border-color:var(--gray-600);background:var(--gray-800)}
-    [data-theme=dark] .btn-cancel-modal{border-color:var(--gray-600);color:var(--gray-300)}
+    .wstat-icon  { font-size: 1.6rem; margin-bottom: 8px; line-height: 1; }
+    .wstat-value { font-size: 1.7rem; font-weight: 900; color: var(--primary); line-height: 1; margin-bottom: 3px; letter-spacing: -.5px; }
+    .wstat-label { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .4px; color: var(--gray-400); }
+    .wstat-change { font-size: .72rem; font-weight: 700; margin-top: 6px; display: flex; align-items: center; gap: 3px; }
+    .wstat-change.up  { color: var(--success); }
+    .wstat-change.neu { color: var(--gray-400); }
+
+    /* ══════════════════════════════════
+       TABS
+    ══════════════════════════════════ */
+    .wd-tabs-bar {
+      background: var(--surface);
+      border-bottom: 1.5px solid var(--gray-200);
+      position: sticky; top: 0; z-index: 40;
+      box-shadow: var(--shadow-sm);
+      margin-top: 28px;
+    }
+    [data-theme=dark] .wd-tabs-bar { border-color: var(--gray-700); }
+
+    .wd-tabs-inner {
+      max-width: 1200px; margin: 0 auto;
+      padding: 0 20px;
+      display: flex; overflow-x: auto;
+    }
+    .wd-tabs-inner::-webkit-scrollbar { display: none; }
+
+    .wd-tab {
+      display: flex; align-items: center; gap: 7px;
+      padding: 14px 18px;
+      font-size: .86rem; font-weight: 700;
+      color: var(--gray-500); cursor: pointer;
+      border-bottom: 2.5px solid transparent;
+      white-space: nowrap; background: none;
+      border-left: none; border-right: none; border-top: none;
+      font-family: var(--font);
+      transition: color .18s, border-color .18s;
+      flex-shrink: 0;
+    }
+    .wd-tab:hover  { color: var(--primary); }
+    .wd-tab.active { color: var(--primary); border-bottom-color: var(--teal); }
+    [data-theme=dark] .wd-tab { color: var(--gray-400); }
+
+    .wd-tab-badge {
+      background: var(--danger); color: #fff;
+      font-size: .65rem; font-weight: 800;
+      padding: 1px 6px; border-radius: 10px;
+    }
+    .wd-tab-badge.green  { background: var(--success); }
+    .wd-tab-badge.amber  { background: #f59e0b; }
+    .wd-tab-badge.teal   { background: var(--teal); }
+
+    /* ══════════════════════════════════
+       BODY
+    ══════════════════════════════════ */
+    .wd-body {
+      max-width: 1200px; margin: 0 auto;
+      padding: 28px 20px 80px;
+    }
+    .wd-panel { display: none; }
+    .wd-panel.active { display: block; }
+
+    .wd-two-col {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 24px; align-items: start;
+    }
+    @media(max-width:960px) { .wd-two-col { grid-template-columns: 1fr; } }
+
+    /* ══════════════════════════════════
+       SECTION HEADER
+    ══════════════════════════════════ */
+    .wd-sec-hdr {
+      display: flex; align-items: center;
+      justify-content: space-between; gap: 12px;
+      margin-bottom: 16px;
+    }
+    .wd-sec-title {
+      font-size: 1rem; font-weight: 900; color: var(--primary);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .wd-sec-action {
+      font-size: .8rem; font-weight: 700; color: var(--teal);
+      cursor: pointer; background: none; border: none;
+      font-family: var(--font); padding: 0;
+      transition: opacity .18s; text-decoration: none;
+    }
+    .wd-sec-action:hover { opacity: .75; }
+
+    /* ══════════════════════════════════
+       GIG BROWSE CARDS
+    ══════════════════════════════════ */
+    .browse-cards-list {
+      display: flex; flex-direction: column; gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .browse-card {
+      background: var(--surface);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      transition: box-shadow .2s, transform .2s;
+    }
+    .browse-card:hover { box-shadow: var(--shadow); transform: translateY(-1px); }
+    [data-theme=dark] .browse-card { border-color: var(--gray-700); }
+    .browse-card.featured { border-color: rgba(13,148,136,.3); }
+    .browse-card.urgent   { border-color: rgba(245,158,11,.35); }
+
+    .bc-top {
+      padding: 16px 20px 12px;
+      display: flex; gap: 14px; align-items: flex-start;
+    }
+    .bc-icon {
+      width: 46px; height: 46px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem; flex-shrink: 0;
+    }
+    .bc-icon.green  { background: rgba(5,150,105,.1); }
+    .bc-icon.blue   { background: rgba(26,60,94,.1); }
+    .bc-icon.purple { background: rgba(124,58,237,.1); }
+    .bc-icon.amber  { background: rgba(217,119,6,.1); }
+    .bc-icon.red    { background: rgba(220,38,38,.1); }
+
+    .bc-info { flex: 1; min-width: 0; }
+    .bc-title {
+      font-size: .96rem; font-weight: 800; color: var(--primary);
+      margin-bottom: 5px; line-height: 1.3;
+    }
+    .bc-meta {
+      display: flex; flex-wrap: wrap; gap: 10px;
+      font-size: .78rem; color: var(--gray-400); font-weight: 600;
+    }
+    .bcm-item { display: flex; align-items: center; gap: 4px; }
+
+    .bc-right {
+      display: flex; flex-direction: column;
+      align-items: flex-end; gap: 6px; flex-shrink: 0;
+    }
+    .bc-budget { font-size: 1.1rem; font-weight: 900; color: var(--primary); }
+    .bc-budget span { font-size: .72rem; font-weight: 500; color: var(--gray-400); }
+    .bc-badge {
+      font-size: .68rem; font-weight: 800;
+      padding: 3px 9px; border-radius: 6px;
+    }
+    .bc-badge.urgent   { background: rgba(245,158,11,.1); color: #d97706; }
+    .bc-badge.featured { background: rgba(13,148,136,.1); color: var(--teal); }
+    .bc-badge.new      { background: rgba(99,102,241,.1); color: #6366f1; }
+
+    .bc-tags {
+      padding: 0 20px 10px;
+      display: flex; flex-wrap: wrap; gap: 6px;
+    }
+    .bc-tag {
+      font-size: .72rem; font-weight: 700;
+      padding: 3px 9px; border-radius: 5px;
+      background: rgba(26,60,94,.07); color: var(--primary);
+    }
+    [data-theme=dark] .bc-tag { background: rgba(255,255,255,.07); }
+
+    .bc-footer {
+      padding: 10px 20px 14px;
+      border-top: 1px solid var(--gray-100);
+      display: flex; align-items: center;
+      justify-content: space-between; gap: 10px; flex-wrap: wrap;
+    }
+    [data-theme=dark] .bc-footer { border-color: var(--gray-700); }
+
+    .bc-poster {
+      display: flex; align-items: center; gap: 8px;
+    }
+    .bc-poster-av {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--teal));
+      display: flex; align-items: center; justify-content: center;
+      font-size: .72rem; font-weight: 800; color: #fff; flex-shrink: 0;
+    }
+    .bc-poster-name { font-size: .8rem; font-weight: 700; color: var(--text); }
+    .bc-poster-rating { font-size: .72rem; color: var(--gray-400); }
+
+    .bc-actions { display: flex; gap: 8px; }
+    .btn-bc {
+      padding: 7px 16px; border-radius: 7px;
+      font-size: .8rem; font-weight: 700;
+      cursor: pointer; font-family: var(--font);
+      transition: all .15s;
+    }
+    .btn-bc-save {
+      background: none; border: 1.5px solid var(--gray-200); color: var(--gray-600);
+    }
+    .btn-bc-save:hover { border-color: var(--teal); color: var(--teal); }
+    .btn-bc-apply {
+      background: linear-gradient(135deg, var(--primary), var(--teal));
+      border: none; color: #fff;
+      box-shadow: 0 2px 8px rgba(13,148,136,.2);
+    }
+    .btn-bc-apply:hover { box-shadow: 0 4px 14px rgba(13,148,136,.32); transform: translateY(-1px); }
+    .btn-bc-apply.applied { background: var(--gray-200); color: var(--gray-500); box-shadow: none; cursor: default; }
+    [data-theme=dark] .btn-bc-save { border-color: var(--gray-600); color: var(--gray-400); }
+
+    /* ══════════════════════════════════
+       MY APPLICATIONS CARDS
+    ══════════════════════════════════ */
+    .myapp-list {
+      display: flex; flex-direction: column; gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .myapp-card {
+      background: var(--surface);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      transition: box-shadow .18s;
+    }
+    [data-theme=dark] .myapp-card { border-color: var(--gray-700); }
+    .myapp-card.accepted { border-color: rgba(16,185,129,.35); }
+    .myapp-card.pending  { border-color: rgba(99,102,241,.25); }
+    .myapp-card.declined { opacity: .65; }
+
+    .mac-body {
+      padding: 14px 18px;
+      display: flex; gap: 14px; align-items: flex-start;
+    }
+    .mac-icon {
+      width: 44px; height: 44px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem; flex-shrink: 0;
+    }
+    .mac-info { flex: 1; min-width: 0; }
+    .mac-title { font-size: .92rem; font-weight: 800; color: var(--primary); margin-bottom: 3px; }
+    .mac-meta  { font-size: .78rem; color: var(--gray-400); font-weight: 600; display: flex; gap: 10px; flex-wrap: wrap; }
+    .mac-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0; }
+
+    .app-status-badge {
+      font-size: .7rem; font-weight: 800;
+      padding: 3px 10px; border-radius: 6px;
+    }
+    .asb-pending  { background: rgba(99,102,241,.1); color: #6366f1; }
+    .asb-accepted { background: rgba(16,185,129,.1); color: #059669; }
+    .asb-declined { background: rgba(107,114,128,.1); color: var(--gray-500); }
+    .asb-shortlist{ background: rgba(245,158,11,.1);  color: #d97706; }
+    .asb-active   { background: rgba(13,148,136,.1);  color: var(--teal); }
+
+    .mac-footer {
+      padding: 10px 18px 14px;
+      border-top: 1px solid var(--gray-100);
+      display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+    }
+    [data-theme=dark] .mac-footer { border-color: var(--gray-700); }
+
+    .btn-mac {
+      padding: 7px 14px; border-radius: 7px;
+      font-size: .78rem; font-weight: 700;
+      cursor: pointer; font-family: var(--font);
+      transition: all .15s; border: 1.5px solid var(--gray-200);
+      background: none; color: var(--gray-600);
+    }
+    .btn-mac:hover { border-color: var(--teal); color: var(--teal); }
+    .btn-mac.primary {
+      background: linear-gradient(135deg, var(--primary), var(--teal));
+      border-color: transparent; color: #fff;
+    }
+    .btn-mac.primary:hover { opacity: .9; }
+    .btn-mac.danger { border-color: rgba(239,68,68,.3); color: var(--danger); }
+    .btn-mac.danger:hover { background: rgba(239,68,68,.05); border-color: var(--danger); }
+    [data-theme=dark] .btn-mac { border-color: var(--gray-600); color: var(--gray-400); }
+
+    /* ══════════════════════════════════
+       ACTIVE GIGS (in progress)
+    ══════════════════════════════════ */
+    .active-gig-card {
+      background: var(--surface);
+      border: 2px solid rgba(13,148,136,.25);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      margin-bottom: 16px;
+      transition: box-shadow .2s;
+    }
+    .active-gig-card:hover { box-shadow: var(--shadow); }
+    [data-theme=dark] .active-gig-card { border-color: rgba(13,148,136,.3); }
+
+    .agc-header {
+      background: linear-gradient(135deg, rgba(5,150,105,.06), rgba(13,148,136,.08));
+      padding: 14px 20px;
+      border-bottom: 1.5px solid rgba(13,148,136,.15);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .agc-header-left { display: flex; align-items: center; gap: 10px; }
+    .agc-pulse {
+      width: 10px; height: 10px; border-radius: 50%;
+      background: var(--success);
+      animation: availPulse 1.5s ease-in-out infinite;
+      flex-shrink: 0;
+    }
+    .agc-title   { font-size: .96rem; font-weight: 800; color: var(--primary); }
+    .agc-live    { font-size: .72rem; font-weight: 700; color: var(--success); }
+
+    .agc-body { padding: 16px 20px; }
+    .agc-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 7px 0;
+      border-bottom: 1px dashed var(--gray-100);
+      font-size: .86rem;
+    }
+    .agc-row:last-child { border-bottom: none; }
+    [data-theme=dark] .agc-row { border-color: var(--gray-700); }
+    .agc-lbl { color: var(--gray-400); font-weight: 600; }
+    .agc-val { font-weight: 700; color: var(--text); }
+    .agc-val.green { color: #059669; }
+
+    .agc-footer {
+      padding: 12px 20px;
+      border-top: 1.5px solid rgba(13,148,136,.12);
+      display: flex; gap: 8px; flex-wrap: wrap;
+    }
+    .btn-agc {
+      padding: 9px 18px; border-radius: var(--radius-sm);
+      font-size: .84rem; font-weight: 700;
+      cursor: pointer; font-family: var(--font);
+      transition: all .18s;
+    }
+    .btn-agc-complete {
+      background: linear-gradient(135deg, #059669, #0d9488);
+      border: none; color: #fff;
+      box-shadow: 0 3px 10px rgba(5,150,105,.25);
+    }
+    .btn-agc-complete:hover { box-shadow: 0 5px 16px rgba(5,150,105,.35); transform: translateY(-1px); }
+    .btn-agc-chat {
+      background: none; border: 1.5px solid var(--gray-200); color: var(--gray-600);
+    }
+    .btn-agc-chat:hover { border-color: var(--teal); color: var(--teal); }
+    [data-theme=dark] .btn-agc-chat { border-color: var(--gray-600); }
+
+    /* Countdown timer inside active gig */
+    .agc-timer {
+      background: rgba(245,158,11,.06);
+      border: 1px solid rgba(245,158,11,.2);
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      margin: 12px 0 4px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .agct-label { font-size: .76rem; font-weight: 700; color: #d97706; }
+    .agct-time  { font-size: 1.1rem; font-weight: 900; color: #d97706; font-variant-numeric: tabular-nums; }
+
+    /* ══════════════════════════════════
+       EARNINGS TAB
+    ══════════════════════════════════ */
+    .earn-hero-card {
+      background: linear-gradient(135deg, #064e3b 0%, #059669 55%, #0d9488 100%);
+      border-radius: var(--radius);
+      padding: 24px;
+      margin-bottom: 20px;
+      color: #fff; position: relative; overflow: hidden;
+    }
+    .earn-hero-card::before {
+      content: "";
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px);
+      background-size: 36px 36px; pointer-events: none;
+    }
+    .ehc-inner { position: relative; z-index: 1; }
+    .ehc-row {
+      display: grid; grid-template-columns: repeat(3,1fr); gap: 20px;
+    }
+    @media(max-width:560px) { .ehc-row { grid-template-columns: 1fr; } }
+    .ehc-item {}
+    .ehc-label { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: rgba(255,255,255,.6); margin-bottom: 4px; }
+    .ehc-val   { font-size: 1.8rem; font-weight: 900; color: #fff; line-height: 1; }
+    .ehc-val span { font-size: 1rem; font-weight: 600; }
+    .ehc-sub   { font-size: .74rem; color: rgba(255,255,255,.6); margin-top: 2px; }
+    .ehc-divider { width: 1px; background: rgba(255,255,255,.15); }
+    @media(max-width:560px) { .ehc-divider { display: none; } }
+
+    .ehc-btns { display: flex; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
+    .btn-ehc {
+      padding: 10px 20px; border-radius: var(--radius-sm);
+      font-weight: 700; font-size: .86rem;
+      cursor: pointer; font-family: var(--font);
+      display: inline-flex; align-items: center; gap: 7px;
+      transition: all .18s;
+    }
+    .btn-ehc-primary {
+      background: rgba(255,255,255,.18);
+      border: 1.5px solid rgba(255,255,255,.3); color: #fff;
+    }
+    .btn-ehc-primary:hover { background: rgba(255,255,255,.28); }
+    .btn-ehc-outline {
+      background: transparent;
+      border: 1.5px solid rgba(255,255,255,.2); color: rgba(255,255,255,.8);
+    }
+    .btn-ehc-outline:hover { border-color: rgba(255,255,255,.4); }
+
+    /* Earnings chart placeholder */
+    .earn-chart-card {
+      background: var(--surface);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow-sm);
+    }
+    [data-theme=dark] .earn-chart-card { border-color: var(--gray-700); }
+    .ecc-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .ecc-title { font-size: .9rem; font-weight: 800; color: var(--primary); }
+    .ecc-period {
+      display: flex; gap: 6px;
+    }
+    .period-btn {
+      padding: 4px 10px; border-radius: 6px;
+      font-size: .74rem; font-weight: 700;
+      cursor: pointer; font-family: var(--font);
+      border: 1.5px solid var(--gray-200);
+      background: none; color: var(--gray-500);
+      transition: all .15s;
+    }
+    .period-btn.active { background: var(--primary); border-color: var(--primary); color: #fff; }
+    [data-theme=dark] .period-btn { border-color: var(--gray-600); }
+
+    /* Bar chart — CSS bars */
+    .bar-chart {
+      display: flex; align-items: flex-end; gap: 8px;
+      height: 120px; padding: 0 4px;
+    }
+    .bar-col {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; gap: 4px; height: 100%;
+      justify-content: flex-end;
+    }
+    .bar-fill {
+      width: 100%; border-radius: 4px 4px 0 0;
+      background: linear-gradient(180deg, var(--teal), var(--primary));
+      transition: height .4s ease;
+      min-height: 4px;
+    }
+    .bar-fill.current { background: linear-gradient(180deg, #6ee7b7, #059669); }
+    .bar-label {
+      font-size: .68rem; font-weight: 700; color: var(--gray-400);
+      white-space: nowrap;
+    }
+    .bar-val { font-size: .7rem; font-weight: 800; color: var(--text); }
+
+    /* Transaction list */
+    .earn-txn-list {
+      background: var(--surface);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+    [data-theme=dark] .earn-txn-list { border-color: var(--gray-700); }
+
+    .etl-header {
+      padding: 14px 18px;
+      border-bottom: 1.5px solid var(--gray-100);
+      display: flex; align-items: center; justify-content: space-between;
+      background: linear-gradient(135deg, rgba(5,150,105,.04), rgba(13,148,136,.05));
+    }
+    [data-theme=dark] .etl-header { border-color: var(--gray-700); }
+    .etl-title { font-size: .9rem; font-weight: 800; color: var(--primary); }
+
+    .etl-row {
+      display: flex; align-items: center; gap: 14px;
+      padding: 13px 18px;
+      border-bottom: 1px solid var(--gray-100);
+      transition: background .15s;
+    }
+    .etl-row:last-child { border-bottom: none; }
+    .etl-row:hover { background: rgba(13,148,136,.03); }
+    [data-theme=dark] .etl-row { border-color: var(--gray-700); }
+
+    .etl-icon {
+      width: 36px; height: 36px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; flex-shrink: 0;
+    }
+    .etl-icon.earn  { background: rgba(5,150,105,.08); }
+    .etl-icon.bonus { background: rgba(245,158,11,.08); }
+    .etl-icon.hold  { background: rgba(99,102,241,.08); }
+    .etl-icon.out   { background: rgba(220,38,38,.08); }
+
+    .etl-info { flex: 1; min-width: 0; }
+    .etl-title-text { font-size: .88rem; font-weight: 700; color: var(--text); margin-bottom: 1px; }
+    .etl-sub   { font-size: .74rem; color: var(--gray-400); font-weight: 600; }
+    .etl-right { text-align: right; flex-shrink: 0; }
+    .etl-amount { font-size: .96rem; font-weight: 900; }
+    .etl-amount.earn  { color: var(--success); }
+    .etl-amount.bonus { color: #d97706; }
+    .etl-amount.hold  { color: #6366f1; }
+    .etl-amount.out   { color: var(--danger); }
+    .etl-date { font-size: .72rem; color: var(--gray-400); font-weight: 600; }
+
+    /* Withdraw card */
+    .withdraw-card {
+      background: var(--surface);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 18px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow-sm);
+    }
+    [data-theme=dark] .withdraw-card { border-color: var(--gray-700); }
+    .wdc-title { font-size: .9rem; font-weight: 800; color: var(--primary); margin-bottom: 14px; display: flex; align-items: center; gap: 7px; }
+
+    .upi-methods { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+    .upi-btn {
+      padding: 10px; border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+      background: none; cursor: pointer; font-family: var(--font);
+      font-size: .8rem; font-weight: 700; color: var(--gray-600);
+      transition: all .15s; text-align: center;
+    }
+    .upi-btn:hover      { border-color: var(--teal); color: var(--teal); }
+    .upi-btn.selected   { border-color: var(--teal); background: rgba(13,148,136,.07); color: var(--teal); }
+    [data-theme=dark] .upi-btn { border-color: var(--gray-600); }
+
+    .withdraw-input {
+      width: 100%; padding: 10px 13px;
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+      background: var(--surface); color: var(--text);
+      font-family: var(--font); font-size: .9rem;
+      box-sizing: border-box; margin-bottom: 10px;
+      transition: border .2s;
+    }
+    .withdraw-input:focus { outline: none; border-color: var(--teal); box-shadow: 0 0 0 3px rgba(13,148,136,.1); }
+    [data-theme=dark] .withdraw-input { border-color: var(--gray-600); background: var(--gray-800); }
+
+    .btn-withdraw-now {
+      width: 100%; padding: 12px;
+      background: linear-gradient(135deg, #059669, #0d9488);
+      border: none; border-radius: var(--radius-sm);
+      color: #fff; font-weight: 800; font-size: .9rem;
+      cursor: pointer; font-family: var(--font);
+      box-shadow: 0 3px 12px rgba(5,150,105,.25);
+      transition: box-shadow .2s, transform .2s;
+    }
+    .btn-withdraw-now:hover { box-shadow: 0 6px 20px rgba(5,150,105,.35); transform: translateY(-1px); }
+
+    /* ══════════════════════════════════
+       PROFILE / SKILLS TAB
+    ══════════════════════════════════ */
+    .profile-section-card {
+      background: var(--surface);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+    [data-theme=dark] .profile-section-card { border-color: var(--gray-700); }
+
+    .psc-header {
+      padding: 16px 20px;
+      border-bottom: 1.5px solid var(--gray-100);
+      background: linear-gradient(135deg, rgba(26,60,94,.03), rgba(13,148,136,.04));
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    [data-theme=dark] .psc-header { border-color: var(--gray-700); }
+    .psc-header-title { font-size: .92rem; font-weight: 800; color: var(--primary); display: flex; align-items: center; gap: 8px; }
+    .btn-psc-edit {
+      padding: 6px 14px; border-radius: var(--radius-sm);
+      border: 1.5px solid var(--gray-200);
+      background: none; color: var(--gray-600);
+      font-size: .76rem; font-weight: 700; cursor: pointer;
+      font-family: var(--font); transition: all .15s;
+    }
+    .btn-psc-edit:hover { border-color: var(--teal); color: var(--teal); }
+    [data-theme=dark] .btn-psc-edit { border-color: var(--gray-600); }
+
+    .psc-body { padding: 18px 20px; }
+
+    /* Profile summary top */
+    .profile-top {
+      display: flex; gap: 18px; align-items: flex-start; margin-bottom: 18px;
+    }
+    .profile-big-avatar {
+      width: 72px; height: 72px; border-radius: 50%;
+      background: linear-gradient(135deg, #6ee7b7, #059669);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.8rem; font-weight: 900; color: #fff;
+      border: 3px solid rgba(13,148,136,.25); flex-shrink: 0;
+    }
+    .profile-top-info {}
+    .pti-name   { font-size: 1.1rem; font-weight: 900; color: var(--primary); margin-bottom: 2px; }
+    .pti-location { font-size: .82rem; color: var(--gray-400); font-weight: 600; margin-bottom: 6px; }
+    .pti-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+    .pti-chip {
+      font-size: .72rem; font-weight: 700;
+      padding: 3px 9px; border-radius: 5px;
+      background: rgba(13,148,136,.1); color: var(--teal);
+    }
+
+    /* Skills tags */
+    .skills-container {
+      display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0;
+    }
+    .skill-tag {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 12px; border-radius: var(--radius-sm);
+      background: rgba(26,60,94,.07);
+      border: 1.5px solid rgba(26,60,94,.12);
+      font-size: .8rem; font-weight: 700; color: var(--primary);
+    }
+    [data-theme=dark] .skill-tag { background: rgba(255,255,255,.07); border-color: rgba(255,255,255,.1); }
+    .skill-level {
+      font-size: .66rem; font-weight: 800;
+      padding: 1px 5px; border-radius: 4px;
+    }
+    .sl-expert   { background: rgba(5,150,105,.12); color: #059669; }
+    .sl-good     { background: rgba(13,148,136,.12); color: var(--teal); }
+    .sl-learning { background: rgba(245,158,11,.1);  color: #d97706; }
+
+    /* Work history */
+    .work-history-item {
+      display: flex; gap: 12px; align-items: flex-start;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--gray-100);
+    }
+    .work-history-item:last-child { border-bottom: none; }
+    [data-theme=dark] .work-history-item { border-color: var(--gray-700); }
+    .whi-icon {
+      width: 36px; height: 36px; border-radius: 10px;
+      background: rgba(13,148,136,.1);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; flex-shrink: 0;
+    }
+    .whi-title  { font-size: .88rem; font-weight: 800; color: var(--text); margin-bottom: 2px; }
+    .whi-meta   { font-size: .76rem; color: var(--gray-400); font-weight: 600; margin-bottom: 4px; }
+    .whi-review { font-size: .8rem; color: var(--gray-600); font-style: italic; line-height: 1.5; }
+    [data-theme=dark] .whi-review { color: var(--gray-400); }
+
+    /* Availability calendar (visual) */
+    .avail-calendar {
+      display: grid; grid-template-columns: repeat(7,1fr); gap: 6px;
+      margin: 12px 0;
+    }
+    .avail-day {
+      aspect-ratio: 1;
+      border-radius: 7px;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 2px; cursor: pointer;
+      border: 1.5px solid var(--gray-200);
+      background: var(--surface);
+      transition: all .15s; font-size: .7rem;
+    }
+    [data-theme=dark] .avail-day { border-color: var(--gray-600); }
+    .avail-day.available { background: rgba(5,150,105,.08); border-color: rgba(5,150,105,.25); }
+    .avail-day.busy      { background: rgba(239,68,68,.06); border-color: rgba(239,68,68,.2); }
+    .avail-day.selected  { background: rgba(13,148,136,.15); border-color: var(--teal); }
+    .avail-day-name  { font-weight: 800; color: var(--gray-400); font-size: .62rem; line-height: 1; }
+    .avail-day-num   { font-weight: 900; color: var(--text); font-size: .76rem; line-height: 1; }
+    .avail-day.available .avail-day-num { color: #059669; }
+    .avail-day.busy      .avail-day-num { color: var(--danger); }
+
+    /* ══════════════════════════════════
+       REVIEWS TAB
+    ══════════════════════════════════ */
+    .worker-review-summary {
+      display: grid; grid-template-columns: 200px 1fr; gap: 24px;
+      background: var(--surface);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 22px;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 24px;
+    }
+    @media(max-width:560px) { .worker-review-summary { grid-template-columns: 1fr; } }
+    [data-theme=dark] .worker-review-summary { border-color: var(--gray-700); }
+
+    .wrs-big { text-align: center; border-right: 1.5px solid var(--gray-100); padding-right: 24px; }
+    @media(max-width:560px) { .wrs-big { border-right: none; border-bottom: 1.5px solid var(--gray-100); padding-right: 0; padding-bottom: 16px; } }
+    [data-theme=dark] .wrs-big { border-color: var(--gray-700); }
+    .wrs-num   { font-size: 3.5rem; font-weight: 900; color: var(--primary); line-height: 1; }
+    .wrs-stars { font-size: 1.3rem; margin: 6px 0; }
+    .wrs-count { font-size: .78rem; color: var(--gray-400); font-weight: 600; }
+
+    .wrs-sub-ratings { display: flex; flex-direction: column; gap: 8px; }
+    .wsr-row {
+      display: flex; align-items: center; gap: 10px;
+    }
+    .wsrr-label { font-size: .78rem; font-weight: 700; color: var(--gray-500); width: 100px; flex-shrink: 0; }
+    .wsrr-bar   { flex: 1; height: 6px; background: var(--gray-100); border-radius: 4px; overflow: hidden; }
+    [data-theme=dark] .wsrr-bar { background: var(--gray-700); }
+    .wsrr-fill  { height: 100%; border-radius: 4px; background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+    .wsrr-val   { font-size: .76rem; font-weight: 800; color: var(--text); width: 24px; text-align: right; flex-shrink: 0; }
+
+    .worker-review-card {
+      background: var(--surface);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 18px;
+      margin-bottom: 14px;
+      box-shadow: var(--shadow-sm);
+    }
+    [data-theme=dark] .worker-review-card { border-color: var(--gray-700); }
+    .wrc-header {
+      display: flex; align-items: flex-start; gap: 12px;
+      margin-bottom: 10px;
+    }
+    .wrc-avatar {
+      width: 40px; height: 40px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: .9rem; color: #fff; flex-shrink: 0;
+    }
+    .wrc-name  { font-size: .9rem; font-weight: 800; color: var(--text); }
+    .wrc-meta  { font-size: .74rem; color: var(--gray-400); font-weight: 600; }
+    .wrc-stars { margin-left: auto; font-size: .95rem; }
+    .wrc-body  { font-size: .86rem; color: var(--gray-600); line-height: 1.7; }
+    [data-theme=dark] .wrc-body { color: var(--gray-400); }
+    .wrc-tags  { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+    .wrc-tag { font-size: .72rem; font-weight: 700; padding: 3px 8px; border-radius: 5px; background: rgba(5,150,105,.08); color: #059669; }
+
+    /* ══════════════════════════════════
+       SIDEBAR WIDGETS
+    ══════════════════════════════════ */
+
+    /* Earnings mini card */
+    .mini-earn-card {
+      background: linear-gradient(135deg, #064e3b 0%, #059669 55%, #0d9488 100%);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 20px;
+      color: #fff; position: relative; overflow: hidden;
+    }
+    .mini-earn-card::before {
+      content: "";
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+      background-size: 32px 32px; pointer-events: none;
+    }
+    .mec-inner { position: relative; z-index: 1; }
+    .mec-label   { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: rgba(255,255,255,.6); margin-bottom: 4px; }
+    .mec-balance { font-size: 1.9rem; font-weight: 900; color: #fff; line-height: 1; margin-bottom: 2px; }
+    .mec-balance span { font-size: .9rem; font-weight: 600; }
+    .mec-sub     { font-size: .74rem; color: rgba(255,255,255,.6); margin-bottom: 14px; }
+    .mec-row {
+      display: flex; justify-content: space-between;
+      font-size: .8rem; color: rgba(255,255,255,.7);
+      padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,.1);
+    }
+    .mec-row:last-of-type { border-bottom: none; }
+    .mec-row strong { color: #fff; }
+    .btn-mec-withdraw {
+      display: flex; align-items: center; justify-content: center; gap: 7px;
+      width: 100%; padding: 10px;
+      background: rgba(255,255,255,.18);
+      border: 1.5px solid rgba(255,255,255,.28); color: #fff;
+      border-radius: var(--radius-sm);
+      font-weight: 800; font-size: .86rem;
+      cursor: pointer; font-family: var(--font);
+      transition: background .2s; margin-top: 14px;
+    }
+    .btn-mec-withdraw:hover { background: rgba(255,255,255,.28); }
+
+    /* Notifications */
+    .notif-card-w {
+      background: var(--surface);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden; margin-bottom: 20px;
+    }
+    [data-theme=dark] .notif-card-w { border-color: var(--gray-700); }
+
+    .ncw-header {
+      padding: 14px 18px;
+      border-bottom: 1.5px solid var(--gray-100);
+      display: flex; align-items: center; justify-content: space-between;
+      background: linear-gradient(135deg, rgba(5,150,105,.03), rgba(13,148,136,.05));
+    }
+    [data-theme=dark] .ncw-header { border-color: var(--gray-700); }
+    .ncwh-title { font-size: .9rem; font-weight: 800; color: var(--primary); display: flex; align-items: center; gap: 7px; }
+    .ncwh-count { background: var(--danger); color: #fff; font-size: .66rem; font-weight: 800; padding: 1px 6px; border-radius: 10px; }
+    .ncwh-clear { font-size: .74rem; font-weight: 700; color: var(--teal); background: none; border: none; cursor: pointer; font-family: var(--font); }
+
+    .notif-item-w {
+      display: flex; gap: 12px; align-items: flex-start;
+      padding: 12px 18px;
+      border-bottom: 1px solid var(--gray-100);
+      transition: background .15s; cursor: pointer;
+    }
+    .notif-item-w:last-child { border-bottom: none; }
+    .notif-item-w:hover { background: rgba(13,148,136,.03); }
+    [data-theme=dark] .notif-item-w { border-color: var(--gray-700); }
+    .notif-item-w.unread { background: rgba(13,148,136,.04); }
+
+    .niw-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--teal); flex-shrink: 0; margin-top: 6px; }
+    .niw-dot.read { background: var(--gray-300); }
+    .niw-text { font-size: .84rem; color: var(--text); line-height: 1.55; margin-bottom: 2px; }
+    .niw-time { font-size: .72rem; color: var(--gray-400); font-weight: 600; }
+
+    /* Profile completion widget */
+    .profile-compl-card {
+      background: var(--surface);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 18px; margin-bottom: 20px;
+      box-shadow: var(--shadow-sm);
+    }
+    [data-theme=dark] .profile-compl-card { border-color: var(--gray-700); }
+    .pcc-title { font-size: .88rem; font-weight: 800; color: var(--primary); margin-bottom: 4px; display: flex; align-items: center; gap: 7px; }
+    .pcc-sub   { font-size: .76rem; color: var(--gray-400); margin-bottom: 12px; }
+    .pcc-meter { background: var(--gray-100); border-radius: 6px; height: 6px; overflow: hidden; margin-bottom: 6px; }
+    [data-theme=dark] .pcc-meter { background: var(--gray-700); }
+    .pcc-fill  { height: 100%; border-radius: 6px; background: linear-gradient(90deg, #059669, var(--teal)); }
+    .pcc-pct   { font-size: .76rem; font-weight: 700; color: var(--text); margin-bottom: 12px; }
+    .pcc-items { display: flex; flex-direction: column; gap: 6px; }
+    .pcc-item  { display: flex; align-items: center; gap: 8px; font-size: .8rem; color: var(--gray-500); }
+    .pcc-item .pcci-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .pcc-item.done  { color: var(--success); }
+    .pcc-item.done .pcci-dot  { background: var(--success); }
+    .pcc-item.todo .pcci-dot  { background: var(--gray-300); }
+
+    /* Recommended gigs sidebar */
+    .rec-gigs-card {
+      background: var(--surface);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden; margin-bottom: 20px;
+    }
+    [data-theme=dark] .rec-gigs-card { border-color: var(--gray-700); }
+    .rgc-header {
+      padding: 14px 18px;
+      border-bottom: 1.5px solid var(--gray-100);
+      background: linear-gradient(135deg, rgba(5,150,105,.03), rgba(13,148,136,.05));
+    }
+    [data-theme=dark] .rgc-header { border-color: var(--gray-700); }
+    .rgc-title { font-size: .9rem; font-weight: 800; color: var(--primary); }
+
+    .rec-gig-item {
+      display: flex; gap: 12px; align-items: flex-start;
+      padding: 12px 18px;
+      border-bottom: 1px solid var(--gray-100);
+      cursor: pointer; transition: background .15s;
+    }
+    .rec-gig-item:last-child { border-bottom: none; }
+    .rec-gig-item:hover { background: rgba(13,148,136,.03); }
+    [data-theme=dark] .rec-gig-item { border-color: var(--gray-700); }
+
+    .rgi-icon {
+      width: 36px; height: 36px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; flex-shrink: 0;
+      background: rgba(13,148,136,.09);
+    }
+    .rgi-title    { font-size: .86rem; font-weight: 800; color: var(--primary); margin-bottom: 2px; }
+    .rgi-meta     { font-size: .74rem; color: var(--gray-400); font-weight: 600; }
+    .rgi-budget   { margin-left: auto; font-size: .9rem; font-weight: 900; color: #059669; flex-shrink: 0; }
+
+    /* Activity feed */
+    .activity-feed-card {
+      background: var(--surface);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius);
+      overflow: hidden; box-shadow: var(--shadow-sm);
+      margin-bottom: 20px;
+    }
+    [data-theme=dark] .activity-feed-card { border-color: var(--gray-700); }
+    .afc-header {
+      padding: 14px 18px;
+      border-bottom: 1.5px solid var(--gray-100);
+      background: linear-gradient(135deg, rgba(5,150,105,.03), rgba(13,148,136,.05));
+    }
+    [data-theme=dark] .afc-header { border-color: var(--gray-700); }
+    .afc-title { font-size: .9rem; font-weight: 800; color: var(--primary); }
+    .afc-item {
+      display: flex; gap: 12px; align-items: flex-start;
+      padding: 12px 18px;
+      border-bottom: 1px solid var(--gray-100);
+    }
+    .afc-item:last-child { border-bottom: none; }
+    [data-theme=dark] .afc-item { border-color: var(--gray-700); }
+    .afc-icon {
+      width: 30px; height: 30px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .88rem; flex-shrink: 0;
+    }
+    .afc-icon.green  { background: rgba(5,150,105,.1); }
+    .afc-icon.blue   { background: rgba(26,60,94,.1); }
+    .afc-icon.amber  { background: rgba(217,119,6,.1); }
+    .afc-icon.purple { background: rgba(124,58,237,.1); }
+    .afc-text { font-size: .82rem; color: var(--text); line-height: 1.5; margin-bottom: 1px; }
+    .afc-time { font-size: .7rem; color: var(--gray-400); font-weight: 600; }
+
+    /* ══════════════════════════════════
+       INFO BOXES
+    ══════════════════════════════════ */
+    .wd-info-box {
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      padding: 11px 14px; margin-bottom: 16px;
+      font-size: .85rem; line-height: 1.65;
+    }
+    .wd-info-box.teal   { background: rgba(13,148,136,.07);  border-left: 3px solid var(--teal); }
+    .wd-info-box.green  { background: rgba(16,185,129,.06);  border-left: 3px solid #059669; }
+    .wd-info-box.warn   { background: rgba(245,158,11,.07);  border-left: 3px solid #f59e0b; }
+    .wd-info-box.danger { background: rgba(239,68,68,.06);   border-left: 3px solid var(--danger); }
+
+    /* empty state */
+    .empty-state {
+      text-align: center; padding: 48px 24px;
+      background: var(--surface);
+      border: 1.5px dashed var(--gray-200);
+      border-radius: var(--radius);
+    }
+    [data-theme=dark] .empty-state { border-color: var(--gray-700); }
+    .es-icon  { font-size: 3rem; margin-bottom: 12px; line-height: 1; }
+    .es-title { font-size: 1rem; font-weight: 800; color: var(--primary); margin-bottom: 6px; }
+    .es-sub   { font-size: .86rem; color: var(--gray-400); line-height: 1.65; margin-bottom: 18px; }
+    .btn-es {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 10px 22px;
+      background: linear-gradient(135deg, #059669, #0d9488);
+      color: #fff; border: none; border-radius: var(--radius-sm);
+      font-weight: 700; font-size: .88rem; cursor: pointer;
+      font-family: var(--font); text-decoration: none;
+      transition: opacity .2s;
+    }
+    .btn-es:hover { opacity: .9; color: #fff; text-decoration: none; }
+
+    /* filter bar */
+    .filter-bar {
+      display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 18px;
+    }
+    .filter-btn {
+      padding: 7px 16px; border-radius: var(--radius-full);
+      border: 1.5px solid var(--gray-200);
+      background: none; color: var(--gray-500);
+      font-size: .8rem; font-weight: 700; cursor: pointer;
+      font-family: var(--font); transition: all .15s;
+    }
+    .filter-btn:hover  { border-color: var(--teal); color: var(--teal); }
+    .filter-btn.active { background: #059669; border-color: #059669; color: #fff; }
+    [data-theme=dark] .filter-btn { border-color: var(--gray-600); }
+
+    .filter-sort {
+      margin-left: auto;
+      padding: 7px 12px; border-radius: var(--radius-sm);
+      border: 1.5px solid var(--gray-200);
+      background: var(--surface); color: var(--text);
+      font-family: var(--font); font-size: .8rem; cursor: pointer;
+    }
+    [data-theme=dark] .filter-sort { border-color: var(--gray-600); background: var(--gray-800); }
+
+    /* mobile bottom nav */
+    .wd-bottom-nav {
+      display: none;
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
+      background: var(--surface);
+      border-top: 1.5px solid var(--gray-200);
+      padding: 6px 0 calc(6px + env(safe-area-inset-bottom));
+      box-shadow: 0 -4px 16px rgba(0,0,0,.08);
+    }
+    [data-theme=dark] .wd-bottom-nav { border-color: var(--gray-700); }
+    @media(max-width:640px) { .wd-bottom-nav { display: flex; } }
+    .wbn-inner { display: flex; width: 100%; justify-content: space-around; }
+    .wbn-item {
+      display: flex; flex-direction: column; align-items: center; gap: 3px;
+      padding: 6px 12px; cursor: pointer;
+      background: none; border: none; font-family: var(--font); flex: 1;
+    }
+    .wbn-icon  { font-size: 1.3rem; line-height: 1; }
+    .wbn-label { font-size: .62rem; font-weight: 700; color: var(--gray-400); }
+    .wbn-item.active .wbn-label { color: var(--teal); }
+
+    @media(max-width:640px) { .wd-body { padding-bottom: 100px; } }
+
   </style>
 </head>
 <body>
+
+  <div id="page-loader"></div>
   <div id="announce-bar"></div>
   <nav id="main-nav"></nav>
 
-  <!-- Withdraw modal -->
-  <div class="modal-overlay" id="withdrawModal">
-    <div class="modal-box">
-      <div id="withdrawForm">
-        <div class="modal-title">💸 Withdraw Earnings</div>
-        <div class="modal-sub">Enter your UPI ID to withdraw your GigLega balance. Simulated — no real transfer.</div>
-        <div class="modal-field">
-          <label>UPI ID</label>
-          <input type="text" id="upiInput" placeholder="yourname@upi" />
+  <main class="wd-wrapper">
+
+    <!-- ══════════════════════════════════
+         HERO
+    ══════════════════════════════════ -->
+    <section class="wd-hero">
+      <div class="wd-hero-inner">
+        <div>
+          <div class="wd-greeting" id="wdGreeting">Good evening 👋</div>
+          <h1 class="wd-hero-name">Arjun <span>Singh</span></h1>
+          <p class="wd-hero-sub">
+            2 nayi gig invitations hain — aur tumhara profile 89% complete hai. Top picks neeche hain!
+          </p>
+          <div class="wd-hero-chips">
+            <span class="wd-hero-chip">✅ Verified Worker</span>
+            <span class="wd-hero-chip">⭐ 4.6 Rating</span>
+            <span class="wd-hero-chip">💼 14 Gigs Done</span>
+            <span class="wd-hero-chip">📍 Gurugram</span>
+          </div>
         </div>
-        <div class="modal-field">
-          <label>Amount (₹)</label>
-          <input type="number" id="withdrawAmount" placeholder="Enter amount" min="1" />
-        </div>
-        <div class="modal-actions">
-          <button class="btn-cancel-modal" id="withdrawCancel">Cancel</button>
-          <button class="btn-confirm-withdraw" id="withdrawConfirm">Withdraw ➤</button>
+        <div class="wd-hero-right">
+          <div class="wd-avatar-wrap">
+            <div class="wd-avatar">AS</div>
+            <div>
+              <div class="wd-av-name">Arjun Singh</div>
+              <div class="wd-av-rating">
+                <span>⭐</span>
+                <strong>4.6</strong>
+                <span>(14 reviews)</span>
+              </div>
+            </div>
+          </div>
+          <button class="avail-toggle" id="availToggle">
+            <div class="avail-dot" id="availDot"></div>
+            <span class="avail-text" id="availText">Available for Gigs</span>
+          </button>
+          <a href="browse.html" class="btn-browse-gigs">🔍 Browse Gigs</a>
         </div>
       </div>
-      <div class="withdraw-success" id="withdrawSuccess">
-        <div class="ws-icon">🎉</div>
-        <h4>Withdrawal Initiated!</h4>
-        <p>₹<span id="withdrawnAmt">0</span> will be credited to your UPI within 24 hours.<br>(Simulated — Firebase integration pending)</p>
-        <button class="btn-confirm-withdraw" style="margin-top:16px" id="withdrawDone">Done</button>
+    </section>
+
+    <!-- ══════════════════════════════════
+         STATS STRIP
+    ══════════════════════════════════ -->
+    <div class="wd-stats-strip">
+      <div class="wd-stats-grid">
+        <div class="wstat-card c1">
+          <div class="wstat-icon">💰</div>
+          <div class="wstat-value">₹8.4k</div>
+          <div class="wstat-label">Earned (Mar)</div>
+          <div class="wstat-change up">↑ ₹2.1k this week</div>
+        </div>
+        <div class="wstat-card c2">
+          <div class="wstat-icon">✅</div>
+          <div class="wstat-value">14</div>
+          <div class="wstat-label">Gigs Completed</div>
+          <div class="wstat-change up">↑ 3 this month</div>
+        </div>
+        <div class="wstat-card c3">
+          <div class="wstat-icon">📩</div>
+          <div class="wstat-value">6</div>
+          <div class="wstat-label">Active Applications</div>
+          <div class="wstat-change neu">2 pending review</div>
+        </div>
+        <div class="wstat-card c4">
+          <div class="wstat-icon">⭐</div>
+          <div class="wstat-value">4.6</div>
+          <div class="wstat-label">Avg Rating</div>
+          <div class="wstat-change up">↑ 0.2 this month</div>
+        </div>
+        <div class="wstat-card c5">
+          <div class="wstat-icon">🎯</div>
+          <div class="wstat-value">89%</div>
+          <div class="wstat-label">Accept Rate</div>
+          <div class="wstat-change up">↑ 4% this month</div>
+        </div>
       </div>
     </div>
-  </div>
 
-  <main class="page-wrapper">
-    <div class="dash-wrap">
-
-      <nav id="breadcrumb" aria-label="breadcrumb"></nav>
-
-      <!-- Top bar -->
-      <div class="dash-topbar">
-        <div class="dash-greeting">
-          <h1 id="greetingText">Welcome back! 👋</h1>
-          <p>Worker Dashboard — Track your gigs and earnings</p>
-        </div>
-        <button class="btn-switch-role" id="btnSwitchRole">
-          🔄 Switch to Poster Mode
+    <!-- ══════════════════════════════════
+         TABS
+    ══════════════════════════════════ -->
+    <div class="wd-tabs-bar">
+      <div class="wd-tabs-inner" id="wdTabs">
+        <button class="wd-tab active" data-tab="overview">🏠 Overview</button>
+        <button class="wd-tab" data-tab="browse">
+          🔍 Browse Gigs
+          <span class="wd-tab-badge teal">42</span>
         </button>
+        <button class="wd-tab" data-tab="applications">
+          📩 My Applications
+          <span class="wd-tab-badge green">6</span>
+        </button>
+        <button class="wd-tab" data-tab="active">
+          💼 Active Gigs
+          <span class="wd-tab-badge amber">1</span>
+        </button>
+        <button class="wd-tab" data-tab="earnings">💰 Earnings</button>
+        <button class="wd-tab" data-tab="profile">👤 Profile</button>
+        <button class="wd-tab" data-tab="reviews">⭐ Reviews</button>
       </div>
-
-      <!-- Wallet card -->
-      <div class="wallet-card">
-        <div class="wallet-top">
-          <div>
-            <div class="wallet-label">💰 GigLega Wallet Balance</div>
-            <div class="wallet-amount">₹<span id="walletBalance">0</span></div>
-            <div class="wallet-sub">Withdrawable anytime via UPI</div>
-          </div>
-          <button class="btn-withdraw" id="btnWithdraw">Withdraw via UPI 💸</button>
-        </div>
-        <div class="wallet-breakdown">
-          <div class="wallet-item">
-            <span class="wallet-item-label">Total Earned</span>
-            <span class="wallet-item-value">₹<span id="totalEarned">0</span></span>
-          </div>
-          <div class="wallet-item">
-            <span class="wallet-item-label">Gigs Completed</span>
-            <span class="wallet-item-value" id="gigsCompleted">0</span>
-          </div>
-          <div class="wallet-item">
-            <span class="wallet-item-label">Avg per Gig</span>
-            <span class="wallet-item-value">₹<span id="avgEarn">0</span></span>
-          </div>
-          <div class="wallet-item">
-            <span class="wallet-item-label">Support Fees Paid</span>
-            <span class="wallet-item-value">₹<span id="feePaid">0</span></span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Stats row -->
-      <div class="stats-row">
-        <div class="stat-card teal">
-          <div class="stat-label">Active Gigs</div>
-          <div class="stat-value" id="statActive">0</div>
-          <div class="stat-sub">Currently in progress</div>
-        </div>
-        <div class="stat-card amber">
-          <div class="stat-label">Completed</div>
-          <div class="stat-value" id="statCompleted">0</div>
-          <div class="stat-sub">All time</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Pending Payment</div>
-          <div class="stat-value" id="statPending">₹0</div>
-          <div class="stat-sub">From active gigs</div>
-        </div>
-      </div>
-
-      <!-- Active gigs -->
-      <div class="section">
-        <div class="section-head">
-          <div class="section-title">⚡ Active Gigs</div>
-          <a href="browse.html" class="section-link">Browse More →</a>
-        </div>
-        <div id="activeGigsList"></div>
-      </div>
-
-      <!-- Completed gigs -->
-      <div class="section">
-        <div class="section-head">
-          <div class="section-title">✅ Completed Gigs</div>
-        </div>
-        <div id="completedGigsList"></div>
-      </div>
-
     </div>
-  </main>
 
-  <footer id="main-footer"></footer>
-  <div id="toast-container"></div>
+    <!-- ══════════════════════════════════
+         PANELS
+    ══════════════════════════════════ -->
+    <div class="wd-body">
 
-  <script>
-  (function () {
+      <!-- ════ OVERVIEW ════ -->
+      <div class="wd-panel active" id="panel-overview">
+        <div class="wd-two-col">
 
-    var FEE_RATE = 0.06;
-    var GIG_KEY  = (typeof GL !== "undefined" && GL.STORAGE_KEY_GIGS) ? GL.STORAGE_KEY_GIGS : "gl_gigs";
-    var USER_KEY = (typeof GL !== "undefined" && GL.STORAGE_KEY_USER)  ? GL.STORAGE_KEY_USER  : "gl_user";
+          <!-- LEFT -->
+          <div>
 
-    /* ── Auth guard ── */
-    var user = (function() {
-  try {
-    var u = JSON.parse(localStorage.getItem("gl_user") || "null");
-    return (u && u.id) ? u : null;
-  } catch(e) { return null; }
-})();
-if (!user) {
-  window.location.href = "login.html?redirect=dashboard-worker.html";
-  return;
-}
+            <!-- Active gig alert -->
+            <div class="wd-info-box green">
+              💼 <strong>1 active gig chal rahi hai</strong> — Warehouse Packing, aaj. Kaam complete hone ke baad "Mark Complete" karo.
+            </div>
 
-    /* ── Breadcrumb ── */
-    if (typeof buildBreadcrumb === "function") {
-      buildBreadcrumb("breadcrumb", [
-        { label: "Home", href: "index.html" },
-        { label: "Dashboard" }
-      ]);
-    }
+            <!-- Active gig card -->
+            <div class="wd-sec-hdr">
+              <div class="wd-sec-title">💼 Active Gig</div>
+              <button class="wd-sec-action" id="btnViewActive">View Details →</button>
+            </div>
 
-    /* ── Greeting ── */
-    var hour = new Date().getHours();
-    var greet = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
-    document.getElementById("greetingText").textContent = greet + ", " + (user.name || "Worker") + "! 👋";
+            <div class="active-gig-card">
+              <div class="agc-header">
+                <div class="agc-header-left">
+                  <div class="agc-pulse"></div>
+                  <div class="agc-title">Weekend Warehouse Packing Helper</div>
+                </div>
+                <div class="agc-live">🟢 In Progress</div>
+              </div>
+              <div class="agc-body">
+                <div class="agc-row">
+                  <span class="agc-lbl">Poster</span>
+                  <span class="agc-val">Rahul Kumar ⭐ 4.8</span>
+                </div>
+                <div class="agc-row">
+                  <span class="agc-lbl">Location</span>
+                  <span class="agc-val">📍 Sector 14, Gurugram</span>
+                </div>
+                <div class="agc-row">
+                  <span class="agc-lbl">Date & Time</span>
+                  <span class="agc-val">📅 Mar 14 • 9:00 AM – 5:00 PM</span>
+                </div>
+                <div class="agc-row">
+                  <span class="agc-lbl">Payment</span>
+                  <span class="agc-val green">₹1,128 (after 6% fee)</span>
+                </div>
+                <div class="agc-row">
+                  <span class="agc-lbl">GIG ID</span>
+                  <span class="agc-val">#GL-2026-0314</span>
+                </div>
+                <div class="agc-timer">
+                  <span class="agct-label">⏰ Auto-release in:</span>
+                  <span class="agct-time" id="wdCountdown">71:59:45</span>
+                </div>
+              </div>
+              <div class="agc-footer">
+                <button class="btn-agc btn-agc-complete" onclick="window.location.href='post-gig.html'">
+                  ✅ Mark Complete & Claim ₹1,128
+                </button>
+                <button class="btn-agc btn-agc-chat">💬 Chat with Poster</button>
+                <button class="btn-agc btn-agc-chat" onclick="window.location.href='post-gig.html#dispute'">🚨 Raise Issue</button>
+              </div>
+            </div>
 
-    /* ── Role switch ── */
-    document.getElementById("btnSwitchRole").addEventListener("click", function () {
-      window.location.href = "dashboard-client.html";
-    });
+            <!-- Recommended gigs -->
+            <div class="wd-sec-hdr" style="margin-top:8px">
+              <div class="wd-sec-title">🔥 Recommended For You</div>
+              <button class="wd-sec-action" id="btnBrowseAll">Browse All →</button>
+            </div>
 
-    /* ── Data helpers ── */
-    function getGigs() { return JSON.parse(localStorage.getItem(GIG_KEY) || "[]"); }
+            <div class="browse-cards-list" id="recGigsList">
 
-    function getMyGigs() {
-      var all = getGigs();
-      return all.filter(function (g) {
-        return g.takenBy === user.id || g.takenBy === user.name;
-      });
-    }
+              <div class="browse-card featured">
+                <div class="bc-top">
+                  <div class="bc-icon green">🛵</div>
+                  <div class="bc-info">
+                    <div class="bc-title">Grocery Delivery — Sector 29, Gurugram</div>
+                    <div class="bc-meta">
+                      <span class="bcm-item">📍 Sec 29, Gurugram</span>
+                      <span class="bcm-item">📅 Mar 16–17</span>
+                      <span class="bcm-item">👤 1 position</span>
+                      <span class="bcm-item">📦 Delivery</span>
+                    </div>
+                  </div>
+                  <div class="bc-right">
+                    <div class="bc-budget">₹800 <span>/day</span></div>
+                    <span class="bc-badge featured">🎯 Best Match</span>
+                  </div>
+                </div>
+                <div class="bc-tags">
+                  <span class="bc-tag">Own Vehicle</span>
+                  <span class="bc-tag">Gurugram Only</span>
+                  <span class="bc-tag">Morning Shift</span>
+                </div>
+                <div class="bc-footer">
+                  <div class="bc-poster">
+                    <div class="bc-poster-av">RK</div>
+                    <div>
+                      <div class="bc-poster-name">Rahul Kumar</div>
+                      <div class="bc-poster-rating">⭐ 4.8 • 12 gigs posted</div>
+                    </div>
+                  </div>
+                  <div class="bc-actions">
+                    <button class="btn-bc btn-bc-save" title="Save">🔖</button>
+                    <button class="btn-bc btn-bc-apply" onclick="applyGig(this)">Apply Now →</button>
+                  </div>
+                </div>
+              </div>
 
-    /* ── Time ago ── */
-    function timeAgo(iso) {
-      var d = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
-      if (d < 60)    return d + "s ago";
-      if (d < 3600)  return Math.floor(d / 60) + "m ago";
-      if (d < 86400) return Math.floor(d / 3600) + "h ago";
-      return Math.floor(d / 86400) + "d ago";
-    }
+              <div class="browse-card urgent">
+                <div class="bc-top">
+                  <div class="bc-icon amber">🎪</div>
+                  <div class="bc-info">
+                    <div class="bc-title">Event Setup Helper — DLF Cyber Hub</div>
+                    <div class="bc-meta">
+                      <span class="bcm-item">📍 DLF Cyber Hub</span>
+                      <span class="bcm-item">📅 Mar 20</span>
+                      <span class="bcm-item">👤 2 positions left</span>
+                    </div>
+                  </div>
+                  <div class="bc-right">
+                    <div class="bc-budget">₹1,500 <span>/fixed</span></div>
+                    <span class="bc-badge urgent">⚡ Urgent</span>
+                  </div>
+                </div>
+                <div class="bc-tags">
+                  <span class="bc-tag">Event Experience</span>
+                  <span class="bc-tag">Lifting OK</span>
+                </div>
+                <div class="bc-footer">
+                  <div class="bc-poster">
+                    <div class="bc-poster-av">RK</div>
+                    <div>
+                      <div class="bc-poster-name">Rahul Kumar</div>
+                      <div class="bc-poster-rating">⭐ 4.8 • Repeat poster</div>
+                    </div>
+                  </div>
+                  <div class="bc-actions">
+                    <button class="btn-bc btn-bc-save">🔖</button>
+                    <button class="btn-bc btn-bc-apply" onclick="applyGig(this)">Apply Now →</button>
+                  </div>
+                </div>
+              </div>
 
-    function escHtml(s) {
-      return String(s || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
-    }
+              <div class="browse-card">
+                <div class="bc-top">
+                  <div class="bc-icon blue">🧹</div>
+                  <div class="bc-info">
+                    <div class="bc-title">Office Deep Cleaning — Udyog Vihar</div>
+                    <div class="bc-meta">
+                      <span class="bcm-item">📍 Udyog Vihar</span>
+                      <span class="bcm-item">📅 TBD</span>
+                      <span class="bcm-item">👤 3 positions</span>
+                    </div>
+                  </div>
+                  <div class="bc-right">
+                    <div class="bc-budget">₹2,000 <span>/fixed</span></div>
+                    <span class="bc-badge new">🆕 New</span>
+                  </div>
+                </div>
+                <div class="bc-tags">
+                  <span class="bc-tag">No Experience Needed</span>
+                  <span class="bc-tag">Equipment Provided</span>
+                </div>
+                <div class="bc-footer">
+                  <div class="bc-poster">
+                    <div class="bc-poster-av">MK</div>
+                    <div>
+                      <div class="bc-poster-name">Manoj Khanna</div>
+                      <div class="bc-poster-rating">⭐ 4.5 • 6 gigs posted</div>
+                    </div>
+                  </div>
+                  <div class="bc-actions">
+                    <button class="btn-bc btn-bc-save">🔖</button>
+                    <button class="btn-bc btn-bc-apply" onclick="applyGig(this)">Apply Now →</button>
+                  </div>
+                </div>
+              </div>
 
-    /* ═══════════════════════════════════════
-       RENDER
-    ═══════════════════════════════════════ */
-    function render() {
-      var myGigs   = getMyGigs();
-      var active   = myGigs.filter(function (g) { return g.status === "taken"; });
-      var completed= myGigs.filter(function (g) { return g.status === "completed"; });
+            </div>
 
-      /* Wallet calc */
-      var totalEarned = 0;
-      var feePaid     = 0;
-      completed.forEach(function (g) {
-        var fee  = Math.round(g.pricePerHr * FEE_RATE);
-        var net  = g.pricePerHr - fee;
-        totalEarned += net;
-        feePaid     += fee;
-      });
-      var pendingAmt = 0;
-      active.forEach(function (g) {
-        var fee = Math.round(g.pricePerHr * FEE_RATE);
-        pendingAmt += g.pricePerHr - fee;
-      });
-      var avg = completed.length ? Math.round(totalEarned / completed.length) : 0;
+          </div>
 
-      /* Update wallet UI */
-      document.getElementById("walletBalance").textContent  = totalEarned;
-      document.getElementById("totalEarned").textContent    = totalEarned;
-      document.getElementById("gigsCompleted").textContent  = completed.length;
-      document.getElementById("avgEarn").textContent        = avg;
-      document.getElementById("feePaid").textContent        = feePaid;
-      document.getElementById("statActive").textContent     = active.length;
-      document.getElementById("statCompleted").textContent  = completed.length;
-      document.getElementById("statPending").textContent    = "₹" + pendingAmt;
+          <!-- RIGHT SIDEBAR -->
+          <div>
 
-      /* Render active */
-      var activeEl = document.getElementById("activeGigsList");
-      if (active.length === 0) {
-        activeEl.innerHTML = emptyHtml("No active gigs right now.", "Browse open gigs and accept one to start earning!", "browse.html", "Browse Gigs");
-      } else {
-        activeEl.className = "gig-list";
-        activeEl.innerHTML = active.map(function (g) { return gigItemHtml(g, "taken"); }).join("");
-        bindGigActions(activeEl);
-      }
+            <!-- Mini earnings card -->
+            <div class="mini-earn-card">
+              <div class="mec-inner">
+                <div class="mec-label">💰 Wallet Balance</div>
+                <div class="mec-balance"><span>₹</span>2,850</div>
+                <div class="mec-sub">Available to withdraw</div>
+                <div class="mec-row"><span>Pending (in escrow)</span><strong>₹1,128</strong></div>
+                <div class="mec-row"><span>Earned this month</span><strong>₹8,400</strong></div>
+                <div class="mec-row"><span>Total all time</span><strong>₹41,200</strong></div>
+                <button class="btn-mec-withdraw" onclick="openTab('earnings')">
+                  🏦 Withdraw Earnings
+                </button>
+              </div>
+            </div>
 
-      /* Render completed */
-      var compEl = document.getElementById("completedGigsList");
-      if (completed.length === 0) {
-        compEl.innerHTML = emptyHtml("No completed gigs yet.", "Complete your first gig to see earnings here.");
-      } else {
-        compEl.className = "gig-list";
-        compEl.innerHTML = completed.map(function (g) { return gigItemHtml(g, "completed"); }).join("");
-      }
-    }
+            <!-- Notifications -->
+            <div class="notif-card-w">
+              <div class="ncw-header">
+                <div class="ncwh-title">
+                  🔔 Notifications
+                  <span class="ncwh-count" id="wdNotifCount">3</span>
+                </div>
+                <button class="ncwh-clear" id="wdClearNotifs">Clear</button>
+              </div>
+              <div id="wdNotifList">
+                <div class="notif-item-w unread">
+                  <div class="niw-dot"></div>
+                  <div>
+                    <div class="niw-text">✅ <strong>Rahul Kumar</strong> ne tumhe Warehouse Gig ke liye accept kar liya!</div>
+                    <div class="niw-time">2 hrs ago</div>
+                  </div>
+                </div>
+                <div class="notif-item-w unread">
+                  <div class="niw-dot"></div>
+                  <div>
+                    <div class="niw-text">🎯 <strong>New gig match!</strong> Grocery Delivery — ₹800/day near you</div>
+                    <div class="niw-time">3 hrs ago</div>
+                  </div>
+                </div>
+                <div class="notif-item-w unread">
+                  <div class="niw-dot"></div>
+                  <div>
+                    <div class="niw-text">💰 ₹1,500 wallet mein credited — Office Relocation gig</div>
+                    <div class="niw-time">2 days ago</div>
+                  </div>
+                </div>
+                <div class="notif-item-w">
+                  <div class="niw-dot read"></div>
+                  <div>
+                    <div class="niw-text">⭐ <strong>Manoj Khanna</strong> ne 5 star rating di!</div>
+                    <div class="niw-time">3 days ago</div>
+                  </div>
+                </div>
+                <div class="notif-item-w">
+                  <div class="niw-dot read"></div>
+                  <div>
+                    <div class="niw-text">📩 Application declined — Data Entry Gig (2 positions filled)</div>
+                    <div class="niw-time">4 days ago</div>
+                  </div>
+                </div>
+              </div>
+            </div>
 
-    /* ── Gig item HTML ── */
-    function gigItemHtml(g, status) {
-      var fee  = Math.round(g.pricePerHr * FEE_RATE);
-      var earn = g.pricePerHr - fee;
-      var badgeCls = status === "taken" ? "s-taken" : "s-completed";
-      var badgeTxt = status === "taken" ? "⚡ In Progress" : "✅ Completed";
-      var payIcon  = g.payType === "cash" ? "💵" : g.payType === "wallet" ? "🔒" : "✅";
+            <!-- Profile completion -->
+            <div class="profile-compl-card">
+              <div class="pcc-title">👤 Profile Strength</div>
+              <div class="pcc-sub">Strong profile = 3x more invitations</div>
+              <div class="pcc-meter"><div class="pcc-fill" style="width:89%"></div></div>
+              <div class="pcc-pct">89% — Almost Perfect!</div>
+              <div class="pcc-items">
+                <div class="pcc-item done"><div class="pcci-dot"></div>Basic info ✓</div>
+                <div class="pcc-item done"><div class="pcci-dot"></div>Phone verified ✓</div>
+                <div class="pcc-item done"><div class="pcci-dot"></div>Skills added ✓</div>
+                <div class="pcc-item done"><div class="pcci-dot"></div>14 gigs completed ✓</div>
+                <div class="pcc-item done"><div class="pcci-dot"></div>Aadhaar verified ✓</div>
+                <div class="pcc-item done"><div class="pcci-dot"></div>UPI linked ✓</div>
+                <div class="pcc-item todo"><div class="pcci-dot"></div>Add profile photo</div>
+                <div class="pcc-item todo"><div class="pcci-dot"></div>Add work portfolio</div>
+              </div>
+              <a href="#" onclick="openTab('profile');return false;" style="display:flex;align-items:center;justify-content:center;gap:7px;margin-top:14px;padding:9px;background:linear-gradient(135deg,#059669,var(--teal));color:#fff;border-radius:var(--radius-sm);font-weight:700;font-size:.82rem;text-decoration:none">
+                Complete Profile →
+              </a>
+            </div>
 
-      return '<div class="gig-item">' +
-        '<div class="gig-item-left">' +
-          '<div class="gig-item-title">' + escHtml(g.title) + '</div>' +
-          '<div class="gig-item-meta">' +
-            (g.location ? '<span class="gig-item-chip">📍 ' + escHtml(g.location) + '</span>' : '') +
-            '<span class="gig-item-chip">🕒 ' + timeAgo(g.postedAt) + '</span>' +
-            '<span class="gig-item-chip">' + payIcon + ' ' + payLabel(g.payType) + '</span>' +
-            '<span class="gig-item-chip">👤 ' + escHtml(g.posterName || "Poster") + '</span>' +
-          '</div>' +
-        '</div>' +
-        '<div class="gig-item-right">' +
-          '<span class="s-badge ' + badgeCls + '">' + badgeTxt + '</span>' +
-          '<div class="gig-earn">₹' + earn + '</div>' +
-          '<div class="gig-earn-sub">after 6% fee</div>' +
-          (status === "taken"
-            ? '<a href="chat.html?gigId=' + g.id + '" class="btn btn-sm btn-primary" style="margin-top:4px">💬 Open Chat</a>'
-            : '<span style="font-size:.72rem;color:var(--gray-400)">Credited to wallet</span>'
-          ) +
-        '</div>' +
-      '</div>';
-    }
+            <!-- Activity -->
+            <div class="activity-feed-card">
+              <div class="afc-header"><div class="afc-title">📊 Recent Activity</div></div>
+              <div class="afc-item">
+                <div class="afc-icon green">✅</div>
+                <div><div class="afc-text"><strong>Warehouse Packing</strong> — started today</div><div class="afc-time">Today</div></div>
+              </div>
+              <div class="afc-item">
+                <div class="afc-icon amber">💰</div>
+                <div><div class="afc-text">₹1,500 credited — Office Relocation</div><div class="afc-time">Mar 7</div></div>
+              </div>
+              <div class="afc-item">
+                <div class="afc-icon purple">⭐</div>
+                <div><div class="afc-text">5★ review received from Manoj K.</div><div class="afc-time">Mar 7</div></div>
+              </div>
+              <div class="afc-item">
+                <div class="afc-icon blue">📩</div>
+                <div><div class="afc-text">Applied to 3 new gigs</div><div class="afc-time">Mar 6</div></div>
+              </div>
+            </div>
 
-    function payLabel(t) {
-      if (t === "cash")   return "Cash";
-      if (t === "wallet") return "Secure Wallet";
-      return "Pay After";
-    }
+          </div>
+        </div>
+      </div>
 
-    function emptyHtml(title, sub, linkHref, linkLabel) {
-      return '<div class="empty-box">' +
-        '<div class="ei">📭</div>' +
-        '<p><strong>' + title + '</strong><br>' + sub + '</p>' +
-        (linkHref ? '<a href="' + linkHref + '" class="btn btn-primary" style="margin-top:14px;display:inline-block">' + linkLabel + '</a>' : '') +
-        '</div>';
-    }
+      <!-- ════ BROWSE GIGS ════ -->
+      <div class="wd-panel" id="panel-browse">
 
-    function bindGigActions(container) {
-      /* future: bind any action buttons */
-    }
+        <div class="wd-info-box teal">
+          🎯 <strong>42 gigs</strong> tumhare skills ke match mein Gurugram mein available hain. Jaldi apply karo!
+        </div>
 
-    /* ═══════════════════════════════════════
-       WITHDRAW MODAL
-    ═══════════════════════════════════════ */
-    var modal         = document.getElementById("withdrawModal");
-    var withdrawForm  = document.getElementById("withdrawForm");
-    var withdrawSucc  = document.getElementById("withdrawSuccess");
+        <div class="filter-bar">
+          <button class="filter-btn active" data-filter="all">All (42)</button>
+          <button class="filter-btn" data-filter="delivery">🛵 Delivery (12)</button>
+          <button class="filter-btn" data-filter="warehouse">📦 Warehouse (8)</button>
+          <button class="filter-btn" data-filter="event">🎪 Events (7)</button>
+          <button class="filter-btn" data-filter="cleaning">🧹 Cleaning (6)</button>
+          <button class="filter-btn" data-filter="other">🔧 Other (9)</button>
+          <select class="filter-sort">
+            <option>Sort: Best Match</option>
+            <option>Newest First</option>
+            <option>Highest Pay</option>
+            <option>Nearest</option>
+          </select>
+        </div>
 
-    document.getElementById("btnWithdraw").addEventListener("click", function () {
-      withdrawForm.style.display  = "block";
-      withdrawSucc.style.display  = "none";
-      document.getElementById("upiInput").value       = "";
-      document.getElementById("withdrawAmount").value = "";
-      modal.classList.add("show");
-    });
+        <div class="wd-two-col">
+          <div>
+            <div class="browse-cards-list">
 
-    document.getElementById("withdrawCancel").addEventListener("click", function () {
-      modal.classList.remove("show");
-    });
+              <div class="browse-card featured">
+                <div class="bc-top">
+                  <div class="bc-icon green">🛵</div>
+                  <div class="bc-info">
+                    <div class="bc-title">Grocery Delivery — Sector 29</div>
+                    <div class="bc-meta">
+                      <span class="bcm-item">📍 Sec 29, Gurugram</span>
+                      <span class="bcm-item">📅 Mar 16–17</span>
+                      <span class="bcm-item">👤 1 position</span>
+                    </div>
+                  </div>
+                  <div class="bc-right">
+                    <div class="bc-budget">₹800 <span>/day</span></div>
+                    <span class="bc-badge featured">🎯 Best Match</span>
+                  </div>
+                </div>
+                <div class="bc-tags">
+                  <span class="bc-tag">Own Vehicle</span>
+                  <span class="bc-tag">Gurugram Only</span>
+                </div>
+                <div class="bc-footer">
+                  <div class="bc-poster">
+                    <div class="bc-poster-av">RK</div>
+                    <div><div class="bc-poster-name">Rahul Kumar</div><div class="bc-poster-rating">⭐ 4.8 • Verified</div></div>
+                  </div>
+                  <div class="bc-actions">
+                    <button class="btn-bc btn-bc-save">🔖</button>
+                    <button class="btn-bc btn-bc-apply" onclick="applyGig(this)">Apply →</button>
+                  </div>
+                </div>
+              </div>
 
-    modal.addEventListener("click", function (e) {
-      if (e.target === modal) modal.classList.remove("show");
-    });
+              <div class="browse-card urgent">
+                <div class="bc-top">
+                  <div class="bc-icon amber">🎪</div>
+                  <div class="bc-info">
+                    <div class="bc-title">Event Setup Helper — Corporate Event</div>
+                    <div class="bc-meta">
+                      <span class="bcm-item">📍 DLF Cyber Hub</span>
+                      <span class="bcm-item">📅 Mar 20</span>
+                      <span class="bcm-item">👤 2 positions left</span>
+                    </div>
+                  </div>
+                  <div class="bc-right">
+                    <div class="bc-budget">₹1,500 <span>/fixed</span></div>
+                    <span class="bc-badge urgent">⚡ Urgent</span>
+                  </div>
+                </div>
+                <div class="bc-tags">
+                  <span class="bc-tag">Event Experience</span>
+                  <span class="bc-tag">Fresher OK</span>
+                </div>
+                <div class="bc-footer">
+                  <div class="bc-poster">
+                    <div class="bc-poster-av">RK</div>
+                    <div><div class="bc-poster-name">Rahul Kumar</div><div class="bc-poster-rating">⭐ 4.8</div></div>
+                  </div>
+                  <div class="bc-actions">
+                    <button class="btn-bc btn-bc-save">🔖</button>
+                    <button class="btn-bc btn-bc-apply" onclick="applyGig(this)">Apply →</button>
+                  </div>
+                </div>
+              </div>
 
-    document.getElementById("withdrawConfirm").addEventListener("click", function () {
-      var upi    = document.getElementById("upiInput").value.trim();
-      var amount = parseInt(document.getElementById("withdrawAmount").value, 10);
-      var bal    = parseInt(document.getElementById("walletBalance").textContent, 10) || 0;
+              <div class="browse-card">
+                <div class="bc-top">
+                  <div class="bc-icon blue">🧹</div>
+                  <div class="bc-info">
+                    <div class="bc-title">Office Deep Cleaning — Udyog Vihar</div>
+                    <div class="bc-meta">
+                      <span class="bcm-item">📍 Udyog Vihar</span>
+                      <span class="bcm-item">📅 TBD</span>
+                      <span class="bcm-item">👤 3 positions</span>
+                    </div>
+                  </div>
+                  <div class="bc-right">
+                    <div class="bc-budget">₹2,000 <span>/fixed</span></div>
+                    <span class="bc-badge new">🆕 New</span>
+                  </div>
+                </div>
+                <div class="bc-tags">
+                  <span class="bc-tag">No Exp Needed</span>
+                  <span class="bc-tag">Tools Provided</span>
+                </div>
+                <div class="bc-footer">
+                  <div class="bc-poster">
+                    <div class="bc-poster-av">MK</div>
+                    <div><div class="bc-poster-name">Manoj Khanna</div><div class="bc-poster-rating">⭐ 4.5</div></div>
+                  </div>
+                  <div class="bc-actions">
+                    <button class="btn-bc btn-bc-save">🔖</button>
+                    <button class="btn-bc btn-bc-apply" onclick="applyGig(this)">Apply →</button>
+                  </div>
+                </div>
+              </div>
 
-      if (!upi || !upi.includes("@")) {
-        if (typeof showToast === "function") showToast("Please enter a valid UPI ID.", "error");
-        return;
-      }
-      if (!amount || amount < 1) {
-        if (typeof showToast === "function") showToast("Please enter a valid amount.", "error");
-        return;
-      }
-      if (amount > bal) {
-        if (typeof showToast === "function") showToast("Amount exceeds your wallet balance.", "error");
-        return;
-      }
+              <div class="browse-card">
+                <div class="bc-top">
+                  <div class="bc-icon purple">💻</div>
+                  <div class="bc-info">
+                    <div class="bc-title">Data Entry — Work from Home</div>
+                    <div class="bc-meta">
+                      <span class="bcm-item">💻 Remote</span>
+                      <span class="bcm-item">📅 Flexible</span>
+                      <span class="bcm-item">👤 5 positions</span>
+                    </div>
+                  </div>
+                  <div class="bc-right">
+                    <div class="bc-budget">₹150 <span>/hr</span></div>
+                    <span class="bc-badge new">🆕 New</span>
+                  </div>
+                </div>
+                <div class="bc-tags">
+                  <span class="bc-tag">Laptop Required</span>
+                  <span class="bc-tag">Internet Required</span>
+                  <span class="bc-tag">English Basic</span>
+                </div>
+                <div class="bc-footer">
+                  <div class="bc-poster">
+                    <div class="bc-poster-av">SA</div>
+                    <div><div class="bc-poster-name">Sneha Agarwal</div><div class="bc-poster-rating">⭐ 4.2 • 4 gigs posted</div></div>
+                  </div>
+                  <div class="bc-actions">
+                    <button class="btn-bc btn-bc-save">🔖</button>
+                    <button class="btn-bc btn-bc-apply" onclick="applyGig(this)">Apply →</button>
+                  </div>
+                </div>
+              </div>
 
-      document.getElementById("withdrawnAmt").textContent = amount;
-      withdrawForm.style.display = "none";
-      withdrawSucc.style.display = "block";
-    });
+              <div class="browse-card">
+                <div class="bc-top">
+                  <div class="bc-icon green">🚛</div>
+                  <div class="bc-info">
+                    <div class="bc-title">Furniture Assembly Helper — Noida</div>
+                    <div class="bc-meta">
+                      <span class="bcm-item">📍 Sector 62, Noida</span>
+                      <span class="bcm-item">📅 Mar 18</span>
+                      <span class="bcm-item">👤 2 positions</span>
+                    </div>
+                  </div>
+                  <div class="bc-right">
+                    <div class="bc-budget">₹900 <span>/day</span></div>
+                    <span class="bc-badge new">🆕</span>
+                  </div>
+                </div>
+                <div class="bc-tags">
+                  <span class="bc-tag">Physical Work</span>
+                  <span class="bc-tag">Tools Provided</span>
+                </div>
+                <div class="bc-footer">
+                  <div class="bc-poster">
+                    <div class="bc-poster-av">VS</div>
+                    <div><div class="bc-poster-name">Vivek Sharma</div><div class="bc-poster-rating">⭐ 4.6 • 8 gigs posted</div></div>
+                  </div>
+                  <div class="bc-actions">
+                    <button class="btn-bc btn-bc-save">🔖</button>
+                    <button class="btn-bc btn-bc-apply" onclick="applyGig(this)">Apply →</button>
+                  </div>
+                </div>
+              </div>
 
-    document.getElementById("withdrawDone").addEventListener("click", function () {
-      modal.classList.remove("show");
-    });
+            </div>
+            <div style="text-align:center">
+              <button class="btn-es" style="background:linear-gradient(135deg,var(--primary),var(--teal))">Load More Gigs →</button>
+            </div>
+          </div>
 
-    /* ── Storage sync ── */
-    window.addEventListener("storage", function (e) {
-      if (e.key === GIG_KEY) render();
-    });
+          <!-- Browse sidebar -->
+          <div>
+            <div class="rec-gigs-card">
+              <div class="rgc-header"><div class="rgc-title">🔥 Expiring Soon</div></div>
+              <div class="rec-gig-item">
+                <div class="rgi-icon">🎪</div>
+                <div>
+                  <div class="rgi-title">Event Setup Helper</div>
+                  <div class="rgi-meta">⏰ Closes in 2 hrs</div>
+                </div>
+                <div class="rgi-budget">₹1,500</div>
+              </div>
+              <div class="rec-gig-item">
+                <div class="rgi-icon">🛵</div>
+                <div>
+                  <div class="rgi-title">Grocery Delivery</div>
+                  <div class="rgi-meta">⏰ Closes in 5 hrs</div>
+                </div>
+                <div class="rgi-budget">₹800/d</div>
+              </div>
+              <div class="rec-gig-item">
+                <div class="rgi-icon">📦</div>
+                <div>
+                  <div class="rgi-title">Packing Helper — DHL</div>
+                  <div class="rgi-meta">⏰ Closes tomorrow</div>
+                </div>
+                <div class="rgi-budget">₹1,100</div>
+              </div>
+            </div>
 
-    render();
+            <div class="wd-info-box teal">
+              💡 <strong>Tip:</strong> Subah 9–11 AM mein apply karo — accept rate 2x zyada hoti hai!
+            </div>
 
-  })();
-  </script>
-</body>
-</html>
+            <div style="background:var(--surface);border:1.5px solid var(--gray-200);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow-sm)">
+              <div style="font-size:.88rem;font-weight:800;color:var(--primary);margin-bottom:12px">🎯 Skill Match</div>
+              <div style="display:flex;flex-direction:column;gap:8px;font-size:.82rem">
+                <div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--gray-100)">
+                  <span style="color:var(--gray-500);font-weight:600">Physical Work</span><strong style="color:var(--success)">14 gigs matching</strong>
+                </div>
+                <div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--gray-100)">
+                  <span style="color:var(--gray-500);font-weight:600">Delivery</span><strong style="color:var(--success)">12 gigs matching</strong>
+                </div>
+                <div style="display:flex;justify-content:space-between;padding:7px 0">
+                  <span style="color:var(--gray-500);font-weight:600">Event Help</span><strong style="color:var(--success)">7 gigs matching</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════ MY APPLICATIONS ════ -->
+      <div class="wd-panel" id="panel-applications">
+
+        <div class="filter-bar">
+          <button class="filter-btn active" data-filter="all">All (6)</button>
+          <button class="filter-btn" data-filter="pending">🔵 Pending (2)</button>
+          <button class="filter-btn" data-filter="accepted">✅ Accepted (3)</button>
+          <button class="filter-btn" data-filter="declined">❌ Declined (1)</button>
+        </div>
+
+        <div class="wd-two-col">
+          <div>
+            <div class="myapp-list">
+
+              <!-- Accepted — active -->
+              <div class="myapp-card accepted">
+                <div class="mac-body">
+                  <div class="mac-icon green" style="background:rgba(5,150,105,.1)">📦</div>
+                  <div class="mac-info">
+                    <div class="mac-title">Weekend Warehouse Packing Helper</div>
+                    <div class="mac-meta">
+                      <span>📍 Sec 14, Gurugram</span>
+                      <span>📅 Mar 14</span>
+                      <span>💰 ₹1,128</span>
+                    </div>
+                  </div>
+                  <div class="mac-right">
+                    <span class="app-status-badge asb-active">🟢 In Progress</span>
+                    <span style="font-size:.72rem;color:var(--gray-400);font-weight:600">Applied Mar 12</span>
+                  </div>
+                </div>
+                <div class="mac-footer">
+                  <button class="btn-mac primary" onclick="window.location.href='post-gig.html'">📋 View Gig Page</button>
+                  <button class="btn-mac">💬 Chat</button>
+                  <button class="btn-mac">📍 Get Directions</button>
+                </div>
+              </div>
+
+              <!-- Accepted — upcoming -->
+              <div class="myapp-card accepted">
+                <div class="mac-body">
+                  <div class="mac-icon amber" style="background:rgba(217,119,6,.1)">🎪</div>
+                  <div class="mac-info">
+                    <div class="mac-title">Event Setup Helper — Corporate Event</div>
+                    <div class="mac-meta">
+                      <span>📍 DLF Cyber Hub</span>
+                      <span>📅 Mar 20</span>
+                      <span>💰 ₹1,410</span>
+                    </div>
+                  </div>
+                  <div class="mac-right">
+                    <span class="app-status-badge asb-accepted">✅ Accepted</span>
+                    <span style="font-size:.72rem;color:var(--gray-400);font-weight:600">Applied Mar 13</span>
+                  </div>
+                </div>
+                <div class="mac-footer">
+                  <button class="btn-mac primary">View Details</button>
+                  <button class="btn-mac">💬 Chat</button>
+                  <button class="btn-mac danger" onclick="withdrawApp(this)">✕ Withdraw</button>
+                </div>
+              </div>
+
+              <!-- Shortlisted -->
+              <div class="myapp-card">
+                <div class="mac-body">
+                  <div class="mac-icon green" style="background:rgba(5,150,105,.1)">🛵</div>
+                  <div class="mac-info">
+                    <div class="mac-title">Grocery Delivery — Sec 29</div>
+                    <div class="mac-meta">
+                      <span>📍 Sec 29, Gurugram</span>
+                      <span>📅 Mar 16–17</span>
+                      <span>💰 ₹1,504</span>
+                    </div>
+                  </div>
+                  <div class="mac-right">
+                    <span class="app-status-badge asb-shortlist">🌟 Shortlisted</span>
+                    <span style="font-size:.72rem;color:var(--gray-400);font-weight:600">Applied Mar 14</span>
+                  </div>
+                </div>
+                <div class="mac-footer">
+                  <button class="btn-mac primary">View Details</button>
+                  <button class="btn-mac">💬 Message</button>
+                  <button class="btn-mac danger" onclick="withdrawApp(this)">✕ Withdraw</button>
+                </div>
+              </div>
+
+              <!-- Pending -->
+              <div class="myapp-card pending">
+                <div class="mac-body">
+                  <div class="mac-icon blue" style="background:rgba(26,60,94,.1)">🧹</div>
+                  <div class="mac-info">
+                    <div class="mac-title">Office Deep Cleaning — Udyog Vihar</div>
+                    <div class="mac-meta">
+                      <span>📍 Udyog Vihar</span>
+                      <span>📅 TBD</span>
+                      <span>💰 ₹1,880</span>
+                    </div>
+                  </div>
+                  <div class="mac-right">
+                    <span class="app-status-badge asb-pending">⏳ Under Review</span>
+                    <span style="font-size:.72rem;color:var(--gray-400);font-weight:600">Applied Mar 14</span>
+                  </div>
+                </div>
+                <div class="mac-footer">
+                  <button class="btn-mac">View Details</button>
+                  <button class="btn-mac danger" onclick="withdrawApp(this)">✕ Withdraw</button>
+                </div>
+              </div>
+
+              <!-- Pending 2 -->
+              <div class="myapp-card pending">
+                <div class="mac-body">
+                  <div class="mac-icon purple" style="background:rgba(124,58,237,.1)">💻</div>
+                  <div class="mac-info">
+                    <div class="mac-title">Data Entry — Work from Home</div>
+                    <div class="mac-meta">
+                      <span>💻 Remote</span>
+                      <span>📅 Flexible</span>
+                      <span>💰 ₹150/hr</span>
+                    </div>
+                  </div>
+                  <div class="mac-right">
+                    <span class="app-status-badge asb-pending">⏳ Under Review</span>
+                    <span style="font-size:.72rem;color:var(--gray-400);font-weight:600">Applied Mar 13</span>
+                  </div>
+                </div>
+                <div class="mac-footer">
+                  <button class="btn-mac">View Details</button>
+                  <button class="btn-mac danger" onclick="withdrawApp(this)">✕ Withdraw</button>
+                </div>
+              </div>
+
+              <!-- Declined -->
+              <div class="myapp-card declined">
+                <div class="mac-body">
+                  <div class="mac-icon red" style="background:rgba(220,38,38,.08)">📦</div>
+                  <div class="mac-info">
+                    <div class="mac-title">Pharma Warehouse Helper — Gurgaon</div>
+                    <div class="mac-meta">
+                      <span>📍 Gurgaon</span>
+                      <span>📅 Mar 10</span>
+                      <span>💰 ₹940</span>
+                    </div>
+                  </div>
+                  <div class="mac-right">
+                    <span class="app-status-badge asb-declined">❌ Declined</span>
+                    <span style="font-size:.72rem;color:var(--gray-400);font-weight:600">Applied Mar 9</span>
+                  </div>
+                </div>
+                <div class="mac-footer">
+                  <span style="font-size:.78rem;color:var(--gray-400);font-style:italic">Reason: Position already filled.</span>
+                  <button class="btn-mac" style="margin-left:auto" onclick="openTab('browse')">🔍 Find Similar</button>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Applications sidebar -->
+          <div>
+            <div style="background:var(--surface);border:1.5px solid var(--gray-200);border-radius:var(--radius);padding:18px;margin-bottom:20px;box-shadow:var(--shadow-sm)">
+              <div style="font-size:.88rem;font-weight:800;color:var(--primary);margin-bottom:14px">📊 Application Stats</div>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <div style="display:flex;justify-content:space-between;font-size:.86rem;padding:7px 0;border-bottom:1px solid var(--gray-100)">
+                  <span style="color:var(--gray-500);font-weight:600">Total Applied</span><strong>6</strong>
+                </div>
+                <div style="display:flex;justify-content:space-between;font-size:.86rem;padding:7px 0;border-bottom:1px solid var(--gray-100)">
+                  <span style="color:var(--gray-500);font-weight:600">Accepted</span><strong style="color:var(--success)">3</strong>
+                </div>
+                <div style="display:flex;justify-content:space-between;font-size:.86rem;padding:7px 0;border-bottom:1px solid var(--gray-100)">
+                  <span style="color:var(--gray-500);font-weight:600">Pending</span><strong style="color:#6366f1">2</strong>
+                </div>
+                <div style="display:flex;justify-content:space-between;font-size:.86rem;padding:7px 0">
+                  <span style="color:var(--gray-500);font-weight:600">Accept Rate</span><strong style="color:var(--success)">60%</strong>
+                </div>
+              </div>
+            </div>
+
+            <div class="wd-info-box teal">
+              💡 Tumhari accept rate 60% hai — average se better! Strong cover messages likhte rehna.
+            </div>
+
+            <div class="rec-gigs-card">
+              <div class="rgc-header"><div class="rgc-title">🎯 Similar Gigs</div></div>
+              <div class="rec-gig-item" onclick="openTab('browse')">
+                <div class="rgi-icon">📦</div>
+                <div><div class="rgi-title">Packing Helper — DHL</div><div class="rgi-meta">📍 Gurugram • Mar 16</div></div>
+                <div class="rgi-budget">₹1,100</div>
+              </div>
+              <div class="rec-gig-item" onclick="openTab('browse')">
+                <div class="rgi-icon">🛵</div>
+                <div><div class="rgi-title">Flipkart Delivery</div><div class="rgi-meta">📍 Gurugram • Mar 15</div></div>
+                <div class="rgi-budget">₹750/d</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════ ACTIVE GIGS ════ -->
+      <div class="wd-panel" id="panel-active">
+        <div class="wd-info-box green">
+          🟢 <strong>1 gig active hai</strong> — kaam poora karo aur poster se payment release karwao.
+        </div>
+
+        <div class="wd-two-col">
+          <div>
+            <div class="active-gig-card">
+              <div class="agc-header">
+                <div class="agc-header
