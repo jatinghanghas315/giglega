@@ -4,761 +4,1738 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Notifications — GigLega</title>
-
-  <script src="shared.js"></script>
+  <meta name="description" content="GigLega notifications — apne gig updates, payments aur messages yahan dekho." />
   <link rel="stylesheet" href="styles.css" />
-
+  <script src="shared.js"></script>
   <style>
-    .notif-wrap { max-width: 760px; margin: 0 auto; padding: 28px 16px 80px; }
 
-    /* ── Page header ── */
-    .notif-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
+    /* ══════════════════════════════════
+       WRAPPER
+    ══════════════════════════════════ */
+    .notif-wrapper { min-height: 100vh; background: var(--bg); }
+
+    /* ══════════════════════════════════
+       HERO TOPBAR
+    ══════════════════════════════════ */
+    .notif-hero {
+      background: linear-gradient(135deg, #0b1e35 0%, #1a3c5e 45%, #064e3b 100%);
+      padding: 36px 20px 72px;
+      position: relative; overflow: hidden;
+    }
+    .notif-hero::before {
+      content: "";
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse at 15% 80%, rgba(13,148,136,.2) 0%, transparent 50%),
+        radial-gradient(ellipse at 85% 20%, rgba(110,231,183,.1) 0%, transparent 50%);
+      pointer-events: none;
+    }
+    .notif-hero::after {
+      content: "";
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+      background-size: 52px 52px; pointer-events: none;
+    }
+    .notif-hero-inner {
+      max-width: 800px; margin: 0 auto;
+      position: relative; z-index: 1;
+      display: flex; align-items: flex-start;
+      justify-content: space-between; gap: 20px; flex-wrap: wrap;
+    }
+    .nh-left {}
+    .nh-tag {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(255,255,255,.1);
+      border: 1px solid rgba(255,255,255,.15);
+      border-radius: var(--radius-full);
+      padding: 4px 14px;
+      font-size: .72rem; font-weight: 700;
+      color: rgba(255,255,255,.75);
+      text-transform: uppercase; letter-spacing: .5px;
+      margin-bottom: 14px;
+    }
+    .nh-title {
+      font-size: clamp(1.5rem, 3vw, 2rem);
+      font-weight: 900; color: #fff;
+      letter-spacing: -.4px; line-height: 1.18;
+      margin-bottom: 8px;
+    }
+    .nh-title span { color: #6ee7b7; }
+    .nh-sub {
+      font-size: .88rem; color: rgba(255,255,255,.6);
+      font-weight: 600; line-height: 1.6;
+    }
+    .nh-actions {
+      display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px;
+    }
+    .btn-nh {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 9px 18px; border-radius: var(--radius-sm);
+      font-size: .84rem; font-weight: 800;
+      cursor: pointer; font-family: var(--font);
+      transition: all .18s;
+    }
+    .btn-nh-glass {
+      background: rgba(255,255,255,.12);
+      border: 1.5px solid rgba(255,255,255,.2); color: #fff;
+    }
+    .btn-nh-glass:hover { background: rgba(255,255,255,.22); color: #fff; }
+    .btn-nh-danger {
+      background: rgba(239,68,68,.15);
+      border: 1.5px solid rgba(239,68,68,.3); color: #fca5a5;
+    }
+    .btn-nh-danger:hover { background: rgba(239,68,68,.25); }
+
+    /* ══════════════════════════════════
+       STATS STRIP
+    ══════════════════════════════════ */
+    .notif-stats-strip {
+      max-width: 800px; margin: -40px auto 0;
+      padding: 0 20px; position: relative; z-index: 10;
+    }
+    .nss-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
       gap: 12px;
-      margin-bottom: 20px;
     }
-    .notif-header-left h1 { font-size: 1.4rem; font-weight: 900; color: var(--primary); margin-bottom: 3px; }
-    .notif-header-left p  { font-size: .84rem; color: var(--gray-500); }
-    .notif-header-actions { display: flex; gap: 8px; flex-wrap: wrap; }
-    .btn-mark-all {
-      padding: 8px 16px;
-      background: transparent;
-      border: 1.5px solid var(--gray-200);
-      border-radius: var(--radius-sm);
-      font-size: .82rem;
-      font-weight: 700;
-      color: var(--gray-600);
-      cursor: pointer;
-      font-family: var(--font);
-      transition: all .2s;
-    }
-    .btn-mark-all:hover { border-color: var(--teal); color: var(--teal); }
-    .btn-clear-all {
-      padding: 8px 16px;
-      background: transparent;
-      border: 1.5px solid var(--gray-200);
-      border-radius: var(--radius-sm);
-      font-size: .82rem;
-      font-weight: 700;
-      color: var(--danger);
-      cursor: pointer;
-      font-family: var(--font);
-      transition: all .2s;
-    }
-    .btn-clear-all:hover { background: var(--danger); color: #fff; border-color: var(--danger); }
+    @media(max-width:640px) { .nss-grid { grid-template-columns: repeat(2,1fr); } }
 
-    /* ── Unread badge ── */
-    .unread-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 6px 14px;
-      background: rgba(13,148,136,.08);
-      border: 1.5px solid rgba(13,148,136,.2);
-      border-radius: 20px;
-      font-size: .8rem;
-      font-weight: 700;
-      color: var(--teal);
-      margin-bottom: 18px;
-    }
-    .unread-dot {
-      width: 8px; height: 8px;
-      border-radius: 50%;
-      background: var(--teal);
-      animation: pulse 1.5s ease-in-out infinite;
-    }
-
-    /* ── Filter chips ── */
-    .filter-bar {
-      display: flex;
-      gap: 7px;
-      margin-bottom: 20px;
-      overflow-x: auto;
-      padding-bottom: 2px;
-    }
-    .chip {
-      padding: 6px 16px;
-      border-radius: 16px;
-      border: 1.5px solid var(--gray-200);
-      font-size: .78rem;
-      font-weight: 700;
-      color: var(--gray-500);
-      cursor: pointer;
-      background: transparent;
-      white-space: nowrap;
-      transition: all .2s;
-      font-family: var(--font);
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-    }
-    .chip.active { border-color: var(--teal); background: rgba(13,148,136,.08); color: var(--teal); }
-    .chip:hover:not(.active) { border-color: var(--gray-400); color: var(--gray-700); }
-    .chip-count {
-      background: var(--teal);
-      color: #fff;
-      font-size: .65rem;
-      font-weight: 800;
-      padding: 1px 6px;
-      border-radius: 8px;
-      min-width: 16px;
-      text-align: center;
-    }
-    .chip:not(.active) .chip-count { background: var(--gray-300); }
-
-    /* ── Notification items ── */
-    .notif-group-label {
-      font-size: .72rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: .7px;
-      color: var(--gray-400);
-      margin: 20px 0 8px;
-      padding: 0 2px;
-    }
-    .notif-group-label:first-child { margin-top: 0; }
-
-    .notif-item {
-      display: flex;
-      align-items: flex-start;
-      gap: 14px;
-      padding: 16px;
+    .nss-card {
       background: var(--surface);
       border: 1.5px solid var(--gray-200);
       border-radius: var(--radius);
-      margin-bottom: 8px;
-      cursor: pointer;
-      transition: all .2s;
-      position: relative;
-      text-decoration: none;
+      padding: 14px 12px;
+      box-shadow: var(--shadow);
+      text-align: center;
+      position: relative; overflow: hidden;
+      transition: transform .2s;
     }
-    .notif-item:hover { border-color: var(--teal); box-shadow: var(--shadow-sm); transform: translateX(2px); }
-    .notif-item.unread {
-      background: rgba(13,148,136,.03);
+    .nss-card:hover { transform: translateY(-2px); }
+    [data-theme=dark] .nss-card { border-color: var(--gray-700); }
+    .nss-card::before {
+      content: ""; position: absolute;
+      top: 0; left: 0; right: 0; height: 3px;
+    }
+    .nss-card:nth-child(1)::before { background: linear-gradient(90deg,#dc2626,#f87171); }
+    .nss-card:nth-child(2)::before { background: linear-gradient(90deg,var(--primary),var(--teal)); }
+    .nss-card:nth-child(3)::before { background: linear-gradient(90deg,#059669,#34d399); }
+    .nss-card:nth-child(4)::before { background: linear-gradient(90deg,#7c3aed,#a78bfa); }
+
+    .nss-icon  { font-size: 1.2rem; margin-bottom: 5px; line-height: 1; }
+    .nss-val   { font-size: 1.3rem; font-weight: 900; color: var(--primary); line-height: 1; margin-bottom: 3px; }
+    .nss-label { font-size: .64rem; font-weight: 700; text-transform: uppercase; letter-spacing: .3px; color: var(--gray-400); }
+
+    /* ══════════════════════════════════
+       FILTER BAR
+    ══════════════════════════════════ */
+    .notif-filter-bar {
+      background: var(--surface);
+      border-bottom: 1.5px solid var(--gray-200);
+      position: sticky; top: 0; z-index: 40;
+      box-shadow: var(--shadow-sm);
+      margin-top: 28px;
+    }
+    [data-theme=dark] .notif-filter-bar { border-color: var(--gray-700); }
+    .nfb-inner {
+      max-width: 800px; margin: 0 auto;
+      padding: 0 20px;
+      display: flex; align-items: center;
+      justify-content: space-between; gap: 12px; flex-wrap: wrap;
+    }
+    .nfb-tabs { display: flex; overflow-x: auto; }
+    .nfb-tabs::-webkit-scrollbar { display: none; }
+
+    .nfb-tab {
+      display: flex; align-items: center; gap: 6px;
+      padding: 14px 16px;
+      font-size: .84rem; font-weight: 700;
+      color: var(--gray-500); cursor: pointer;
+      border-bottom: 2.5px solid transparent;
+      white-space: nowrap; background: none;
+      border-left: none; border-right: none; border-top: none;
+      font-family: var(--font);
+      transition: color .15s, border-color .15s;
+      flex-shrink: 0;
+    }
+    .nfb-tab:hover  { color: var(--primary); }
+    .nfb-tab.active { color: var(--primary); border-bottom-color: var(--teal); }
+    [data-theme=dark] .nfb-tab { color: var(--gray-400); }
+    .nfb-count {
+      font-size: .62rem; font-weight: 900;
+      padding: 2px 6px; border-radius: 8px;
+      background: var(--danger); color: #fff;
+    }
+    .nfb-count.gray { background: var(--gray-200); color: var(--gray-500); }
+    [data-theme=dark] .nfb-count.gray { background: var(--gray-700); color: var(--gray-400); }
+
+    .nfb-right {
+      display: flex; align-items: center; gap: 8px; flex-shrink: 0;
+      padding: 8px 0;
+    }
+    .btn-nfb-action {
+      padding: 6px 13px; border-radius: var(--radius-sm);
+      border: 1.5px solid var(--gray-200);
+      background: none; color: var(--gray-500);
+      font-size: .76rem; font-weight: 700;
+      cursor: pointer; font-family: var(--font);
+      transition: all .15s; white-space: nowrap;
+    }
+    .btn-nfb-action:hover { border-color: var(--teal); color: var(--teal); }
+    [data-theme=dark] .btn-nfb-action { border-color: var(--gray-600); color: var(--gray-400); }
+
+    /* ══════════════════════════════════
+       BODY
+    ══════════════════════════════════ */
+    .notif-body {
+      max-width: 800px; margin: 0 auto;
+      padding: 24px 20px 80px;
+    }
+
+    /* ══════════════════════════════════
+       NOTIFICATION LIST
+    ══════════════════════════════════ */
+    .notif-list { display: flex; flex-direction: column; gap: 0; }
+
+    /* Date group divider */
+    .notif-date-divider {
+      display: flex; align-items: center; gap: 12px;
+      font-size: .72rem; font-weight: 800;
+      text-transform: uppercase; letter-spacing: .5px;
+      color: var(--gray-400);
+      padding: 18px 0 10px;
+    }
+    .notif-date-divider::after {
+      content: ""; flex: 1; height: 1px; background: var(--gray-200);
+    }
+    [data-theme=dark] .notif-date-divider::after { background: var(--gray-700); }
+
+    /* Notification card */
+    .notif-card {
+      background: var(--surface);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 16px;
+      margin-bottom: 10px;
+      display: flex; align-items: flex-start; gap: 14px;
+      cursor: pointer;
+      transition: all .18s;
+      position: relative;
+      overflow: hidden;
+    }
+    .notif-card:hover {
+      border-color: rgba(13,148,136,.3);
+      box-shadow: 0 4px 20px rgba(13,148,136,.08);
+      transform: translateY(-1px);
+    }
+    .notif-card.unread {
+      background: rgba(13,148,136,.04);
       border-color: rgba(13,148,136,.2);
     }
-    .notif-item.unread::before {
+    .notif-card.unread::before {
       content: "";
-      position: absolute;
-      left: -1.5px; top: 16px;
-      width: 4px; height: 32px;
-      background: var(--teal);
-      border-radius: 0 3px 3px 0;
+      position: absolute; top: 0; left: 0; bottom: 0;
+      width: 4px;
+      border-radius: 4px 0 0 4px;
     }
+    [data-theme=dark] .notif-card { border-color: var(--gray-700); }
+    [data-theme=dark] .notif-card.unread { background: rgba(13,148,136,.07); border-color: rgba(13,148,136,.25); }
 
-    /* Icon */
-    .notif-icon {
-      width: 44px; height: 44px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.2rem;
-      flex-shrink: 0;
+    /* Category accent colors */
+    .notif-card.unread.type-payment::before { background: #059669; }
+    .notif-card.unread.type-gig::before     { background: var(--teal); }
+    .notif-card.unread.type-message::before { background: #7c3aed; }
+    .notif-card.unread.type-system::before  { background: #d97706; }
+    .notif-card.unread.type-rating::before  { background: #f59e0b; }
+    .notif-card.unread.type-alert::before   { background: var(--danger); }
+
+    /* Icon bubble */
+    .notif-icon-wrap {
+      width: 46px; height: 46px; border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem; flex-shrink: 0;
+      position: relative;
     }
-    .notif-icon.application { background: rgba(13,148,136,.1); }
-    .notif-icon.payment     { background: rgba(16,185,129,.1); }
-    .notif-icon.gig         { background: rgba(26,60,94,.1); }
-    .notif-icon.system      { background: rgba(107,114,128,.1); }
-    .notif-icon.alert       { background: rgba(239,68,68,.1); }
-    .notif-icon.review      { background: rgba(245,158,11,.1); }
-    .notif-icon.chat        { background: rgba(59,130,246,.1); }
+    .notif-icon-wrap.type-payment { background: rgba(5,150,105,.1); }
+    .notif-icon-wrap.type-gig     { background: rgba(13,148,136,.1); }
+    .notif-icon-wrap.type-message { background: rgba(124,58,237,.1); }
+    .notif-icon-wrap.type-system  { background: rgba(217,119,6,.08); }
+    .notif-icon-wrap.type-rating  { background: rgba(245,158,11,.1); }
+    .notif-icon-wrap.type-alert   { background: rgba(239,68,68,.08); }
+
+    /* Unread dot on icon */
+    .notif-unread-dot {
+      position: absolute; top: -2px; right: -2px;
+      width: 10px; height: 10px; border-radius: 50%;
+      background: var(--danger);
+      border: 2px solid var(--surface);
+    }
 
     /* Content */
-    .notif-body { flex: 1; min-width: 0; }
+    .notif-content { flex: 1; min-width: 0; }
     .notif-title {
-      font-size: .9rem;
-      font-weight: 700;
-      color: var(--text);
-      margin-bottom: 4px;
-      line-height: 1.35;
+      font-size: .9rem; font-weight: 800; color: var(--text);
+      margin-bottom: 4px; line-height: 1.35;
     }
-    .notif-item.unread .notif-title { color: var(--primary); font-weight: 800; }
-    .notif-desc {
-      font-size: .82rem;
-      color: var(--gray-500);
-      line-height: 1.55;
-      margin-bottom: 8px;
+    .notif-card.unread .notif-title { color: var(--primary); }
+    .notif-body-text {
+      font-size: .82rem; color: var(--gray-500);
+      line-height: 1.6; margin-bottom: 8px;
+      font-weight: 600;
     }
-    .notif-meta {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-    .notif-time { font-size: .72rem; color: var(--gray-400); }
-    .notif-tag {
-      font-size: .68rem;
-      font-weight: 700;
-      padding: 2px 8px;
-      border-radius: 6px;
-      text-transform: uppercase;
-      letter-spacing: .4px;
-    }
-    .notif-tag.application { background: rgba(13,148,136,.1); color: var(--teal); }
-    .notif-tag.payment     { background: rgba(16,185,129,.1); color: var(--success); }
-    .notif-tag.gig         { background: rgba(26,60,94,.1);   color: var(--primary); }
-    .notif-tag.system      { background: rgba(107,114,128,.1);color: var(--gray-500); }
-    .notif-tag.alert       { background: rgba(239,68,68,.1);  color: var(--danger); }
-    .notif-tag.review      { background: rgba(245,158,11,.1); color: #b45309; }
-    .notif-tag.chat        { background: rgba(59,130,246,.1); color: #2563eb; }
+    [data-theme=dark] .notif-body-text { color: var(--gray-400); }
 
-    /* Right — time + dismiss */
-    .notif-right {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 6px;
-      flex-shrink: 0;
+    /* Footer row */
+    .notif-footer {
+      display: flex; align-items: center;
+      gap: 10px; flex-wrap: wrap;
     }
-    .notif-unread-dot {
-      width: 9px; height: 9px;
-      border-radius: 50%;
-      background: var(--teal);
-    }
-    .btn-dismiss {
-      background: none;
-      border: none;
-      color: var(--gray-300);
-      cursor: pointer;
-      font-size: .85rem;
-      padding: 2px;
-      line-height: 1;
-      display: none;
-      transition: color .15s;
-    }
-    .notif-item:hover .btn-dismiss { display: block; }
-    .btn-dismiss:hover { color: var(--danger); }
-
-    /* ── CTA in notification ── */
-    .notif-cta {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 5px 12px;
-      background: var(--primary);
-      color: #fff;
-      border-radius: 8px;
-      font-size: .75rem;
-      font-weight: 700;
-      text-decoration: none;
-      transition: opacity .2s;
-      margin-top: 4px;
-    }
-    .notif-cta:hover { opacity: .85; text-decoration: none; color: #fff; }
-    .notif-cta.outline {
-      background: transparent;
-      color: var(--teal);
-      border: 1.5px solid var(--teal);
-    }
-    .notif-cta.outline:hover { background: var(--teal); color: #fff; }
-
-    /* ── Empty state ── */
-    .notif-empty {
-      text-align: center;
-      padding: 64px 20px;
+    .notif-time {
+      font-size: .7rem; font-weight: 700;
       color: var(--gray-400);
+      display: flex; align-items: center; gap: 4px;
     }
-    .notif-empty .ei { font-size: 3rem; margin-bottom: 14px; display: block; }
-    .notif-empty h3  { font-size: 1rem; font-weight: 800; color: var(--primary); margin-bottom: 6px; }
-    .notif-empty p   { font-size: .85rem; line-height: 1.6; }
+    .notif-category-tag {
+      font-size: .66rem; font-weight: 800;
+      padding: 2px 8px; border-radius: 5px;
+    }
+    .notif-category-tag.type-payment { background: rgba(5,150,105,.1);  color: #059669; }
+    .notif-category-tag.type-gig     { background: rgba(13,148,136,.1); color: var(--teal); }
+    .notif-category-tag.type-message { background: rgba(124,58,237,.1); color: #7c3aed; }
+    .notif-category-tag.type-system  { background: rgba(217,119,6,.1);  color: #d97706; }
+    .notif-category-tag.type-rating  { background: rgba(245,158,11,.1); color: #d97706; }
+    .notif-category-tag.type-alert   { background: rgba(239,68,68,.1);  color: var(--danger); }
 
-    /* ── Notification settings ── */
-    .settings-card {
+    /* CTA buttons inside card */
+    .notif-ctas {
+      display: flex; gap: 7px; margin-top: 10px; flex-wrap: wrap;
+    }
+    .btn-notif-primary {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 7px 16px; border-radius: var(--radius-sm);
+      background: linear-gradient(135deg, var(--primary), var(--teal));
+      border: none; color: #fff;
+      font-size: .78rem; font-weight: 800;
+      cursor: pointer; font-family: var(--font);
+      transition: opacity .15s;
+    }
+    .btn-notif-primary:hover { opacity: .88; }
+    .btn-notif-outline {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 7px 14px; border-radius: var(--radius-sm);
+      border: 1.5px solid var(--gray-200);
+      background: none; color: var(--gray-600);
+      font-size: .78rem; font-weight: 700;
+      cursor: pointer; font-family: var(--font);
+      transition: all .15s;
+    }
+    .btn-notif-outline:hover { border-color: var(--teal); color: var(--teal); }
+    .btn-notif-danger {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 7px 14px; border-radius: var(--radius-sm);
+      border: 1.5px solid rgba(239,68,68,.25);
+      background: none; color: var(--danger);
+      font-size: .78rem; font-weight: 700;
+      cursor: pointer; font-family: var(--font);
+      transition: all .15s;
+    }
+    .btn-notif-danger:hover { background: rgba(239,68,68,.06); }
+    [data-theme=dark] .btn-notif-outline { border-color: var(--gray-600); color: var(--gray-400); }
+
+    /* Right meta */
+    .notif-right {
+      display: flex; flex-direction: column;
+      align-items: flex-end; gap: 8px; flex-shrink: 0;
+    }
+    .notif-amount {
+      font-size: .96rem; font-weight: 900; color: #059669;
+      white-space: nowrap;
+    }
+    .notif-amount.debit { color: var(--danger); }
+    .notif-amount.pending { color: #d97706; }
+    .btn-notif-dismiss {
+      width: 24px; height: 24px; border-radius: 6px;
+      background: none; border: 1.5px solid var(--gray-200);
+      color: var(--gray-400); font-size: .7rem;
+      cursor: pointer; display: flex;
+      align-items: center; justify-content: center;
+      transition: all .15s; flex-shrink: 0;
+    }
+    .btn-notif-dismiss:hover { border-color: var(--danger); color: var(--danger); }
+    [data-theme=dark] .btn-notif-dismiss { border-color: var(--gray-600); }
+
+    /* ══════════════════════════════════
+       EMPTY STATE
+    ══════════════════════════════════ */
+    .notif-empty {
+      text-align: center; padding: 64px 24px;
+      display: none; flex-direction: column;
+      align-items: center; gap: 12px;
+    }
+    .notif-empty.visible { display: flex; }
+    .ne-icon  { font-size: 3.6rem; }
+    .ne-title { font-size: 1rem; font-weight: 800; color: var(--primary); }
+    .ne-sub   { font-size: .86rem; color: var(--gray-400); line-height: 1.7; max-width: 300px; }
+
+    /* ══════════════════════════════════
+       SETTINGS PANEL
+    ══════════════════════════════════ */
+    .notif-settings-panel {
+      display: none;
+    }
+    .notif-settings-panel.active { display: block; }
+
+    .ns-section-title {
+      font-size: .78rem; font-weight: 800;
+      text-transform: uppercase; letter-spacing: .5px;
+      color: var(--gray-400); margin-bottom: 12px;
+      padding: 0 4px;
+    }
+
+    .ns-card {
       background: var(--surface);
       border: 1.5px solid var(--gray-200);
       border-radius: var(--radius);
       overflow: hidden;
-      margin-top: 28px;
+      margin-bottom: 20px;
       box-shadow: var(--shadow-sm);
     }
-    .settings-title {
-      font-size: .9rem;
-      font-weight: 800;
-      color: var(--primary);
+    [data-theme=dark] .ns-card { border-color: var(--gray-700); }
+
+    .ns-card-header {
       padding: 14px 18px;
       border-bottom: 1.5px solid var(--gray-100);
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      background: linear-gradient(135deg, rgba(26,60,94,.03), rgba(13,148,136,.04));
+      font-size: .9rem; font-weight: 800; color: var(--primary);
+      display: flex; align-items: center; gap: 8px;
     }
-    .settings-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 13px 18px;
-      border-bottom: 1px solid var(--gray-100);
-      gap: 12px;
-    }
-    .settings-row:last-child { border-bottom: none; }
-    .settings-row-info h4 { font-size: .87rem; font-weight: 700; color: var(--text); margin-bottom: 2px; }
-    .settings-row-info p  { font-size: .76rem; color: var(--gray-400); line-height: 1.4; }
+    [data-theme=dark] .ns-card-header { border-color: var(--gray-700); }
 
-    /* Toggle switch */
-    .toggle-wrap { position: relative; width: 44px; height: 24px; flex-shrink: 0; }
-    .toggle-wrap input { opacity: 0; width: 0; height: 0; position: absolute; }
-    .toggle-slider {
-      position: absolute;
-      inset: 0;
-      background: var(--gray-300);
-      border-radius: 24px;
-      cursor: pointer;
-      transition: .3s;
+    .ns-row {
+      display: flex; align-items: center; gap: 14px;
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--gray-100);
+      transition: background .15s;
     }
-    .toggle-slider::before {
+    .ns-row:last-child { border-bottom: none; }
+    .ns-row:hover { background: rgba(13,148,136,.03); }
+    [data-theme=dark] .ns-row { border-color: var(--gray-700); }
+
+    .ns-icon {
+      width: 36px; height: 36px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .96rem; flex-shrink: 0;
+    }
+    .ns-icon.green  { background: rgba(5,150,105,.1); }
+    .ns-icon.blue   { background: rgba(26,60,94,.1); }
+    .ns-icon.amber  { background: rgba(217,119,6,.1); }
+    .ns-icon.purple { background: rgba(124,58,237,.1); }
+    .ns-icon.red    { background: rgba(220,38,38,.1); }
+    .ns-icon.teal   { background: rgba(13,148,136,.1); }
+
+    .ns-info { flex: 1; }
+    .ns-title { font-size: .88rem; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+    .ns-sub   { font-size: .74rem; color: var(--gray-400); font-weight: 600; }
+
+    /* Toggle */
+    .ns-toggle {
+      position: relative; width: 44px; height: 24px; flex-shrink: 0;
+    }
+    .ns-toggle input { opacity: 0; width: 0; height: 0; }
+    .ns-slider {
+      position: absolute; inset: 0;
+      background: var(--gray-300); border-radius: 24px;
+      cursor: pointer; transition: background .2s;
+    }
+    .ns-slider::before {
       content: "";
       position: absolute;
-      height: 18px; width: 18px;
-      left: 3px; bottom: 3px;
-      background: #fff;
-      border-radius: 50%;
-      transition: .3s;
-      box-shadow: 0 1px 4px rgba(0,0,0,.2);
+      width: 18px; height: 18px; border-radius: 50%;
+      background: #fff; left: 3px; top: 3px;
+      transition: transform .2s;
+      box-shadow: 0 1px 4px rgba(0,0,0,.15);
     }
-    input:checked + .toggle-slider { background: var(--teal); }
-    input:checked + .toggle-slider::before { transform: translateX(20px); }
+    .ns-toggle input:checked + .ns-slider { background: var(--teal); }
+    .ns-toggle input:checked + .ns-slider::before { transform: translateX(20px); }
+    [data-theme=dark] .ns-slider { background: var(--gray-600); }
 
-    /* Dark mode */
-    [data-theme="dark"] .notif-item         { border-color: var(--gray-700); }
-    [data-theme="dark"] .notif-item.unread  { background: rgba(13,148,136,.06); border-color: rgba(13,148,136,.25); }
-    [data-theme="dark"] .settings-card      { border-color: var(--gray-700); }
-    [data-theme="dark"] .settings-title     { border-color: var(--gray-700); }
-    [data-theme="dark"] .settings-row       { border-color: var(--gray-800); }
-    [data-theme="dark"] .toggle-slider      { background: var(--gray-600); }
-    [data-theme="dark"] .btn-mark-all,
-    [data-theme="dark"] .btn-clear-all      { border-color: var(--gray-700); }
-    [data-theme="dark"] .chip               { border-color: var(--gray-700); }
+    /* Frequency selector */
+    .ns-freq {
+      display: flex; gap: 5px; flex-shrink: 0;
+    }
+    .ns-freq-btn {
+      padding: 5px 10px; border-radius: 6px;
+      border: 1.5px solid var(--gray-200);
+      background: none; color: var(--gray-500);
+      font-size: .7rem; font-weight: 700;
+      cursor: pointer; font-family: var(--font);
+      transition: all .15s;
+    }
+    .ns-freq-btn:hover { border-color: var(--teal); color: var(--teal); }
+    .ns-freq-btn.active {
+      background: rgba(13,148,136,.1);
+      border-color: rgba(13,148,136,.3); color: var(--teal);
+    }
+    [data-theme=dark] .ns-freq-btn { border-color: var(--gray-600); color: var(--gray-400); }
+
+    /* Save settings */
+    .ns-save-row {
+      padding: 16px 18px;
+      border-top: 1.5px solid var(--gray-100);
+      display: flex; gap: 10px; align-items: center;
+    }
+    [data-theme=dark] .ns-save-row { border-color: var(--gray-700); }
+    .btn-ns-save {
+      padding: 10px 24px; border-radius: var(--radius-sm);
+      background: linear-gradient(135deg, var(--primary), var(--teal));
+      border: none; color: #fff;
+      font-size: .88rem; font-weight: 800;
+      cursor: pointer; font-family: var(--font);
+      transition: all .2s;
+      box-shadow: 0 3px 10px rgba(13,148,136,.22);
+    }
+    .btn-ns-save:hover { opacity: .9; transform: translateY(-1px); }
+    .ns-save-status {
+      font-size: .8rem; font-weight: 700; color: var(--success);
+      display: none; align-items: center; gap: 5px;
+    }
+    .ns-save-status.visible { display: flex; }
+
+    /* Quiet hours */
+    .quiet-hours-row {
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    }
+    .qh-label { font-size: .8rem; font-weight: 700; color: var(--gray-500); }
+    .qh-input {
+      padding: 6px 10px;
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+      background: var(--surface); color: var(--text);
+      font-family: var(--font); font-size: .84rem;
+      transition: border .2s;
+    }
+    .qh-input:focus { outline: none; border-color: var(--teal); }
+    [data-theme=dark] .qh-input { border-color: var(--gray-600); background: var(--gray-800); }
+
+    /* ══════════════════════════════════
+       LOAD MORE / PAGINATION
+    ══════════════════════════════════ */
+    .notif-load-more {
+      text-align: center; padding: 16px 0 8px;
+    }
+    .btn-load-more {
+      padding: 10px 28px; border-radius: var(--radius-sm);
+      border: 1.5px solid var(--gray-200);
+      background: none; color: var(--gray-600);
+      font-size: .86rem; font-weight: 700;
+      cursor: pointer; font-family: var(--font);
+      transition: all .15s;
+    }
+    .btn-load-more:hover { border-color: var(--teal); color: var(--teal); }
+    [data-theme=dark] .btn-load-more { border-color: var(--gray-600); color: var(--gray-400); }
+
+    /* ══════════════════════════════════
+       TOAST
+    ══════════════════════════════════ */
+    .notif-toast {
+      position: fixed; bottom: 28px; left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--primary); color: #fff;
+      padding: 10px 22px; border-radius: var(--radius-full);
+      font-size: .84rem; font-weight: 700;
+      opacity: 0; transition: all .3s;
+      pointer-events: none; z-index: 200;
+      white-space: nowrap; box-shadow: var(--shadow-md);
+    }
+    .notif-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ══════════════════════════════════
+       REALTIME BADGE (top-right)
+    ══════════════════════════════════ */
+    .realtime-indicator {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: .72rem; font-weight: 700;
+      color: rgba(255,255,255,.65);
+      margin-top: 6px;
+    }
+    .rt-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: #34d399;
+      animation: rtPulse 2s ease-in-out infinite;
+    }
+    @keyframes rtPulse {
+      0%,100% { opacity: 1; transform: scale(1); }
+      50%      { opacity: .5; transform: scale(.7); }
+    }
+
+    /* ══════════════════════════════════
+       INFO BOX
+    ══════════════════════════════════ */
+    .ni-box {
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      padding: 11px 14px; margin-bottom: 16px;
+      font-size: .85rem; line-height: 1.65;
+    }
+    .ni-box.teal   { background: rgba(13,148,136,.07); border-left: 3px solid var(--teal); }
+    .ni-box.warn   { background: rgba(245,158,11,.07); border-left: 3px solid #f59e0b; }
+
+    /* ══════════════════════════════════
+       SWIPE HINT (mobile)
+    ══════════════════════════════════ */
+    .swipe-hint {
+      text-align: center; font-size: .72rem;
+      font-weight: 600; color: var(--gray-400);
+      padding: 8px 0 0;
+      display: none;
+    }
+    @media(max-width:500px) { .swipe-hint { display: block; } }
+
   </style>
 </head>
 <body>
 
+  <div id="page-loader"></div>
   <div id="announce-bar"></div>
   <nav id="main-nav"></nav>
 
-  <main>
-    <div class="notif-wrap">
+  <div class="notif-toast" id="notifToast"></div>
 
-      <nav id="breadcrumb"></nav>
+  <main class="notif-wrapper">
 
-      <!-- Header -->
-      <div class="notif-header">
-        <div class="notif-header-left">
-          <h1>🔔 Notifications</h1>
-          <p>Stay updated on your gigs, applications, and payments.</p>
+    <!-- ══════════════════════════════════
+         HERO
+    ══════════════════════════════════ -->
+    <section class="notif-hero">
+      <div class="notif-hero-inner">
+        <div class="nh-left">
+          <div class="nh-tag">🔔 Notification Centre</div>
+          <h1 class="nh-title">Tumhare <span>Updates</span></h1>
+          <p class="nh-sub">Gig alerts, payments, messages — sab kuch ek jagah.</p>
+          <div class="realtime-indicator">
+            <div class="rt-dot"></div> Live — auto-refreshes
+          </div>
         </div>
-        <div class="notif-header-actions">
-          <button class="btn-mark-all" id="btnMarkAll">✓ Mark all as read</button>
-          <button class="btn-clear-all" id="btnClearAll">🗑 Clear all</button>
+        <div class="nh-actions">
+          <button class="btn-nh btn-nh-glass" onclick="markAllRead()">✅ Mark All Read</button>
+          <button class="btn-nh btn-nh-glass" onclick="openSettings()">⚙️ Settings</button>
+          <button class="btn-nh btn-nh-danger" onclick="clearAll()">🗑️ Clear All</button>
         </div>
       </div>
+    </section>
 
-      <!-- Unread count -->
-      <div class="unread-badge" id="unreadBadge" style="display:none">
-        <div class="unread-dot"></div>
-        <span id="unreadCount">0</span> unread notifications
-      </div>
-
-      <!-- Filter chips -->
-      <div class="filter-bar" id="filterBar">
-        <button class="chip active" data-filter="all">All <span class="chip-count" id="cntAll">0</span></button>
-        <button class="chip" data-filter="application">Applications <span class="chip-count" id="cntApplication">0</span></button>
-        <button class="chip" data-filter="payment">Payments <span class="chip-count" id="cntPayment">0</span></button>
-        <button class="chip" data-filter="gig">Gigs <span class="chip-count" id="cntGig">0</span></button>
-        <button class="chip" data-filter="chat">Messages <span class="chip-count" id="cntChat">0</span></button>
-        <button class="chip" data-filter="alert">Alerts <span class="chip-count" id="cntAlert">0</span></button>
-        <button class="chip" data-filter="system">System <span class="chip-count" id="cntSystem">0</span></button>
-      </div>
-
-      <!-- Notification list -->
-      <div id="notifList"></div>
-
-      <!-- Notification settings -->
-      <div class="settings-card">
-        <div class="settings-title">⚙️ Notification Preferences</div>
-
-        <div class="settings-row">
-          <div class="settings-row-info">
-            <h4>New Gig Applications</h4>
-            <p>When someone applies to your posted gig</p>
-          </div>
-          <label class="toggle-wrap">
-            <input type="checkbox" checked data-pref="applications" />
-            <span class="toggle-slider"></span>
-          </label>
+    <!-- ══════════════════════════════════
+         STATS STRIP
+    ══════════════════════════════════ -->
+    <div class="notif-stats-strip">
+      <div class="nss-grid">
+        <div class="nss-card">
+          <div class="nss-icon">🔴</div>
+          <div class="nss-val" id="statUnread">8</div>
+          <div class="nss-label">Unread</div>
         </div>
-
-        <div class="settings-row">
-          <div class="settings-row-info">
-            <h4>Payment Updates</h4>
-            <p>When you receive or release a payment</p>
-          </div>
-          <label class="toggle-wrap">
-            <input type="checkbox" checked data-pref="payments" />
-            <span class="toggle-slider"></span>
-          </label>
+        <div class="nss-card">
+          <div class="nss-icon">💰</div>
+          <div class="nss-val">3</div>
+          <div class="nss-label">Payment Alerts</div>
         </div>
-
-        <div class="settings-row">
-          <div class="settings-row-info">
-            <h4>Gig Status Changes</h4>
-            <p>When a gig you applied to is updated</p>
-          </div>
-          <label class="toggle-wrap">
-            <input type="checkbox" checked data-pref="gig_status" />
-            <span class="toggle-slider"></span>
-          </label>
+        <div class="nss-card">
+          <div class="nss-icon">✅</div>
+          <div class="nss-val">5</div>
+          <div class="nss-label">Gig Updates</div>
         </div>
-
-        <div class="settings-row">
-          <div class="settings-row-info">
-            <h4>New Messages</h4>
-            <p>When you receive a chat message</p>
-          </div>
-          <label class="toggle-wrap">
-            <input type="checkbox" checked data-pref="messages" />
-            <span class="toggle-slider"></span>
-          </label>
+        <div class="nss-card">
+          <div class="nss-icon">💬</div>
+          <div class="nss-val">2</div>
+          <div class="nss-label">New Messages</div>
         </div>
-
-        <div class="settings-row">
-          <div class="settings-row-info">
-            <h4>New Reviews</h4>
-            <p>When someone leaves you a rating or review</p>
-          </div>
-          <label class="toggle-wrap">
-            <input type="checkbox" checked data-pref="reviews" />
-            <span class="toggle-slider"></span>
-          </label>
-        </div>
-
-        <div class="settings-row">
-          <div class="settings-row-info">
-            <h4>Platform Announcements</h4>
-            <p>New features, tips, and GigLega updates</p>
-          </div>
-          <label class="toggle-wrap">
-            <input type="checkbox" data-pref="announcements" />
-            <span class="toggle-slider"></span>
-          </label>
-        </div>
-
       </div>
     </div>
+
+    <!-- ══════════════════════════════════
+         FILTER BAR
+    ══════════════════════════════════ -->
+    <div class="notif-filter-bar">
+      <div class="nfb-inner">
+        <div class="nfb-tabs" id="nfbTabs">
+          <button class="nfb-tab active" data-filter="all">
+            All <span class="nfb-count" id="badgeAll">8</span>
+          </button>
+          <button class="nfb-tab" data-filter="payment">
+            💰 Payment <span class="nfb-count" id="badgePayment">3</span>
+          </button>
+          <button class="nfb-tab" data-filter="gig">
+            📋 Gigs <span class="nfb-count" id="badgeGig">3</span>
+          </button>
+          <button class="nfb-tab" data-filter="message">
+            💬 Messages <span class="nfb-count" id="badgeMessage">2</span>
+          </button>
+          <button class="nfb-tab" data-filter="rating">
+            ⭐ Ratings <span class="nfb-count gray" id="badgeRating">0</span>
+          </button>
+          <button class="nfb-tab" data-filter="system">
+            ⚙️ System <span class="nfb-count gray" id="badgeSystem">0</span>
+          </button>
+          <button class="nfb-tab" data-filter="settings" id="settingsTab">
+            ⚙️ Settings
+          </button>
+        </div>
+        <div class="nfb-right">
+          <button class="btn-nfb-action" id="unreadOnlyBtn" onclick="toggleUnreadOnly(this)">
+            🔴 Unread Only
+          </button>
+          <button class="btn-nfb-action" onclick="sortByDate()">
+            🕐 Latest First
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════
+         BODY
+    ══════════════════════════════════ -->
+    <div class="notif-body">
+
+      <div class="swipe-hint">💡 Notification pe tap karo — dismiss ke liye ✕ dbaao</div>
+
+      <!-- ════ MAIN NOTIFICATION LIST ════ -->
+      <div id="notifMainList">
+
+        <!-- ───── TODAY ───── -->
+        <div class="notif-date-divider" data-date="today">🕐 Aaj — March 14, 2026</div>
+
+        <!-- 1. Payment credit — UNREAD -->
+        <div class="notif-card unread type-payment" data-type="payment" data-unread="true" onclick="readCard(this)">
+          <div class="notif-icon-wrap type-payment">
+            💰
+            <div class="notif-unread-dot"></div>
+          </div>
+          <div class="notif-content">
+            <div class="notif-title">Payment Released — ₹3,290 🎉</div>
+            <div class="notif-body-text">
+              Office Relocation gig (#GL-2026-0305) ka payment tumhare wallet mein aa gaya! Rahul Kumar ne payment release ki.
+            </div>
+            <div class="notif-footer">
+              <div class="notif-time">⏰ 5:14 PM</div>
+              <span class="notif-category-tag type-payment">💰 Payment</span>
+            </div>
+            <div class="notif-ctas">
+              <button class="btn-notif-primary" onclick="event.stopPropagation();goTo('wallet.html')">💳 View Wallet</button>
+              <button class="btn-notif-outline" onclick="event.stopPropagation();goTo('wallet.html#withdraw')">💸 Withdraw Now</button>
+            </div>
+          </div>
+          <div class="notif-right">
+            <div class="notif-amount">+₹3,290</div>
+            <button class="btn-notif-dismiss" onclick="event.stopPropagation();dismissCard(this)" title="Dismiss">✕</button>
+          </div>
+        </div>
+
+        <!-- 2. New gig invitation — UNREAD -->
+        <div class="notif-card unread type-gig" data-type="gig" data-unread="true" onclick="readCard(this)">
+          <div class="notif-icon-wrap type-gig">
+            📋
+            <div class="notif-unread-dot"></div>
+          </div>
+          <div class="notif-content">
+            <div class="notif-title">🎯 Naya Gig Invitation — Delivery Helper</div>
+            <div class="notif-body-text">
+              Sanjay Traders ne tumhe "Sector 56 Grocery Delivery" ke liye invite kiya hai — ₹1,800/day · Kal se shuru.
+            </div>
+            <div class="notif-footer">
+              <div class="notif-time">⏰ 4:50 PM</div>
+              <span class="notif-category-tag type-gig">📋 Gig Invite</span>
+            </div>
+            <div class="notif-ctas">
+              <button class="btn-notif-primary" onclick="event.stopPropagation();acceptGig(this)">✅ Accept</button>
+              <button class="btn-notif-outline" onclick="event.stopPropagation();goTo('post-gig.html')">👁️ View Details</button>
+              <button class="btn-notif-danger" onclick="event.stopPropagation();declineGig(this)">❌ Decline</button>
+            </div>
+          </div>
+          <div class="notif-right">
+            <div class="notif-amount" style="color:var(--teal)">₹1,800</div>
+            <button class="btn-notif-dismiss" onclick="event.stopPropagation();dismissCard(this)" title="Dismiss">✕</button>
+          </div>
+        </div>
+
+        <!-- 3. Message — UNREAD -->
+        <div class="notif-card unread type-message" data-type="message" data-unread="true" onclick="event.stopPropagation();goTo('chat.html')">
+          <div class="notif-icon-wrap type-message">
+            💬
+            <div class="notif-unread-dot"></div>
+          </div>
+          <div class="notif-content">
+            <div class="notif-title">Rahul Kumar ka naya message 💬</div>
+            <div class="notif-body-text">
+              "Theek hai bhai, kal 9 baje aa jana — gate pe naam bata dena 👍"
+            </div>
+            <div class="notif-footer">
+              <div class="notif-time">⏰ 5:14 PM</div>
+              <span class="notif-category-tag type-message">💬 Message</span>
+              <span style="font-size:.72rem;font-weight:700;color:var(--gray-400)">Warehouse Packing Gig</span>
+            </div>
+            <div class="notif-ctas">
+              <button class="btn-notif-primary" onclick="event.stopPropagation();goTo('chat.html')">💬 Reply Now</button>
+            </div>
+          </div>
+          <div class="notif-right">
+            <div class="notif-amount" style="color:#7c3aed;font-size:.8rem">2 unread</div>
+            <button class="btn-notif-dismiss" onclick="event.stopPropagation();dismissCard(this)" title="Dismiss">✕</button>
+          </div>
+        </div>
+
+        <!-- 4. Application accepted — UNREAD -->
+        <div class="notif-card unread type-gig" data-type="gig" data-unread="true" onclick="readCard(this)">
+          <div class="notif-icon-wrap type-gig">
+            🎉
+            <div class="notif-unread-dot"></div>
+          </div>
+          <div class="notif-content">
+            <div class="notif-title">Application Accept Ho Gayi! 🥳</div>
+            <div class="notif-body-text">
+              Kavya Sharma ne tumhari application "Corporate Event Setup Helper" ke liye accept kar li. Gig starts: Mar 20 · DLF Cyber Hub.
+            </div>
+            <div class="notif-footer">
+              <div class="notif-time">⏰ 3:30 PM</div>
+              <span class="notif-category-tag type-gig">✅ Accepted</span>
+            </div>
+            <div class="notif-ctas">
+              <button class="btn-notif-primary" onclick="event.stopPropagation();goTo('chat.html')">💬 Client se baat karo</button>
+              <button class="btn-notif-outline" onclick="event.stopPropagation();goTo('post-gig.html')">📋 Gig Details</button>
+            </div>
+          </div>
+          <div class="notif-right">
+            <div class="notif-amount">₹1,410</div>
+            <button class="btn-notif-dismiss" onclick="event.stopPropagation();dismissCard(this)" title="Dismiss">✕</button>
+          </div>
+        </div>
+
+        <!-- 5. Pending payment alert — UNREAD -->
+        <div class="notif-card unread type-payment" data-type="payment" data-unread="true" onclick="readCard(this)">
+          <div class="notif-icon-wrap type-payment">
+            ⏳
+            <div class="notif-unread-dot"></div>
+          </div>
+          <div class="notif-content">
+            <div class="notif-title">₹1,128 — Gig Complete Karo, Payment Lo!</div>
+            <div class="notif-body-text">
+              Warehouse Packing Gig (#GL-2026-0314) chal raha hai. Gig complete mark karne ke baad payment auto-release hogi — 30 minutes mein wallet mein.
+            </div>
+            <div class="notif-footer">
+              <div class="notif-time">⏰ 9:05 AM</div>
+              <span class="notif-category-tag type-payment">⏳ Pending</span>
+            </div>
+            <div class="notif-ctas">
+              <button class="btn-notif-primary" onclick="event.stopPropagation();markGigDone(this)">✅ Mark Gig Complete</button>
+              <button class="btn-notif-outline" onclick="event.stopPropagation();goTo('wallet.html')">💳 Wallet</button>
+            </div>
+          </div>
+          <div class="notif-right">
+            <div class="notif-amount pending">₹1,128</div>
+            <button class="btn-notif-dismiss" onclick="event.stopPropagation();dismissCard(this)" title="Dismiss">✕</button>
+          </div>
+        </div>
+
+        <!-- 6. Message 2 — UNREAD -->
+        <div class="notif-card unread type-message" data-type="message" data-unread="true" onclick="event.stopPropagation();goTo('chat.html')">
+          <div class="notif-icon-wrap type-message">
+            💬
+            <div class="notif-unread-dot"></div>
+          </div>
+          <div class="notif-content">
+            <div class="notif-title">Priya Kumari ka message</div>
+            <div class="notif-body-text">
+              "Meri Activa toh ready hai, kal timing confirm karo please 👍"
+            </div>
+            <div class="notif-footer">
+              <div class="notif-time">⏰ 8:45 AM</div>
+              <span class="notif-category-tag type-message">💬 Message</span>
+              <span style="font-size:.72rem;font-weight:700;color:var(--gray-400)">Grocery Delivery Gig</span>
+            </div>
+            <div class="notif-ctas">
+              <button class="btn-notif-primary" onclick="event.stopPropagation();goTo('chat.html')">💬 Reply</button>
+            </div>
+          </div>
+          <div class="notif-right">
+            <div class="notif-amount" style="color:#7c3aed;font-size:.8rem">1 unread</div>
+            <button class="btn-notif-dismiss" onclick="event.stopPropagation();dismissCard(this)" title="Dismiss">✕</button>
+          </div>
+        </div>
+
+        <!-- 7. System — UNREAD -->
+        <div class="notif-card unread type-alert" data-type="system" data-unread="true" onclick="readCard(this)">
+          <div class="notif-icon-wrap type-alert">
+            🔒
+            <div class="notif-unread-dot"></div>
+          </div>
+          <div class="notif-content">
+            <div class="notif-title">Security Alert — Naya Login Detected</div>
+            <div class="notif-body-text">
+              Chrome browser se naya login detect hua — Delhi, India. Agar yeh tum nahi the toh abhi apna password badlo!
+            </div>
+            <div class="notif-footer">
+              <div class="notif-time">⏰ 7:30 AM</div>
+              <span class="notif-category-tag type-alert">🔒 Security</span>
+            </div>
+            <div class="notif-ctas">
+              <button class="btn-notif-primary" onclick="event.stopPropagation();showToast('Password change page opening…')">🔑 Change Password</button>
+              <button class="btn-notif-outline" onclick="event.stopPropagation();showToast('Yeh login maine kiya tha ✅')">✅ Yes, It Was Me</button>
+            </div>
+          </div>
+          <div class="notif-right">
+            <button class="btn-notif-dismiss" onclick="event.stopPropagation();dismissCard(this)" title="Dismiss">✕</button>
+          </div>
+        </div>
+
+        <!-- 8. Referral bonus — UNREAD -->
+        <div class="notif-card unread type-payment" data-type="payment" data-unread="true" onclick="readCard(this)">
+          <div class="notif-icon-wrap type-payment">
+            🎁
+            <div class="notif-unread-dot"></div>
+          </div>
+          <div class="notif-content">
+            <div class="notif-title">Referral Bonus Mila — ₹100 🎁</div>
+            <div class="notif-body-text">
+              Tumhara dost Pankaj Das ne pehla gig complete kar liya (Code: ARJUN100). Tumhare wallet mein ₹100 bonus aa gaya!
+            </div>
+            <div class="notif-footer">
+              <div class="notif-time">⏰ 9:15 AM</div>
+              <span class="notif-category-tag type-payment">🎁 Bonus</span>
+            </div>
+            <div class="notif-ctas">
+              <button class="btn-notif-primary" onclick="event.stopPropagation();goTo('wallet.html')">💳 Wallet Dekho</button>
+              <button class="btn-notif-outline" onclick="event.stopPropagation();goTo('wallet.html#rewards')">➕ Aur Refer Karo</button>
+            </div>
+          </div>
+          <div class="notif-right">
+            <div class="notif-amount">+₹100</div>
+            <button class="btn-notif-dismiss" onclick="event.stopPropagation();dismissCard(this)" title="Dismiss">✕</button>
+          </div>
+        </div>
+
+        <!-- ───── YESTERDAY ───── -->
+        <div class="notif-date-divider" data-date="yesterday">📅 Kal — March 13, 2026</div>
+
+        <!-- 9. Rating received — READ -->
+        <div class="notif-card type-rating" data-type="rating" data-unread="false" onclick="readCard(this)">
+          <div class="notif-icon-wrap type-rating">⭐</div>
+          <div class="notif-content">
+            <div class="notif-title">Naya Review Mila — 5 Stars! ⭐⭐⭐⭐⭐</div>
+            <div class="notif-body-text">
+              Mohan Das ne tumhare Office Relocation kaam ke liye 5 star review diya: "Excellent work, very careful with furniture!"
+            </div>
+            <div class="notif-footer">
+              <div class="notif-time">⏰ 10:30 PM</div>
+              <span class="notif-category-tag type-rating">⭐ Rating</span>
+            </div>
+            <div class="notif-ctas">
+              <button class="btn-notif-outline" onclick="event.stopPropagation();goTo('profile.html#reviews')">👁️ Review Dekho</button>
+            </div>
+          </div>
+          <div class="notif-right">
+            <div style="font-size:1rem">⭐⭐⭐⭐⭐</div>
+            <button class="btn-notif-dismiss" onclick="event.stopPropagation();dismissCard(this)" title="Dismiss">✕</button>
+          </div>
+        </div>
+
+        <!-- 10. Gig reminder — READ -->
+        <div class="notif-card type-gig" data-type="gig" data-unread="false" onclick="readCard(this)">
+          <div class="notif-icon-wrap type-gig">⏰</div>
+          <div class="notif-content">
+            <div class="notif-title">⏰ Kal ka Gig Reminder — Warehouse Packing</div>
+            <div class="notif-body-text">
+              Kal subah 9:00 AM — Sector 14 Warehouse, Gurugram. Samay pe pahuncho aur entry pe Rahul Ka naam bolo. Comfortable kapde pehno!
+            </div>
+            <div class="notif-footer">
+              <div class="notif-time">⏰ 8:00 PM</div>
+              <span class="notif-category-tag type-gig">⏰ Reminder</span>
+            </div>
+            <div class="notif-ctas">
+              <button class="btn-notif-outline" onclick="event.stopPropagation();showToast('Directions loading…')">📍 Directions</button>
+              <button class="btn-notif-outline" onclick="event.stopPropagation();goTo('chat.html')">💬 Client se baat karo</button>
+            </div>
+          </div>
+          <div class="notif-right">
+            <button class="btn-notif-dismiss" onclick="event.stopPropagation();dismissCard(this)" title="Dismiss">✕</button>
+          </div>
+        </div>
+
+        <!-- 11. Application submitted — READ -->
+        <div class="notif-card type-gig" data-type="gig" data-unread="false" onclick="readCard(this)">
+          <div class="notif-icon-wrap type-gig">📩</div>
+          <div class="notif-content">
+            <div class="notif-title">Application Bhej Di — Event Helper Gig</div>
+            <div class="notif-body-text">
+              Tumne "DLF Cyber Hub Event Setup Helper" ke liye apply kar diya. Client ka response 24 ghante mein aayega.
+            </div>
+            <div class="notif-footer">
+              <div class="notif-time">⏰ 3:45 PM</div>
+              <span class="notif-category-tag type-gig">📩 Applied</span>
+            </div>
+          </div>
+          <div class="notif-right">
+            <button class="btn-notif-dismiss" onclick="event.stopPropagation();dismissCard(this)" title="Dismiss">✕</button>
+          </div>
+        </div>
+
+        <!-- 12. System — profile tip — READ -->
+        <div class="notif-card type-system" data-type="system" data-unread="false" onclick="readCard(this)">
+          <div class="notif-icon-wrap type-system">💡</div>
+          <div class="notif-content">
+            <div class="notif-title">Profile 89% Complete — Photo Add Karo!</div>
+            <div class="notif-body-text">
+              Profile photo add karne se 40% zyada applications aati hain. Sirf 2 minute lagenge — abhi complete karo!
+            </div>
+            <div class="notif-footer">
+              <div class="notif-time">⏰ 11:00 AM</div>
+              <span class="notif-category-tag type-system">💡 Tip</span>
+            </div>
+            <div class="notif-ctas">
+              <button class="btn-notif-outline" onclick="event.stopPropagation();goTo('profile.html#edit')">✏️ Profile Edit Karo</button>
+            </div>
+          </div>
+          <div class="notif-right">
+            <button class="btn-notif-dismiss" onclick="event.stopPropagation();dismissCard(this)" title="Dismiss">✕</button>
+          </div>
+        </div>
+
+        <!-- ───── EARLIER ───── -->
+        <div class="notif-date-divider" data-date="earlier">🗓️ Pehle — March 5–12, 2026</div>
+
+        <!-- 13. Payment — READ -->
+        <div class="notif-card type-payment" data-type="payment" data-unread="false" onclick="readCard(this)">
+          <div class="notif-icon-wrap type-payment">💸</div>
+          <div class="notif-content">
+            <div class="notif-title">Withdrawal Successful — ₹3,000</div>
+            <div class="notif-body-text">
+              ₹3,000 tumhare Google Pay (arjunsingh@okaxis) mein transfer ho gaya. Ref: GL-WD-030501.
+            </div>
+            <div class="notif-footer">
+              <div class="notif-time">📅 Mar 5, 9:15 PM</div>
+              <span class="notif-category-tag type-payment">📤 Withdrawn</span>
+            </div>
+          </div>
+          <div class="notif-right">
+            <div class="notif-amount debit">−₹3,000</div>
+            <button class="btn-notif-dismiss" onclick="event.stopPropagation();dismissCard(this)" title="Dismiss">✕</button>
+          </div>
+        </div>
+
+        <!-- 14. Rating received — READ -->
+        <div class="notif-card type-rating" data-type="rating" data-unread="false" onclick="readCard(this)">
+          <div class="notif-icon-wrap type-rating">⭐</div>
+          <div class="notif-content">
+            <div class="notif-title">Review Mila — 4 Stars ⭐⭐⭐⭐</div>
+            <div class="notif-body-text">
+              Kavya Sharma ne Corporate Event Setup ke liye 4 star review diya: "Mehnat se kaam kiya, thoda late hua lekin overall theek tha."
+            </div>
+            <div class="notif-footer">
+              <div class="notif-time">📅 Mar 5, 11:00 PM</div>
+              <span class="notif-category-tag type-rating">⭐ Rating</span>
+            </div>
+          </div>
+          <div class="notif-right">
+            <div style="font-size:.9rem">⭐⭐⭐⭐</div>
+            <button class="btn-notif-dismiss" onclick="event.stopPropagation();dismissCard(this)" title="Dismiss">✕</button>
+          </div>
+        </div>
+
+        <!-- 15. New gig match — READ -->
+        <div class="notif-card type-gig" data-type="gig" data-unread="false" onclick="readCard(this)">
+          <div class="notif-icon-wrap type-gig">🎯</div>
+          <div class="notif-content">
+            <div class="notif-title">33 New Gig Matches — Gurugram Area</div>
+            <div class="notif-body-text">
+              Tumhari skills se 33 naye gigs match ho rahe hain Gurugram mein. Delivery, Warehouse aur Event gigs available hain — abhi apply karo!
+            </div>
+            <div class="notif-footer">
+              <div class="notif-time">📅 Mar 3, 10:00 AM</div>
+              <span class="notif-category-tag type-gig">🎯 Matches</span>
+            </div>
+            <div class="notif-ctas">
+              <button class="btn-notif-outline" onclick="event.stopPropagation();goTo('browse.html')">🔍 Browse Gigs</button>
+            </div>
+          </div>
+          <div class="notif-right">
+            <div style="font-size:.88rem;font-weight:900;color:var(--teal)">33 gigs</div>
+            <button class="btn-notif-dismiss" onclick="event.stopPropagation();dismissCard(this)" title="Dismiss">✕</button>
+          </div>
+        </div>
+
+        <!-- Load More -->
+        <div class="notif-load-more" id="loadMoreSection">
+          <button class="btn-load-more" onclick="loadMore()">📋 Aur Notifications Load Karo →</button>
+        </div>
+
+        <!-- Empty state -->
+        <div class="notif-empty" id="notifEmpty">
+          <div class="ne-icon">🔔</div>
+          <div class="ne-title">Sab clear hai!</div>
+          <div class="ne-sub">Koi notification nahi hai is category mein. Naye gigs apply karo aur updates yahan dikhenge.</div>
+          <button class="btn-notif-outline" onclick="goTo('browse.html')" style="margin-top:8px">🔍 Browse Gigs</button>
+        </div>
+
+      </div><!-- /notifMainList -->
+
+      <!-- ════ SETTINGS PANEL ════ -->
+      <div class="notif-settings-panel" id="settingsPanel">
+
+        <div class="ni-box teal">
+          🔔 <strong>Notifications settings</strong> — decide karo kya, kab aur kaise notifications receive karna chahte ho.
+        </div>
+
+        <!-- Push Notifications -->
+        <div class="ns-section-title">📱 Push Notifications</div>
+        <div class="ns-card">
+          <div class="ns-card-header">📱 Mobile / Browser Notifications</div>
+
+          <div class="ns-row">
+            <div class="ns-icon green">💰</div>
+            <div class="ns-info">
+              <div class="ns-title">Payment Alerts</div>
+              <div class="ns-sub">Jab payment release ho, withdrawal complete ho, bonus mile</div>
+            </div>
+            <label class="ns-toggle">
+              <input type="checkbox" checked onchange="saveSettingsDebounce()" />
+              <span class="ns-slider"></span>
+            </label>
+          </div>
+
+          <div class="ns-row">
+            <div class="ns-icon teal">📋</div>
+            <div class="ns-info">
+              <div class="ns-title">Gig Updates</div>
+              <div class="ns-sub">Application accepted/rejected, new invite, gig reminders</div>
+            </div>
+            <label class="ns-toggle">
+              <input type="checkbox" checked onchange="saveSettingsDebounce()" />
+              <span class="ns-slider"></span>
+            </label>
+          </div>
+
+          <div class="ns-row">
+            <div class="ns-icon purple">💬</div>
+            <div class="ns-info">
+              <div class="ns-title">Messages</div>
+              <div class="ns-sub">Naye messages, client replies</div>
+            </div>
+            <label class="ns-toggle">
+              <input type="checkbox" checked onchange="saveSettingsDebounce()" />
+              <span class="ns-slider"></span>
+            </label>
+          </div>
+
+          <div class="ns-row">
+            <div class="ns-icon amber">⭐</div>
+            <div class="ns-info">
+              <div class="ns-title">Ratings & Reviews</div>
+              <div class="ns-sub">Jab client tumhe rate kare ya review likhe</div>
+            </div>
+            <label class="ns-toggle">
+              <input type="checkbox" checked onchange="saveSettingsDebounce()" />
+              <span class="ns-slider"></span>
+            </label>
+          </div>
+
+          <div class="ns-row">
+            <div class="ns-icon teal">🎯</div>
+            <div class="ns-info">
+              <div class="ns-title">New Gig Matches</div>
+              <div class="ns-sub">Jab tumhari skills se gig match ho Gurugram mein</div>
+            </div>
+            <label class="ns-toggle">
+              <input type="checkbox" checked onchange="saveSettingsDebounce()" />
+              <span class="ns-slider"></span>
+            </label>
+          </div>
+
+          <div class="ns-row">
+            <div class="ns-icon red">🔒</div>
+            <div class="ns-info">
+              <div class="ns-title">Security Alerts</div>
+              <div class="ns-sub">New login, password change, suspicious activity</div>
+            </div>
+            <label class="ns-toggle">
+              <input type="checkbox" checked onchange="saveSettingsDebounce()" />
+              <span class="ns-slider"></span>
+            </label>
+          </div>
+
+          <div class="ns-row">
+            <div class="ns-icon blue">💡</div>
+            <div class="ns-info">
+              <div class="ns-title">Tips & Suggestions</div>
+              <div class="ns-sub">Profile improvement tips, weekly performance summary</div>
+            </div>
+            <label class="ns-toggle">
+              <input type="checkbox" onchange="saveSettingsDebounce()" />
+              <span class="ns-slider"></span>
+            </label>
+          </div>
+
+          <div class="ns-row">
+            <div class="ns-icon amber">🎁</div>
+            <div class="ns-info">
+              <div class="ns-title">Promotions & Offers</div>
+              <div class="ns-sub">Bonus events, seasonal offers, referral campaigns</div>
+            </div>
+            <label class="ns-toggle">
+              <input type="checkbox" checked onchange="saveSettingsDebounce()" />
+              <span class="ns-slider"></span>
+            </label>
+          </div>
+
+        </div>
+
+        <!-- Email Notifications -->
+        <div class="ns-section-title">📧 Email Notifications</div>
+        <div class="ns-card">
+          <div class="ns-card-header">📧 arjun.singh@gmail.com</div>
+
+          <div class="ns-row">
+            <div class="ns-icon green">💰</div>
+            <div class="ns-info">
+              <div class="ns-title">Payment Receipts</div>
+              <div class="ns-sub">Har payment ka email confirmation</div>
+            </div>
+            <label class="ns-toggle">
+              <input type="checkbox" checked onchange="saveSettingsDebounce()" />
+              <span class="ns-slider"></span>
+            </label>
+          </div>
+
+          <div class="ns-row">
+            <div class="ns-icon teal">📊</div>
+            <div class="ns-info">
+              <div class="ns-title">Weekly Summary</div>
+              <div class="ns-sub">Har Sunday — earnings, gig count, ratings summary</div>
+            </div>
+            <div class="ns-freq">
+              <button class="ns-freq-btn active" onclick="setFreq(this,'weekly')">Weekly</button>
+              <button class="ns-freq-btn" onclick="setFreq(this,'monthly')">Monthly</button>
+              <button class="ns-freq-btn" onclick="setFreq(this,'off')">Off</button>
+            </div>
+          </div>
+
+          <div class="ns-row">
+            <div class="ns-icon red">🔒</div>
+            <div class="ns-info">
+              <div class="ns-title">Security Emails</div>
+              <div class="ns-sub">Login alerts, password changes (recommended ON)</div>
+            </div>
+            <label class="ns-toggle">
+              <input type="checkbox" checked onchange="saveSettingsDebounce()" />
+              <span class="ns-slider"></span>
+            </label>
+          </div>
+
+          <div class="ns-row">
+            <div class="ns-icon amber">📢</div>
+            <div class="ns-info">
+              <div class="ns-title">Marketing Emails</div>
+              <div class="ns-sub">New features, GigLega news, campaigns</div>
+            </div>
+            <label class="ns-toggle">
+              <input type="checkbox" onchange="saveSettingsDebounce()" />
+              <span class="ns-slider"></span>
+            </label>
+          </div>
+
+        </div>
+
+        <!-- Quiet Hours -->
+        <div class="ns-section-title">🌙 Quiet Hours (Do Not Disturb)</div>
+        <div class="ns-card">
+          <div class="ns-card-header">🌙 Disturbance free time set karo</div>
+
+          <div class="ns-row">
+            <div class="ns-icon blue">🌙</div>
+            <div class="ns-info">
+              <div class="ns-title">Enable Quiet Hours</div>
+              <div class="ns-sub">Is time mein sirf urgent payment alerts aayenge</div>
+            </div>
+            <label class="ns-toggle">
+              <input type="checkbox" id="quietToggle" onchange="toggleQuietHours(this)" />
+              <span class="ns-slider"></span>
+            </label>
+          </div>
+
+          <div class="ns-row" id="quietHoursRow" style="opacity:.4;pointer-events:none">
+            <div class="ns-icon blue">⏰</div>
+            <div class="ns-info">
+              <div class="ns-title">Quiet Hours Timing</div>
+              <div style="margin-top:8px">
+                <div class="quiet-hours-row">
+                  <span class="qh-label">From:</span>
+                  <input type="time" class="qh-input" value="22:00" />
+                  <span class="qh-label">To:</span>
+                  <input type="time" class="qh-input" value="08:00" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="ns-save-row">
+            <button class="btn-ns-save" onclick="saveSettings()">💾 Save Settings</button>
+            <div class="ns-save-status" id="nsSaveStatus">✅ Saved!</div>
+          </div>
+
+        </div>
+
+        <!-- Notification Grouping -->
+        <div class="ns-section-title">🗂️ Display Preferences</div>
+        <div class="ns-card">
+          <div class="ns-card-header">🗂️ Notification Display</div>
+
+          <div class="ns-row">
+            <div class="ns-icon teal">🗂️</div>
+            <div class="ns-info">
+              <div class="ns-title">Group Similar Notifications</div>
+              <div class="ns-sub">Same type ke notifications ek group mein dikhao</div>
+            </div>
+            <label class="ns-toggle">
+              <input type="checkbox" checked onchange="saveSettingsDebounce()" />
+              <span class="ns-slider"></span>
+            </label>
+          </div>
+
+          <div class="ns-row">
+            <div class="ns-icon amber">🔊</div>
+            <div class="ns-info">
+              <div class="ns-title">Sound Alerts</div>
+              <div class="ns-sub">Payment aur urgent notifications pe sound</div>
+            </div>
+            <label class="ns-toggle">
+              <input type="checkbox" checked onchange="saveSettingsDebounce()" />
+              <span class="ns-slider"></span>
+            </label>
+          </div>
+
+          <div class="ns-row">
+            <div class="ns-icon green">📳</div>
+            <div class="ns-info">
+              <div class="ns-title">Vibration</div>
+              <div class="ns-sub">Mobile vibrate kare notifications pe</div>
+            </div>
+            <label class="ns-toggle">
+              <input type="checkbox" checked onchange="saveSettingsDebounce()" />
+              <span class="ns-slider"></span>
+            </label>
+          </div>
+
+          <div class="ns-row">
+            <div class="ns-icon blue">🔢</div>
+            <div class="ns-info">
+              <div class="ns-title">Badge Count</div>
+              <div class="ns-sub">App icon pe unread count badge dikhao</div>
+            </div>
+            <label class="ns-toggle">
+              <input type="checkbox" checked onchange="saveSettingsDebounce()" />
+              <span class="ns-slider"></span>
+            </label>
+          </div>
+
+          <div class="ns-save-row">
+            <button class="btn-ns-save" onclick="saveSettings()">💾 Save Preferences</button>
+            <div class="ns-save-status" id="nsSaveStatus2">✅ Saved!</div>
+          </div>
+
+        </div>
+
+      </div><!-- /settingsPanel -->
+
+    </div><!-- /notif-body -->
   </main>
 
-  <footer id="main-footer"></footer>
-  <div id="toast-container"></div>
-
   <script>
-  (function () {
 
-    /* ── Auth ── */
-    var user = (function () {
-      try {
-        var u = JSON.parse(localStorage.getItem("gl_user") || "null");
-        return (u && u.id) ? u : null;
-      } catch(e) { return null; }
-    })();
-    if (!user) { window.location.href = "login.html?redirect=notifications.html"; return; }
+    /* ══════════════════════════════════
+       FILTER SYSTEM
+    ══════════════════════════════════ */
+    let activeFilter = "all";
+    let unreadOnly   = false;
 
-    /* ── Breadcrumb ── */
-    if (typeof buildBreadcrumb === "function") {
-      buildBreadcrumb("breadcrumb", [
-        { label: "Home",      href: "index.html" },
-        { label: "Notifications" }
-      ]);
-    }
+    document.querySelectorAll(".nfb-tab").forEach(tab => {
+      tab.addEventListener("click", function() {
+        const f = this.dataset.filter;
 
-    /* ── Storage ── */
-    var NOTIF_KEY = "gl_notifs_" + user.id;
-    var PREF_KEY  = "gl_notif_prefs_" + user.id;
-
-    function getNotifs()  { return JSON.parse(localStorage.getItem(NOTIF_KEY) || "[]"); }
-    function saveNotifs(n){ localStorage.setItem(NOTIF_KEY, JSON.stringify(n)); }
-    function getPrefs()   { return JSON.parse(localStorage.getItem(PREF_KEY)  || "{}"); }
-    function savePrefs(p) { localStorage.setItem(PREF_KEY, JSON.stringify(p)); }
-
-    /* ── Seed demo notifications ── */
-    (function seed() {
-      if (getNotifs().length) return;
-      var now = Date.now();
-      saveNotifs([
-        {
-          id:"n1", type:"application", unread:true,
-          title:"New application on your gig",
-          desc:"Rahul Sharma applied for 'Need Delivery Person — Sector 45'. View their profile and respond.",
-          time: new Date(now - 600000).toISOString(),
-          cta: { label:"View Application", href:"dashboard-client.html" }
-        },
-        {
-          id:"n2", type:"payment", unread:true,
-          title:"₹500 payment received 🎉",
-          desc:"Payment of ₹470 (after 6% fee) has been released to your GigLega Wallet for completing 'Data Entry Task'.",
-          time: new Date(now - 1800000).toISOString(),
-          cta: { label:"View Wallet", href:"wallet.html" }
-        },
-        {
-          id:"n3", type:"application", unread:true,
-          title:"Your application was accepted!",
-          desc:"Priya Mehta accepted your application for 'Office Cleaning — DLF Phase 2'. Get in touch to confirm timing.",
-          time: new Date(now - 3600000).toISOString(),
-          cta: { label:"Open Chat", href:"chat.html" }
-        },
-        {
-          id:"n4", type:"chat", unread:true,
-          title:"New message from Amit K.",
-          desc:"\"Hi, are you available tomorrow morning for the delivery gig?\"",
-          time: new Date(now - 7200000).toISOString(),
-          cta: { label:"Reply Now", href:"chat.html" }
-        },
-        {
-          id:"n5", type:"gig", unread:false,
-          title:"Your gig is getting attention!",
-          desc:"'Need Cook for Weekend Party' has been viewed 24 times in the last hour. 3 workers have bookmarked it.",
-          time: new Date(now - 10800000).toISOString(),
-          cta: { label:"View Gig", href:"gig-detail.html" }
-        },
-        {
-          id:"n6", type:"review", unread:false,
-          title:"You received a 5-star review ⭐",
-          desc:"Sneha T. left you a review: \"Excellent work, very punctual and professional. Highly recommend!\"",
-          time: new Date(now - 86400000).toISOString(),
-          cta: { label:"View Profile", href:"profile.html" }
-        },
-        {
-          id:"n7", type:"payment", unread:false,
-          title:"Withdrawal of ₹250 processed",
-          desc:"Your withdrawal of ₹250 to UPI has been successfully processed and credited to your account.",
-          time: new Date(now - 172800000).toISOString(),
-          cta: { label:"View Wallet", href:"wallet.html" }
-        },
-        {
-          id:"n8", type:"alert", unread:false,
-          title:"Complete your profile for more gigs",
-          desc:"Profiles with a photo and bio get 3x more applications. Add yours now to stand out.",
-          time: new Date(now - 259200000).toISOString(),
-          cta: { label:"Edit Profile", href:"profile.html" }
-        },
-        {
-          id:"n9", type:"system", unread:false,
-          title:"Welcome to GigLega Beta! 🚀",
-          desc:"You've joined GigLega during our early Beta phase. Thank you! Enjoy zero platform fees on your first 5 gigs.",
-          time: new Date(now - 432000000).toISOString(),
-          cta: null
+        // Settings tab is special
+        if (f === "settings") {
+          openSettings();
+          return;
         }
-      ]);
-    })();
 
-    /* ── State ── */
-    var currentFilter = "all";
+        document.querySelectorAll(".nfb-tab").forEach(t => t.classList.remove("active"));
+        this.classList.add("active");
+        activeFilter = f;
+        applyFilter();
+        hideSettings();
+      });
+    });
 
-    /* ── Helpers ── */
-    function escH(s) { return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
-
-    function timeAgo(iso) {
-      var s = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
-      if (s < 60)    return "Just now";
-      if (s < 3600)  return Math.floor(s/60) + " min ago";
-      if (s < 86400) return Math.floor(s/3600) + " hr ago";
-      if (s < 604800)return Math.floor(s/86400) + " days ago";
-      return new Date(iso).toLocaleDateString("en-IN", { day:"numeric", month:"short" });
+    function applyFilter() {
+      const cards = document.querySelectorAll(".notif-card");
+      let visible = 0;
+      cards.forEach(card => {
+        const type    = card.dataset.type;
+        const isUnread = card.dataset.unread === "true";
+        let show = true;
+        if (activeFilter !== "all" && type !== activeFilter) show = false;
+        if (unreadOnly && !isUnread) show = false;
+        card.style.display = show ? "" : "none";
+        if (show) visible++;
+      });
+      // Date dividers: hide if no visible cards after them
+      updateDividerVisibility();
+      document.getElementById("notifEmpty").classList.toggle("visible", visible === 0);
+      document.getElementById("loadMoreSection").style.display = visible > 0 ? "" : "none";
     }
 
-    function groupLabel(iso) {
-      var d    = new Date(iso);
-      var now  = new Date();
-      var diff = Math.floor((now - d) / 86400000);
-      if (diff === 0) return "Today";
-      if (diff === 1) return "Yesterday";
-      if (diff < 7)   return "This Week";
-      return "Earlier";
-    }
-
-    var typeIcons = {
-      application: "👤",
-      payment:     "💰",
-      gig:         "📋",
-      chat:        "💬",
-      alert:       "⚠️",
-      review:      "⭐",
-      system:      "🔔"
-    };
-
-    var typeLabels = {
-      application: "Application",
-      payment:     "Payment",
-      gig:         "Gig Update",
-      chat:        "Message",
-      alert:       "Alert",
-      review:      "Review",
-      system:      "System"
-    };
-
-    /* ── Render ── */
-    function render() {
-      var notifs   = getNotifs();
-      var unread   = notifs.filter(function(n){ return n.unread; });
-      var filtered = currentFilter === "all" ? notifs : notifs.filter(function(n){ return n.type === currentFilter; });
-
-      /* Unread badge */
-      var badge = document.getElementById("unreadBadge");
-      if (unread.length > 0) {
-        badge.style.display = "inline-flex";
-        document.getElementById("unreadCount").textContent = unread.length;
-      } else {
-        badge.style.display = "none";
-      }
-
-      /* Chip counts */
-      var types = ["application","payment","gig","chat","alert","review","system"];
-      document.getElementById("cntAll").textContent = notifs.length;
-      types.forEach(function(t) {
-        var el = document.getElementById("cnt" + t.charAt(0).toUpperCase() + t.slice(1));
-        if (el) el.textContent = notifs.filter(function(n){ return n.type === t; }).length;
-      });
-
-      /* Notification list */
-      var list = document.getElementById("notifList");
-      if (!filtered.length) {
-        list.innerHTML =
-          '<div class="notif-empty">' +
-            '<span class="ei">🔔</span>' +
-            '<h3>No notifications here</h3>' +
-            '<p>When you get applications, payments, or messages,<br>they\'ll show up here.</p>' +
-          '</div>';
-        return;
-      }
-
-      /* Group by day */
-      var groups = {};
-      var order  = [];
-      filtered.forEach(function(n) {
-        var g = groupLabel(n.time);
-        if (!groups[g]) { groups[g] = []; order.push(g); }
-        groups[g].push(n);
-      });
-
-      var html = "";
-      order.forEach(function(g) {
-        html += '<div class="notif-group-label">' + g + '</div>';
-        groups[g].forEach(function(n) {
-          var icon  = typeIcons[n.type]  || "🔔";
-          var label = typeLabels[n.type] || n.type;
-          var ctaHtml = n.cta
-            ? '<a href="' + escH(n.cta.href) + '" class="notif-cta" data-notif-id="' + n.id + '">' + escH(n.cta.label) + ' →</a>'
-            : "";
-
-          html +=
-            '<div class="notif-item' + (n.unread ? " unread" : "") + '" data-id="' + n.id + '">' +
-              '<div class="notif-icon ' + n.type + '">' + icon + '</div>' +
-              '<div class="notif-body">' +
-                '<div class="notif-title">' + escH(n.title) + '</div>' +
-                '<div class="notif-desc">'  + escH(n.desc)  + '</div>' +
-                '<div class="notif-meta">' +
-                  '<span class="notif-time">' + timeAgo(n.time) + '</span>' +
-                  '<span class="notif-tag ' + n.type + '">' + label + '</span>' +
-                '</div>' +
-                (ctaHtml ? '<div style="margin-top:8px">' + ctaHtml + '</div>' : '') +
-              '</div>' +
-              '<div class="notif-right">' +
-                (n.unread ? '<div class="notif-unread-dot"></div>' : '') +
-                '<button class="btn-dismiss" data-dismiss="' + n.id + '" title="Dismiss">✕</button>' +
-              '</div>' +
-            '</div>';
-        });
-      });
-
-      list.innerHTML = html;
-      bindActions();
-    }
-
-    /* ── Bind item actions ── */
-    function bindActions() {
-      /* Click to mark as read */
-      document.querySelectorAll(".notif-item").forEach(function(item) {
-        item.addEventListener("click", function(e) {
-          if (e.target.closest(".btn-dismiss") || e.target.closest(".notif-cta")) return;
-          var id     = item.dataset.id;
-          var notifs = getNotifs();
-          var n      = notifs.find(function(x){ return x.id === id; });
-          if (n && n.unread) {
-            n.unread = false;
-            saveNotifs(notifs);
-            render();
+    function updateDividerVisibility() {
+      const dividers = document.querySelectorAll(".notif-date-divider");
+      dividers.forEach(div => {
+        let sibling = div.nextElementSibling;
+        let hasVisible = false;
+        while (sibling && !sibling.classList.contains("notif-date-divider")) {
+          if (sibling.classList.contains("notif-card") && sibling.style.display !== "none") {
+            hasVisible = true; break;
           }
-        });
-      });
-
-      /* CTA links — mark as read then navigate */
-      document.querySelectorAll(".notif-cta").forEach(function(a) {
-        a.addEventListener("click", function(e) {
-          var id     = a.dataset.notifId;
-          var notifs = getNotifs();
-          var n      = notifs.find(function(x){ return x.id === id; });
-          if (n) { n.unread = false; saveNotifs(notifs); }
-        });
-      });
-
-      /* Dismiss buttons */
-      document.querySelectorAll(".btn-dismiss").forEach(function(btn) {
-        btn.addEventListener("click", function(e) {
-          e.stopPropagation();
-          var id     = btn.dataset.dismiss;
-          var notifs = getNotifs().filter(function(n){ return n.id !== id; });
-          saveNotifs(notifs);
-          render();
-        });
+          sibling = sibling.nextElementSibling;
+        }
+        div.style.display = hasVisible ? "" : "none";
       });
     }
 
-    /* ── Filter chips ── */
-    document.getElementById("filterBar").addEventListener("click", function(e) {
-      var chip = e.target.closest(".chip");
-      if (!chip) return;
-      currentFilter = chip.dataset.filter;
-      document.querySelectorAll(".chip").forEach(function(c){ c.classList.remove("active"); });
-      chip.classList.add("active");
-      render();
-    });
+    /* ══════════════════════════════════
+       UNREAD ONLY TOGGLE
+    ══════════════════════════════════ */
+    function toggleUnreadOnly(btn) {
+      unreadOnly = !unreadOnly;
+      btn.style.background = unreadOnly ? "rgba(239,68,68,.1)" : "";
+      btn.style.borderColor = unreadOnly ? "rgba(239,68,68,.35)" : "";
+      btn.style.color = unreadOnly ? "var(--danger)" : "";
+      applyFilter();
+    }
 
-    /* ── Mark all as read ── */
-    document.getElementById("btnMarkAll").addEventListener("click", function() {
-      var notifs = getNotifs();
-      notifs.forEach(function(n){ n.unread = false; });
-      saveNotifs(notifs);
-      render();
-      if (typeof showToast === "function") showToast("All notifications marked as read.", "success");
-    });
+    /* ══════════════════════════════════
+       MARK AS READ
+    ══════════════════════════════════ */
+    function readCard(card) {
+      if (card.dataset.unread === "true") {
+        card.dataset.unread = "false";
+        card.classList.remove("unread");
+        const dot = card.querySelector(".notif-unread-dot");
+        if (dot) dot.remove();
+        updateUnreadCount();
+      }
+    }
 
-    /* ── Clear all ── */
-    document.getElementById("btnClearAll").addEventListener("click", function() {
-      if (!confirm("Clear all notifications? This cannot be undone.")) return;
-      saveNotifs([]);
-      render();
-      if (typeof showToast === "function") showToast("All notifications cleared.", "info");
-    });
-
-    /* ── Preferences toggles ── */
-    var prefs = getPrefs();
-    document.querySelectorAll("[data-pref]").forEach(function(toggle) {
-      var key = toggle.dataset.pref;
-      if (prefs[key] !== undefined) toggle.checked = prefs[key];
-      toggle.addEventListener("change", function() {
-        prefs[key] = toggle.checked;
-        savePrefs(prefs);
-        if (typeof showToast === "function") showToast(
-          toggle.checked ? "Notifications enabled." : "Notifications disabled.",
-          toggle.checked ? "success" : "info"
-        );
+    function markAllRead() {
+      document.querySelectorAll(".notif-card.unread").forEach(card => {
+        card.dataset.unread = "false";
+        card.classList.remove("unread");
+        const dot = card.querySelector(".notif-unread-dot");
+        if (dot) dot.remove();
       });
-    });
+      updateUnreadCount();
+      showToast("✅ Sab notifications read mark ho gaye!");
+    }
 
-    render();
+    function updateUnreadCount() {
+      const count = document.querySelectorAll(".notif-card[data-unread='true']").length;
+      document.getElementById("statUnread").textContent = count;
 
-  })();
+      // Update tab badges
+      const types = { payment: 0, gig: 0, message: 0, rating: 0, system: 0 };
+      document.querySelectorAll(".notif-card[data-unread='true']").forEach(c => {
+        const t = c.dataset.type;
+        if (types[t] !== undefined) types[t]++;
+      });
+
+      const badgeAll = document.getElementById("badgeAll");
+      if (badgeAll) {
+        badgeAll.textContent = count;
+        badgeAll.className = count > 0 ? "nfb-count" : "nfb-count gray";
+      }
+      Object.keys(types).forEach(t => {
+        const el = document.getElementById("badge" + t.charAt(0).toUpperCase() + t.slice(1));
+        if (el) {
+          el.textContent = types[t];
+          el.className = types[t] > 0 ? "nfb-count" : "nfb-count gray";
+        }
+      });
+    }
+
+    /* ══════════════════════════════════
+       DISMISS CARD
+    ══════════════════════════════════ */
+    function dismissCard(btn) {
+      const card = btn.closest(".notif-card");
+      card.style.transition = "opacity .3s, transform .3s, max-height .3s, padding .3s, margin .3s";
+      card.style.opacity = "0";
+      card.style.transform = "translateX(30px)";
+      card.style.maxHeight = card.offsetHeight + "px";
+      setTimeout(() => {
+        card.style.maxHeight = "0";
+        card.style.padding   = "0";
+        card.style.margin    = "0";
+        card.style.border    = "none";
+      }, 260);
+      setTimeout(() => {
+        card.remove();
+        updateUnreadCount();
+        updateDividerVisibility();
+      }, 550);
+    }
+
+    /* ══════════════════════════════════
+       CLEAR ALL
+    ══════════════════════════════════ */
+    function clearAll() {
+      if (!confirm("Saari notifications delete karna chahte ho?")) return;
+      document.querySelectorAll(".notif-card").forEach(card => {
+        card.style.opacity = "0";
+        card.style.transform = "scale(.95)";
+        card.style.transition = "all .2s";
+      });
+      setTimeout(() => {
+        document.querySelectorAll(".notif-card").forEach(c => c.remove());
+        updateUnreadCount();
+        updateDividerVisibility();
+        document.getElementById("notifEmpty").classList.add("visible");
+        document.getElementById("loadMoreSection").style.display = "none";
+        showToast("🗑️ Sab notifications clear ho gaye!");
+      }, 300);
+    }
+
+    /* ══════════════════════════════════
+       SORT
+    ══════════════════════════════════ */
+    function sortByDate() {
+      showToast("🕐 Latest first order — already sorted!");
+    }
+
+    /* ══════════════════════════════════
+       GIG ACTION BUTTONS
+    ══════════════════════════════════ */
+    function acceptGig(btn) {
+      const card = btn.closest(".notif-card");
+      readCard(card);
+      const ctas = card.querySelector(".notif-ctas");
+      ctas.innerHTML = `
+        <div style="display:flex;align-items:center;gap:8px;font-size:.82rem;font-weight:800;color:#059669">
+          ✅ Gig Accept Ho Gaya! Client ko message karo.
+        </div>
+        <button class="btn-notif-outline" onclick="goTo('chat.html')">💬 Client se baat karo</button>`;
+      showToast("✅ Gig accept kar li — badhai ho!");
+    }
+
+    function declineGig(btn) {
+      const card = btn.closest(".notif-card");
+      readCard(card);
+      const ctas = card.querySelector(".notif-ctas");
+      ctas.innerHTML = `
+        <div style="font-size:.82rem;font-weight:700;color:var(--gray-400)">
+          ❌ Gig decline kar di. Aur gigs browse karo.
+        </div>`;
+      showToast("Gig decline kar di.");
+    }
+
+    function markGigDone(btn) {
+      const card = btn.closest(".notif-card");
+      readCard(card);
+      const ctas = card.querySelector(".notif-ctas");
+      ctas.innerHTML = `
+        <div style="font-size:.82rem;font-weight:800;color:#059669">
+          ✅ Gig complete mark ho gayi! Payment 30 min mein wallet mein.
+        </div>`;
+      showToast("✅ Gig complete! Payment aa rahi hai…");
+
+      // Simulate payment notification
+      setTimeout(() => {
+        prependNewNotif({
+          type: "payment",
+          icon: "💰",
+          title: "Payment Released — ₹1,128!",
+          body:  "Warehouse Packing Gig complete — payment tumhare wallet mein aa gayi!",
+          time:  "Abhi",
+          amount: "+₹1,128",
+          unread: true,
+        });
+        showToast("💰 ₹1,128 wallet mein aa gaya!");
+      }, 5000);
+    }
+
+    /* ══════════════════════════════════
+       PREPEND NEW NOTIFICATION (live)
+    ══════════════════════════════════ */
+    function prependNewNotif({ type, icon, title, body, time, amount, unread }) {
+      const list = document.getElementById("notifMainList");
+      const firstDivider = list.querySelector(".notif-date-divider");
+
+      const card = document.createElement("div");
+      card.className = `notif-card ${unread ? "unread" : ""} type-${type}`;
+      card.dataset.type   = type;
+      card.dataset.unread = unread ? "true" : "false";
+      card.style.opacity  = "0";
+      card.style.transform = "translateY(-12px)";
+      card.onclick = function() { readCard(this); };
+
+      card.innerHTML = `
+        <div class="notif-icon-wrap type-${type}">
+          ${icon}
+          ${unread ? '<div class="notif-unread-dot"></div>' : ""}
+        </div>
+        <div class="notif-content">
+          <div class="notif-title">${title}</div>
+          <div class="notif-body-text">${body}</div>
+          <div class="notif-footer">
+            <div class="notif-time">⏰ ${time}</div>
+            <span class="notif-category-tag type-${type}">${type.charAt(0).toUpperCase()+type.slice(1)}</span>
+          </div>
+        </div>
+        <div class="notif-right">
+          ${amount ? `<div class="notif-amount">${amount}</div>` : ""}
+          <button class="btn-notif-dismiss" onclick="event.stopPropagation();dismissCard(this)" title="Dismiss">✕</button>
+        </div>`;
+
+      list.insertBefore(card, firstDivider);
+      requestAnimationFrame(() => {
+        card.style.transition = "opacity .4s, transform .4s";
+        card.style.opacity = "1";
+        card.style.transform = "translateY(0)";
+      });
+      updateUnreadCount();
+    }
+
+    /* ══════════════════════════════════
+       SETTINGS PANEL
+    ══════════════════════════════════ */
+    function openSettings() {
+      document.querySelectorAll(".nfb-tab").forEach(t => t.classList.remove("active"));
+      document.getElementById("settingsTab").classList.add("active");
+      document.getElementById("settingsPanel").classList.add("active");
+      document.getElementById("notifMainList").style.display = "none";
+    }
+
+    function hideSettings() {
+      document.getElementById("settingsPanel").classList.remove("active");
+      document.getElementById("notifMainList").style.display = "";
+    }
+
+    function toggleQuietHours(input) {
+      const row = document.getElementById("quietHoursRow");
+      row.style.opacity = input.checked ? "1" : ".4";
+      row.style.pointerEvents = input.checked ? "auto" : "none";
+    }
+
+    function setFreq(btn, val) {
+      btn.closest(".ns-freq").querySelectorAll(".ns-freq-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      saveSettingsDebounce();
+    }
+
+    let saveTimer;
+    function saveSettingsDebounce() {
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(saveSettings, 1200);
+    }
+
+    function saveSettings() {
+      ["nsSaveStatus","nsSaveStatus2"].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.classList.add("visible");
+          setTimeout(() => el.classList.remove("visible"), 2500);
+        }
+      });
+      showToast("✅ Notification settings save ho gayi!");
+    }
+
+    /* ══════════════════════════════════
+       LOAD MORE
+    ══════════════════════════════════ */
+    function loadMore() {
+      showToast("📋 Loading older notifications…");
+      setTimeout(() => {
+        const list = document.getElementById("notifMainList");
+        const loadBtn = document.getElementById("loadMoreSection");
+
+        const older = [
+          { type:"payment", icon:"💰", title:"₹1,504 Wallet Mein Aaya", body:"Grocery Delivery Gig Feb 28 — payment received!", time:"Feb 28", amount:"+₹1,504", unread:false },
+          { type:"gig",     icon:"📩", title:"Apply Ki — Home Shifting Helper", body:"Sector 62 Noida Home Shifting gig — application submitted.", time:"Feb 12", amount:"", unread:false },
+          { type:"system",  icon:"🏆", title:"Badge Mila — '10+ Gigs Done' 🏆", body:"Badhai ho! Tumne 10 gigs successfully complete kar liye hain. Naya badge tumhare profile pe add ho gaya.", time:"Feb 10", amount:"", unread:false },
+        ];
+
+        const div = document.createElement("div");
+        div.className = "notif-date-divider";
+        div.textContent = "📅 February 2026";
+        list.insertBefore(div, loadBtn);
+
+        older.forEach(n => {
+          const card = document.createElement("div");
+          card.className = `notif-card type-${n.type}`;
+          card.dataset.type   = n.type;
+          card.dataset.unread = "false";
+          card.onclick = function() { readCard(this); };
+          card.innerHTML = `
+            <div class="notif-icon-wrap type-${n.type}">${n.icon}</div>
+            <div class="notif-content">
+              <div class="notif-title">${n.title}</div>
+              <div class="notif-body-text">${n.body}</div>
+              <div class="notif-footer">
+                <div class="notif-time">📅 ${n.time}</div>
+                <span class="notif-category-tag type-${n.type}">${n.type.charAt(0).toUpperCase()+n.type.slice(1)}</span>
+              </div>
+            </div>
+            <div class="notif-right">
+              ${n.amount ? `<div class="notif-amount">${n.amount}</div>` : ""}
+              <button class="btn-notif-dismiss" onclick="event.stopPropagation();dismissCard(this)" title="Dismiss">✕</button>
+            </div>`;
+          list.insertBefore(card, loadBtn);
+        });
+
+        loadBtn.innerHTML = `<span style="font-size:.82rem;color:var(--gray-400);font-weight:700">✅ Sab notifications load ho gaye!</span>`;
+        applyFilter();
+      }, 900);
+    }
+
+    /* ══════════════════════════════════
+       SIMULATED LIVE NOTIFICATION
+    ══════════════════════════════════ */
+    setTimeout(() => {
+      prependNewNotif({
+        type:   "gig",
+        icon:   "🎯",
+        title:  "Naya Gig Match — Packing Helper, Sector 44",
+        body:   "Aaj ki posting — ₹1,200/day · 9 AM se 6 PM · Sector 44 Gurugram. Sirf 3 spots baaki hain!",
+        time:   "Abhi",
+        amount: "₹1,200",
+        unread: true,
+      });
+      showToast("🎯 Naya gig match mila — dekho!");
+    }, 12000);
+
+    /* ══════════════════════════════════
+       HELPERS
+    ══════════════════════════════════ */
+    function goTo(url) {
+      window.location.href = url;
+    }
+
+    let toastTimer;
+    function showToast(msg) {
+      const t = document.getElementById("notifToast");
+      t.textContent = msg;
+      t.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => t.classList.remove("show"), 2800);
+    }
+
+    /* ══════════════════════════════════
+       INIT
+    ══════════════════════════════════ */
+    updateUnreadCount();
+
   </script>
 
 </body>
