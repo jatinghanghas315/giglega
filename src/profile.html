@@ -3,509 +3,1900 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Profile — GigLega</title>
-  <meta name="description" content="GigLega user profile — apni details update karo." />
+  <title>My Profile — GigLega</title>
+  <meta name="description" content="GigLega profile — apna account manage karo, skills update karo, earnings dekho." />
   <link rel="stylesheet" href="styles.css" />
   <script src="shared.js"></script>
   <style>
-    .profile-wrap{max-width:800px;margin:0 auto;padding:32px 16px 80px}
 
-    /* ── Hero card ── */
-    .hero-card{background:linear-gradient(135deg,var(--primary) 0%,var(--teal) 100%);border-radius:var(--radius);padding:32px 28px;color:#fff;margin-bottom:24px;display:flex;align-items:center;gap:24px;flex-wrap:wrap}
-    .avatar-wrap{position:relative;flex-shrink:0;cursor:pointer}
-    .avatar-circle{width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,.2);border:3px solid rgba(255,255,255,.4);display:flex;align-items:center;justify-content:center;font-size:1.6rem;font-weight:800;color:#fff;overflow:hidden;transition:filter .2s}
-    .avatar-circle img{width:100%;height:100%;object-fit:cover}
-    .avatar-overlay{position:absolute;inset:0;border-radius:50%;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;font-size:1.1rem;opacity:0;transition:opacity .2s;pointer-events:none}
-    .avatar-wrap:hover .avatar-overlay{opacity:1}
-    .avatar-wrap:hover .avatar-circle{filter:brightness(.75)}
-    input#avatarInput{display:none}
+    /* ══════════════════════════════════
+       WRAPPER
+    ══════════════════════════════════ */
+    .pf-wrapper { min-height: 100vh; background: var(--bg); }
 
-    .hero-info{flex:1;min-width:200px}
-    .hero-name{font-size:1.4rem;font-weight:800;margin-bottom:4px}
-    .hero-role{font-size:.83rem;opacity:.75;margin-bottom:10px}
-    .hero-chips{display:flex;flex-wrap:wrap;gap:8px}
-    .hero-chip{font-size:.75rem;background:rgba(255,255,255,.15);padding:4px 12px;border-radius:10px}
+    /* ══════════════════════════════════
+       HERO BANNER
+    ══════════════════════════════════ */
+    .pf-hero {
+      background: linear-gradient(135deg, #0b1e35 0%, var(--primary) 50%, #064e3b 100%);
+      padding: 0 0 64px;
+      position: relative; overflow: hidden;
+    }
+    .pf-hero::before {
+      content: "";
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse at 15% 75%, rgba(13,148,136,.2) 0%, transparent 50%),
+        radial-gradient(ellipse at 85% 20%, rgba(110,231,183,.1) 0%, transparent 50%);
+      pointer-events: none;
+    }
+    .pf-hero::after {
+      content: "";
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+      background-size: 52px 52px; pointer-events: none;
+    }
 
-    /* ── Form card ── */
-    .form-card{background:var(--surface);border:1.5px solid var(--gray-200);border-radius:var(--radius);padding:24px;margin-bottom:20px;box-shadow:var(--shadow-sm)}
-    .card-title{font-size:1rem;font-weight:700;color:var(--primary);margin-bottom:18px;display:flex;align-items:center;gap:8px}
+    /* Cover photo area */
+    .pf-cover {
+      height: 140px;
+      background: transparent;
+      position: relative; z-index: 1;
+      display: flex; align-items: flex-end; justify-content: flex-end;
+      padding: 12px 20px;
+    }
+    .btn-change-cover {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 7px 14px;
+      background: rgba(255,255,255,.14);
+      border: 1.5px solid rgba(255,255,255,.25);
+      border-radius: var(--radius-sm);
+      color: rgba(255,255,255,.85);
+      font-size: .76rem; font-weight: 700;
+      cursor: pointer; font-family: var(--font);
+      transition: background .2s;
+    }
+    .btn-change-cover:hover { background: rgba(255,255,255,.24); }
 
-    .field{margin-bottom:18px}
-    .field label{display:block;font-weight:600;font-size:.88rem;color:var(--gray-700);margin-bottom:6px}
-    .field input,.field select,.field textarea{width:100%;padding:11px 14px;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);font-size:.93rem;background:var(--surface);color:var(--text);font-family:inherit;transition:border .2s;box-sizing:border-box}
-    .field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--teal)}
-    .field textarea{resize:vertical;min-height:90px}
-    .field-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-    @media(max-width:560px){.field-row{grid-template-columns:1fr}}
+    /* Profile info row */
+    .pf-info-row {
+      max-width: 1100px; margin: 0 auto;
+      padding: 0 20px;
+      display: flex; align-items: flex-end;
+      justify-content: space-between;
+      gap: 18px; flex-wrap: wrap;
+      position: relative; z-index: 2;
+    }
 
-    /* ── Completion bar ── */
-    .completion-card{background:var(--surface);border:1.5px solid var(--gray-200);border-radius:var(--radius);padding:20px 24px;margin-bottom:20px;box-shadow:var(--shadow-sm)}
-    .completion-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
-    .completion-title{font-size:.9rem;font-weight:700;color:var(--primary)}
-    .completion-pct{font-size:1.1rem;font-weight:800;color:var(--teal)}
-    .completion-bar-track{height:8px;background:var(--gray-200);border-radius:4px;overflow:hidden;margin-bottom:12px}
-    .completion-bar-fill{height:100%;background:linear-gradient(90deg,var(--primary),var(--teal));border-radius:4px;transition:width .5s ease}
-    .completion-tips{display:flex;flex-direction:column;gap:6px}
-    .completion-tip{display:flex;align-items:center;gap:8px;font-size:.8rem}
-    .completion-tip.done{color:var(--success)}
-    .completion-tip.missing{color:var(--gray-400)}
+    .pf-avatar-group {
+      display: flex; align-items: flex-end; gap: 16px;
+    }
+    .pf-avatar-outer {
+      position: relative;
+      margin-bottom: -28px;
+    }
+    .pf-avatar {
+      width: 96px; height: 96px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #6ee7b7, #059669);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.2rem; font-weight: 900; color: #fff;
+      border: 4px solid rgba(255,255,255,.3);
+      box-shadow: 0 8px 24px rgba(0,0,0,.2);
+      flex-shrink: 0; cursor: pointer;
+      position: relative;
+      transition: opacity .2s;
+    }
+    .pf-avatar:hover { opacity: .9; }
+    .pf-avatar-edit {
+      position: absolute;
+      bottom: 2px; right: 2px;
+      width: 26px; height: 26px;
+      border-radius: 50%;
+      background: var(--teal);
+      border: 2.5px solid rgba(255,255,255,.8);
+      display: flex; align-items: center; justify-content: center;
+      font-size: .7rem; cursor: pointer;
+    }
 
-    /* ── Skills tags ── */
-    .skills-input-wrap{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
-    .skill-tag{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;background:rgba(13,148,136,.1);border:1px solid var(--teal);border-radius:14px;font-size:.8rem;color:var(--teal);font-weight:600}
-    .skill-tag button{background:none;border:none;cursor:pointer;color:var(--teal);font-size:.85rem;line-height:1;padding:0}
-    .skill-add-row{display:flex;gap:8px}
-    .skill-add-row input{flex:1;padding:9px 12px;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);font-size:.88rem;background:var(--surface);color:var(--text);font-family:inherit}
-    .skill-add-row input:focus{outline:none;border-color:var(--teal)}
-    .btn-add-skill{padding:9px 16px;background:var(--teal);color:#fff;border:none;border-radius:var(--radius-sm);font-weight:700;font-size:.85rem;cursor:pointer}
+    .pf-hero-text { margin-bottom: 4px; }
+    .pf-hero-name {
+      font-size: clamp(1.3rem, 3vw, 1.8rem);
+      font-weight: 900; color: #fff;
+      letter-spacing: -.3px; line-height: 1.2;
+      margin-bottom: 5px;
+    }
+    .pf-hero-meta {
+      display: flex; flex-wrap: wrap; gap: 10px;
+      font-size: .8rem; color: rgba(255,255,255,.7); font-weight: 600;
+    }
+    .phm-item { display: flex; align-items: center; gap: 5px; }
 
-    /* ── Stats mini ── */
-    .stats-mini{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;margin-bottom:20px}
-    .stat-mini{background:var(--surface);border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);padding:14px;text-align:center;box-shadow:var(--shadow-sm)}
-    .stat-mini-val{font-size:1.3rem;font-weight:800;color:var(--primary)}
-    .stat-mini-lbl{font-size:.72rem;color:var(--gray-400);margin-top:3px}
+    .pf-hero-chips {
+      display: flex; flex-wrap: wrap; gap: 7px;
+      margin-top: 10px;
+    }
+    .pf-hero-chip {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: rgba(255,255,255,.12);
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: var(--radius-full);
+      padding: 4px 12px;
+      font-size: .72rem; font-weight: 700; color: rgba(255,255,255,.9);
+    }
 
-    /* ── Save button ── */
-    .save-row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
-    .btn-save{padding:12px 32px;background:linear-gradient(135deg,var(--primary) 0%,var(--teal) 100%);color:#fff;border:none;border-radius:var(--radius-sm);font-weight:800;font-size:.92rem;cursor:pointer;transition:transform .15s,box-shadow .15s;box-shadow:0 3px 12px rgba(13,148,136,.3)}
-    .btn-save:hover{transform:translateY(-2px);box-shadow:0 5px 18px rgba(13,148,136,.4)}
-    .btn-save:disabled{opacity:.5;transform:none;cursor:not-allowed}
-    .save-status{font-size:.82rem;color:var(--success);display:none;font-weight:600}
-    .save-status.show{display:block}
+    .pf-hero-actions {
+      display: flex; gap: 9px; flex-wrap: wrap; margin-bottom: 4px;
+    }
+    .btn-pf-action {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 10px 20px; border-radius: var(--radius-sm);
+      font-size: .86rem; font-weight: 800;
+      cursor: pointer; font-family: var(--font);
+      transition: all .18s; text-decoration: none;
+    }
+    .btn-pf-primary {
+      background: rgba(255,255,255,.18);
+      border: 1.5px solid rgba(255,255,255,.3); color: #fff;
+    }
+    .btn-pf-primary:hover { background: rgba(255,255,255,.28); color: #fff; text-decoration: none; }
+    .btn-pf-outline {
+      background: transparent;
+      border: 1.5px solid rgba(255,255,255,.2); color: rgba(255,255,255,.8);
+    }
+    .btn-pf-outline:hover { border-color: rgba(255,255,255,.4); color: #fff; text-decoration: none; }
 
-    /* ── Danger zone ── */
-    .danger-zone{background:rgba(239,68,68,.04);border:1.5px solid rgba(239,68,68,.2);border-radius:var(--radius);padding:20px 24px;margin-top:8px}
-    .danger-zone h4{font-size:.9rem;font-weight:700;color:var(--danger);margin-bottom:8px}
-    .danger-zone p{font-size:.82rem;color:var(--gray-500);margin-bottom:14px;line-height:1.5}
-    .btn-danger-action{padding:10px 20px;background:transparent;border:1.5px solid var(--danger);color:var(--danger);border-radius:var(--radius-sm);font-weight:700;font-size:.82rem;cursor:pointer;transition:all .2s}
-    .btn-danger-action:hover{background:var(--danger);color:#fff}
+    /* ══════════════════════════════════
+       STATS STRIP
+    ══════════════════════════════════ */
+    .pf-stats-strip {
+      max-width: 1100px; margin: -28px auto 0;
+      padding: 0 20px; position: relative; z-index: 10;
+    }
+    .pf-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 12px;
+    }
+    @media(max-width:900px) { .pf-stats-grid { grid-template-columns: repeat(3,1fr); } }
+    @media(max-width:520px) { .pf-stats-grid { grid-template-columns: repeat(2,1fr); } }
 
-    /* Dark mode */
-    [data-theme=dark] .form-card{border-color:var(--gray-700)}
-    [data-theme=dark] .completion-card{border-color:var(--gray-700)}
-    [data-theme=dark] .stat-mini{border-color:var(--gray-700);background:var(--gray-800)}
-    [data-theme=dark] .completion-bar-track{background:var(--gray-700)}
-    [data-theme=dark] .skill-tag{background:rgba(13,148,136,.15);border-color:var(--teal)}
-    [data-theme=dark] .skill-add-row input{border-color:var(--gray-600);background:var(--gray-800)}
-    [data-theme=dark] .danger-zone{background:rgba(239,68,68,.07);border-color:rgba(239,68,68,.3)}
-    [data-theme=dark] .field label{color:var(--gray-300)}
+    .pf-stat-card {
+      background: var(--surface);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 16px 14px;
+      box-shadow: var(--shadow);
+      text-align: center;
+      transition: transform .2s, box-shadow .2s;
+      position: relative; overflow: hidden;
+    }
+    .pf-stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+    [data-theme=dark] .pf-stat-card { border-color: var(--gray-700); }
+    .pf-stat-card::before {
+      content: ""; position: absolute;
+      top: 0; left: 0; right: 0; height: 3px;
+    }
+    .pf-stat-card:nth-child(1)::before { background: linear-gradient(90deg,#059669,#34d399); }
+    .pf-stat-card:nth-child(2)::before { background: linear-gradient(90deg,var(--primary),var(--teal)); }
+    .pf-stat-card:nth-child(3)::before { background: linear-gradient(90deg,#7c3aed,#a78bfa); }
+    .pf-stat-card:nth-child(4)::before { background: linear-gradient(90deg,#d97706,#fbbf24); }
+    .pf-stat-card:nth-child(5)::before { background: linear-gradient(90deg,#dc2626,#f87171); }
+    .pf-stat-card:nth-child(6)::before { background: linear-gradient(90deg,#0891b2,#67e8f9); }
+
+    .pf-stat-icon  { font-size: 1.4rem; margin-bottom: 6px; line-height: 1; }
+    .pf-stat-val   { font-size: 1.4rem; font-weight: 900; color: var(--primary); line-height: 1; margin-bottom: 3px; letter-spacing: -.3px; }
+    .pf-stat-label { font-size: .66rem; font-weight: 700; text-transform: uppercase; letter-spacing: .3px; color: var(--gray-400); }
+
+    /* ══════════════════════════════════
+       TAB NAV
+    ══════════════════════════════════ */
+    .pf-tabs-bar {
+      background: var(--surface);
+      border-bottom: 1.5px solid var(--gray-200);
+      position: sticky; top: 0; z-index: 40;
+      box-shadow: var(--shadow-sm);
+      margin-top: 28px;
+    }
+    [data-theme=dark] .pf-tabs-bar { border-color: var(--gray-700); }
+    .pf-tabs-inner {
+      max-width: 1100px; margin: 0 auto;
+      padding: 0 20px;
+      display: flex; overflow-x: auto;
+    }
+    .pf-tabs-inner::-webkit-scrollbar { display: none; }
+
+    .pf-tab {
+      display: flex; align-items: center; gap: 7px;
+      padding: 14px 18px;
+      font-size: .86rem; font-weight: 700;
+      color: var(--gray-500); cursor: pointer;
+      border-bottom: 2.5px solid transparent;
+      white-space: nowrap; background: none;
+      border-left: none; border-right: none; border-top: none;
+      font-family: var(--font);
+      transition: color .18s, border-color .18s;
+      flex-shrink: 0;
+    }
+    .pf-tab:hover  { color: var(--primary); }
+    .pf-tab.active { color: var(--primary); border-bottom-color: var(--teal); }
+    [data-theme=dark] .pf-tab { color: var(--gray-400); }
+
+    /* ══════════════════════════════════
+       BODY
+    ══════════════════════════════════ */
+    .pf-body {
+      max-width: 1100px; margin: 0 auto;
+      padding: 28px 20px 80px;
+    }
+    .pf-panel { display: none; }
+    .pf-panel.active { display: block; }
+
+    .pf-two-col {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 24px; align-items: start;
+    }
+    @media(max-width:900px) { .pf-two-col { grid-template-columns: 1fr; } }
+
+    /* ══════════════════════════════════
+       SECTION CARD
+    ══════════════════════════════════ */
+    .pf-card {
+      background: var(--surface);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+    [data-theme=dark] .pf-card { border-color: var(--gray-700); }
+
+    .pf-card-header {
+      padding: 16px 20px;
+      border-bottom: 1.5px solid var(--gray-100);
+      background: linear-gradient(135deg, rgba(26,60,94,.03), rgba(13,148,136,.04));
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    [data-theme=dark] .pf-card-header { border-color: var(--gray-700); }
+    .pf-card-title {
+      font-size: .92rem; font-weight: 800; color: var(--primary);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .btn-pf-card-action {
+      padding: 6px 14px; border-radius: var(--radius-sm);
+      border: 1.5px solid var(--gray-200);
+      background: none; color: var(--gray-600);
+      font-size: .76rem; font-weight: 700;
+      cursor: pointer; font-family: var(--font);
+      transition: all .15s;
+    }
+    .btn-pf-card-action:hover { border-color: var(--teal); color: var(--teal); }
+    [data-theme=dark] .btn-pf-card-action { border-color: var(--gray-600); color: var(--gray-400); }
+
+    .pf-card-body { padding: 20px; }
+
+    /* ══════════════════════════════════
+       INFO BOX
+    ══════════════════════════════════ */
+    .pf-info-box {
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      padding: 11px 14px; margin-bottom: 18px;
+      font-size: .85rem; line-height: 1.65;
+    }
+    .pf-info-box.teal   { background: rgba(13,148,136,.07);  border-left: 3px solid var(--teal); }
+    .pf-info-box.green  { background: rgba(16,185,129,.06);  border-left: 3px solid #059669; }
+    .pf-info-box.warn   { background: rgba(245,158,11,.07);  border-left: 3px solid #f59e0b; }
+    .pf-info-box.danger { background: rgba(239,68,68,.06);   border-left: 3px solid var(--danger); }
+
+    /* ══════════════════════════════════
+       OVERVIEW — about
+    ══════════════════════════════════ */
+    .about-text {
+      font-size: .9rem; color: var(--gray-600);
+      line-height: 1.8; margin-bottom: 0;
+    }
+    [data-theme=dark] .about-text { color: var(--gray-400); }
+
+    /* Info rows */
+    .info-rows { display: flex; flex-direction: column; gap: 0; }
+    .info-row {
+      display: flex; align-items: center; gap: 14px;
+      padding: 11px 0;
+      border-bottom: 1px solid var(--gray-100);
+      font-size: .88rem;
+    }
+    .info-row:last-child { border-bottom: none; }
+    [data-theme=dark] .info-row { border-color: var(--gray-700); }
+    .ir-icon { font-size: 1.1rem; width: 22px; text-align: center; flex-shrink: 0; }
+    .ir-label { color: var(--gray-400); font-weight: 600; width: 110px; flex-shrink: 0; }
+    .ir-val   { color: var(--text); font-weight: 700; flex: 1; }
+    .ir-badge {
+      font-size: .68rem; font-weight: 700;
+      padding: 2px 8px; border-radius: 5px;
+    }
+    .ir-badge.green { background: rgba(16,185,129,.1); color: #059669; }
+    .ir-badge.amber { background: rgba(245,158,11,.1);  color: #d97706; }
+    .ir-badge.gray  { background: rgba(107,114,128,.1); color: var(--gray-500); }
+
+    /* ══════════════════════════════════
+       SKILLS TAGS
+    ══════════════════════════════════ */
+    .skills-grid {
+      display: flex; flex-wrap: wrap; gap: 9px;
+    }
+    .skill-pill {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 7px 14px;
+      border-radius: var(--radius-sm);
+      background: rgba(26,60,94,.07);
+      border: 1.5px solid rgba(26,60,94,.12);
+      font-size: .82rem; font-weight: 700; color: var(--primary);
+      cursor: pointer; transition: all .15s;
+      position: relative;
+    }
+    .skill-pill:hover { background: rgba(13,148,136,.1); border-color: rgba(13,148,136,.3); }
+    [data-theme=dark] .skill-pill { background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.1); }
+
+    .skill-level-dot {
+      width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
+    }
+    .sld-expert   { background: #059669; }
+    .sld-good     { background: var(--teal); }
+    .sld-learning { background: #f59e0b; }
+
+    .skill-remove {
+      width: 16px; height: 16px; border-radius: 50%;
+      background: var(--danger); color: #fff;
+      font-size: .56rem; font-weight: 800;
+      display: none; align-items: center; justify-content: center;
+      cursor: pointer; margin-left: 2px;
+    }
+    .skill-pill:hover .skill-remove { display: flex; }
+
+    .add-skill-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 7px 14px;
+      border-radius: var(--radius-sm);
+      border: 1.5px dashed rgba(13,148,136,.4);
+      background: none; color: var(--teal);
+      font-size: .82rem; font-weight: 700;
+      cursor: pointer; font-family: var(--font);
+      transition: all .15s;
+    }
+    .add-skill-btn:hover { background: rgba(13,148,136,.07); border-style: solid; }
+
+    /* ══════════════════════════════════
+       WORK HISTORY
+    ══════════════════════════════════ */
+    .wh-list { display: flex; flex-direction: column; gap: 0; }
+    .wh-item {
+      display: flex; gap: 14px; align-items: flex-start;
+      padding: 16px 0;
+      border-bottom: 1px solid var(--gray-100);
+    }
+    .wh-item:last-child { border-bottom: none; }
+    [data-theme=dark] .wh-item { border-color: var(--gray-700); }
+
+    .wh-icon {
+      width: 42px; height: 42px; border-radius: 11px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem; flex-shrink: 0;
+    }
+    .wh-icon.green  { background: rgba(5,150,105,.1); }
+    .wh-icon.blue   { background: rgba(26,60,94,.1); }
+    .wh-icon.amber  { background: rgba(217,119,6,.1); }
+    .wh-icon.purple { background: rgba(124,58,237,.1); }
+
+    .wh-info { flex: 1; min-width: 0; }
+    .wh-title  { font-size: .92rem; font-weight: 800; color: var(--primary); margin-bottom: 3px; }
+    .wh-meta   { font-size: .78rem; color: var(--gray-400); font-weight: 600; margin-bottom: 6px; display: flex; gap: 10px; flex-wrap: wrap; }
+    .wh-review { font-size: .84rem; color: var(--gray-600); font-style: italic; line-height: 1.65; }
+    [data-theme=dark] .wh-review { color: var(--gray-400); }
+
+    .wh-right { text-align: right; flex-shrink: 0; }
+    .wh-amount { font-size: .96rem; font-weight: 900; color: #059669; }
+    .wh-stars  { font-size: .82rem; margin-top: 2px; }
+
+    /* ══════════════════════════════════
+       AVAILABILITY CALENDAR
+    ══════════════════════════════════ */
+    .avail-section {}
+    .avail-month-nav {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .amn-title { font-size: .92rem; font-weight: 800; color: var(--primary); }
+    .amn-btns  { display: flex; gap: 6px; }
+    .btn-amn {
+      width: 28px; height: 28px;
+      border-radius: 7px;
+      border: 1.5px solid var(--gray-200);
+      background: none; color: var(--gray-500);
+      font-size: .82rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all .15s;
+    }
+    .btn-amn:hover { border-color: var(--teal); color: var(--teal); }
+    [data-theme=dark] .btn-amn { border-color: var(--gray-600); }
+
+    .avail-weekdays {
+      display: grid; grid-template-columns: repeat(7,1fr);
+      gap: 4px; margin-bottom: 6px;
+    }
+    .avd-label {
+      text-align: center; font-size: .66rem; font-weight: 800;
+      color: var(--gray-400); text-transform: uppercase; letter-spacing: .3px;
+      padding: 4px 0;
+    }
+
+    .avail-grid {
+      display: grid; grid-template-columns: repeat(7,1fr);
+      gap: 4px;
+    }
+    .avail-cell {
+      aspect-ratio: 1;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .76rem; font-weight: 700;
+      cursor: pointer;
+      border: 1.5px solid var(--gray-100);
+      background: var(--surface);
+      transition: all .15s;
+      color: var(--text);
+      user-select: none;
+    }
+    .avail-cell:hover     { border-color: var(--teal); color: var(--teal); }
+    .avail-cell.available { background: rgba(5,150,105,.1); border-color: rgba(5,150,105,.3); color: #059669; }
+    .avail-cell.busy      { background: rgba(245,158,11,.08); border-color: rgba(245,158,11,.25); color: #d97706; }
+    .avail-cell.today     { border-color: var(--teal); font-weight: 900; }
+    .avail-cell.past      { opacity: .35; cursor: default; }
+    .avail-cell.empty     { border-color: transparent; cursor: default; background: none; }
+    [data-theme=dark] .avail-cell { border-color: var(--gray-700); }
+
+    .avail-legend {
+      display: flex; gap: 14px; flex-wrap: wrap;
+      margin-top: 12px; font-size: .74rem; font-weight: 600; color: var(--gray-500);
+    }
+    .al-item { display: flex; align-items: center; gap: 5px; }
+    .al-dot {
+      width: 9px; height: 9px; border-radius: 50%;
+    }
+    .al-dot.available { background: #059669; }
+    .al-dot.busy      { background: #d97706; }
+    .al-dot.open      { background: var(--gray-300); border: 1.5px solid var(--gray-300); }
+
+    /* ══════════════════════════════════
+       EDIT PROFILE FORMS
+    ══════════════════════════════════ */
+    .pf-form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    @media(max-width:560px) { .pf-form-grid { grid-template-columns: 1fr; } }
+    .pf-form-grid.full { grid-template-columns: 1fr; }
+
+    .form-field {
+      display: flex; flex-direction: column; gap: 6px;
+    }
+    .form-field.span2 { grid-column: span 2; }
+    @media(max-width:560px) { .form-field.span2 { grid-column: span 1; } }
+
+    .ff-label {
+      font-size: .78rem; font-weight: 700;
+      color: var(--gray-600); letter-spacing: .2px;
+    }
+    [data-theme=dark] .ff-label { color: var(--gray-400); }
+    .ff-label .ff-required { color: var(--danger); margin-left: 2px; }
+
+    .ff-input, .ff-select, .ff-textarea {
+      padding: 10px 13px;
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+      background: var(--surface);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: .9rem;
+      transition: border .2s, box-shadow .2s;
+      width: 100%; box-sizing: border-box;
+    }
+    .ff-input:focus, .ff-select:focus, .ff-textarea:focus {
+      outline: none;
+      border-color: var(--teal);
+      box-shadow: 0 0 0 3px rgba(13,148,136,.1);
+    }
+    [data-theme=dark] .ff-input,
+    [data-theme=dark] .ff-select,
+    [data-theme=dark] .ff-textarea {
+      border-color: var(--gray-600); background: var(--gray-800);
+    }
+    .ff-textarea { resize: vertical; min-height: 90px; line-height: 1.6; }
+    .ff-hint { font-size: .72rem; color: var(--gray-400); font-weight: 600; margin-top: 2px; }
+
+    .ff-input-with-icon {
+      position: relative;
+    }
+    .ff-input-icon {
+      position: absolute; left: 12px; top: 50%;
+      transform: translateY(-50%);
+      font-size: .9rem; color: var(--gray-400);
+    }
+    .ff-input-with-icon .ff-input { padding-left: 34px; }
+
+    /* Phone with verify */
+    .ff-verify-row { display: flex; gap: 8px; }
+    .ff-verify-row .ff-input { flex: 1; }
+    .btn-verify {
+      padding: 10px 16px; border-radius: var(--radius-sm);
+      border: 1.5px solid rgba(13,148,136,.4);
+      background: rgba(13,148,136,.08);
+      color: var(--teal); font-size: .8rem; font-weight: 700;
+      cursor: pointer; font-family: var(--font);
+      white-space: nowrap; transition: all .15s; flex-shrink: 0;
+    }
+    .btn-verify:hover { background: rgba(13,148,136,.15); border-color: var(--teal); }
+    .btn-verify.verified {
+      background: rgba(16,185,129,.08); color: #059669;
+      border-color: rgba(16,185,129,.3); cursor: default;
+    }
+
+    /* Photo upload */
+    .photo-upload-area {
+      border: 2px dashed rgba(13,148,136,.3);
+      border-radius: var(--radius);
+      padding: 28px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all .2s;
+      background: rgba(13,148,136,.03);
+    }
+    .photo-upload-area:hover {
+      border-color: var(--teal);
+      background: rgba(13,148,136,.07);
+    }
+    .pua-icon  { font-size: 2.4rem; margin-bottom: 10px; line-height: 1; }
+    .pua-title { font-size: .9rem; font-weight: 800; color: var(--primary); margin-bottom: 4px; }
+    .pua-sub   { font-size: .78rem; color: var(--gray-400); line-height: 1.6; }
+    .pua-btn {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 8px 18px; margin-top: 12px;
+      border-radius: var(--radius-sm);
+      border: 1.5px solid var(--teal);
+      background: rgba(13,148,136,.08); color: var(--teal);
+      font-size: .8rem; font-weight: 700;
+      cursor: pointer; font-family: var(--font);
+      transition: all .15s;
+    }
+    .pua-btn:hover { background: rgba(13,148,136,.15); }
+
+    /* Save button */
+    .btn-save-section {
+      display: flex; align-items: center; gap: 10px;
+      padding: 16px 20px;
+      border-top: 1.5px solid var(--gray-100);
+      background: rgba(26,60,94,.02);
+      flex-wrap: wrap;
+    }
+    [data-theme=dark] .btn-save-section { border-color: var(--gray-700); }
+    .btn-save {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 11px 26px; border-radius: var(--radius-sm);
+      background: linear-gradient(135deg, var(--primary), var(--teal));
+      border: none; color: #fff; font-weight: 800; font-size: .9rem;
+      cursor: pointer; font-family: var(--font);
+      box-shadow: 0 3px 12px rgba(13,148,136,.25);
+      transition: all .2s;
+    }
+    .btn-save:hover { box-shadow: 0 5px 18px rgba(13,148,136,.35); transform: translateY(-1px); }
+    .btn-save-outline {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 11px 20px; border-radius: var(--radius-sm);
+      border: 1.5px solid var(--gray-200);
+      background: none; color: var(--gray-600);
+      font-weight: 700; font-size: .9rem;
+      cursor: pointer; font-family: var(--font);
+      transition: all .15s;
+    }
+    .btn-save-outline:hover { border-color: var(--teal); color: var(--teal); }
+    [data-theme=dark] .btn-save-outline { border-color: var(--gray-600); color: var(--gray-400); }
+    .save-status {
+      font-size: .8rem; font-weight: 700; color: var(--success);
+      display: none; align-items: center; gap: 5px;
+    }
+    .save-status.visible { display: flex; }
+
+    /* ══════════════════════════════════
+       VERIFICATION SECTION
+    ══════════════════════════════════ */
+    .verif-list { display: flex; flex-direction: column; gap: 12px; }
+    .verif-item {
+      display: flex; align-items: center; gap: 14px;
+      padding: 14px 16px;
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+      background: var(--surface);
+      transition: border .15s;
+    }
+    [data-theme=dark] .verif-item { border-color: var(--gray-600); }
+    .verif-item.done { border-color: rgba(16,185,129,.3); background: rgba(16,185,129,.03); }
+
+    .vi-icon {
+      width: 40px; height: 40px; border-radius: 11px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem; flex-shrink: 0;
+    }
+    .vi-icon.done   { background: rgba(16,185,129,.1); }
+    .vi-icon.todo   { background: rgba(107,114,128,.08); }
+    .vi-icon.amber  { background: rgba(245,158,11,.08); }
+
+    .vi-info { flex: 1; min-width: 0; }
+    .vi-title { font-size: .88rem; font-weight: 800; color: var(--text); margin-bottom: 2px; }
+    .vi-sub   { font-size: .76rem; color: var(--gray-400); font-weight: 600; }
+
+    .vi-status {
+      font-size: .72rem; font-weight: 800;
+      padding: 3px 10px; border-radius: 6px; flex-shrink: 0;
+    }
+    .vi-status.done   { background: rgba(16,185,129,.1); color: #059669; }
+    .vi-status.todo   { background: rgba(107,114,128,.1); color: var(--gray-500); }
+    .vi-status.amber  { background: rgba(245,158,11,.1);  color: #d97706; }
+
+    .btn-vi {
+      padding: 7px 14px; border-radius: var(--radius-sm);
+      font-size: .76rem; font-weight: 700;
+      cursor: pointer; font-family: var(--font);
+      transition: all .15s; flex-shrink: 0;
+    }
+    .btn-vi-start {
+      background: linear-gradient(135deg, var(--primary), var(--teal));
+      border: none; color: #fff;
+    }
+    .btn-vi-start:hover { opacity: .9; }
+    .btn-vi-done {
+      background: none; border: 1.5px solid rgba(16,185,129,.3);
+      color: #059669;
+    }
+
+    /* ══════════════════════════════════
+       REVIEWS TAB
+    ══════════════════════════════════ */
+    .reviews-summary {
+      display: grid; grid-template-columns: 180px 1fr; gap: 24px;
+      padding: 20px;
+    }
+    @media(max-width:520px) { .reviews-summary { grid-template-columns: 1fr; } }
+
+    .rs-big { text-align: center; border-right: 1.5px solid var(--gray-100); padding-right: 24px; }
+    @media(max-width:520px) { .rs-big { border-right: none; border-bottom: 1.5px solid var(--gray-100); padding-right: 0; padding-bottom: 16px; } }
+    [data-theme=dark] .rs-big { border-color: var(--gray-700); }
+    .rsb-num   { font-size: 3.2rem; font-weight: 900; color: var(--primary); line-height: 1; }
+    .rsb-stars { font-size: 1.2rem; margin: 6px 0; }
+    .rsb-count { font-size: .76rem; color: var(--gray-400); font-weight: 600; }
+    .rsb-tags  { display: flex; flex-wrap: wrap; justify-content: center; gap: 5px; margin-top: 10px; }
+    .rsb-tag {
+      font-size: .7rem; font-weight: 700;
+      padding: 3px 8px; border-radius: 5px;
+      background: rgba(13,148,136,.08); color: var(--teal);
+    }
+
+    .rs-bars { display: flex; flex-direction: column; gap: 8px; justify-content: center; }
+    .rsbar-row { display: flex; align-items: center; gap: 10px; }
+    .rsbar-label { font-size: .76rem; font-weight: 700; color: var(--gray-500); width: 28px; flex-shrink: 0; }
+    .rsbar-track { flex: 1; height: 7px; background: var(--gray-100); border-radius: 4px; overflow: hidden; }
+    [data-theme=dark] .rsbar-track { background: var(--gray-700); }
+    .rsbar-fill  { height: 100%; border-radius: 4px; background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+    .rsbar-count { font-size: .72rem; font-weight: 700; color: var(--gray-400); width: 18px; text-align: right; flex-shrink: 0; }
+
+    .review-card {
+      padding: 18px 20px;
+      border-bottom: 1.5px solid var(--gray-100);
+    }
+    .review-card:last-child { border-bottom: none; }
+    [data-theme=dark] .review-card { border-color: var(--gray-700); }
+    .rc-hdr { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 10px; }
+    .rc-av {
+      width: 38px; height: 38px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: .88rem; color: #fff; flex-shrink: 0;
+    }
+    .rc-name  { font-size: .9rem; font-weight: 800; color: var(--text); margin-bottom: 2px; }
+    .rc-meta  { font-size: .74rem; color: var(--gray-400); font-weight: 600; }
+    .rc-stars { margin-left: auto; font-size: .9rem; }
+    .rc-body  { font-size: .86rem; color: var(--gray-600); line-height: 1.7; }
+    [data-theme=dark] .rc-body { color: var(--gray-400); }
+    .rc-tags  { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+    .rc-tag {
+      font-size: .7rem; font-weight: 700;
+      padding: 3px 8px; border-radius: 5px;
+      background: rgba(5,150,105,.08); color: #059669;
+    }
+
+    /* ══════════════════════════════════
+       SETTINGS TAB
+    ══════════════════════════════════ */
+    .settings-section { margin-bottom: 6px; }
+
+    .setting-row {
+      display: flex; align-items: center; gap: 14px;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--gray-100);
+      transition: background .15s;
+    }
+    .setting-row:last-child { border-bottom: none; }
+    .setting-row:hover { background: rgba(13,148,136,.03); }
+    [data-theme=dark] .setting-row { border-color: var(--gray-700); }
+
+    .sr-icon {
+      width: 36px; height: 36px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; flex-shrink: 0;
+    }
+    .sr-icon.blue   { background: rgba(26,60,94,.1); }
+    .sr-icon.green  { background: rgba(5,150,105,.1); }
+    .sr-icon.amber  { background: rgba(217,119,6,.1); }
+    .sr-icon.purple { background: rgba(124,58,237,.1); }
+    .sr-icon.red    { background: rgba(220,38,38,.1); }
+    .sr-icon.teal   { background: rgba(13,148,136,.1); }
+
+    .sr-info { flex: 1; min-width: 0; }
+    .sr-title { font-size: .88rem; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+    .sr-sub   { font-size: .75rem; color: var(--gray-400); font-weight: 600; }
+
+    /* Toggle switch */
+    .sr-toggle {
+      position: relative;
+      width: 44px; height: 24px; flex-shrink: 0;
+    }
+    .sr-toggle input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider {
+      position: absolute; inset: 0;
+      background: var(--gray-300);
+      border-radius: 24px;
+      cursor: pointer;
+      transition: background .2s;
+    }
+    .toggle-slider::before {
+      content: "";
+      position: absolute;
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      background: #fff;
+      left: 3px; top: 3px;
+      transition: transform .2s;
+      box-shadow: 0 1px 4px rgba(0,0,0,.2);
+    }
+    .sr-toggle input:checked + .toggle-slider { background: var(--teal); }
+    .sr-toggle input:checked + .toggle-slider::before { transform: translateX(20px); }
+    [data-theme=dark] .toggle-slider { background: var(--gray-600); }
+
+    /* Arrow link */
+    .sr-arrow {
+      color: var(--gray-400); font-size: .9rem; flex-shrink: 0; cursor: pointer;
+    }
+    .setting-row:hover .sr-arrow { color: var(--teal); }
+
+    /* Danger zone */
+    .danger-zone-card {
+      background: rgba(239,68,68,.04);
+      border: 1.5px solid rgba(239,68,68,.2);
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+    .dzc-header {
+      padding: 14px 20px;
+      border-bottom: 1.5px solid rgba(239,68,68,.15);
+      font-size: .88rem; font-weight: 800; color: var(--danger);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .dz-row {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 16px; padding: 14px 20px;
+      border-bottom: 1px solid rgba(239,68,68,.1);
+      flex-wrap: wrap;
+    }
+    .dz-row:last-child { border-bottom: none; }
+    .dzr-title { font-size: .88rem; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+    .dzr-sub   { font-size: .76rem; color: var(--gray-400); font-weight: 600; }
+    .btn-dz {
+      padding: 8px 16px; border-radius: var(--radius-sm);
+      font-size: .78rem; font-weight: 700;
+      cursor: pointer; font-family: var(--font);
+      transition: all .15s; flex-shrink: 0; white-space: nowrap;
+    }
+    .btn-dz-soft {
+      background: none; border: 1.5px solid rgba(239,68,68,.3); color: var(--danger);
+    }
+    .btn-dz-soft:hover { background: rgba(239,68,68,.05); border-color: var(--danger); }
+    .btn-dz-hard {
+      background: var(--danger); border: none; color: #fff;
+    }
+    .btn-dz-hard:hover { background: #b91c1c; }
+
+    /* ══════════════════════════════════
+       SIDEBAR WIDGETS
+    ══════════════════════════════════ */
+
+    /* Completion card */
+    .completion-card {
+      background: var(--surface);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 18px;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 20px;
+    }
+    [data-theme=dark] .completion-card { border-color: var(--gray-700); }
+    .cc-title { font-size: .88rem; font-weight: 800; color: var(--primary); margin-bottom: 4px; display: flex; align-items: center; gap: 7px; }
+    .cc-sub   { font-size: .76rem; color: var(--gray-400); margin-bottom: 12px; line-height: 1.5; }
+    .cc-meter { background: var(--gray-100); border-radius: 6px; height: 8px; overflow: hidden; margin-bottom: 6px; }
+    [data-theme=dark] .cc-meter { background: var(--gray-700); }
+    .cc-fill  {
+      height: 100%; border-radius: 6px;
+      background: linear-gradient(90deg, var(--primary), var(--teal));
+      transition: width .5s ease;
+    }
+    .cc-pct   { font-size: .76rem; font-weight: 700; color: var(--text); margin-bottom: 14px; }
+    .cc-items { display: flex; flex-direction: column; gap: 7px; }
+    .cc-item  { display: flex; align-items: center; gap: 9px; font-size: .82rem; cursor: pointer; }
+    .cc-item:hover .cc-item-label { color: var(--teal); text-decoration: underline; }
+    .cc-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .cc-item.done  .cc-dot { background: var(--success); }
+    .cc-item.todo  .cc-dot { background: var(--gray-300); }
+    .cc-item.done  .cc-item-label { color: var(--success); }
+    .cc-item.todo  .cc-item-label { color: var(--gray-500); }
+    .cc-item-pts { margin-left: auto; font-size: .68rem; font-weight: 700; color: var(--teal); }
+    .cc-item.done .cc-item-pts { color: var(--gray-300); text-decoration: line-through; }
+
+    /* Badges */
+    .badges-card {
+      background: var(--surface);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 18px;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 20px;
+    }
+    [data-theme=dark] .badges-card { border-color: var(--gray-700); }
+    .bc-title { font-size: .88rem; font-weight: 800; color: var(--primary); margin-bottom: 14px; display: flex; align-items: center; gap: 7px; }
+    .badges-grid {
+      display: grid; grid-template-columns: repeat(3,1fr); gap: 10px;
+    }
+    .badge-item {
+      text-align: center;
+      padding: 12px 6px;
+      border-radius: var(--radius-sm);
+      border: 1.5px solid var(--gray-200);
+      background: var(--surface);
+      transition: all .15s; cursor: default;
+    }
+    [data-theme=dark] .badge-item { border-color: var(--gray-700); }
+    .badge-item.earned { border-color: rgba(13,148,136,.25); background: rgba(13,148,136,.04); }
+    .badge-item.locked { opacity: .4; }
+    .bi-icon  { font-size: 1.6rem; margin-bottom: 5px; line-height: 1; }
+    .bi-label { font-size: .66rem; font-weight: 700; color: var(--text); line-height: 1.3; }
+    .bi-pts   { font-size: .62rem; font-weight: 700; color: var(--teal); margin-top: 2px; }
+    .badge-item.locked .bi-label { color: var(--gray-400); }
+
+    /* Quick links sidebar */
+    .quick-links-card {
+      background: var(--surface);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 20px;
+    }
+    [data-theme=dark] .quick-links-card { border-color: var(--gray-700); }
+    .qlc-header {
+      padding: 13px 16px;
+      border-bottom: 1.5px solid var(--gray-100);
+      font-size: .86rem; font-weight: 800; color: var(--primary);
+    }
+    [data-theme=dark] .qlc-header { border-color: var(--gray-700); }
+    .ql-link {
+      display: flex; align-items: center; gap: 11px;
+      padding: 11px 16px;
+      border-bottom: 1px solid var(--gray-100);
+      cursor: pointer; transition: background .15s;
+      text-decoration: none; color: inherit;
+    }
+    .ql-link:last-child { border-bottom: none; }
+    .ql-link:hover { background: rgba(13,148,136,.04); text-decoration: none; color: inherit; }
+    [data-theme=dark] .ql-link { border-color: var(--gray-700); }
+    .qll-icon { font-size: 1rem; width: 20px; text-align: center; flex-shrink: 0; }
+    .qll-text { font-size: .84rem; font-weight: 700; color: var(--text); flex: 1; }
+    .qll-arrow { color: var(--gray-400); font-size: .8rem; }
+    .ql-link:hover .qll-arrow { color: var(--teal); }
+
+    /* Share profile card */
+    .share-card {
+      background: linear-gradient(135deg, rgba(13,148,136,.07), rgba(26,60,94,.05));
+      border: 1.5px solid rgba(13,148,136,.2);
+      border-radius: var(--radius);
+      padding: 18px;
+      margin-bottom: 20px;
+    }
+    .sc-title { font-size: .86rem; font-weight: 800; color: var(--primary); margin-bottom: 4px; }
+    .sc-sub   { font-size: .76rem; color: var(--gray-400); margin-bottom: 12px; line-height: 1.5; }
+    .sc-url {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--surface);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+      padding: 8px 12px;
+      margin-bottom: 10px;
+    }
+    [data-theme=dark] .sc-url { border-color: var(--gray-600); background: var(--gray-800); }
+    .sc-url-text { font-size: .76rem; color: var(--gray-500); font-weight: 600; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .btn-copy {
+      padding: 4px 10px; border-radius: 5px;
+      background: rgba(13,148,136,.1); border: 1.5px solid rgba(13,148,136,.25);
+      color: var(--teal); font-size: .72rem; font-weight: 700;
+      cursor: pointer; font-family: var(--font); flex-shrink: 0;
+      transition: all .15s;
+    }
+    .btn-copy:hover { background: rgba(13,148,136,.2); }
+    .sc-share-btns { display: flex; gap: 7px; flex-wrap: wrap; }
+    .btn-share-sm {
+      padding: 7px 12px; border-radius: var(--radius-sm);
+      border: 1.5px solid var(--gray-200);
+      background: none; color: var(--gray-600);
+      font-size: .76rem; font-weight: 700;
+      cursor: pointer; font-family: var(--font);
+      transition: all .15s; flex: 1;
+    }
+    .btn-share-sm:hover { border-color: var(--teal); color: var(--teal); }
+    [data-theme=dark] .btn-share-sm { border-color: var(--gray-600); color: var(--gray-400); }
+
+    /* Toast */
+    .pf-toast {
+      position: fixed; bottom: 28px; left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--primary); color: #fff;
+      padding: 10px 22px; border-radius: var(--radius-full);
+      font-size: .84rem; font-weight: 700;
+      opacity: 0; transition: all .3s;
+      pointer-events: none; z-index: 200;
+      white-space: nowrap; box-shadow: var(--shadow-md);
+    }
+    .pf-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* Mobile bottom nav */
+    .pf-bottom-nav {
+      display: none;
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
+      background: var(--surface);
+      border-top: 1.5px solid var(--gray-200);
+      padding: 6px 0 calc(6px + env(safe-area-inset-bottom));
+      box-shadow: 0 -4px 16px rgba(0,0,0,.08);
+    }
+    [data-theme=dark] .pf-bottom-nav { border-color: var(--gray-700); }
+    @media(max-width:600px) { .pf-bottom-nav { display: flex; } .pf-body { padding-bottom: 100px; } }
+    .pbn-inner { display: flex; width: 100%; justify-content: space-around; }
+    .pbn-item {
+      display: flex; flex-direction: column; align-items: center; gap: 3px;
+      padding: 6px 10px; cursor: pointer;
+      background: none; border: none; font-family: var(--font); flex: 1;
+      text-decoration: none;
+    }
+    .pbn-icon  { font-size: 1.3rem; line-height: 1; }
+    .pbn-label { font-size: .62rem; font-weight: 700; color: var(--gray-400); }
+    .pbn-item.active .pbn-label { color: var(--teal); }
+
   </style>
 </head>
 <body>
+
+  <div id="page-loader"></div>
   <div id="announce-bar"></div>
   <nav id="main-nav"></nav>
 
-  <main class="page-wrapper">
-    <div class="profile-wrap">
-      <nav id="breadcrumb" aria-label="breadcrumb"></nav>
+  <div class="pf-toast" id="pfToast"></div>
 
-      <!-- Hero -->
-      <div class="hero-card">
-        <div class="avatar-wrap" id="avatarWrap" title="Click to change photo">
-          <div class="avatar-circle" id="avatarCircle">JG</div>
-          <div class="avatar-overlay">📷</div>
-          <input type="file" id="avatarInput" accept="image/*" />
-        </div>
-        <div class="hero-info">
-          <div class="hero-name" id="heroName">Your Name</div>
-          <div class="hero-role" id="heroRole">Member since today</div>
-          <div class="hero-chips" id="heroChips"></div>
-        </div>
+  <main class="pf-wrapper">
+
+    <!-- ══════════════════════════════════
+         HERO
+    ══════════════════════════════════ -->
+    <section class="pf-hero">
+      <div class="pf-cover">
+        <button class="btn-change-cover" onclick="showToast('Cover photo upload coming soon!')">
+          🖼️ Change Cover
+        </button>
       </div>
-
-      <!-- Stats mini -->
-      <div class="stats-mini" id="statsMini">
-        <div class="stat-mini"><div class="stat-mini-val" id="smGigsPosted">0</div><div class="stat-mini-lbl">Gigs Posted</div></div>
-        <div class="stat-mini"><div class="stat-mini-val" id="smGigsDone">0</div><div class="stat-mini-lbl">Gigs Completed</div></div>
-        <div class="stat-mini"><div class="stat-mini-val" id="smEarned">₹0</div><div class="stat-mini-lbl">Total Earned</div></div>
-        <div class="stat-mini"><div class="stat-mini-val" id="smSpent">₹0</div><div class="stat-mini-lbl">Total Spent</div></div>
-        <div class="stat-mini" style="cursor:pointer" onclick="window.location.href='reviews.html'">
-  <div class="stat-mini-val" style="color:var(--accent)">⭐ 4.8</div>
-  <div class="stat-mini-lbl">My Reviews →</div>
-</div>
-      </div>
-
-      <!-- Profile completion -->
-      <div class="completion-card">
-        <div class="completion-header">
-          <div class="completion-title">🎯 Profile Completion</div>
-          <div class="completion-pct" id="completionPct">0%</div>
-        </div>
-        <div class="completion-bar-track">
-          <div class="completion-bar-fill" id="completionFill" style="width:0%"></div>
-        </div>
-        <div class="completion-tips" id="completionTips"></div>
-      </div>
-
-      <!-- Basic info -->
-      <div class="form-card">
-        <div class="card-title">👤 Basic Information</div>
-        <div class="field-row">
-          <div class="field">
-            <label>Full Name</label>
-            <input type="text" id="fieldName" placeholder="Your full name" />
+      <div class="pf-info-row">
+        <div class="pf-avatar-group">
+          <div class="pf-avatar-outer">
+            <div class="pf-avatar" id="pfMainAvatar" onclick="openTab('edit')">
+              AS
+              <div class="pf-avatar-edit">✏️</div>
+            </div>
           </div>
-          <div class="field">
-            <label>Phone / WhatsApp</label>
-            <input type="tel" id="fieldPhone" placeholder="+91 98765 43210" />
+          <div class="pf-hero-text">
+            <h1 class="pf-hero-name" id="pfName">Arjun Singh</h1>
+            <div class="pf-hero-meta">
+              <span class="phm-item">📍 Sector 14, Gurugram</span>
+              <span class="phm-item">📅 Joined Feb 2026</span>
+              <span class="phm-item">💼 Worker + Client</span>
+            </div>
+            <div class="pf-hero-chips">
+              <span class="pf-hero-chip">✅ Aadhaar Verified</span>
+              <span class="pf-hero-chip">📱 Phone Verified</span>
+              <span class="pf-hero-chip">⭐ 4.6 Rating</span>
+              <span class="pf-hero-chip">🏆 Trusted Worker</span>
+            </div>
           </div>
         </div>
-        <div class="field">
-          <label>Email Address</label>
-          <input type="email" id="fieldEmail" placeholder="you@email.com" />
-        </div>
-        <div class="field-row">
-          <div class="field">
-            <label>City / Area</label>
-            <input type="text" id="fieldCity" placeholder="e.g. Gurugram, Sector 45" />
-          </div>
-          <div class="field">
-            <label>Pincode</label>
-            <input type="text" id="fieldPincode" placeholder="e.g. 122001" maxlength="6" />
-          </div>
+        <div class="pf-hero-actions">
+          <button class="btn-pf-action btn-pf-primary" onclick="openTab('edit')">✏️ Edit Profile</button>
+          <button class="btn-pf-action btn-pf-outline" onclick="openTab('settings')">⚙️ Settings</button>
+          <a href="dashboard.html" class="btn-pf-action btn-pf-outline">🏠 Dashboard</a>
         </div>
       </div>
+    </section>
 
-      <!-- About -->
-      <div class="form-card">
-        <div class="card-title">📝 About You</div>
-        <div class="field">
-          <label>Bio</label>
-          <textarea id="fieldBio" maxlength="300" placeholder="Tell posters and workers a bit about yourself — your skills, experience, or what kind of gigs you prefer..."></textarea>
+    <!-- ══════════════════════════════════
+         STATS STRIP
+    ══════════════════════════════════ -->
+    <div class="pf-stats-strip">
+      <div class="pf-stats-grid">
+        <div class="pf-stat-card">
+          <div class="pf-stat-icon">✅</div>
+          <div class="pf-stat-val">14</div>
+          <div class="pf-stat-label">Gigs Done</div>
         </div>
-        <div class="field">
-          <label>Preferred Work Type</label>
-          <select id="fieldWorkType">
-            <option value="">— Select —</option>
-            <option value="hyperlocal">📍 Hyperlocal (On-site work)</option>
-            <option value="remote">💻 Remote (Online work)</option>
-            <option value="both">Both</option>
-          </select>
+        <div class="pf-stat-card">
+          <div class="pf-stat-icon">💰</div>
+          <div class="pf-stat-val">₹41.2k</div>
+          <div class="pf-stat-label">Total Earned</div>
         </div>
-      </div>
-
-      <!-- Skills -->
-      <div class="form-card">
-        <div class="card-title">🛠️ Your Skills</div>
-        <div class="skills-input-wrap" id="skillTags"></div>
-        <div class="skill-add-row">
-          <input type="text" id="skillInput" placeholder="Add a skill (e.g. Plumbing, Graphic Design)" maxlength="40" />
-          <button class="btn-add-skill" id="btnAddSkill">+ Add</button>
+        <div class="pf-stat-card">
+          <div class="pf-stat-icon">⭐</div>
+          <div class="pf-stat-val">4.6</div>
+          <div class="pf-stat-label">Avg Rating</div>
         </div>
-      </div>
-
-      <!-- Save -->
-            <!-- Reviews link -->
-      <div class="form-card" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
-        <div>
-          <div class="card-title" style="margin-bottom:4px">⭐ Reviews & Ratings</div>
-          <div style="font-size:.82rem;color:var(--gray-500)">See what others are saying about you.</div>
+        <div class="pf-stat-card">
+          <div class="pf-stat-icon">📩</div>
+          <div class="pf-stat-val">6</div>
+          <div class="pf-stat-label">Open Apps</div>
         </div>
-        <a href="reviews.html" style="padding:10px 20px;background:linear-gradient(135deg,var(--primary),var(--teal));color:#fff;border-radius:var(--radius-sm);font-weight:700;font-size:.85rem;text-decoration:none;white-space:nowrap">View All Reviews →</a>
-      </div>
-
-      <div class="save-row">
-        <button class="btn-save" id="btnSave">💾 Save Profile</button>
-        <span class="save-status" id="saveStatus">✅ Profile saved!</span>
-      </div>
-
-      <!-- Danger zone -->
-      <div class="danger-zone" style="margin-top:32px">
-        <h4>⚠️ Danger Zone</h4>
-        <p>These actions are irreversible. Please be absolutely sure before proceeding.</p>
-        <div style="display:flex;gap:10px;flex-wrap:wrap">
-          <button class="btn-danger-action" id="btnLogout">🚪 Log Out</button>
-          <button class="btn-danger-action" id="btnDeleteAccount">🗑️ Delete Account</button>
+        <div class="pf-stat-card">
+          <div class="pf-stat-icon">📋</div>
+          <div class="pf-stat-val">3</div>
+          <div class="pf-stat-label">Gigs Posted</div>
+        </div>
+        <div class="pf-stat-card">
+          <div class="pf-stat-icon">🎯</div>
+          <div class="pf-stat-val">89%</div>
+          <div class="pf-stat-label">Accept Rate</div>
         </div>
       </div>
-
     </div>
-  </main>
 
-  <footer id="main-footer"></footer>
-  <div id="toast-container"></div>
+    <!-- ══════════════════════════════════
+         TAB NAV
+    ══════════════════════════════════ -->
+    <div class="pf-tabs-bar">
+      <div class="pf-tabs-inner" id="pfTabs">
+        <button class="pf-tab active" data-tab="overview">👤 Overview</button>
+        <button class="pf-tab" data-tab="edit">✏️ Edit Profile</button>
+        <button class="pf-tab" data-tab="skills">🛠️ Skills</button>
+        <button class="pf-tab" data-tab="history">📋 Work History</button>
+        <button class="pf-tab" data-tab="reviews">⭐ Reviews</button>
+        <button class="pf-tab" data-tab="settings">⚙️ Settings</button>
+      </div>
+    </div>
 
-  <script>
-  (function () {
+    <!-- ══════════════════════════════════
+         BODY
+    ══════════════════════════════════ -->
+    <div class="pf-body">
 
-    var GIG_KEY  = (typeof GL !== "undefined" && GL.STORAGE_KEY_GIGS)  ? GL.STORAGE_KEY_GIGS  : "gl_gigs";
-    var USER_KEY = (typeof GL !== "undefined" && GL.STORAGE_KEY_USER)   ? GL.STORAGE_KEY_USER  : "gl_user";
-    var FEE_RATE = 0.06;
+      <!-- ════ OVERVIEW ════ -->
+      <div class="pf-panel active" id="panel-overview">
+        <div class="pf-two-col">
+          <div>
 
-    /* ── Auth guard ── */
-  var user = (function() {
-  try {
-    var u = JSON.parse(localStorage.getItem("gl_user") || "null");
-    return (u && u.id) ? u : null;
-  } catch(e) { return null; }
-})();
-if (!user) {
-  window.location.href = "login.html?redirect=profile.html";
-  return;
-}
+            <!-- About -->
+            <div class="pf-card">
+              <div class="pf-card-header">
+                <div class="pf-card-title">📝 About Me</div>
+                <button class="btn-pf-card-action" onclick="openTab('edit')">✏️ Edit</button>
+              </div>
+              <div class="pf-card-body">
+                <p class="about-text" id="pfAboutText">
+                  Main Arjun Singh hoon — Gurugram mein rehta hoon. Physical work, delivery aur event management mein 3 saal ka experience hai. Punctual, hardworking aur trustworthy hoon. GigLega pe 14 gigs successfully complete ki hain bina kisi issue ke. Seedha paise kamana chahta hoon apni mehnat se. 💪
+                </p>
+              </div>
+            </div>
 
-    /* ── Breadcrumb ── */
-    if (typeof buildBreadcrumb === "function") {
-      buildBreadcrumb("breadcrumb", [
-        { label: "Home", href: "index.html" },
-        { label: "Profile" }
-      ]);
-    }
+            <!-- Personal Info -->
+            <div class="pf-card">
+              <div class="pf-card-header">
+                <div class="pf-card-title">ℹ️ Personal Information</div>
+                <button class="btn-pf-card-action" onclick="openTab('edit')">✏️ Edit</button>
+              </div>
+              <div class="pf-card-body" style="padding: 0">
+                <div class="info-rows">
+                  <div class="info-row" style="padding:12px 20px">
+                    <span class="ir-icon">👤</span>
+                    <span class="ir-label">Full Name</span>
+                    <span class="ir-val">Arjun Singh</span>
+                  </div>
+                  <div class="info-row" style="padding:12px 20px">
+                    <span class="ir-icon">📱</span>
+                    <span class="ir-label">Phone</span>
+                    <span class="ir-val">+91 98765 43210</span>
+                    <span class="ir-badge green">✓ Verified</span>
+                  </div>
+                  <div class="info-row" style="padding:12px 20px">
+                    <span class="ir-icon">📧</span>
+                    <span class="ir-label">Email</span>
+                    <span class="ir-val">arjun.singh@gmail.com</span>
+                    <span class="ir-badge green">✓ Verified</span>
+                  </div>
+                  <div class="info-row" style="padding:12px 20px">
+                    <span class="ir-icon">📍</span>
+                    <span class="ir-label">Location</span>
+                    <span class="ir-val">Sector 14, Gurugram, Haryana</span>
+                  </div>
+                  <div class="info-row" style="padding:12px 20px">
+                    <span class="ir-icon">🎂</span>
+                    <span class="ir-label">Age</span>
+                    <span class="ir-val">24 years</span>
+                  </div>
+                  <div class="info-row" style="padding:12px 20px">
+                    <span class="ir-icon">🗣️</span>
+                    <span class="ir-label">Languages</span>
+                    <span class="ir-val">Hindi, English (basic)</span>
+                  </div>
+                  <div class="info-row" style="padding:12px 20px">
+                    <span class="ir-icon">💼</span>
+                    <span class="ir-label">Account Type</span>
+                    <span class="ir-val">Worker + Client</span>
+                  </div>
+                </div>
+              </div>
+            </div>
 
-    var skills = user.skills ? user.skills.slice() : [];
+            <!-- Skills preview -->
+            <div class="pf-card">
+              <div class="pf-card-header">
+                <div class="pf-card-title">🛠️ Skills</div>
+                <button class="btn-pf-card-action" onclick="openTab('skills')">Manage →</button>
+              </div>
+              <div class="pf-card-body">
+                <div class="skills-grid">
+                  <div class="skill-pill"><div class="skill-level-dot sld-expert"></div>Physical Work</div>
+                  <div class="skill-pill"><div class="skill-level-dot sld-expert"></div>Warehouse Ops</div>
+                  <div class="skill-pill"><div class="skill-level-dot sld-expert"></div>Delivery (2-Wheeler)</div>
+                  <div class="skill-pill"><div class="skill-level-dot sld-good"></div>Event Setup</div>
+                  <div class="skill-pill"><div class="skill-level-dot sld-good"></div>Furniture Moving</div>
+                  <div class="skill-pill"><div class="skill-level-dot sld-good"></div>Customer Handling</div>
+                  <div class="skill-pill"><div class="skill-level-dot sld-learning"></div>Data Entry</div>
+                  <div class="skill-pill"><div class="skill-level-dot sld-learning"></div>Basic Computer</div>
+                </div>
+              </div>
+            </div>
 
-    /* ═══════════════════════════════════════
-       INIT FIELDS
-    ═══════════════════════════════════════ */
-    function initFields() {
-      setVal("fieldName",     user.name     || "");
-      setVal("fieldPhone",    user.phone    || "");
-      setVal("fieldEmail",    user.email    || "");
-      setVal("fieldCity",     user.city     || "");
-      setVal("fieldPincode",  user.pincode  || "");
-      setVal("fieldBio",      user.bio      || "");
-      setVal("fieldWorkType", user.workType || "");
-    }
+            <!-- Availability -->
+            <div class="pf-card">
+              <div class="pf-card-header">
+                <div class="pf-card-title">📅 Availability (March 2026)</div>
+                <button class="btn-pf-card-action" onclick="openTab('edit')">Edit →</button>
+              </div>
+              <div class="pf-card-body">
+                <div class="avail-section" id="availSection"></div>
+              </div>
+            </div>
 
-    function setVal(id, val) {
-      var el = document.getElementById(id);
-      if (el) el.value = val;
-    }
+          </div>
 
-    /* ═══════════════════════════════════════
-       HERO
-    ═══════════════════════════════════════ */
-    function renderHero() {
-      var nameEl = document.getElementById("heroName");
-      var roleEl = document.getElementById("heroRole");
-      var avatarEl = document.getElementById("avatarCircle");
+          <!-- SIDEBAR -->
+          <div>
 
-      nameEl.textContent = user.name || "Your Name";
+            <!-- Profile completion -->
+            <div class="completion-card">
+              <div class="cc-title">📊 Profile Strength</div>
+              <div class="cc-sub">Complete profile = 3x more gig invitations</div>
+              <div class="cc-meter"><div class="cc-fill" id="ccFill" style="width:89%"></div></div>
+              <div class="cc-pct" id="ccPct">89% — Almost Perfect!</div>
+              <div class="cc-items">
+                <div class="cc-item done" onclick="openTab('edit')">
+                  <div class="cc-dot"></div>
+                  <span class="cc-item-label">Basic info ✓</span>
+                  <span class="cc-item-pts">+15</span>
+                </div>
+                <div class="cc-item done">
+                  <div class="cc-dot"></div>
+                  <span class="cc-item-label">Phone verified ✓</span>
+                  <span class="cc-item-pts">+20</span>
+                </div>
+                <div class="cc-item done">
+                  <div class="cc-dot"></div>
+                  <span class="cc-item-label">Aadhaar verified ✓</span>
+                  <span class="cc-item-pts">+25</span>
+                </div>
+                <div class="cc-item done" onclick="openTab('skills')">
+                  <div class="cc-dot"></div>
+                  <span class="cc-item-label">Skills added ✓</span>
+                  <span class="cc-item-pts">+15</span>
+                </div>
+                <div class="cc-item done">
+                  <div class="cc-dot"></div>
+                  <span class="cc-item-label">UPI linked ✓</span>
+                  <span class="cc-item-pts">+14</span>
+                </div>
+                <div class="cc-item todo" onclick="openTab('edit')">
+                  <div class="cc-dot"></div>
+                  <span class="cc-item-label">Add profile photo</span>
+                  <span class="cc-item-pts">+6</span>
+                </div>
+                <div class="cc-item todo" onclick="openTab('edit')">
+                  <div class="cc-dot"></div>
+                  <span class="cc-item-label">Add portfolio work</span>
+                  <span class="cc-item-pts">+5</span>
+                </div>
+              </div>
+              <button class="btn-save" style="width:100%;margin-top:14px;justify-content:center" onclick="openTab('edit')">
+                Complete Profile →
+              </button>
+            </div>
 
-      var joined = user.createdAt
-        ? new Date(user.createdAt).toLocaleDateString("en-IN", { month: "long", year: "numeric" })
-        : "Recently joined";
-      roleEl.textContent = "Member since " + joined;
+            <!-- Badges -->
+            <div class="badges-card">
+              <div class="bc-title">🏅 Badges Earned</div>
+              <div class="badges-grid">
+                <div class="badge-item earned">
+                  <div class="bi-icon">🏆</div>
+                  <div class="bi-label">Trusted Worker</div>
+                  <div class="bi-pts">Earned</div>
+                </div>
+                <div class="badge-item earned">
+                  <div class="bi-icon">✅</div>
+                  <div class="bi-label">Verified ID</div>
+                  <div class="bi-pts">Earned</div>
+                </div>
+                <div class="badge-item earned">
+                  <div class="bi-icon">⚡</div>
+                  <div class="bi-label">Fast Responder</div>
+                  <div class="bi-pts">Earned</div>
+                </div>
+                <div class="badge-item earned">
+                  <div class="bi-icon">💯</div>
+                  <div class="bi-label">10+ Gigs Done</div>
+                  <div class="bi-pts">Earned</div>
+                </div>
+                <div class="badge-item locked">
+                  <div class="bi-icon">🌟</div>
+                  <div class="bi-label">Top Rated</div>
+                  <div class="bi-pts">4.8+ needed</div>
+                </div>
+                <div class="badge-item locked">
+                  <div class="bi-icon">💎</div>
+                  <div class="bi-label">Elite Worker</div>
+                  <div class="bi-pts">50 gigs needed</div>
+                </div>
+              </div>
+            </div>
 
-      /* Avatar */
-      if (user.avatar) {
-        avatarEl.innerHTML = '<img src="' + user.avatar + '" alt="avatar" />';
-      } else {
-        var initials = (user.name || "GL").split(" ").map(function (w) { return w[0]; }).join("").slice(0,2).toUpperCase();
-        avatarEl.textContent = initials;
-      }
+            <!-- Quick links -->
+            <div class="quick-links-card">
+              <div class="qlc-header">⚡ Quick Links</div>
+              <a href="dashboard-worker.html" class="ql-link">
+                <span class="qll-icon">💼</span>
+                <span class="qll-text">Worker Dashboard</span>
+                <span class="qll-arrow">→</span>
+              </a>
+              <a href="dashboard-client.html" class="ql-link">
+                <span class="qll-icon">🏢</span>
+                <span class="qll-text">Client Dashboard</span>
+                <span class="qll-arrow">→</span>
+              </a>
+              <a href="browse.html" class="ql-link">
+                <span class="qll-icon">🔍</span>
+                <span class="qll-text">Browse Gigs</span>
+                <span class="qll-arrow">→</span>
+              </a>
+              <a href="chat.html" class="ql-link">
+                <span class="qll-icon">💬</span>
+                <span class="qll-text">Messages</span>
+                <span class="qll-arrow">→</span>
+              </a>
+              <a href="post-gig-form.html" class="ql-link">
+                <span class="qll-icon">➕</span>
+                <span class="qll-text">Post a Gig</span>
+                <span class="qll-arrow">→</span>
+              </a>
+            </div>
 
-      /* Chips */
-      var chips = [];
-      if (user.workType === "hyperlocal") chips.push("📍 Hyperlocal Worker");
-      else if (user.workType === "remote") chips.push("💻 Remote Worker");
-      else if (user.workType === "both")   chips.push("⚡ Hyperlocal & Remote");
-      if (user.city) chips.push("📍 " + user.city);
-      document.getElementById("heroChips").innerHTML = chips.map(function (c) {
-        return '<span class="hero-chip">' + c + '</span>';
-      }).join("");
-    }
+            <!-- Share profile -->
+            <div class="share-card">
+              <div class="sc-title">🔗 Share Profile</div>
+              <div class="sc-sub">Workers — apna profile share karo aur zyada invitations lo!</div>
+              <div class="sc-url">
+                <span class="sc-url-text">giglega.in/u/arjun-singh</span>
+                <button class="btn-copy" onclick="copyProfileLink()">Copy</button>
+              </div>
+              <div class="sc-share-btns">
+                <button class="btn-share-sm" onclick="showToast('WhatsApp share opened!')">📱 WhatsApp</button>
+                <button class="btn-share-sm" onclick="showToast('Link copied!')">🔗 Copy Link</button>
+              </div>
+            </div>
 
-    /* ═══════════════════════════════════════
-       STATS MINI
-    ═══════════════════════════════════════ */
-    function renderStats() {
-      var gigs = JSON.parse(localStorage.getItem(GIG_KEY) || "[]");
+          </div>
+        </div>
+      </div>
 
-      var posted    = gigs.filter(function (g) { return g.posterId === user.id; }).length;
-      var completed = gigs.filter(function (g) {
-        return (g.takenBy === user.id || g.takenBy === user.name) && g.status === "completed";
-      });
-      var postedCompleted = gigs.filter(function (g) {
-        return g.posterId === user.id && g.status === "completed";
-      });
+      <!-- ════ EDIT PROFILE ════ -->
+      <div class="pf-panel" id="panel-edit">
+        <div class="pf-two-col">
+          <div>
 
-      var earned = 0;
-      completed.forEach(function (g) { earned += g.pricePerHr - Math.round(g.pricePerHr * FEE_RATE); });
+            <!-- Photo Upload -->
+            <div class="pf-card">
+              <div class="pf-card-header">
+                <div class="pf-card-title">📸 Profile Photo</div>
+              </div>
+              <div class="pf-card-body">
+                <div style="display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap">
+                  <div style="display:flex;flex-direction:column;align-items:center;gap:8px">
+                    <div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#6ee7b7,#059669);display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:900;color:#fff;border:3px solid rgba(13,148,136,.2)">AS</div>
+                    <span style="font-size:.72rem;color:var(--gray-400);font-weight:600">Current</span>
+                  </div>
+                  <div style="flex:1;min-width:180px">
+                    <div class="photo-upload-area" onclick="showToast('File picker opened!')">
+                      <div class="pua-icon">📷</div>
+                      <div class="pua-title">Upload New Photo</div>
+                      <div class="pua-sub">JPG, PNG • Max 5MB • Square preferred<br>Achhi photo se 40% zyada applications milti hain!</div>
+                      <div class="pua-btn">📂 Choose Photo</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
 
-      var spent = 0;
-      postedCompleted.forEach(function (g) { spent += g.pricePerHr || 0; });
+            <!-- Basic Info -->
+            <div class="pf-card">
+              <div class="pf-card-header">
+                <div class="pf-card-title">👤 Basic Information</div>
+              </div>
+              <div class="pf-card-body">
+                <div class="pf-form-grid">
+                  <div class="form-field">
+                    <label class="ff-label">First Name <span class="ff-required">*</span></label>
+                    <input class="ff-input" type="text" id="ffFirstName" value="Arjun" placeholder="Your first name" />
+                  </div>
+                  <div class="form-field">
+                    <label class="ff-label">Last Name <span class="ff-required">*</span></label>
+                    <input class="ff-input" type="text" id="ffLastName" value="Singh" placeholder="Your last name" />
+                  </div>
+                  <div class="form-field">
+                    <label class="ff-label">Date of Birth</label>
+                    <input class="ff-input" type="date" id="ffDob" value="2002-03-15" />
+                  </div>
+                  <div class="form-field">
+                    <label class="ff-label">Gender</label>
+                    <select class="ff-select" id="ffGender">
+                      <option value="male" selected>Male</option>
+                      <option value="female">Female</option>
+                      <option value="other">Other</option>
+                      <option value="prefer-not">Prefer not to say</option>
+                    </select>
+                  </div>
+                  <div class="form-field span2">
+                    <label class="ff-label">About Me <span class="ff-required">*</span></label>
+                    <textarea class="ff-textarea" id="ffAbout" maxlength="400">Main Arjun Singh hoon — Gurugram mein rehta hoon. Physical work, delivery aur event management mein 3 saal ka experience hai. Punctual, hardworking aur trustworthy hoon. GigLega pe 14 gigs successfully complete ki hain bina kisi issue ke. Seedha paise kamana chahta hoon apni mehnat se. 💪</textarea>
+                    <div class="ff-hint">Max 400 characters — <span id="ffAboutCount">0</span> used</div>
+                  </div>
+                  <div class="form-field">
+                    <label class="ff-label">Languages</label>
+                    <input class="ff-input" type="text" id="ffLangs" value="Hindi, English" placeholder="Hindi, English…" />
+                  </div>
+                  <div class="form-field">
+                    <label class="ff-label">Account Type</label>
+                    <select class="ff-select" id="ffAccType">
+                      <option value="both" selected>Worker + Client (Both)</option>
+                      <option value="worker">Worker Only</option>
+                      <option value="client">Client Only</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <div class="btn-save-section">
+                <button class="btn-save" onclick="saveSection('basic')">💾 Save Changes</button>
+                <button class="btn-save-outline" onclick="resetSection('basic')">Reset</button>
+                <div class="save-status" id="saveStat-basic">✅ Saved!</div>
+              </div>
+            </div>
 
-      document.getElementById("smGigsPosted").textContent = posted;
-      document.getElementById("smGigsDone").textContent   = completed.length;
-      document.getElementById("smEarned").textContent     = "₹" + earned;
-      document.getElementById("smSpent").textContent      = "₹" + spent;
-    }
+            <!-- Contact Info -->
+            <div class="pf-card">
+              <div class="pf-card-header">
+                <div class="pf-card-title">📞 Contact & Location</div>
+              </div>
+              <div class="pf-card-body">
+                <div class="pf-form-grid">
+                  <div class="form-field">
+                    <label class="ff-label">Phone Number <span class="ff-required">*</span></label>
+                    <div class="ff-verify-row">
+                      <div class="ff-input-with-icon" style="flex:1">
+                        <span class="ff-input-icon">📱</span>
+                        <input class="ff-input" type="tel" id="ffPhone" value="+91 98765 43210" />
+                      </div>
+                      <button class="btn-verify verified" id="phoneVerifyBtn">✓ Verified</button>
+                    </div>
+                  </div>
+                  <div class="form-field">
+                    <label class="ff-label">Email Address</label>
+                    <div class="ff-verify-row">
+                      <div class="ff-input-with-icon" style="flex:1">
+                        <span class="ff-input-icon">📧</span>
+                        <input class="ff-input" type="email" id="ffEmail" value="arjun.singh@gmail.com" />
+                      </div>
+                      <button class="btn-verify verified" id="emailVerifyBtn">✓ Verified</button>
+                    </div>
+                  </div>
+                  <div class="form-field span2">
+                    <label class="ff-label">Full Address</label>
+                    <div class="ff-input-with-icon">
+                      <span class="ff-input-icon">📍</span>
+                      <input class="ff-input" type="text" id="ffAddress" value="Sector 14, Gurugram, Haryana — 122001" />
+                    </div>
+                  </div>
+                  <div class="form-field">
+                    <label class="ff-label">City <span class="ff-required">*</span></label>
+                    <input class="ff-input" type="text" id="ffCity" value="Gurugram" />
+                  </div>
+                  <div class="form-field">
+                    <label class="ff-label">State</label>
+                    <select class="ff-select" id="ffState">
+                      <option value="haryana" selected>Haryana</option>
+                      <option value="delhi">Delhi</option>
+                      <option value="up">Uttar Pradesh</option>
+                      <option value="rajasthan">Rajasthan</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+                  <div class="form-field">
+                    <label class="ff-label">Work Radius</label>
+                    <select class="ff-select" id="ffRadius">
+                      <option value="5">Within 5 km</option>
+                      <option value="10" selected>Within 10 km</option>
+                      <option value="20">Within 20 km</option>
+                      <option value="any">Any distance</option>
+                    </select>
+                    <div class="ff-hint">Kitni door ka gig le sakte ho</div>
+                  </div>
+                  <div class="form-field">
+                    <label class="ff-label">Transport Available</label>
+                    <select class="ff-select" id="ffTransport">
+                      <option value="bike" selected>Own Bike / Scooter</option>
+                      <option value="cycle">Cycle</option>
+                      <option value="public">Public Transport</option>
+                      <option value="none">None / On Foot</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <div class="btn-save-section">
+                <button class="btn-save" onclick="saveSection('contact')">💾 Save Changes</button>
+                <button class="btn-save-outline">Reset</button>
+                <div class="save-status" id="saveStat-contact">✅ Saved!</div>
+              </div>
+            </div>
 
-    /* ═══════════════════════════════════════
-       COMPLETION BAR
-    ═══════════════════════════════════════ */
-    var COMPLETION_FIELDS = [
-      { key: "name",     label: "Full name",        check: function () { return !!user.name; } },
-      { key: "phone",    label: "Phone number",     check: function () { return !!user.phone; } },
-      { key: "email",    label: "Email address",    check: function () { return !!user.email; } },
-      { key: "city",     label: "City / Area",      check: function () { return !!user.city; } },
-      { key: "bio",      label: "Bio",              check: function () { return !!(user.bio && user.bio.length > 20); } },
-      { key: "skills",   label: "At least 1 skill", check: function () { return skills.length > 0; } },
-      { key: "workType", label: "Work preference",  check: function () { return !!user.workType; } },
-      { key: "avatar",   label: "Profile photo",    check: function () { return !!user.avatar; } }
-    ];
+            <!-- UPI / Payment -->
+            <div class="pf-card">
+              <div class="pf-card-header">
+                <div class="pf-card-title">💳 Payment Details</div>
+              </div>
+              <div class="pf-card-body">
+                <div class="pf-info-box teal">
+                  🔒 Tumhara UPI ID safe hai — sirf GigLega ke zariye payments hoti hain. Kabhi directly kisi ko share mat karo.
+                </div>
+                <div class="pf-form-grid">
+                  <div class="form-field">
+                    <label class="ff-label">UPI ID <span class="ff-required">*</span></label>
+                    <div class="ff-verify-row">
+                      <input class="ff-input" type="text" id="ffUpi" value="arjunsingh@okaxis" placeholder="yourname@upi" style="flex:1" />
+                      <button class="btn-verify verified">✓ Linked</button>
+                    </div>
+                  </div>
+                  <div class="form-field">
+                    <label class="ff-label">UPI App</label>
+                    <select class="ff-select">
+                      <option value="gpay" selected>Google Pay</option>
+                      <option value="phonepe">PhonePe</option>
+                      <option value="paytm">Paytm</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+                  <div class="form-field span2">
+                    <label class="ff-label">Bank Account (optional — for bulk payouts)</label>
+                    <input class="ff-input" type="text" placeholder="Account number (optional)" />
+                    <div class="ff-hint">Small gig payments UPI se, badi payouts bank se ho sakti hain.</div>
+                  </div>
+                </div>
+              </div>
+              <div class="btn-save-section">
+                <button class="btn-save" onclick="saveSection('payment')">💾 Save Payment Info</button>
+                <div class="save-status" id="saveStat-payment">✅ Saved!</div>
+              </div>
+            </div>
 
-    function renderCompletion() {
-      var done  = COMPLETION_FIELDS.filter(function (f) { return f.check(); }).length;
-      var total = COMPLETION_FIELDS.length;
-      var pct   = Math.round((done / total) * 100);
+            <!-- Availability -->
+            <div class="pf-card">
+              <div class="pf-card-header">
+                <div class="pf-card-title">📅 Set Availability</div>
+              </div>
+              <div class="pf-card-body">
+                <div class="pf-info-box teal">
+                  💡 Apni availability set karo — clients sirf available workers ko invite karte hain!
+                </div>
+                <div id="editAvailSection"></div>
+                <div style="margin-top:16px">
+                  <label class="ff-label" style="margin-bottom:8px;display:block">Preferred Work Hours</label>
+                  <div style="display:flex;gap:8px;flex-wrap:wrap">
+                    <button class="btn-save-outline pref-time active" data-time="morning" onclick="togglePref(this)">🌅 Morning (6–12)</button>
+                    <button class="btn-save-outline pref-time active" data-time="afternoon" onclick="togglePref(this)">☀️ Afternoon (12–6)</button>
+                    <button class="btn-save-outline pref-time" data-time="evening" onclick="togglePref(this)">🌙 Evening (6–10)</button>
+                    <button class="btn-save-outline pref-time" data-time="night" onclick="togglePref(this)">🦉 Night (10–6)</button>
+                  </div>
+                </div>
+              </div>
+              <div class="btn-save-section">
+                <button class="btn-save" onclick="saveSection('availability')">💾 Save Availability</button>
+                <div class="save-status" id="saveStat-availability">✅ Saved!</div>
+              </div>
+            </div>
 
-      document.getElementById("completionPct").textContent = pct + "%";
-      document.getElementById("completionFill").style.width = pct + "%";
+          </div>
 
-      document.getElementById("completionTips").innerHTML = COMPLETION_FIELDS.map(function (f) {
-        var isDone = f.check();
-        return '<div class="completion-tip ' + (isDone ? "done" : "missing") + '">' +
-          (isDone ? "✅" : "⬜") + " " + f.label +
-        '</div>';
-      }).join("");
-    }
+          <!-- Edit sidebar -->
+          <div>
+            <div class="pf-info-box teal" style="border-radius:var(--radius)">
+              🎯 <strong>Profile tip:</strong> Photo aur about section fill karne se applications 3x badh jaati hain. Sirf 2 minute lagenge!
+            </div>
 
-    /* ═══════════════════════════════════════
-       SKILLS
-    ═══════════════════════════════════════ */
-    function renderSkills() {
-      var wrap = document.getElementById("skillTags");
-      wrap.innerHTML = skills.map(function (s, i) {
-        return '<span class="skill-tag">' + escHtml(s) +
-          '<button data-i="' + i + '" title="Remove">✕</button></span>';
-      }).join("");
-      wrap.querySelectorAll("button[data-i]").forEach(function (btn) {
-        btn.addEventListener("click", function () {
-          skills.splice(parseInt(btn.getAttribute("data-i"), 10), 1);
-          renderSkills();
-          renderCompletion();
-        });
-      });
-    }
+            <!-- Verifications -->
+            <div class="pf-card">
+              <div class="pf-card-header">
+                <div class="pf-card-title">🛡️ Verifications</div>
+              </div>
+              <div class="pf-card-body" style="padding:14px">
+                <div class="verif-list">
+                  <div class="verif-item done">
+                    <div class="vi-icon done">📱</div>
+                    <div class="vi-info">
+                      <div class="vi-title">Phone Number</div>
+                      <div class="vi-sub">+91 98765 43210</div>
+                    </div>
+                    <button class="btn-vi btn-vi-done">✓ Done</button>
+                  </div>
+                  <div class="verif-item done">
+                    <div class="vi-icon done">🪪</div>
+                    <div class="vi-info">
+                      <div class="vi-title">Aadhaar Card</div>
+                      <div class="vi-sub">XXXX-XXXX-4521</div>
+                    </div>
+                    <button class="btn-vi btn-vi-done">✓ Done</button>
+                  </div>
+                  <div class="verif-item done">
+                    <div class="vi-icon done">📧</div>
+                    <div class="vi-info">
+                      <div class="vi-title">Email Address</div>
+                      <div class="vi-sub">arjun.singh@gmail.com</div>
+                    </div>
+                    <button class="btn-vi btn-vi-done">✓ Done</button>
+                  </div>
+                  <div class="verif-item">
+                    <div class="vi-icon amber">🏦</div>
+                    <div class="vi-info">
+                      <div class="vi-title">Bank Account</div>
+                      <div class="vi-sub">Not linked yet</div>
+                    </div>
+                    <button class="btn-vi btn-vi-start" onclick="showToast('Bank verification form opening…')">Start</button>
+                  </div>
+                  <div class="verif-item">
+                    <div class="vi-icon todo">🎓</div>
+                    <div class="vi-info">
+                      <div class="vi-title">Education Proof</div>
+                      <div class="vi-sub">Optional — adds trust</div>
+                    </div>
+                    <button class="btn-vi btn-vi-start" onclick="showToast('Document upload opening…')">Add</button>
+                  </div>
+                </div>
+              </div>
+            </div>
 
-    document.getElementById("btnAddSkill").addEventListener("click", addSkill);
-    document.getElementById("skillInput").addEventListener("keydown", function (e) {
-      if (e.key === "Enter") { e.preventDefault(); addSkill(); }
-    });
+          </div>
+        </div>
+      </div>
 
-    function addSkill() {
-      var val = document.getElementById("skillInput").value.trim();
-      if (!val) return;
-      if (skills.includes(val)) {
-        if (typeof showToast === "function") showToast("Skill already added.", "error");
-        return;
-      }
-      if (skills.length >= 15) {
-        if (typeof showToast === "function") showToast("Max 15 skills allowed.", "error");
-        return;
-      }
-      skills.push(val);
-      document.getElementById("skillInput").value = "";
-      renderSkills();
-      renderCompletion();
-    }
+      <!-- ════ SKILLS ════ -->
+      <div class="pf-panel" id="panel-skills">
+        <div class="pf-two-col">
+          <div>
 
-    /* ═══════════════════════════════════════
-       AVATAR UPLOAD
-    ═══════════════════════════════════════ */
-    document.getElementById("avatarWrap").addEventListener("click", function () {
-      document.getElementById("avatarInput").click();
-    });
+            <div class="pf-info-box teal">
+              🛠️ <strong>Skills help karte hain</strong> clients tumhe dhundne mein. Jitni relevant skills, utni zyada gig matches!
+            </div>
 
-    document.getElementById("avatarInput").addEventListener("change", function () {
-      var file = this.files[0];
-      if (!file) return;
-      if (file.size > 2 * 1024 * 1024) {
-        if (typeof showToast === "function") showToast("Image must be under 2MB.", "error");
-        this.value = "";
-        return;
-      }
-      var reader = new FileReader();
-      reader.onload = function (e) {
-        user.avatar = e.target.result;
-        var avatarEl = document.getElementById("avatarCircle");
-        avatarEl.innerHTML = '<img src="' + user.avatar + '" alt="avatar" />';
-        renderCompletion();
-        if (typeof showToast === "function") showToast("📷 Photo updated! Save to keep it.", "success");
-      };
-      reader.readAsDataURL(file);
-      this.value = "";
-    });
+            <!-- Current skills -->
+            <div class="pf-card">
+              <div class="pf-card-header">
+                <div class="pf-card-title">✅ My Skills (8)</div>
+                <div style="display:flex;align-items:center;gap:8px;font-size:.72rem;color:var(--gray-400);font-weight:600">
+                  <span style="display:flex;align-items:center;gap:4px"><div class="skill-level-dot sld-expert" style="width:8px;height:8px;border-radius:50%;display:inline-block"></div>Expert</span>
+                  <span style="display:flex;align-items:center;gap:4px"><div class="skill-level-dot sld-good" style="width:8px;height:8px;border-radius:50%;background:var(--teal);display:inline-block"></div>Good</span>
+                  <span style="display:flex;align-items:center;gap:4px"><div class="skill-level-dot sld-learning" style="width:8px;height:8px;border-radius:50%;background:#f59e0b;display:inline-block"></div>Learning</span>
+                </div>
+              </div>
+              <div class="pf-card-body">
+                <div class="skills-grid" id="skillsGrid">
+                  <div class="skill-pill" data-level="expert"><div class="skill-level-dot sld-expert"></div>Physical Work<div class="skill-remove" onclick="removePill(this)">✕</div></div>
+                  <div class="skill-pill" data-level="expert"><div class="skill-level-dot sld-expert"></div>Warehouse Ops<div class="skill-remove" onclick="removePill(this)">✕</div></div>
+                  <div class="skill-pill" data-level="expert"><div class="skill-level-dot sld-expert"></div>Delivery (2-Wheeler)<div class="skill-remove" onclick="removePill(this)">✕</div></div>
+                  <div class="skill-pill" data-level="good"><div class="skill-level-dot sld-good"></div>Event Setup<div class="skill-remove" onclick="removePill(this)">✕</div></div>
+                  <div class="skill-pill" data-level="good"><div class="skill-level-dot sld-good"></div>Furniture Moving<div class="skill-remove" onclick="removePill(this)">✕</div></div>
+                  <div class="skill-pill" data-level="good"><div class="skill-level-dot sld-good"></div>Customer Handling<div class="skill-remove" onclick="removePill(this)">✕</div></div>
+                  <div class="skill-pill" data-level="learning"><div class="skill-level-dot sld-learning"></div>Data Entry<div class="skill-remove" onclick="removePill(this)">✕</div></div>
+                  <div class="skill-pill" data-level="learning"><div class="skill-level-dot sld-learning"></div>Basic Computer<div class="skill-remove" onclick="removePill(this)">✕</div></div>
+                </div>
+              </div>
+            </div>
 
-    /* ═══════════════════════════════════════
-       SAVE
-    ═══════════════════════════════════════ */
-    document.getElementById("btnSave").addEventListener("click", function () {
-      var btn = this;
-      btn.disabled    = true;
-      btn.textContent = "⏳ Saving...";
+            <!-- Add skills -->
+            <div class="pf-card">
+              <div class="pf-card-header">
+                <div class="pf-card-title">➕ Add New Skill</div>
+              </div>
+              <div class="pf-card-body">
+                <div class="pf-form-grid">
+                  <div class="form-field">
+                    <label class="ff-label">Skill Name</label>
+                    <input class="ff-input" type="text" id="newSkillName" placeholder="e.g. Driving, Cooking, Painting…" />
+                  </div>
+                  <div class="form-field">
+                    <label class="ff-label">Proficiency Level</label>
+                    <select class="ff-select" id="newSkillLevel">
+                      <option value="expert">🟢 Expert (3+ years)</option>
+                      <option value="good" selected>🔵 Good (1–3 years)</option>
+                      <option value="learning">🟡 Learning (&lt;1 year)</option>
+                    </select>
+                  </div>
+                </div>
+                <button class="btn-save" style="margin-top:12px" onclick="addSkill()">➕ Add Skill</button>
+              </div>
+            </div>
 
-      user.name     = document.getElementById("fieldName").value.trim();
-      user.phone    = document.getElementById("fieldPhone").value.trim();
-      user.email    = document.getElementById("fieldEmail").value.trim();
-      user.city     = document.getElementById("fieldCity").value.trim();
-      user.pincode  = document.getElementById("fieldPincode").value.trim();
-      user.bio      = document.getElementById("fieldBio").value.trim();
-      user.workType = document.getElementById("fieldWorkType").value;
-      user.skills   = skills;
+            <!-- Suggested skills -->
+            <div class="pf-card">
+              <div class="pf-card-header">
+                <div class="pf-card-title">💡 Suggested Skills (based on your gigs)</div>
+              </div>
+              <div class="pf-card-body">
+                <div class="skills-grid" id="suggestedSkills">
+                  <button class="add-skill-btn" onclick="addSuggested(this,'Packing')">+ Packing</button>
+                  <button class="add-skill-btn" onclick="addSuggested(this,'Heavy Lifting')">+ Heavy Lifting</button>
+                  <button class="add-skill-btn" onclick="addSuggested(this,'Route Planning')">+ Route Planning</button>
+                  <button class="add-skill-btn" onclick="addSuggested(this,'Inventory Mgmt')">+ Inventory Mgmt</button>
+                  <button class="add-skill-btn" onclick="addSuggested(this,'Cleaning')">+ Cleaning</button>
+                  <button class="add-skill-btn" onclick="addSuggested(this,'Cooking')">+ Cooking</button>
+                  <button class="add-skill-btn" onclick="addSuggested(this,'Driving (4W)')">+ Driving (4W)</button>
+                  <button class="add-skill-btn" onclick="addSuggested(this,'Photography')">+ Photography</button>
+                </div>
+              </div>
+            </div>
 
-      /* Persist to localStorage */
-      localStorage.setItem(USER_KEY, JSON.stringify(user));
+          </div>
 
-      /* Also update in users array if it exists */
-      var USERS_KEY = (typeof GL !== "undefined" && GL.STORAGE_KEY_USERS) ? GL.STORAGE_KEY_USERS : "gl_users";
-      var users = JSON.parse(localStorage.getItem(USERS_KEY) || "[]");
-      var idx   = users.findIndex(function (u) { return u.id === user.id; });
-      if (idx > -1) { users[idx] = user; localStorage.setItem(USERS_KEY, JSON.stringify(users)); }
+          <!-- Skills sidebar -->
+          <div>
+            <div class="pf-card">
+              <div class="pf-card-header"><div class="pf-card-title">📊 Skill Impact</div></div>
+              <div class="pf-card-body" style="padding:0">
+                <div class="info-rows">
+                  <div class="info-row" style="padding:11px 16px">
+                    <span class="ir-icon">🎯</span>
+                    <span class="ir-label">Gig Matches</span>
+                    <span class="ir-val" style="color:var(--success)">33 active</span>
+                  </div>
+                  <div class="info-row" style="padding:11px 16px">
+                    <span class="ir-icon">📩</span>
+                    <span class="ir-label">Invitations</span>
+                    <span class="ir-val">2 this week</span>
+                  </div>
+                  <div class="info-row" style="padding:11px 16px">
+                    <span class="ir-icon">🔍</span>
+                    <span class="ir-label">Search Rank</span>
+                    <span class="ir-val">#3 in Gurugram</span>
+                  </div>
+                </div>
+              </div>
+            </div>
 
-      setTimeout(function () {
-        btn.disabled    = false;
-        btn.textContent = "💾 Save Profile";
-        var statusEl = document.getElementById("saveStatus");
-        statusEl.classList.add("show");
-        setTimeout(function () { statusEl.classList.remove("show"); }, 3000);
-        renderHero();
-        renderCompletion();
-        if (typeof showToast === "function") showToast("✅ Profile saved successfully!", "success");
-      }, 700);
-    });
+            <div class="pf-info-box teal" style="border-radius:var(--radius);margin-top:0">
+              💡 <strong>3 aur skills add karo</strong> aur top 10 search results mein aa jao — 2x zyada invitations guarantee!
+            </div>
 
-    /* ═══════════════════════════════════════
-       DANGER ZONE
-    ═══════════════════════════════════════ */
-    document.getElementById("btnLogout").addEventListener("click", function () {
-      if (confirm("Are you sure you want to log out?")) {
-        if (typeof safeLogout === "function") { safeLogout(); }
-        else {
-          localStorage.removeItem(USER_KEY);
-          window.location.href = "index.html";
-        }
-      }
-    });
+            <div class="pf-card">
+              <div class="pf-card-header"><div class="pf-card-title">🔥 In-Demand Skills</div></div>
+              <div class="pf-card-body">
+                <div style="display:flex;flex-direction:column;gap:9px">
+                  <div style="display:flex;align-items:center;justify-content:space-between;font-size:.84rem">
+                    <span style="font-weight:700">🛵 Delivery</span>
+                    <span style="color:var(--success);font-weight:800">128 open gigs</span>
+                  </div>
+                  <div style="display:flex;align-items:center;justify-content:space-between;font-size:.84rem">
+                    <span style="font-weight:700">📦 Warehouse</span>
+                    <span style="color:var(--success);font-weight:800">86 open gigs</span>
+                  </div>
+                  <div style="display:flex;align-items:center;justify-content:space-between;font-size:.84rem">
+                    <span style="font-weight:700">🧹 Cleaning</span>
+                    <span style="color:#d97706;font-weight:800">42 open gigs</span>
+                  </div>
+                  <div style="display:flex;align-items:center;justify-content:space-between;font-size:.84rem">
+                    <span style="font-weight:700">🎪 Events</span>
+                    <span style="color:#d97706;font-weight:800">29 open gigs</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-    document.getElementById("btnDeleteAccount").addEventListener("click", function () {
-      if (!confirm("⚠️ This will permanently delete your account and all your data. Are you absolutely sure?")) return;
-      if (!confirm("Last chance — this CANNOT be undone. Delete account?")) return;
+      <!-- ════ WORK HISTORY ════ -->
+      <div class="pf-panel" id="panel-history">
+        <div class="pf-two-col">
+          <div>
 
-      var USERS_KEY = (typeof GL !== "undefined" && GL.STORAGE_KEY_USERS) ? GL.STORAGE_KEY_USERS : "gl_users";
-      var users = JSON.parse(localStorage.getItem(USERS_KEY) || "[]");
-      users = users.filter(function (u) { return u.id !== user.id; });
-      localStorage.setItem(USERS_KEY, JSON.stringify(users));
-      localStorage.removeItem(USER_KEY);
+            <div class="pf-card">
+              <div class="pf-card-header">
+                <div class="pf-card-title">📋 Completed Gigs (14)</div>
+                <select style="padding:5px 10px;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-family:var(--font);font-size:.76rem">
+                  <option>All Time</option>
+                  <option>This Month</option>
+                  <option>Last 3 Months</option>
+                </select>
+              </div>
+              <div class="pf-card-body" style="padding:0 0 4px">
+                <div class="wh-list" style="padding:0 20px">
 
-      if (typeof showToast === "function") showToast("Account deleted.", "success");
-      setTimeout(function () { window.location.href = "index.html"; }, 1200);
-    });
+                  <div class="wh-item">
+                    <div class="wh-icon green">📦</div>
+                    <div class="wh-info">
+                      <div class="wh-title">Weekend Warehouse Packing Helper</div>
+                      <div class="wh-meta">
+                        <span>📍 Sec 14, Gurugram</span>
+                        <span>📅 Mar 14, 2026</span>
+                        <span style="color:var(--success);font-weight:800">🟢 In Progress</span>
+                      </div>
+                    </div>
+                    <div class="wh-right">
+                      <div class="wh-amount">₹1,128</div>
+                      <div class="wh-stars">—</div>
+                    </div>
+                  </div>
 
-    function escHtml(s) {
-      return String(s || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
-    }
+                  <div class="wh-item">
+                    <div class="wh-icon amber">🎪</div>
+                    <div class="wh-info">
+                      <div class="wh-title">Office Relocation Helper</div>
+                      <div class="wh-meta">
+                        <span>📍 Sec 44, Gurugram</span>
+                        <span>📅 Mar 5, 2026</span>
+                      </div>
+                      <div class="wh-review">"Arjun ne bahut accha kaam kiya — time pe aaya aur bina kisi problem ke pura relocation kar diya!"</div>
+                    </div>
+                    <div class="wh-right">
+                      <div class="wh-amount">₹3,290</div>
+                      <div class="wh-stars">⭐⭐⭐⭐⭐</div>
+                    </div>
+                  </div>
 
-    /* ── Init ── */
-    initFields();
-    renderHero();
-    renderStats();
-    renderSkills();
-    renderCompletion();
+                  <div class="wh-item">
+                    <div class="wh-icon green">🛵</div>
+                    <div class="wh-info">
+                      <div class="wh-title">Grocery Delivery — Sector 29</div>
+                      <div class="wh-meta">
+                        <span>📍 Sec 29, Gurugram</span>
+                        <span>📅 Feb 28, 2026</span>
+                      </div>
+                      <div class="wh-review">"Bahut fast delivery, sab customers khush. Arjun ko zaroor dubara hire karunga."</div>
+                    </div>
+                    <div class="wh-right">
+                      <div class="wh-amount">₹1,504</div>
+                      <div class="wh-stars">⭐⭐⭐⭐⭐</div>
+                    </div>
+                  </div>
 
-  })();
-  </script>
-</body>
-</html>
+                  <div class="wh-item">
+                    <div class="wh-icon amber">🎪</div>
+                    <div class="wh-info">
+                      <div class="wh-title">Corporate Event Setup</div>
+                      <div class="wh-meta">
+                        <span>📍 DLF Cyber Hub</span>
+                        <span>📅 Feb 20, 2026</span>
+                      </div>
+                      <div class="wh-review">"Mehnat se kaam kiya. Ek jagah thoda late hua lekin overall theek tha."</div>
+                    </div>
+                    <div class="wh-right">
+                      <div class="wh-amount">₹1,410</div>
+                      <div class="wh-stars">⭐⭐⭐⭐</div>
+                    </div>
+                  </div>
+
+                  <div class="wh-item">
+                    <div class="wh-icon blue">🚛</div>
+                    <div class="wh-info">
+                      <div class="wh-title">Home Shifting Helper — Noida</div>
+                      <div class="wh-meta">
+                        <span>📍 Sector 62, Noida</span>
+                        <span>📅 Feb 12, 2026</span>
+                      </div>
+                      <div class="wh-review">"Excellent work, very careful with furniture. 5 stars!"</div>
+                    </div>
+                    <div class="wh-right">
+                      <div class="wh-amount">₹2,820</div>
+                      <div class="wh-stars">⭐⭐⭐⭐⭐</div>
+                    </div>
+                  </div>
+
+                  <div style="padding:14px 0;text-align:center">
+                    <button class="btn-save-outline" onclick="showToast('Loading more history…')">Load More (9 more) →</button>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- History sidebar -->
+          <div>
+            <div class="pf-card">
+              <div class="pf-card-header"><div class="pf-card-title">💰 Earnings Summary</div></div>
+              <div class="pf-card-body" style="padding:0">
+                <div class="info-rows">
+                  <div class="info-row" style="padding:11px 16px">
+                    <span class="ir-icon">💰</span>
+                    <span class="ir-label">This Month</span>
+                    <span class="ir-val" style="color:#059669">₹8,400</span>
+                  </div>
+                  <div class="info-row" style="padding:11px 16px">
+                    <span class="ir-icon">📅</span>
+                    <span class="ir-label">Last Month</span>
+                    <span class="ir-val">₹12,600</span>
+                  </div>
+                  <div class="info-row" style="padding:11px 16px">
+                    <span class="ir-icon">🏆</span>
+                    <span class="ir-label">All Time</span>
+                    <span class="ir-val" style="color:var(--primary);font-weight:900">₹41,200</span>
+                  </div>
+                  <div class="info-row" style="padding:11px 16px">
+                    <span class="ir-icon">📊</span>
+                    <span class="ir-label">Avg per Gig</span>
+                    <span class="ir-val">₹2,943</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="pf-card" style="margin-top:0">
+              <div class="pf-card-header"><div class="pf-card-title">📊 Gig Breakdown</div></div>
+              <div class="pf-card-body">
+                <div style="display:flex;flex-direction:column;gap:10px">
+                  <div>
+                    <div style="display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:4px"><span style="font-weight:700">📦 Warehouse/Packing</span><span style="font-weight:800;color:var(--primary)">5 gigs</span></div>
+                    <div style="background:var(--gray-100);border-radius:4px;height:6px;overflow:hidden"><div style="width:36%;height:100%;background:linear-gradient(90deg,var(--primary),var(--teal));border-radius:4px"></div></div>
+                  </div>
+                  <div>
+                    <div style="display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:4px"><span style="font-weight:700">🛵 Delivery</span><span style="font-weight:800;color:var(--primary)">4 gigs</span></div>
+                    <div style="background:var(--gray-100);border-radius:4px;height:6px;overflow:hidden"><div style="width:29%;height:100%;background:linear-gradient(90deg,#059669,#34d399);border-radius:4px
