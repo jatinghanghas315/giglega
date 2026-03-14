@@ -109,7 +109,7 @@
             '→ Login to Continue' +
           '</a>' +
           '<p style="margin-top:14px;font-size:.82rem;color:var(--gray-400)">' +
-            'Don\'t have an account? <a href="signup.html" style="color:var(--teal);font-weight:600">Register free</a>' +
+            'Don\\'t have an account? <a href="signup.html" style="color:var(--teal);font-weight:600">Register free</a>' +
           '</p>';
         // Replace main content with wall
         if (main.firstChild) {
@@ -552,7 +552,7 @@
     catch (e) {}
   }
 
-  global.getNotifs          = getNotifs;
+  global.getNotifs           = getNotifs;
   global.getUnreadNotifCount = getUnreadNotifCount;
   global.pushNotif           = pushNotif;
 
@@ -780,6 +780,83 @@
 
     ].join("\n");
     document.head.appendChild(style);
+  }
+
+
+  /* ══════════════════════════════════════════════════════════
+     14. REGISTER SERVICE WORKER + UPDATE BANNER
+  ══════════════════════════════════════════════════════════ */
+
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () {
+      try {
+        navigator.serviceWorker.register('/service-worker.js', {
+          scope: '/',
+          updateViaCache: 'none'
+        }).then(function (reg) {
+          console.log('[GigLega] SW registered:', reg.scope);
+
+          // Detect new SW waiting — show update prompt
+          reg.addEventListener('updatefound', function () {
+            var newSW = reg.installing;
+            if (!newSW) return;
+            newSW.addEventListener('statechange', function () {
+              if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
+                showUpdateBanner(newSW);
+              }
+            });
+          });
+        });
+
+        // Listen for messages from SW
+        navigator.serviceWorker.addEventListener('message', function (event) {
+          var data = event.data || {};
+          var type = data.type;
+          var url  = data.url;
+          if (type === 'NAVIGATE' && url) window.location.href = url;
+          if (type === 'SW_UPDATED') console.log('[GigLega] SW updated to', data.version);
+          if (type === 'SYNC_SUCCESS') console.log('[GigLega] Synced:', data.url);
+        });
+
+      } catch (err) {
+        console.error('[GigLega] SW registration failed:', err);
+      }
+    });
+  }
+
+  function showUpdateBanner(newSW) {
+    var banner = document.createElement('div');
+    banner.style.cssText =
+      'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);' +
+      'background:#1a3c5e;color:#fff;padding:12px 20px;border-radius:10px;' +
+      'display:flex;align-items:center;gap:12px;z-index:9999;' +
+      'box-shadow:0 4px 20px rgba(0,0,0,.3);font-family:inherit;' +
+      'border:1.5px solid rgba(13,148,136,.3);font-size:.86rem;';
+
+    banner.innerHTML =
+      '<span>🚀 <strong>GigLega update ready!</strong></span>' +
+      '<button style="padding:6px 14px;background:linear-gradient(135deg,#059669,#0d9488);border:none;' +
+        'border-radius:6px;color:#fff;font-weight:800;cursor:pointer;font-family:inherit;font-size:.82rem">' +
+        'Update Karo ↻' +
+      '</button>' +
+      '<button style="background:none;border:none;color:rgba(255,255,255,.5);cursor:pointer;font-size:1rem">✕</button>';
+
+    var updateBtn = banner.querySelector('button:nth-child(2)');
+    var closeBtn  = banner.querySelector('button:nth-child(3)');
+
+    updateBtn.addEventListener('click', function () {
+      if (banner.parentNode) banner.parentNode.removeChild(banner);
+      if (newSW && newSW.state === 'installed' && navigator.serviceWorker.controller) {
+        navigator.serviceWorker.controller.postMessage({ type: 'SKIP_WAITING' });
+      }
+      window.location.reload();
+    });
+
+    closeBtn.addEventListener('click', function () {
+      if (banner.parentNode) banner.parentNode.removeChild(banner);
+    });
+
+    document.body.appendChild(banner);
   }
 
 })(window);
