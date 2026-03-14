@@ -4,1168 +4,895 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>GigLega — Gurugram ka #1 Gig Platform</title>
-  <meta name="description" content="GigLega — Gurugram mein hyperlocal aur remote gigs dhundo ya post karo. Students, freelancers, aur local businesses ke liye." />
-  <meta property="og:title" content="GigLega — Karo Kaam, Kamao Daam" />
-  <meta property="og:description" content="Gurugram ka fastest gig platform. Kaam dhundo ya kaam do — turant connect ho jao." />
-  <meta property="og:type" content="website" />
-
-  <!-- ✅ NO defer — loads synchronously so auth + nav are available instantly -->
-  <script src="shared.js"></script>
+  <meta name="description" content="GigLega pe gig karo ya gig do. Gurugram aur NCR ke best hyperlocal gigs — students, bachelors aur workers ke liye." />
+  <meta name="keywords" content="gig work Gurugram, part time jobs Gurugram, freelance Gurugram, gig economy India" />
   <link rel="stylesheet" href="styles.css" />
-
+  <script src="shared.js"></script>
   <style>
-    /* ══════════════════════════════
-       PAGE-SPECIFIC STYLES
-    ══════════════════════════════ */
 
-    /* ── Hero ── */
+    /* ══════════════════════════════════
+       HERO
+    ══════════════════════════════════ */
     .hero {
-      background: var(--bg);
-      padding: 72px 16px 80px;
-      text-align: center;
       position: relative;
+      background: linear-gradient(135deg, var(--primary) 0%, #0f4c7a 40%, var(--teal) 100%);
+      color: #fff;
+      padding: 72px 20px 80px;
       overflow: hidden;
+      text-align: center;
     }
     .hero::before {
       content: "";
       position: absolute;
-      top: -120px; left: 50%;
-      transform: translateX(-50%);
-      width: 700px; height: 700px;
-      background: radial-gradient(circle, rgba(13,148,136,.08) 0%, transparent 70%);
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 20% 50%, rgba(13,148,136,.35) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 30%, rgba(245,158,11,.15) 0%, transparent 50%);
       pointer-events: none;
     }
-    .hero-badges {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-bottom: 28px;
-    }
-    .hero-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 6px 16px;
-      background: var(--surface);
-      border: 1.5px solid var(--gray-200);
-      border-radius: 20px;
-      font-size: .78rem;
-      font-weight: 700;
-      color: var(--gray-600);
-      box-shadow: var(--shadow-sm);
-    }
-    .hero-badge .dot {
-      width: 7px; height: 7px;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
-    .hero-badge .dot.teal   { background: var(--teal); }
-    .hero-badge .dot.amber  { background: var(--accent); }
-    .hero-badge .dot.green  { background: var(--success); }
+    .hero-inner { position: relative; z-index: 1; max-width: 760px; margin: 0 auto; }
 
-    .hero-headline {
-      font-size: clamp(2.2rem, 6vw, 4rem);
-      font-weight: 900;
-      line-height: 1.15;
-      color: var(--primary);
-      margin-bottom: 20px;
-      letter-spacing: -1.5px;
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(255,255,255,.15);
+      border: 1px solid rgba(255,255,255,.25);
+      border-radius: var(--radius-full);
+      padding: 6px 16px; font-size: .78rem; font-weight: 700;
+      margin-bottom: 22px; backdrop-filter: blur(8px);
     }
-    .hero-headline .highlight { color: var(--teal); }
+    .hero-badge-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: #4ade80;
+      box-shadow: 0 0 0 3px rgba(74,222,128,.3);
+      animation: pulse-dot 1.8s ease-in-out infinite;
+    }
+    @keyframes pulse-dot {
+      0%, 100% { box-shadow: 0 0 0 3px rgba(74,222,128,.3); }
+      50%       { box-shadow: 0 0 0 6px rgba(74,222,128,.1); }
+    }
+
+    .hero h1 {
+      font-size: clamp(1.9rem, 5vw, 3.2rem);
+      font-weight: 900;
+      color: #fff;
+      line-height: 1.15;
+      margin-bottom: 18px;
+      letter-spacing: -1px;
+    }
+    .hero h1 span { color: #fbbf24; }
 
     .hero-sub {
-      font-size: clamp(.95rem, 2vw, 1.1rem);
-      color: var(--gray-500);
-      max-width: 540px;
-      margin: 0 auto 36px;
-      line-height: 1.75;
+      font-size: clamp(.92rem, 2vw, 1.08rem);
+      color: rgba(255,255,255,.8);
+      line-height: 1.7;
+      margin-bottom: 36px;
+      max-width: 560px;
+      margin-left: auto; margin-right: auto;
     }
 
-    .hero-actions {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-bottom: 52px;
-    }
-    .hero-cta-primary {
-      padding: 14px 32px;
-      background: linear-gradient(135deg, var(--primary) 0%, var(--teal) 100%);
-      color: #fff;
-      border: none;
-      border-radius: var(--radius-sm);
-      font-size: 1rem;
-      font-weight: 800;
-      cursor: pointer;
-      text-decoration: none;
-      box-shadow: 0 4px 18px rgba(13,148,136,.35);
+    .hero-cta { display: flex; align-items: center; justify-content: center; gap: 14px; flex-wrap: wrap; }
+
+    .btn-hero-primary {
+      padding: 15px 32px; border-radius: var(--radius-sm);
+      background: #fff; color: var(--primary);
+      font-weight: 800; font-size: 1rem; border: none; cursor: pointer;
       transition: transform .2s, box-shadow .2s;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
+      box-shadow: 0 8px 24px rgba(0,0,0,.2);
+      text-decoration: none; display: inline-flex; align-items: center; gap: 8px;
     }
-    .hero-cta-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 7px 24px rgba(13,148,136,.45);
-      text-decoration: none;
-      color: #fff;
-    }
-    .hero-cta-secondary {
-      padding: 14px 28px;
-      background: var(--surface);
-      border: 2px solid var(--gray-200);
-      border-radius: var(--radius-sm);
-      font-size: 1rem;
-      font-weight: 700;
-      color: var(--gray-700);
-      cursor: pointer;
-      text-decoration: none;
-      transition: all .2s;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .hero-cta-secondary:hover {
-      border-color: var(--teal);
-      color: var(--teal);
-      text-decoration: none;
-    }
+    .btn-hero-primary:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(0,0,0,.28); text-decoration: none; color: var(--primary); }
 
-    /* Hero stats row */
+    .btn-hero-secondary {
+      padding: 14px 28px; border-radius: var(--radius-sm);
+      background: transparent; color: #fff;
+      font-weight: 700; font-size: .95rem;
+      border: 2px solid rgba(255,255,255,.45); cursor: pointer;
+      transition: all .2s; text-decoration: none;
+      display: inline-flex; align-items: center; gap: 8px;
+    }
+    .btn-hero-secondary:hover { background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.8); text-decoration: none; color: #fff; }
+
     .hero-stats {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 32px;
-      flex-wrap: wrap;
+      display: flex; align-items: center; justify-content: center;
+      gap: 32px; flex-wrap: wrap;
+      margin-top: 44px; padding-top: 36px;
+      border-top: 1px solid rgba(255,255,255,.15);
     }
-    .hero-stat { text-align: center; }
-    .hero-stat-val {
-      font-size: 1.6rem;
-      font-weight: 900;
-      color: var(--primary);
-      line-height: 1;
+    .hero-stat-item { text-align: center; }
+    .hero-stat-num  { font-size: 1.6rem; font-weight: 900; color: #fff; line-height: 1; }
+    .hero-stat-lbl  { font-size: .75rem; color: rgba(255,255,255,.65); margin-top: 3px; font-weight: 600; letter-spacing: .3px; }
+
+    /* Floating chips */
+    .hero-chips {
+      display: flex; flex-wrap: wrap; justify-content: center;
+      gap: 10px; margin-top: 28px;
     }
-    .hero-stat-lbl {
-      font-size: .75rem;
-      color: var(--gray-400);
-      font-weight: 600;
-      margin-top: 3px;
-    }
-    .hero-stat-div {
-      width: 1px; height: 36px;
-      background: var(--gray-200);
+    .hero-chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.2);
+      border-radius: var(--radius-full); padding: 6px 14px;
+      font-size: .78rem; font-weight: 600; color: rgba(255,255,255,.9);
+      backdrop-filter: blur(6px);
     }
 
-    /* ── Section wrapper ── */
-    .section { padding: 64px 16px; }
-    .section-alt { background: var(--surface); }
-    .section-inner { max-width: var(--max-width); margin: 0 auto; }
-
-    .section-eyebrow {
-      font-size: .75rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: var(--teal);
-      margin-bottom: 8px;
-    }
-    .section-big-title {
-      font-size: clamp(1.5rem, 3.5vw, 2.2rem);
-      font-weight: 900;
-      color: var(--primary);
-      margin-bottom: 12px;
-      line-height: 1.2;
-    }
-    .section-desc {
-      font-size: .95rem;
-      color: var(--gray-500);
-      max-width: 520px;
-      line-height: 1.7;
-    }
-
-    /* ── How it works ── */
-    .steps-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 24px;
-      margin-top: 40px;
-    }
-    .step-card {
+    /* ══════════════════════════════════
+       SEARCH BAR
+    ══════════════════════════════════ */
+    .search-wrap {
+      max-width: 680px; margin: 0 auto;
+      position: relative; z-index: 2;
       background: var(--surface);
+      border-radius: var(--radius-sm);
+      box-shadow: var(--shadow-xl);
+      display: flex; align-items: center;
       border: 1.5px solid var(--gray-200);
-      border-radius: var(--radius);
-      padding: 28px 22px;
-      text-align: center;
-      box-shadow: var(--shadow-sm);
-      transition: transform .2s, box-shadow .2s;
-    }
-    .step-card:hover {
-      transform: translateY(-4px);
-      box-shadow: var(--shadow-md);
-    }
-    .step-num {
-      width: 44px; height: 44px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--primary), var(--teal));
-      color: #fff;
-      font-size: .9rem;
-      font-weight: 900;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 16px;
-    }
-    .step-icon { font-size: 1.8rem; margin-bottom: 10px; }
-    .step-card h3 { font-size: 1rem; font-weight: 800; color: var(--primary); margin-bottom: 8px; }
-    .step-card p  { font-size: .84rem; color: var(--gray-500); line-height: 1.6; }
-
-    /* Tab switcher (Poster / Worker) */
-    .how-tabs {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 32px;
-      flex-wrap: wrap;
-    }
-    .how-tab {
-      padding: 9px 22px;
-      border-radius: 20px;
-      border: 2px solid var(--gray-200);
-      background: transparent;
-      font-size: .875rem;
-      font-weight: 700;
-      color: var(--gray-500);
-      cursor: pointer;
-      transition: all .2s;
-      font-family: var(--font);
-    }
-    .how-tab.active {
-      background: var(--primary);
-      border-color: var(--primary);
-      color: #fff;
-    }
-    .how-panel { display: none; }
-    .how-panel.active { display: block; }
-
-    /* ── Categories ── */
-    .cat-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-      gap: 14px;
-      margin-top: 36px;
-    }
-    .cat-card {
-      background: var(--surface);
-      border: 1.5px solid var(--gray-200);
-      border-radius: var(--radius);
-      padding: 20px 14px;
-      text-align: center;
-      cursor: pointer;
-      text-decoration: none;
-      transition: all .2s;
-      box-shadow: var(--shadow-sm);
-    }
-    .cat-card:hover {
-      border-color: var(--teal);
-      transform: translateY(-3px);
-      box-shadow: var(--shadow-md);
-      text-decoration: none;
-    }
-    .cat-icon { font-size: 2rem; margin-bottom: 10px; display: block; }
-    .cat-name { font-size: .83rem; font-weight: 700; color: var(--gray-700); margin-bottom: 4px; }
-    .cat-count { font-size: .72rem; color: var(--gray-400); }
-
-    /* ── Live gigs ticker ── */
-    .gigs-ticker-wrap {
-      background: linear-gradient(135deg, var(--primary) 0%, var(--teal) 100%);
-      border-radius: var(--radius);
-      padding: 20px 24px;
-      margin-top: 40px;
-      display: flex;
-      align-items: center;
-      gap: 16px;
+      margin-top: -28px;
       overflow: hidden;
     }
-    .ticker-label {
-      font-size: .75rem;
-      font-weight: 800;
-      color: rgba(255,255,255,.7);
-      text-transform: uppercase;
-      letter-spacing: .8px;
-      white-space: nowrap;
-      flex-shrink: 0;
+    .search-icon { padding: 0 14px; font-size: 1.1rem; flex-shrink: 0; }
+    .search-input {
+      flex: 1; border: none; outline: none; background: transparent;
+      font-size: .95rem; color: var(--text); font-family: var(--font);
+      padding: 16px 0;
     }
-    .ticker-dot {
-      width: 8px; height: 8px;
-      border-radius: 50%;
-      background: #4ade80;
-      flex-shrink: 0;
-      animation: pulse 1.5s ease-in-out infinite;
+    .search-input::placeholder { color: var(--gray-400); }
+    .search-btn {
+      padding: 12px 20px; background: var(--primary); color: #fff;
+      border: none; font-weight: 700; font-size: .88rem; cursor: pointer;
+      transition: background .2s; white-space: nowrap; font-family: var(--font);
+      display: flex; align-items: center; gap: 6px;
     }
-    .ticker-scroll {
-      flex: 1;
-      overflow: hidden;
-      position: relative;
-    }
-    .ticker-inner {
-      display: flex;
-      gap: 32px;
-      animation: ticker 28s linear infinite;
-      white-space: nowrap;
-    }
-    .ticker-inner:hover { animation-play-state: paused; }
-    .ticker-item {
-      font-size: .82rem;
-      font-weight: 600;
-      color: rgba(255,255,255,.85);
-      flex-shrink: 0;
-    }
-    @keyframes ticker {
-      0%   { transform: translateX(0); }
-      100% { transform: translateX(-50%); }
-    }
+    .search-btn:hover { background: var(--teal); }
 
-    /* ── Why GigLega ── */
-    .why-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 20px;
-      margin-top: 40px;
+    [data-theme=dark] .search-wrap { border-color: var(--gray-700); background: var(--gray-800); }
+    [data-theme=dark] .search-input { color: var(--gray-100); }
+
+    /* ══════════════════════════════════
+       CATEGORY CHIPS
+    ══════════════════════════════════ */
+    .cats-section { padding: 40px 20px 0; }
+    .cats-inner { max-width: 900px; margin: 0 auto; }
+    .cats-title { text-align: center; font-size: .8rem; font-weight: 700; text-transform: uppercase; letter-spacing: .8px; color: var(--gray-400); margin-bottom: 16px; }
+    .cats-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+    .cat-chip {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 9px 16px; border-radius: var(--radius-full);
+      border: 1.5px solid var(--gray-200); background: var(--surface);
+      font-size: .82rem; font-weight: 600; color: var(--gray-600);
+      cursor: pointer; transition: all .2s; text-decoration: none;
     }
-    .why-card {
-      background: var(--surface);
-      border: 1.5px solid var(--gray-200);
-      border-radius: var(--radius);
-      padding: 24px;
-      box-shadow: var(--shadow-sm);
-      display: flex;
-      gap: 16px;
+    .cat-chip:hover { border-color: var(--teal); color: var(--teal); background: rgba(13,148,136,.05); transform: translateY(-2px); text-decoration: none; }
+    [data-theme=dark] .cat-chip { border-color: var(--gray-700); background: var(--gray-800); color: var(--gray-300); }
+
+    /* ══════════════════════════════════
+       HOW IT WORKS
+    ══════════════════════════════════ */
+    .hiw-section { padding: 72px 20px; }
+    .hiw-inner { max-width: 1100px; margin: 0 auto; }
+    .section-head { text-align: center; margin-bottom: 48px; }
+    .section-head h2 { font-size: 1.7rem; font-weight: 900; color: var(--primary); margin-bottom: 8px; }
+    .section-head p  { font-size: .95rem; color: var(--gray-500); max-width: 480px; margin: 0 auto; line-height: 1.6; }
+
+    .hiw-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }
+    @media(max-width:768px) { .hiw-grid { grid-template-columns: 1fr; } }
+
+    .hiw-col { }
+    .hiw-col-title {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 1rem; font-weight: 800; color: var(--primary);
+      margin-bottom: 20px; padding-bottom: 12px;
+      border-bottom: 2px solid var(--gray-200);
+    }
+    .hiw-col-badge {
+      font-size: .72rem; font-weight: 700; padding: 3px 10px;
+      border-radius: var(--radius-full);
+    }
+    .badge-worker { background: rgba(13,148,136,.1); color: var(--teal); }
+    .badge-poster { background: rgba(26,60,94,.1); color: var(--primary); }
+
+    .hiw-step {
+      display: flex; gap: 16px; margin-bottom: 20px;
       align-items: flex-start;
-      transition: transform .2s, box-shadow .2s;
     }
-    .why-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
-    .why-icon {
-      font-size: 1.6rem;
-      flex-shrink: 0;
-      width: 48px; height: 48px;
-      background: var(--gray-50);
-      border-radius: var(--radius-sm);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .why-content h3 { font-size: .95rem; font-weight: 800; color: var(--primary); margin-bottom: 6px; }
-    .why-content p  { font-size: .83rem; color: var(--gray-500); line-height: 1.6; }
-
-    /* ── Testimonials ── */
-    .testimonials-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 20px;
-      margin-top: 40px;
-    }
-    .testi-card {
-      background: var(--surface);
-      border: 1.5px solid var(--gray-200);
-      border-radius: var(--radius);
-      padding: 24px;
-      box-shadow: var(--shadow-sm);
-    }
-    .testi-stars { color: var(--accent); font-size: .9rem; margin-bottom: 12px; }
-    .testi-text { font-size: .88rem; color: var(--gray-600); line-height: 1.7; margin-bottom: 16px; font-style: italic; }
-    .testi-author { display: flex; align-items: center; gap: 12px; }
-    .testi-avatar {
-      width: 38px; height: 38px;
-      border-radius: 50%;
+    .hiw-num {
+      width: 36px; height: 36px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 900; font-size: .85rem; flex-shrink: 0;
       background: linear-gradient(135deg, var(--primary), var(--teal));
-      color: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: .75rem;
-      font-weight: 700;
-      flex-shrink: 0;
+      color: #fff; box-shadow: 0 4px 12px rgba(13,148,136,.25);
     }
-    .testi-name { font-size: .85rem; font-weight: 700; color: var(--primary); }
-    .testi-role { font-size: .75rem; color: var(--gray-400); }
+    .hiw-content h4 { font-size: .93rem; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+    .hiw-content p  { font-size: .82rem; color: var(--gray-500); line-height: 1.5; }
 
-    /* ── FAQ ── */
-    .faq-list { margin-top: 36px; display: flex; flex-direction: column; gap: 12px; }
-    .faq-item {
-      background: var(--surface);
-      border: 1.5px solid var(--gray-200);
-      border-radius: var(--radius-sm);
-      overflow: hidden;
-      box-shadow: var(--shadow-sm);
-    }
-    .faq-q {
-      width: 100%;
-      padding: 16px 20px;
-      background: none;
-      border: none;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      font-size: .92rem;
-      font-weight: 700;
-      color: var(--text);
-      cursor: pointer;
-      text-align: left;
-      font-family: var(--font);
-      transition: background .15s;
-    }
-    .faq-q:hover { background: var(--gray-50); }
-    .faq-q.open  { color: var(--teal); }
-    .faq-arrow {
-      flex-shrink: 0;
-      font-size: .75rem;
-      color: var(--gray-400);
-      transition: transform .3s;
-    }
-    .faq-q.open .faq-arrow { transform: rotate(180deg); color: var(--teal); }
-    .faq-a {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height .35s ease;
-    }
-    .faq-a.open { max-height: 400px; }
-    .faq-a-inner {
-      padding: 0 20px 16px;
-      font-size: .875rem;
-      color: var(--gray-500);
-      line-height: 1.75;
-      border-top: 1px solid var(--gray-100);
-      padding-top: 14px;
-    }
+    /* ══════════════════════════════════
+       LIVE GIGS
+    ══════════════════════════════════ */
+    .gigs-section { background: var(--gray-50); padding: 72px 20px; }
+    [data-theme=dark] .gigs-section { background: rgba(13,148,136,.04); }
+    .gigs-inner { max-width: 1100px; margin: 0 auto; }
 
-    /* ── CTA banner ── */
-    .cta-banner {
+    .gigs-header {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 14px; margin-bottom: 28px;
+    }
+    .gigs-header h2 { font-size: 1.4rem; font-weight: 800; color: var(--primary); }
+
+    .gigs-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    @media(max-width:900px){ .gigs-grid { grid-template-columns: repeat(2,1fr); } }
+    @media(max-width:560px){ .gigs-grid { grid-template-columns: 1fr; } }
+
+    /* ══════════════════════════════════
+       TRUST STRIP
+    ══════════════════════════════════ */
+    .trust-strip {
       background: linear-gradient(135deg, var(--primary) 0%, var(--teal) 100%);
-      border-radius: var(--radius);
-      padding: 52px 32px;
+      padding: 40px 20px;
       text-align: center;
       color: #fff;
-      position: relative;
-      overflow: hidden;
     }
-    .cta-banner::before {
-      content: "";
-      position: absolute;
-      top: -60px; right: -60px;
-      width: 250px; height: 250px;
-      border-radius: 50%;
-      background: rgba(255,255,255,.06);
-      pointer-events: none;
+    .trust-inner { max-width: 900px; margin: 0 auto; }
+    .trust-strip h2 { font-size: 1.4rem; font-weight: 800; margin-bottom: 8px; color: #fff; }
+    .trust-strip p  { font-size: .92rem; opacity: .8; margin-bottom: 24px; }
+    .trust-ctas { display: flex; align-items: center; justify-content: center; gap: 14px; flex-wrap: wrap; }
+    .btn-trust-primary {
+      padding: 13px 28px; background: #fff; color: var(--primary);
+      font-weight: 800; font-size: .93rem; border: none; border-radius: var(--radius-sm);
+      cursor: pointer; text-decoration: none; transition: transform .2s, box-shadow .2s;
+      display: inline-flex; align-items: center; gap: 7px;
+      box-shadow: 0 4px 16px rgba(0,0,0,.15);
     }
-    .cta-banner::after {
-      content: "";
-      position: absolute;
-      bottom: -80px; left: -40px;
-      width: 300px; height: 300px;
-      border-radius: 50%;
-      background: rgba(255,255,255,.04);
-      pointer-events: none;
+    .btn-trust-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.2); text-decoration: none; color: var(--primary); }
+    .btn-trust-secondary {
+      padding: 12px 24px; background: transparent; color: #fff;
+      font-weight: 700; font-size: .9rem;
+      border: 2px solid rgba(255,255,255,.45); border-radius: var(--radius-sm);
+      cursor: pointer; text-decoration: none; transition: all .2s;
+      display: inline-flex; align-items: center; gap: 7px;
     }
-    .cta-banner h2 {
-      font-size: clamp(1.5rem, 3.5vw, 2.2rem);
-      font-weight: 900;
-      color: #fff;
-      margin-bottom: 12px;
-      position: relative;
-      z-index: 1;
-    }
-    .cta-banner p {
-      font-size: .95rem;
-      opacity: .8;
-      max-width: 440px;
-      margin: 0 auto 28px;
-      line-height: 1.7;
-      position: relative;
-      z-index: 1;
-    }
-    .cta-banner-actions {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      flex-wrap: wrap;
-      position: relative;
-      z-index: 1;
-    }
-    .cta-btn-white {
-      padding: 13px 28px;
-      background: #fff;
-      color: var(--primary);
-      border: none;
-      border-radius: var(--radius-sm);
-      font-size: .95rem;
-      font-weight: 800;
-      cursor: pointer;
-      text-decoration: none;
-      transition: all .2s;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .cta-btn-white:hover { opacity: .9; transform: translateY(-2px); text-decoration: none; color: var(--primary); }
-    .cta-btn-outline-white {
-      padding: 13px 28px;
-      background: transparent;
-      color: #fff;
-      border: 2px solid rgba(255,255,255,.5);
-      border-radius: var(--radius-sm);
-      font-size: .95rem;
-      font-weight: 700;
-      cursor: pointer;
-      text-decoration: none;
-      transition: all .2s;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .cta-btn-outline-white:hover {
-      border-color: #fff;
-      background: rgba(255,255,255,.1);
-      text-decoration: none;
-      color: #fff;
-    }
+    .btn-trust-secondary:hover { background: rgba(255,255,255,.1); border-color: #fff; text-decoration: none; color: #fff; }
 
-    /* ── Trust strip ── */
-    .trust-strip {
+    /* ══════════════════════════════════
+       FEATURES
+    ══════════════════════════════════ */
+    .features-section { padding: 72px 20px; }
+    .features-inner { max-width: 1100px; margin: 0 auto; }
+    .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 48px; }
+    @media(max-width:900px){ .features-grid { grid-template-columns: repeat(2,1fr); } }
+    @media(max-width:560px){ .features-grid { grid-template-columns: 1fr; } }
+
+    .feat-card {
+      background: var(--surface); border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius); padding: 28px 24px;
+      box-shadow: var(--shadow-sm); transition: transform .2s, box-shadow .2s;
+    }
+    .feat-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+    .feat-icon { font-size: 2.2rem; margin-bottom: 14px; line-height: 1; }
+    .feat-title { font-size: 1rem; font-weight: 800; color: var(--primary); margin-bottom: 8px; }
+    .feat-desc  { font-size: .84rem; color: var(--gray-500); line-height: 1.6; }
+    [data-theme=dark] .feat-card { border-color: var(--gray-700); }
+
+    /* ══════════════════════════════════
+       TESTIMONIALS
+    ══════════════════════════════════ */
+    .testi-section { background: var(--gray-50); padding: 72px 20px; }
+    [data-theme=dark] .testi-section { background: rgba(13,148,136,.03); }
+    .testi-inner { max-width: 1000px; margin: 0 auto; }
+    .testi-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; margin-top: 40px; }
+    @media(max-width:768px){ .testi-grid { grid-template-columns: 1fr; } }
+
+    .testi-card {
+      background: var(--surface); border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius); padding: 24px;
+      box-shadow: var(--shadow-sm);
+    }
+    .testi-stars { font-size: .9rem; margin-bottom: 10px; }
+    .testi-body  { font-size: .86rem; color: var(--gray-600); line-height: 1.6; margin-bottom: 16px; font-style: italic; }
+    .testi-user  { display: flex; align-items: center; gap: 10px; }
+    .testi-avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--teal));
+      display: flex; align-items: center; justify-content: center;
+      font-size: .72rem; font-weight: 800; color: #fff; flex-shrink: 0;
+    }
+    .testi-name { font-size: .86rem; font-weight: 700; color: var(--text); }
+    .testi-role { font-size: .74rem; color: var(--gray-400); }
+    [data-theme=dark] .testi-card { border-color: var(--gray-700); }
+
+    /* ══════════════════════════════════
+       FAQ
+    ══════════════════════════════════ */
+    .faq-section { padding: 72px 20px; }
+    .faq-inner { max-width: 720px; margin: 0 auto; }
+    .faq-item {
+      border: 1.5px solid var(--gray-200); border-radius: var(--radius-sm);
+      margin-bottom: 10px; overflow: hidden;
+      transition: border-color .2s;
+    }
+    .faq-item.open { border-color: var(--teal); }
+    .faq-q {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 16px 20px; cursor: pointer; background: var(--surface);
+      font-weight: 700; font-size: .92rem; color: var(--text);
+      user-select: none; gap: 12px;
+    }
+    .faq-q:hover { background: rgba(13,148,136,.04); }
+    .faq-chevron { font-size: .78rem; color: var(--gray-400); transition: transform .25s; flex-shrink: 0; }
+    .faq-item.open .faq-chevron { transform: rotate(180deg); color: var(--teal); }
+    .faq-a {
+      max-height: 0; overflow: hidden;
+      transition: max-height .3s ease, padding .3s ease;
       background: var(--surface);
-      border-top: 1.5px solid var(--gray-200);
-      border-bottom: 1.5px solid var(--gray-200);
-      padding: 20px 16px;
+      font-size: .86rem; color: var(--gray-500); line-height: 1.7;
+      padding: 0 20px;
     }
-    .trust-inner {
-      max-width: var(--max-width);
-      margin: 0 auto;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 32px;
-      flex-wrap: wrap;
-    }
-    .trust-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: .8rem;
-      font-weight: 700;
-      color: var(--gray-500);
-      white-space: nowrap;
-    }
-    .trust-item span:first-child { font-size: 1.1rem; }
+    .faq-item.open .faq-a { max-height: 220px; padding: 0 20px 16px; }
+    [data-theme=dark] .faq-item { border-color: var(--gray-700); }
+    [data-theme=dark] .faq-q { background: var(--gray-800); }
+    [data-theme=dark] .faq-a { background: var(--gray-800); }
 
-    /* ── Dark mode overrides ── */
-    [data-theme="dark"] .step-card   { border-color: var(--gray-700); }
-    [data-theme="dark"] .cat-card    { border-color: var(--gray-700); }
-    [data-theme="dark"] .why-card    { border-color: var(--gray-700); }
-    [data-theme="dark"] .testi-card  { border-color: var(--gray-700); }
-    [data-theme="dark"] .faq-item    { border-color: var(--gray-700); }
-    [data-theme="dark"] .faq-a-inner { border-color: var(--gray-700); }
-    [data-theme="dark"] .faq-q:hover { background: var(--gray-800); }
-    [data-theme="dark"] .hero-badge  { background: var(--gray-800); border-color: var(--gray-700); }
-    [data-theme="dark"] .why-icon    { background: var(--gray-800); }
-    [data-theme="dark"] .trust-strip { border-color: var(--gray-700); }
-    [data-theme="dark"] .how-tab     { border-color: var(--gray-600); color: var(--gray-400); }
-    [data-theme="dark"] .hero-stat-div { background: var(--gray-700); }
-
-    @media (max-width: 600px) {
-      .hero { padding: 48px 16px 56px; }
-      .hero-stat-div { display: none; }
-      .hero-stats { gap: 20px; }
-      .section { padding: 44px 16px; }
-      .cta-banner { padding: 36px 20px; }
-      .trust-inner { gap: 16px; }
+    /* ══════════════════════════════════
+       FINAL CTA BANNER
+    ══════════════════════════════════ */
+    .final-cta {
+      padding: 72px 20px;
+      background: linear-gradient(135deg, rgba(26,60,94,.05) 0%, rgba(13,148,136,.08) 100%);
+      text-align: center;
     }
+    .final-cta-inner { max-width: 600px; margin: 0 auto; }
+    .final-cta h2 { font-size: 1.7rem; font-weight: 900; color: var(--primary); margin-bottom: 10px; }
+    .final-cta p  { font-size: .95rem; color: var(--gray-500); margin-bottom: 28px; line-height: 1.6; }
+    .final-cta-btns { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+
   </style>
 </head>
 <body>
-
-  <!-- ✅ All 4 required anchor divs -->
+  <div id="page-loader"></div>
   <div id="announce-bar"></div>
   <nav id="main-nav"></nav>
 
   <main>
 
-    <!-- ════════════════════════════
+    <!-- ══════════════════════════════════
          HERO
-    ════════════════════════════ -->
+    ══════════════════════════════════ -->
     <section class="hero">
-      <div class="hero-badges">
-        <span class="hero-badge"><span class="dot teal"></span> Hyperlocal Gigs</span>
-        <span class="hero-badge"><span class="dot amber"></span> Gurugram First</span>
-        <span class="hero-badge"><span class="dot green"></span> Fast Hiring</span>
-      </div>
+      <div class="hero-inner">
 
-      <h1 class="hero-headline">
-        Gurugram mein<br>
-        <span class="highlight">kaam dhundo,</span><br>
-        kaam do,<br>
-        aur turant connect ho jao.
-      </h1>
+        <div class="hero-badge">
+          <span class="hero-badge-dot"></span>
+          🚀 v1.1 Live — Gurugram NCR
+        </div>
 
-      <p class="hero-sub">
-        GigLega students, freelancers, part-timers aur local businesses ko ek hi jagah connect karta hai. Chhote kaam ho ya urgent help, ab local hiring simple aur fast hogi.
-      </p>
+        <h1>
+          Gig Dhundho, <span>Kaam Karo,</span><br/>
+          Paise Kamao
+        </h1>
 
-      <div class="hero-actions">
-        <a href="login.html?tab=register" class="hero-cta-primary">🚀 Free Mein Join Karo</a>
-        <a href="browse.html" class="hero-cta-secondary">🔍 Gigs Browse Karo</a>
-      </div>
+        <p class="hero-sub">
+          GigLega Gurugram ka #1 hyperlocal gig platform hai — students, bachelors
+          aur working professionals ke liye. Fast kaam, fast payment.
+        </p>
 
-      <div class="hero-stats">
-        <div class="hero-stat">
-          <div class="hero-stat-val" id="statGigs">0</div>
-          <div class="hero-stat-lbl">Gigs Posted</div>
+        <div class="hero-cta">
+          <a href="browse.html" class="btn-hero-primary">🔍 Browse Gigs</a>
+          <a href="post-gig.html" class="btn-hero-secondary">➕ Post a Gig</a>
         </div>
-        <div class="hero-stat-div"></div>
-        <div class="hero-stat">
-          <div class="hero-stat-val" id="statUsers">0</div>
-          <div class="hero-stat-lbl">Registered Users</div>
+
+        <div class="hero-chips">
+          <span class="hero-chip">⚡ Same-day gigs</span>
+          <span class="hero-chip">💰 Instant payments</span>
+          <span class="hero-chip">📍 Near you</span>
+          <span class="hero-chip">🔒 Verified workers</span>
+          <span class="hero-chip">🆓 Free to join</span>
         </div>
-        <div class="hero-stat-div"></div>
-        <div class="hero-stat">
-          <div class="hero-stat-val">₹150+</div>
-          <div class="hero-stat-lbl">Starting Pay/hr</div>
+
+        <div class="hero-stats">
+          <div class="hero-stat-item">
+            <div class="hero-stat-num" id="statGigs">0</div>
+            <div class="hero-stat-lbl">Live Gigs</div>
+          </div>
+          <div class="hero-stat-item">
+            <div class="hero-stat-num" id="statWorkers">0</div>
+            <div class="hero-stat-lbl">Active Workers</div>
+          </div>
+          <div class="hero-stat-item">
+            <div class="hero-stat-num">₹0</div>
+            <div class="hero-stat-lbl">Platform Fee on First Gig</div>
+          </div>
+          <div class="hero-stat-item">
+            <div class="hero-stat-num">6%</div>
+            <div class="hero-stat-lbl">Low Platform Fee</div>
+          </div>
         </div>
-        <div class="hero-stat-div"></div>
-        <div class="hero-stat">
-          <div class="hero-stat-val">6%</div>
-          <div class="hero-stat-lbl">Platform Fee Only</div>
-        </div>
+
       </div>
     </section>
 
-    <!-- ════════════════════════════
-         TRUST STRIP
-    ════════════════════════════ -->
-    <div class="trust-strip">
-      <div class="trust-inner">
-        <div class="trust-item"><span>🔒</span><span>Safe & Verified</span></div>
-        <div class="trust-item"><span>⚡</span><span>Instant Connection</span></div>
-        <div class="trust-item"><span>💸</span><span>No Hidden Charges</span></div>
-        <div class="trust-item"><span>📍</span><span>Gurugram Focused</span></div>
-        <div class="trust-item"><span>🤝</span><span>Both Sides Free</span></div>
-        <div class="trust-item"><span>📱</span><span>WhatsApp Support</span></div>
+    <!-- SEARCH BAR -->
+    <div class="container" style="position:relative;z-index:2">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="heroSearch" class="search-input"
+          placeholder="Search gigs — e.g. House Help, Delivery, Tutoring…"
+          autocomplete="off" />
+        <button class="search-btn" id="heroSearchBtn">Search →</button>
       </div>
     </div>
 
-    <!-- ════════════════════════════
+    <!-- CATEGORIES -->
+    <section class="cats-section">
+      <div class="cats-inner">
+        <div class="cats-title">Popular Categories</div>
+        <div class="cats-grid" id="catsGrid"></div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════
          HOW IT WORKS
-    ════════════════════════════ -->
-    <section class="section section-alt">
-      <div class="section-inner">
-        <div style="text-align:center;margin-bottom:8px">
-          <div class="section-eyebrow">How It Works</div>
-          <h2 class="section-big-title">Simple as 1-2-3</h2>
-          <p class="section-desc" style="margin:0 auto">Chahe gig dhoondna ho ya post karna — poora process sirf 3 steps mein.</p>
+    ══════════════════════════════════ -->
+    <section class="hiw-section">
+      <div class="hiw-inner">
+        <div class="section-head">
+          <h2>⚙️ Kaise Kaam Karta Hai?</h2>
+          <p>Worker ho ya Poster — dono ke liye super simple process hai.</p>
         </div>
 
-        <!-- Tabs -->
-        <div class="how-tabs" style="justify-content:center;margin-top:28px">
-          <button class="how-tab active" data-how="worker">⚡ I Want to Work</button>
-          <button class="how-tab" data-how="poster">📋 I Want to Hire</button>
-        </div>
+        <div class="hiw-grid">
 
-        <!-- Worker panel -->
-        <div class="how-panel active" id="howWorker">
-          <div class="steps-grid">
-            <div class="step-card">
-              <div class="step-num">1</div>
-              <div class="step-icon">📝</div>
-              <h3>Register Free</h3>
-              <p>Apna naam, phone, aur city daalo. 30 seconds mein account ready.</p>
+          <!-- Worker side -->
+          <div class="hiw-col">
+            <div class="hiw-col-title">
+              <span>⚡</span> For Workers
+              <span class="hiw-col-badge badge-worker">Earn Money</span>
             </div>
-            <div class="step-card">
-              <div class="step-num">2</div>
-              <div class="step-icon">🔍</div>
-              <h3>Browse Gigs</h3>
-              <p>Category aur location filter karke apne area ke gigs dekho. Real-time updates.</p>
+            <div class="hiw-step">
+              <div class="hiw-num">1</div>
+              <div class="hiw-content">
+                <h4>Create your free profile</h4>
+                <p>Signup, add your skills and city. 2 minutes mein ready.</p>
+              </div>
             </div>
-            <div class="step-card">
-              <div class="step-num">3</div>
-              <div class="step-icon">✅</div>
-              <h3>Accept & Earn</h3>
-              <p>Gig accept karo, kaam karo, aur payment lo. As simple as that.</p>
+            <div class="hiw-step">
+              <div class="hiw-num">2</div>
+              <div class="hiw-content">
+                <h4>Browse nearby gigs</h4>
+                <p>Filter by category, budget, type. Apne area ke gigs dekho.</p>
+              </div>
             </div>
-            <div class="step-card">
-              <div class="step-num">4</div>
-              <div class="step-icon">⭐</div>
-              <h3>Build Reputation</h3>
-              <p>Rating badhao, zyada gigs milenge. Top workers ko priority listing milti hai.</p>
+            <div class="hiw-step">
+              <div class="hiw-num">3</div>
+              <div class="hiw-content">
+                <h4>Accept & chat with poster</h4>
+                <p>Ek click mein gig accept karo, details discuss karo.</p>
+              </div>
+            </div>
+            <div class="hiw-step">
+              <div class="hiw-num">4</div>
+              <div class="hiw-content">
+                <h4>Do the work, get paid</h4>
+                <p>Kaam complete karo. Payment direct wallet mein — same day.</p>
+              </div>
             </div>
           </div>
-        </div>
 
-        <!-- Poster panel -->
-        <div class="how-panel" id="howPoster">
-          <div class="steps-grid">
-            <div class="step-card">
-              <div class="step-num">1</div>
-              <div class="step-icon">📋</div>
-              <h3>Post Your Gig</h3>
-              <p>Kaam ka title, category, location, aur price set karo. 2 minutes mein live.</p>
+          <!-- Poster side -->
+          <div class="hiw-col">
+            <div class="hiw-col-title">
+              <span>📋</span> For Posters
+              <span class="hiw-col-badge badge-poster">Get Help</span>
             </div>
-            <div class="step-card">
-              <div class="step-num">2</div>
-              <div class="step-icon">👀</div>
-              <h3>Workers Apply</h3>
-              <p>Nearby available workers turant dekhenge aur first-come-first-served basis pe accept karenge.</p>
+            <div class="hiw-step">
+              <div class="hiw-num">1</div>
+              <div class="hiw-content">
+                <h4>Sign up & post a gig</h4>
+                <p>Describe your task, set budget, add location. 3 min max.</p>
+              </div>
             </div>
-            <div class="step-card">
-              <div class="step-num">3</div>
-              <div class="step-icon">💬</div>
-              <h3>Chat & Confirm</h3>
-              <p>Worker se seedha chat karo, details confirm karo, aur kaam shuru ho jao.</p>
+            <div class="hiw-step">
+              <div class="hiw-num">2</div>
+              <div class="hiw-content">
+                <h4>Workers apply fast</h4>
+                <p>Verified workers in your area will accept your gig quickly.</p>
+              </div>
             </div>
-            <div class="step-card">
-              <div class="step-num">4</div>
-              <div class="step-icon">💳</div>
-              <h3>Pay After Done</h3>
-              <p>Kaam complete hone ke baad hi payment — cash, UPI, ya GigLega wallet se.</p>
+            <div class="hiw-step">
+              <div class="hiw-num">3</div>
+              <div class="hiw-content">
+                <h4>Chat & confirm</h4>
+                <p>In-app chat se details confirm karo, address share karo.</p>
+              </div>
+            </div>
+            <div class="hiw-step">
+              <div class="hiw-num">4</div>
+              <div class="hiw-content">
+                <h4>Task done, review worker</h4>
+                <p>Kaam ho jae toh rating do. Community better hoti rahegi.</p>
+              </div>
             </div>
           </div>
-        </div>
 
+        </div>
       </div>
     </section>
 
-    <!-- ════════════════════════════
-         LIVE TICKER
-    ════════════════════════════ -->
-    <div class="section" style="padding:0 16px 32px">
-      <div class="section-inner">
-        <div class="gigs-ticker-wrap">
-          <span class="ticker-dot"></span>
-          <span class="ticker-label">Live Gigs</span>
-          <div class="ticker-scroll">
-            <div class="ticker-inner" id="tickerInner">
-              <!-- Populated by JS -->
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ════════════════════════════
-         CATEGORIES
-    ════════════════════════════ -->
-    <section class="section section-alt">
-      <div class="section-inner">
-        <div class="section-eyebrow">Categories</div>
-        <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:12px">
+    <!-- ══════════════════════════════════
+         LIVE GIGS
+    ══════════════════════════════════ -->
+    <section class="gigs-section">
+      <div class="gigs-inner">
+        <div class="gigs-header">
           <div>
-            <h2 class="section-big-title">Koi bhi kaam,<br>GigLega pe milega</h2>
-            <p class="section-desc">15+ categories — hyperlocal se leke remote tak sab kuch.</p>
+            <h2>🔥 Live Gigs Near You</h2>
+            <p style="font-size:.84rem;color:var(--gray-500);margin-top:2px">Recently posted — accept karo aur kaam shuru karo</p>
           </div>
-          <a href="browse.html" style="font-size:.85rem;font-weight:700;color:var(--teal);text-decoration:none">All Categories →</a>
+          <a href="browse.html" class="btn btn-secondary btn-sm">View All →</a>
         </div>
-
-        <div class="cat-grid">
-          <a href="browse.html?cat=delivery" class="cat-card">
-            <span class="cat-icon">🛵</span>
-            <div class="cat-name">Delivery</div>
-            <div class="cat-count">Fast & Local</div>
-          </a>
-          <a href="browse.html?cat=cleaning" class="cat-card">
-            <span class="cat-icon">🧹</span>
-            <div class="cat-name">Cleaning</div>
-            <div class="cat-count">Home & Office</div>
-          </a>
-          <a href="browse.html?cat=moving" class="cat-card">
-            <span class="cat-icon">📦</span>
-            <div class="cat-name">Moving Help</div>
-            <div class="cat-count">Shifting & Packing</div>
-          </a>
-          <a href="browse.html?cat=tech" class="cat-card">
-            <span class="cat-icon">💻</span>
-            <div class="cat-name">Tech Support</div>
-            <div class="cat-count">Remote & On-site</div>
-          </a>
-          <a href="browse.html?cat=tutoring" class="cat-card">
-            <span class="cat-icon">📚</span>
-            <div class="cat-name">Tutoring</div>
-            <div class="cat-count">All Subjects</div>
-          </a>
-          <a href="browse.html?cat=cooking" class="cat-card">
-            <span class="cat-icon">🍳</span>
-            <div class="cat-name">Cooking</div>
-            <div class="cat-count">Home Chef</div>
-          </a>
-          <a href="browse.html?cat=design" class="cat-card">
-            <span class="cat-icon">🎨</span>
-            <div class="cat-name">Design</div>
-            <div class="cat-count">Graphic & UI</div>
-          </a>
-          <a href="browse.html?cat=photography" class="cat-card">
-            <span class="cat-icon">📸</span>
-            <div class="cat-name">Photography</div>
-            <div class="cat-count">Events & Products</div>
-          </a>
-          <a href="browse.html?cat=plumbing" class="cat-card">
-            <span class="cat-icon">🔧</span>
-            <div class="cat-name">Plumbing</div>
-            <div class="cat-count">Repairs & Fix</div>
-          </a>
-          <a href="browse.html?cat=electrical" class="cat-card">
-            <span class="cat-icon">⚡</span>
-            <div class="cat-name">Electrical</div>
-            <div class="cat-count">Wiring & Fitting</div>
-          </a>
-          <a href="browse.html?cat=data-entry" class="cat-card">
-            <span class="cat-icon">📊</span>
-            <div class="cat-name">Data Entry</div>
-            <div class="cat-count">Remote Work</div>
-          </a>
-          <a href="browse.html?cat=other" class="cat-card" style="border-style:dashed">
-            <span class="cat-icon">➕</span>
-            <div class="cat-name">More</div>
-            <div class="cat-count">Explore All</div>
-          </a>
+        <div class="gigs-grid" id="featuredGigs">
+          <!-- Injected by JS -->
+        </div>
+        <div class="empty-state hidden" id="gigsEmpty">
+          <div class="empty-icon">🔍</div>
+          <div class="empty-title">Abhi koi gig available nahi</div>
+          <div class="empty-body">Pehle poster bano aur pehla gig post karo!</div>
+          <a href="post-gig.html" class="btn btn-primary" style="margin-top:4px">➕ Post First Gig</a>
+        </div>
+        <div style="text-align:center;margin-top:32px">
+          <a href="browse.html" class="btn btn-primary btn-lg">Browse All Gigs →</a>
         </div>
       </div>
     </section>
 
-    <!-- ════════════════════════════
-         WHY GIGLEGA
-    ════════════════════════════ -->
-    <section class="section">
-      <div class="section-inner">
-        <div style="text-align:center;margin-bottom:8px">
-          <div class="section-eyebrow">Why GigLega</div>
-          <h2 class="section-big-title">Doosre platforms se alag kyun?</h2>
-          <p class="section-desc" style="margin:0 auto">GigLega sirf Gurugram ke liye banaya gaya hai — local needs, local solutions.</p>
+    <!-- ══════════════════════════════════
+         TRUST STRIP
+    ══════════════════════════════════ -->
+    <section class="trust-strip">
+      <div class="trust-inner">
+        <h2>Ready to start earning or getting help?</h2>
+        <p>Join thousands of workers and posters across Gurugram NCR</p>
+        <div class="trust-ctas">
+          <a href="signup.html?role=worker" class="btn-trust-primary">⚡ Join as Worker</a>
+          <a href="signup.html?role=poster" class="btn-trust-secondary">📋 Post a Gig</a>
         </div>
-        <div class="why-grid">
-          <div class="why-card">
-            <div class="why-icon">📍</div>
-            <div class="why-content">
-              <h3>Hyperlocal First</h3>
-              <p>Apne area ke gigs pehle dikho. Sector-level filtering se nearest worker ya gig milta hai.</p>
-            </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════
+         FEATURES
+    ══════════════════════════════════ -->
+    <section class="features-section">
+      <div class="features-inner">
+        <div class="section-head">
+          <h2>✨ GigLega Kyun Choose Karein?</h2>
+          <p>Dusre platforms se bilkul alag — local, fast, aur honest.</p>
+        </div>
+        <div class="features-grid">
+          <div class="feat-card">
+            <div class="feat-icon">📍</div>
+            <div class="feat-title">Hyperlocal First</div>
+            <div class="feat-desc">Sirf apne area ke gigs dikhai denge. No unnecessary travel — kaam paas mein hi milega.</div>
           </div>
-          <div class="why-card">
-            <div class="why-icon">⚡</div>
-            <div class="why-content">
-              <h3>Instant Matching</h3>
-              <p>Gig post karo aur minutes mein worker accept kar leta hai. No waiting for days.</p>
-            </div>
+          <div class="feat-card">
+            <div class="feat-icon">⚡</div>
+            <div class="feat-title">Same-Day Gigs</div>
+            <div class="feat-desc">Urgent task hai? Post karo aur kuch ghanton mein worker mil jaata hai. Real-time matching.</div>
           </div>
-          <div class="why-card">
-            <div class="why-icon">💸</div>
-            <div class="why-content">
-              <h3>Fair Pricing</h3>
-              <p>Sirf 6% support fee — aur woh bhi tab jab kaam complete ho. No upfront charges, ever.</p>
-            </div>
+          <div class="feat-card">
+            <div class="feat-icon">💰</div>
+            <div class="feat-title">Low 6% Fee</div>
+            <div class="feat-desc">Sirf 6% platform fee — worker aur poster dono ke liye transparent. Koi hidden charge nahi.</div>
           </div>
-          <div class="why-card">
-            <div class="why-icon">🔒</div>
-            <div class="why-content">
-              <h3>Safe Payments</h3>
-              <p>Cash, UPI, ya GigLega secure wallet — jo method comfortable lage, woh use karo.</p>
-            </div>
+          <div class="feat-card">
+            <div class="feat-icon">🔒</div>
+            <div class="feat-title">Verified Profiles</div>
+            <div class="feat-desc">Worker profiles verified hain. Reviews aur ratings se trust build hota hai over time.</div>
           </div>
-          <div class="why-card">
-            <div class="why-icon">💬</div>
-            <div class="why-content">
-              <h3>Built-in Chat</h3>
-              <p>Har gig ke liye dedicated chat — no sharing phone numbers until you're comfortable.</p>
-            </div>
+          <div class="feat-card">
+            <div class="feat-icon">💬</div>
+            <div class="feat-title">In-App Chat</div>
+            <div class="feat-desc">Personal number share karne ki zaroorat nahi. Secure in-app chat directly on platform.</div>
           </div>
-          <div class="why-card">
-            <div class="why-icon">📱</div>
-            <div class="why-content">
-              <h3>WhatsApp Support</h3>
-              <p>Koi bhi problem ho, seedha WhatsApp karo. Hum 10AM–10PM available hain.</p>
-            </div>
+          <div class="feat-card">
+            <div class="feat-icon">📱</div>
+            <div class="feat-title">Mobile Ready</div>
+            <div class="feat-desc">Phone pe bilkul smooth experience. Kahi se bhi gig post karo ya accept karo.</div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ════════════════════════════
+    <!-- ══════════════════════════════════
          TESTIMONIALS
-    ════════════════════════════ -->
-    <section class="section section-alt">
-      <div class="section-inner">
-        <div style="text-align:center;margin-bottom:8px">
-          <div class="section-eyebrow">Testimonials</div>
-          <h2 class="section-big-title">Log kya keh rahe hain</h2>
-          <p class="section-desc" style="margin:0 auto">Beta users ki real feedback — unhi ke shabd mein.</p>
+    ══════════════════════════════════ -->
+    <section class="testi-section">
+      <div class="testi-inner">
+        <div class="section-head">
+          <h2>❤️ Log Kya Bol Rahe Hain</h2>
+          <p>GigLega use karne waale workers aur posters ki real stories.</p>
         </div>
-        <div class="testimonials-grid">
+        <div class="testi-grid">
+
           <div class="testi-card">
-            <div class="testi-stars">★★★★★</div>
-            <p class="testi-text">"GigLega se mujhe pehla gig ek ghante mein mila. Delivery ka kaam tha, aur payment bhi turant ho gaya. Ekdum smooth experience!"</p>
-            <div class="testi-author">
-              <div class="testi-avatar">RK</div>
+            <div class="testi-stars">⭐⭐⭐⭐⭐</div>
+            <div class="testi-body">"GigLega ne meri zindagi badal di. College ke baad part-time gigs milne lage — ₹8000 monthly extra earn kar raha hoon!"</div>
+            <div class="testi-user">
+              <div class="testi-avatar">RS</div>
               <div>
-                <div class="testi-name">Rahul Kumar</div>
-                <div class="testi-role">Delivery Worker · Sector 45, Gurugram</div>
+                <div class="testi-name">Rahul Sharma</div>
+                <div class="testi-role">⚡ Worker — DLF Phase 2</div>
               </div>
             </div>
           </div>
+
           <div class="testi-card">
-            <div class="testi-stars">★★★★★</div>
-            <p class="testi-text">"Maine ghar shifting ke liye help post ki — 20 minutes mein 2 workers ready the. Dono bahut kaam ke nikle. GigLega rocks!"</p>
-            <div class="testi-author">
-              <div class="testi-avatar" style="background:linear-gradient(135deg,var(--teal),var(--accent))">PS</div>
+            <div class="testi-stars">⭐⭐⭐⭐⭐</div>
+            <div class="testi-body">"Mujhe ek reliable house helper chahiye tha ek din ke liye. GigLega pe post kiya aur 2 ghante mein verified worker aa gaya!"</div>
+            <div class="testi-user">
+              <div class="testi-avatar">PG</div>
               <div>
-                <div class="testi-name">Priya Sharma</div>
-                <div class="testi-role">Poster · DLF Phase 2, Gurugram</div>
+                <div class="testi-name">Priya Gupta</div>
+                <div class="testi-role">📋 Poster — Sector 56</div>
               </div>
             </div>
           </div>
+
           <div class="testi-card">
-            <div class="testi-stars">★★★★☆</div>
-            <p class="testi-text">"Student hoon aur part-time kaam chahiye tha. GigLega pe data entry gigs milte hain jo ghar se kar sakta hoon. Ek mahine mein ₹8,000 extra!"</p>
-            <div class="testi-author">
-              <div class="testi-avatar" style="background:linear-gradient(135deg,#7c3aed,#a78bfa)">AM</div>
+            <div class="testi-stars">⭐⭐⭐⭐⭐</div>
+            <div class="testi-body">"Weekend mein delivery gigs karta hoon. Ek mahine mein ₹12,000 extra kama liya. GigLega best hai NCR mein!"</div>
+            <div class="testi-user">
+              <div class="testi-avatar">AK</div>
               <div>
-                <div class="testi-name">Aman Mehta</div>
-                <div class="testi-role">Remote Worker · Palam Vihar, Gurugram</div>
+                <div class="testi-name">Amit Kumar</div>
+                <div class="testi-role">⚡ Worker — Sohna Road</div>
               </div>
             </div>
           </div>
+
         </div>
       </div>
     </section>
 
-    <!-- ════════════════════════════
+    <!-- ══════════════════════════════════
          FAQ
-    ════════════════════════════ -->
-   <section class="section" id="faq">
-  <div class="section-inner" style="max-width:760px">
-    <div style="text-align:center;margin-bottom:8px">
-      <div class="section-eyebrow">FAQ</div>
-          <h2 class="section-big-title">Common questions</h2>
-          <p class="section-desc" style="margin:0 auto">GigLega ke baare mein kuch sawaal hain? Yahan dekho.</p>
+    ══════════════════════════════════ -->
+    <section class="faq-section">
+      <div class="faq-inner">
+        <div class="section-head">
+          <h2>❓ Aksar Pooche Jaane Waale Sawaal</h2>
+          <p>Koi bhi doubt ho toh yahan check karo — warna <a href="help-center.html">Help Center</a> visit karo.</p>
         </div>
-
-        <div class="faq-list" id="faqList">
-
-          <div class="faq-item">
-            <button class="faq-q">
-              GigLega kya hai aur yeh kaise kaam karta hai?
-              <span class="faq-arrow">▼</span>
-            </button>
-            <div class="faq-a">
-              <div class="faq-a-inner">GigLega Gurugram ka hyperlocal gig platform hai jahan workers local part-time ya freelance kaam dhundh sakte hain, aur businesses apna kaam post karke suitable workers se directly connect kar sakte hain. Poora process free aur simple hai.</div>
-            </div>
-          </div>
-
-          <div class="faq-item">
-            <button class="faq-q">
-              Kya GigLega use karna free hai?
-              <span class="faq-arrow">▼</span>
-            </button>
-            <div class="faq-a">
-              <div class="faq-a-inner">Haan! GigLega workers aur clients dono ke liye completely free hai. Registration free, gig posting free, aur applying free. Sirf ek 6% support fee lagti hai jab kaam successfully complete ho jaata hai — aur woh bhi worker ki earning se kati hai.</div>
-            </div>
-          </div>
-
-          <div class="faq-item">
-            <button class="faq-q">
-              Kya GigLega sirf Gurugram ke liye hai?
-              <span class="faq-arrow">▼</span>
-            </button>
-            <div class="faq-a">
-              <div class="faq-a-inner">Abhi GigLega Gurugram mein focused hai, lekin jald hi Delhi, Noida, aur Faridabad mein bhi aayega. Gurugram waale pehle benefit uthao! Remote gigs ke liye koi location restriction nahi hai.</div>
-            </div>
-          </div>
-
-          <div class="faq-item">
-            <button class="faq-q">
-              Payment kaise hoti hai — safe hai kya?
-              <span class="faq-arrow">▼</span>
-            </button>
-            <div class="faq-a">
-              <div class="faq-a-inner">GigLega 3 payment options deta hai: (1) Pay After Completion — seedha worker ko kaam ke baad, (2) Secure Wallet — payment platform hold karta hai aur complete hone pe release hoti hai, (3) Cash — on-site cash payment. Sabse safe method hai GigLega Wallet jo escrow-style protection deta hai.</div>
-            </div>
-          </div>
-
-          <div class="faq-item">
-            <button class="faq-q">
-              Agar worker kaam complete na kare toh kya hoga?
-              <span class="faq-arrow">▼</span>
-            </button>
-            <div class="faq-a">
-              <div class="faq-a-inner">Agar Secure Wallet payment use kiya hai, toh payment automatic hold rehti hai — worker ko tabhi milti hai jab aap mark karo ki kaam complete hua. Problem hone pe Giglega.official@gmail.com ya WhatsApp +91 9319635257 pe contact karo. Hum mediate karne ki koshish karenge.</div>
-            </div>
-          </div>
-
-          <div class="faq-item">
-            <button class="faq-q">
-              Mujhe problem hai, kaise contact karein?
-              <span class="faq-arrow">▼</span>
-            </button>
-            <div class="faq-a">
-              <div class="faq-a-inner">Contact page par form fill karo ya directly WhatsApp par message karo: <a href="https://wa.me/919319635257" target="_blank" rel="noopener" style="color:var(--teal);font-weight:700">+91 93196 35257</a>. Hum jaldi reply karte hain — typically 1-2 ghante mein.</div>
-            </div>
-          </div>
-
-        </div>
+        <div id="faqList" style="margin-top:32px"></div>
       </div>
     </section>
 
-    <!-- ════════════════════════════
-         CTA BANNER
-    ════════════════════════════ -->
-    <section class="section" style="padding-top:0">
-      <div class="section-inner">
-        <div class="cta-banner">
-          <h2>Taiyar ho? Abhi shuru karo.</h2>
-          <p>Gurugram mein kaam dhundh rahe ho ya hire karna chahte ho — GigLega par register karo, free mein, aur apna pehla step lo.</p>
-          <div class="cta-banner-actions">
-            <a href="login.html?tab=register" class="cta-btn-white">🚀 Free Mein Join Karo</a>
-            <a href="browse.html" class="cta-btn-outline-white">🔍 Gigs Browse Karo</a>
-          </div>
+    <!-- ══════════════════════════════════
+         FINAL CTA
+    ══════════════════════════════════ -->
+    <section class="final-cta">
+      <div class="final-cta-inner">
+        <h2>🚀 Shuru Karo Aaj Hi</h2>
+        <p>Free mein join karo. Koi subscription nahi, koi hidden fee nahi.<br/>Sirf kaam karo — aur paise kamao.</p>
+        <div class="final-cta-btns">
+          <a href="signup.html" class="btn btn-primary btn-lg">Join Free →</a>
+          <a href="browse.html" class="btn btn-secondary btn-lg">Browse Gigs</a>
         </div>
       </div>
     </section>
 
   </main>
 
-  <!-- ✅ Footer and toast anchors -->
   <footer id="main-footer"></footer>
   <div id="toast-container"></div>
 
   <script>
-  (function () {
+  document.addEventListener("DOMContentLoaded", function () {
+
+    var GIGS_KEY = (typeof GL !== "undefined") ? GL.STORAGE_KEY_GIGS : "gl_gigs";
+
+    /* ── Helpers ── */
+    function getGigs() {
+      try { return JSON.parse(localStorage.getItem(GIGS_KEY) || "[]"); } catch(e) { return []; }
+    }
+    function escH(s) {
+      return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+    }
+    function timeAgo(iso) {
+      var diff = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
+      if (diff < 60)    return diff + "s ago";
+      if (diff < 3600)  return Math.floor(diff/60)  + "m ago";
+      if (diff < 86400) return Math.floor(diff/3600) + "h ago";
+      return Math.floor(diff/86400) + "d ago";
+    }
 
     /* ── Live stats from localStorage ── */
-    function _getUser() {
-      try {
-        var u = JSON.parse(localStorage.getItem("gl_user") || "null");
-        return (u && u.id) ? u : null;
-      } catch(e) { return null; }
-    }
+    var allGigs    = getGigs();
+    var liveGigs   = allGigs.filter(function(g){ return g.status === "open"; });
+    var allUsers   = [];
+    try { allUsers = JSON.parse(localStorage.getItem((typeof GL!=="undefined"?GL.STORAGE_KEY_USERS:"gl_users"))||"[]"); } catch(e){}
 
-    function animateCount(el, target, prefix, suffix) {
-      prefix = prefix || "";
+    /* Animate number counter */
+    function animCount(elId, target, suffix) {
+      var el = document.getElementById(elId);
+      if (!el) return;
+      target = target || 0;
       suffix = suffix || "";
-      var start    = 0;
-      var duration = 1200;
-      var step     = 16;
-      var steps    = Math.ceil(duration / step);
-      var inc      = target / steps;
-      var current  = 0;
-      var timer    = setInterval(function () {
-        current += inc;
-        if (current >= target) {
-          current = target;
-          clearInterval(timer);
-        }
-        el.textContent = prefix + Math.floor(current) + suffix;
-      }, step);
+      if (target === 0) { el.textContent = "0" + suffix; return; }
+      var start = 0, duration = 1200, step = Math.ceil(target / 40);
+      var timer = setInterval(function(){
+        start = Math.min(start + step, target);
+        el.textContent = start + suffix;
+        if (start >= target) clearInterval(timer);
+      }, duration / 40);
+    }
+    animCount("statGigs",    liveGigs.length  || 0);
+    animCount("statWorkers", allUsers.filter(function(u){ return u.role==="worker"; }).length || 0);
+
+    /* ── Categories ── */
+    var CATS = [
+      {icon:"🧹", label:"House Help"},
+      {icon:"📦", label:"Moving"},
+      {icon:"🛒", label:"Errands"},
+      {icon:"🔧", label:"Handyman"},
+      {icon:"💻", label:"Tech Help"},
+      {icon:"📚", label:"Tutoring"},
+      {icon:"🎉", label:"Events"},
+      {icon:"🚗", label:"Driver"},
+      {icon:"🐕", label:"Pet Care"},
+      {icon:"🎨", label:"Design"},
+      {icon:"🌐", label:"Web Dev"},
+      {icon:"📱", label:"Social Media"}
+    ];
+    var catsGrid = document.getElementById("catsGrid");
+    CATS.forEach(function(cat){
+      var a = document.createElement("a");
+      a.className = "cat-chip";
+      a.href = "browse.html?cat=" + encodeURIComponent(cat.label);
+      a.innerHTML = cat.icon + " " + cat.label;
+      catsGrid.appendChild(a);
+    });
+
+    /* ── Featured gigs (max 6 open gigs) ── */
+    var container = document.getElementById("featuredGigs");
+    var emptyEl   = document.getElementById("gigsEmpty");
+    var show      = liveGigs.slice(0, 6);
+
+    if (!show.length) {
+      container.classList.add("hidden");
+      emptyEl.classList.remove("hidden");
+    } else {
+      emptyEl.classList.add("hidden");
+      show.forEach(function(gig){
+        var fee    = Math.round((gig.budget || 0) * 0.06);
+        var earn   = (gig.budget || 0) - fee;
+        var isHyper = gig.type === "hyperlocal";
+        container.innerHTML += '<div class="gig-card card-hover">' +
+          '<div class="gig-type-tag ' + (isHyper ? "tag-hyperlocal" : "tag-remote") + '">' +
+            (isHyper ? "📍 Hyperlocal" : "🌐 Remote") +
+          '</div>' +
+          '<div class="gig-card-title">' + escH(gig.title) + '</div>' +
+          '<div class="gig-card-desc line-clamp-2">' + escH(gig.description||"") + '</div>' +
+          '<div class="gig-card-meta">' +
+            '<span class="gig-meta-chip">📍 ' + escH(gig.location||"Gurugram") + '</span>' +
+            '<span class="gig-meta-chip">🕐 ' + timeAgo(gig.createdAt) + '</span>' +
+            (gig.category ? '<span class="gig-meta-chip">🏷️ ' + escH(gig.category) + '</span>' : '') +
+          '</div>' +
+          '<div class="gig-earn-strip">' +
+            '<div>' +
+              '<div class="gig-earn-label">You Earn</div>' +
+              '<div class="gig-earn-val">₹' + earn.toLocaleString("en-IN") + '</div>' +
+            '</div>' +
+            '<div style="text-align:right">' +
+              '<div class="gig-earn-label">Posted Budget</div>' +
+              '<div class="gig-price">₹' + (gig.budget||0).toLocaleString("en-IN") + '</div>' +
+            '</div>' +
+          '</div>' +
+          '<a href="gig-detail.html?id=' + escH(gig.id) + '" class="btn btn-primary btn-sm btn-block" style="margin-top:auto">View Gig →</a>' +
+        '</div>';
+      });
     }
 
-    function loadStats() {
-      var gigs  = JSON.parse(localStorage.getItem("gl_gigs")  || "[]");
-      var users = JSON.parse(localStorage.getItem("gl_users") || "[]");
-
-      /* Add demo floor counts so it doesn't look empty on first load */
-      var gigCount  = gigs.length  + 24;
-      var userCount = users.length + 87;
-
-      var gigEl  = document.getElementById("statGigs");
-      var userEl = document.getElementById("statUsers");
-      if (gigEl)  animateCount(gigEl,  gigCount);
-      if (userEl) animateCount(userEl, userCount);
-    }
-
-    /* ── Ticker ── */
-    function buildTicker() {
-      var gigs  = JSON.parse(localStorage.getItem("gl_gigs") || "[]");
-      var demos = [
-        "🛵 Delivery needed · Sector 56 · ₹250/hr",
-        "💻 Data entry · Remote · ₹200/hr",
-        "🧹 House cleaning · DLF Phase 1 · ₹300/hr",
-        "📚 Maths tutor · Palam Vihar · ₹350/hr",
-        "📦 Shifting help · Sohna Road · ₹400/hr",
-        "🎨 Logo design · Remote · ₹500/hr",
-        "🔧 Plumber needed · Sector 14 · ₹280/hr",
-        "📸 Event photographer · Golf Course Rd · ₹600/hr",
-        "🍳 Home chef · Unitech · ₹450/hr",
-        "⚡ Electrician · Sector 23 · ₹300/hr"
+    /* ── Seed demo gigs if none exist ── */
+    if (!allGigs.length) {
+      var demoGigs = [
+        { id:"gig_demo1", title:"House Cleaning — 3BHK", description:"Mujhe ek reliable cleaner chahiye full 3BHK ke liye Saturday ko. All supplies provided.", budget:800, category:"House Help", type:"hyperlocal", location:"Sector 56, Gurugram", status:"open", createdAt: new Date(Date.now()-3600000).toISOString(), posterId:"demo" },
+        { id:"gig_demo2", title:"Grocery Pickup & Delivery", description:"BigBazaar se saman lana hai ghar pe. Light items only. 1-2 ghante max.", budget:300, category:"Errands", type:"hyperlocal", location:"DLF Phase 3", status:"open", createdAt: new Date(Date.now()-7200000).toISOString(), posterId:"demo" },
+        { id:"gig_demo3", title:"Logo Design — Startup", description:"Need a clean, minimal logo for a food delivery startup. 2 concepts chahiye.", budget:1500, category:"Design", type:"remote", location:"Remote", status:"open", createdAt: new Date(Date.now()-10800000).toISOString(), posterId:"demo" },
+        { id:"gig_demo4", title:"Math Tutor — Class 10", description:"Meri beti ko maths weak hai. Weekend 2 hours daily. Nearby preferred.", budget:600, category:"Tutoring", type:"hyperlocal", location:"Sohna Road", status:"open", createdAt: new Date(Date.now()-14400000).toISOString(), posterId:"demo" },
+        { id:"gig_demo5", title:"WordPress Bug Fix", description:"Simple blog site ka contact form kaam nahi kar raha. Quick fix needed.", budget:500, category:"Tech Help", type:"remote", location:"Remote", status:"open", createdAt: new Date(Date.now()-18000000).toISOString(), posterId:"demo" },
+        { id:"gig_demo6", title:"Furniture Assembly — IKEA", description:"2 wardrobes + 1 bed assemble karna hai. Tools apne laana please.", budget:700, category:"Handyman", type:"hyperlocal", location:"Sector 45, Gurugram", status:"open", createdAt: new Date(Date.now()-21600000).toISOString(), posterId:"demo" }
       ];
-
-      var live = gigs.filter(function (g) {
-        return g.status === "open";
-      }).slice(0, 6).map(function (g) {
-        return "🟢 " + g.title + " · " + (g.city || "Gurugram") + " · ₹" + g.pricePerHr + "/hr";
+      try { localStorage.setItem(GIGS_KEY, JSON.stringify(demoGigs)); } catch(e){}
+      /* Refresh the gig grid */
+      container.innerHTML = "";
+      emptyEl.classList.add("hidden");
+      container.classList.remove("hidden");
+      demoGigs.forEach(function(gig){
+        var fee  = Math.round(gig.budget * 0.06);
+        var earn = gig.budget - fee;
+        var isHyper = gig.type === "hyperlocal";
+        container.innerHTML += '<div class="gig-card card-hover">' +
+          '<div class="gig-type-tag ' + (isHyper ? "tag-hyperlocal" : "tag-remote") + '">' +
+            (isHyper ? "📍 Hyperlocal" : "🌐 Remote") +
+          '</div>' +
+          '<div class="gig-card-title">' + escH(gig.title) + '</div>' +
+          '<div class="gig-card-desc line-clamp-2">' + escH(gig.description) + '</div>' +
+          '<div class="gig-card-meta">' +
+            '<span class="gig-meta-chip">📍 ' + escH(gig.location) + '</span>' +
+            '<span class="gig-meta-chip">🕐 ' + timeAgo(gig.createdAt) + '</span>' +
+            '<span class="gig-meta-chip">🏷️ ' + escH(gig.category) + '</span>' +
+          '</div>' +
+          '<div class="gig-earn-strip">' +
+            '<div>' +
+              '<div class="gig-earn-label">You Earn</div>' +
+              '<div class="gig-earn-val">₹' + earn.toLocaleString("en-IN") + '</div>' +
+            '</div>' +
+            '<div style="text-align:right">' +
+              '<div class="gig-earn-label">Posted Budget</div>' +
+              '<div class="gig-price">₹' + gig.budget.toLocaleString("en-IN") + '</div>' +
+            '</div>' +
+          '</div>' +
+          '<a href="gig-detail.html?id=' + escH(gig.id) + '" class="btn btn-primary btn-sm btn-block" style="margin-top:auto">View Gig →</a>' +
+        '</div>';
       });
-
-      var items = live.length ? live.concat(demos) : demos;
-      /* Duplicate for seamless loop */
-      var all   = items.concat(items);
-
-      var wrap = document.getElementById("tickerInner");
-      if (wrap) {
-        wrap.innerHTML = all.map(function (t) {
-          return '<span class="ticker-item">' + escHtml(t) + ' &nbsp;&nbsp; ·</span>';
-        }).join("");
-      }
+      animCount("statGigs", demoGigs.length);
     }
 
-    function escHtml(s) {
-      return String(s || "")
-        .replace(/&/g,"&amp;")
-        .replace(/</g,"&lt;")
-        .replace(/>/g,"&gt;");
+    /* ── Hero search ── */
+    function doSearch() {
+      var q = document.getElementById("heroSearch").value.trim();
+      if (!q) { window.location.href = "browse.html"; return; }
+      window.location.href = "browse.html?q=" + encodeURIComponent(q);
     }
-
-    /* ── How It Works tab switcher ── */
-    document.querySelectorAll(".how-tab").forEach(function (tab) {
-      tab.addEventListener("click", function () {
-        document.querySelectorAll(".how-tab").forEach(function (t) { t.classList.remove("active"); });
-        document.querySelectorAll(".how-panel").forEach(function (p) { p.classList.remove("active"); });
-        tab.classList.add("active");
-        var target = tab.getAttribute("data-how") === "worker" ? "howWorker" : "howPoster";
-        document.getElementById(target).classList.add("active");
-      });
+    document.getElementById("heroSearchBtn").addEventListener("click", doSearch);
+    document.getElementById("heroSearch").addEventListener("keydown", function(e){
+      if (e.key === "Enter") doSearch();
     });
 
-    /* ── FAQ accordion ── */
-    document.querySelectorAll(".faq-q").forEach(function (btn) {
-      btn.addEventListener("click", function () {
-        var answer  = btn.nextElementSibling;
-        var isOpen  = answer.classList.contains("open");
+    /* ── FAQ ── */
+    var FAQS = [
+      { q:"GigLega pe kaise join karein?",                      a:"Bilkul free hai! Upar 'Join Free' button click karo, naam, email/phone aur password daalo. 2 minute mein account ready." },
+      { q:"Payment kaise milti hai workers ko?",                a:"Gig complete hone ke baad payment in-app wallet mein aa jaati hai. Wahan se UPI/bank account pe withdraw kar sakte ho. Same-day processing." },
+      { q:"Poster ke liye koi charge hai?",                     a:"Gig post karna completely free hai. Sirf jab gig successfully complete hoti hai tab 6% platform fee lagti hai — koi upfront charge nahi." },
+      { q:"Kya GigLega safe hai?",                              a:"Haan! Sabhi workers verified hain, in-app chat hai toh personal number share nahi karna padta, aur reviews/ratings system trust build karta hai." },
+      { q:"Gurugram ke bahar bhi gigs available hain?",         a:"Abhi primarily Gurugram NCR focus hai. Remote gigs (design, coding, writing) ke liye India anywhere se apply kar sakte ho." },
+      { q:"Mujhe koi gig nahi mili, ab kya karein?",            a:"Browse page pe filters use karo — category, budget, type (remote/hyperlocal). Aur apna profile strong banao taaki posters tumhe directly reach karein." }
+    ];
 
-        /* Close all */
-        document.querySelectorAll(".faq-q").forEach(function (b) { b.classList.remove("open"); });
-        document.querySelectorAll(".faq-a").forEach(function (a) { a.classList.remove("open"); });
+    var faqList = document.getElementById("faqList");
+    FAQS.forEach(function(f, i){
+      var item = document.createElement("div");
+      item.className = "faq-item";
+      item.innerHTML =
+        '<div class="faq-q" tabindex="0" role="button" aria-expanded="false">' +
+          '<span>' + escH(f.q) + '</span>' +
+          '<span class="faq-chevron">▼</span>' +
+        '</div>' +
+        '<div class="faq-a">' + escH(f.a) + '</div>';
 
-        /* Toggle clicked */
-        if (!isOpen) {
-          btn.classList.add("open");
-          answer.classList.add("open");
+      var q = item.querySelector(".faq-q");
+      function toggle() {
+        var isOpen = item.classList.contains("open");
+        /* Close all first */
+        document.querySelectorAll(".faq-item.open").forEach(function(el){ el.classList.remove("open"); el.querySelector(".faq-q").setAttribute("aria-expanded","false"); });
+        if (!isOpen) { item.classList.add("open"); q.setAttribute("aria-expanded","true"); }
+      }
+      q.addEventListener("click", toggle);
+      q.addEventListener("keydown", function(e){ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); toggle(); } });
+      faqList.appendChild(item);
+    });
+
+    /* ── Redirect post-gig / signup if already logged in ── */
+    var currentUser = (typeof getCurrentUser === "function") ? getCurrentUser() : null;
+    if (currentUser) {
+      /* Swap "Join Free" CTA to dashboard link */
+      document.querySelectorAll('a[href="signup.html"], a[href="signup.html?role=worker"], a[href="signup.html?role=poster"]').forEach(function(a){
+        if (a.href.includes("signup")) {
+          a.href = "dashboard.html";
+          if (a.textContent.includes("Join")) a.innerHTML = "⚡ Go to Dashboard";
         }
       });
-    });
-
-    /* ── Redirect logged-in user away from hero CTAs ── */
-    var user = _getUser();
-    if (user) {
-      var joinBtn = document.querySelector('a[href="login.html?tab=register"]');
-      if (joinBtn) {
-        joinBtn.href        = "dashboard-worker.html";
-        joinBtn.textContent = "⚡ My Dashboard";
-      }
     }
 
-    /* ── Init ── */
-    loadStats();
-    buildTicker();
-
-  })();
+  });
   </script>
-
 </body>
 </html>
