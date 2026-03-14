@@ -4,204 +4,1469 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Terms of Service — GigLega</title>
-  <meta name="description" content="GigLega Terms of Service — platform usage rules and policies." />
+  <meta name="description" content="GigLega Terms of Service — platform use karne ke rules, responsibilities aur policies. Simple language mein." />
   <link rel="stylesheet" href="styles.css" />
-  <script defer src="shared.js"></script>
+  <script src="shared.js"></script>
   <style>
-    .legal-wrap{max-width:800px;margin:0 auto;padding:40px 16px 80px}
-    .legal-hero{background:linear-gradient(135deg,var(--primary) 0%,var(--teal) 100%);border-radius:var(--radius);padding:32px 28px;color:#fff;margin-bottom:32px}
-    .legal-hero h1{font-size:1.6rem;font-weight:800;margin-bottom:6px}
-    .legal-hero p{font-size:.88rem;opacity:.8}
-    .legal-card{background:var(--surface);border:1.5px solid var(--gray-200);border-radius:var(--radius);padding:28px;margin-bottom:20px;box-shadow:var(--shadow-sm)}
-    .legal-section-title{font-size:1rem;font-weight:800;color:var(--primary);margin-bottom:12px;display:flex;align-items:center;gap:8px}
-    .legal-body{font-size:.9rem;color:var(--gray-700);line-height:1.8}
-    .legal-body p{margin-bottom:12px}
-    .legal-body ul{padding-left:20px;margin-bottom:12px}
-    .legal-body ul li{margin-bottom:6px}
-    .legal-body strong{color:var(--text)}
-    .legal-toc{background:var(--gray-50);border:1px solid var(--gray-200);border-radius:var(--radius-sm);padding:16px 20px;margin-bottom:24px}
-    .legal-toc h4{font-size:.85rem;font-weight:700;color:var(--primary);margin-bottom:10px}
-    .legal-toc ol{padding-left:18px;font-size:.83rem;color:var(--teal);line-height:1.8}
-    .legal-toc ol li a{color:var(--teal);text-decoration:none}
-    .legal-toc ol li a:hover{text-decoration:underline}
-    .highlight-box{background:rgba(245,158,11,.08);border-left:4px solid var(--accent);border-radius:0 var(--radius-sm) var(--radius-sm) 0;padding:12px 16px;margin:14px 0;font-size:.85rem;color:var(--gray-700);line-height:1.6}
-    [data-theme=dark] .legal-card{border-color:var(--gray-700)}
-    [data-theme=dark] .legal-toc{background:var(--gray-800);border-color:var(--gray-700)}
-    [data-theme=dark] .legal-body{color:var(--gray-300)}
-    [data-theme=dark] .legal-body strong{color:var(--gray-100)}
-    [data-theme=dark] .highlight-box{background:rgba(245,158,11,.1);color:var(--gray-300)}
+
+    /* ══════════════════════════════════
+       READING PROGRESS
+    ══════════════════════════════════ */
+    .reading-progress {
+      position: fixed; top: 0; left: 0; right: 0;
+      height: 3px; background: var(--gray-200);
+      z-index: 999; pointer-events: none;
+    }
+    .reading-progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--teal));
+      width: 0%; transition: width .1s linear;
+    }
+
+    /* ══════════════════════════════════
+       HERO
+    ══════════════════════════════════ */
+    .tos-hero {
+      background: linear-gradient(135deg, #0b1e35 0%, var(--primary) 55%, #0d4f47 100%);
+      padding: 60px 20px 72px;
+      color: #fff;
+      position: relative; overflow: hidden;
+    }
+    .tos-hero::before {
+      content: "";
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse at 18% 65%, rgba(13,148,136,.22) 0%, transparent 55%),
+        radial-gradient(ellipse at 82% 18%, rgba(245,158,11,.1) 0%, transparent 50%);
+      pointer-events: none;
+    }
+    .tos-hero::after {
+      content: "";
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+      background-size: 54px 54px; pointer-events: none;
+    }
+    .tos-hero-inner {
+      position: relative; z-index: 1;
+      max-width: 820px; margin: 0 auto;
+    }
+    .tos-eyebrow {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: rgba(255,255,255,.12);
+      border: 1px solid rgba(255,255,255,.2);
+      border-radius: var(--radius-full);
+      padding: 5px 16px;
+      font-size: .76rem; font-weight: 700; color: rgba(255,255,255,.9);
+      margin-bottom: 18px;
+    }
+    .tos-hero h1 {
+      font-size: clamp(1.7rem, 4vw, 2.8rem);
+      font-weight: 900; color: #fff;
+      line-height: 1.2; margin-bottom: 12px; letter-spacing: -.8px;
+    }
+    .tos-hero h1 span { color: #6ee7b7; }
+    .tos-hero-meta {
+      display: flex; gap: 20px; flex-wrap: wrap;
+      font-size: .82rem; color: rgba(255,255,255,.65);
+      margin-bottom: 22px;
+    }
+    .tos-hero-meta span { display: flex; align-items: center; gap: 6px; }
+    .tos-hero-chips {
+      display: flex; flex-wrap: wrap; gap: 10px;
+    }
+    .tos-chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(255,255,255,.1);
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: var(--radius-full);
+      padding: 5px 14px;
+      font-size: .76rem; font-weight: 600;
+      color: rgba(255,255,255,.88);
+    }
+
+    /* ══════════════════════════════════
+       LAYOUT
+    ══════════════════════════════════ */
+    .tos-body {
+      max-width: 1060px; margin: 0 auto;
+      padding: 44px 20px 80px;
+      display: grid;
+      grid-template-columns: 230px 1fr;
+      gap: 36px;
+      align-items: start;
+    }
+    @media(max-width:820px) { .tos-body { grid-template-columns: 1fr; } }
+
+    /* ══════════════════════════════════
+       SIDEBAR TOC
+    ══════════════════════════════════ */
+    .tos-toc { position: sticky; top: 80px; }
+    @media(max-width:820px) { .tos-toc { position: static; } }
+
+    .tos-toc-title {
+      font-size: .72rem; font-weight: 800;
+      text-transform: uppercase; letter-spacing: .6px;
+      color: var(--gray-400); margin-bottom: 12px; padding: 0 4px;
+    }
+    .tos-toc-item {
+      display: flex; align-items: center; gap: 8px;
+      padding: 9px 12px;
+      border-radius: var(--radius-sm);
+      font-size: .84rem; font-weight: 600;
+      color: var(--gray-500);
+      cursor: pointer; transition: var(--transition);
+      border: none; background: none;
+      width: 100%; text-align: left;
+      font-family: var(--font);
+      border-left: 2.5px solid transparent;
+    }
+    .tos-toc-item:hover  { color: var(--teal); background: rgba(13,148,136,.05); }
+    .tos-toc-item.active { color: var(--primary); font-weight: 800; border-left-color: var(--teal); background: rgba(13,148,136,.07); }
+    [data-theme=dark] .tos-toc-item { color: var(--gray-400); }
+    [data-theme=dark] .tos-toc-item:hover  { color: var(--teal); }
+    [data-theme=dark] .tos-toc-item.active { color: var(--teal); }
+
+    .tos-toc-divider { height: 1px; background: var(--gray-200); margin: 12px 0; }
+    [data-theme=dark] .tos-toc-divider { background: var(--gray-700); }
+
+    /* Key points summary card in sidebar */
+    .tos-toc-card {
+      margin-top: 18px;
+      background: rgba(245,158,11,.05);
+      border: 1.5px solid rgba(245,158,11,.2);
+      border-radius: var(--radius-sm);
+      padding: 16px;
+    }
+    .tos-toc-card h4 { font-size: .84rem; font-weight: 800; color: #b45309; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+    .tos-toc-card ul { padding-left: 14px; margin: 0; }
+    .tos-toc-card ul li { font-size: .75rem; color: var(--gray-600); margin-bottom: 5px; line-height: 1.5; }
+    [data-theme=dark] .tos-toc-card ul li { color: var(--gray-400); }
+
+    .btn-tos-sm {
+      display: block; width: 100%; padding: 9px;
+      border-radius: var(--radius-sm);
+      font-weight: 700; font-size: .8rem; cursor: pointer;
+      font-family: var(--font); text-align: center;
+      text-decoration: none; transition: opacity .2s;
+      margin-top: 12px;
+      background: linear-gradient(135deg, var(--primary), var(--teal));
+      color: #fff; border: none;
+    }
+    .btn-tos-sm:hover { opacity: .88; text-decoration: none; color: #fff; }
+
+    /* ══════════════════════════════════
+       MAIN CONTENT
+    ══════════════════════════════════ */
+    .tos-main {}
+
+    /* Summary cards */
+    .tos-summary-grid {
+      display: grid;
+      grid-template-columns: repeat(3,1fr);
+      gap: 16px; margin-bottom: 36px;
+    }
+    @media(max-width:640px) { .tos-summary-grid { grid-template-columns: 1fr; } }
+
+    .tos-sum-card {
+      background: var(--surface);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+      padding: 18px 16px;
+      box-shadow: var(--shadow-sm);
+      position: relative; overflow: hidden;
+    }
+    .tos-sum-card::before {
+      content: ""; position: absolute;
+      top: 0; left: 0; right: 0; height: 3px;
+    }
+    .tos-sum-card.teal::before   { background: linear-gradient(90deg, var(--primary), var(--teal)); }
+    .tos-sum-card.green::before  { background: linear-gradient(90deg, #059669, #34d399); }
+    .tos-sum-card.orange::before { background: linear-gradient(90deg, #d97706, #fbbf24); }
+    [data-theme=dark] .tos-sum-card { border-color: var(--gray-700); }
+
+    .tsc-icon  { font-size: 1.6rem; margin-bottom: 8px; line-height: 1; }
+    .tsc-title { font-size: .88rem; font-weight: 800; color: var(--primary); margin-bottom: 4px; }
+    .tsc-text  { font-size: .78rem; color: var(--gray-500); line-height: 1.55; }
+
+    /* Sections */
+    .tos-section { scroll-margin-top: 90px; margin-bottom: 50px; }
+
+    .tos-section-header {
+      display: flex; align-items: center; gap: 14px;
+      margin-bottom: 20px; padding-bottom: 14px;
+      border-bottom: 1.5px solid var(--gray-200);
+    }
+    [data-theme=dark] .tos-section-header { border-color: var(--gray-700); }
+
+    .tos-sec-icon {
+      width: 44px; height: 44px; border-radius: 12px;
+      background: linear-gradient(135deg, rgba(26,60,94,.08), rgba(13,148,136,.1));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem; flex-shrink: 0;
+    }
+    .tos-sec-num   { font-size: .72rem; font-weight: 800; text-transform: uppercase; letter-spacing: .5px; color: var(--teal); margin-bottom: 2px; }
+    .tos-sec-title { font-size: 1.1rem; font-weight: 900; color: var(--primary); line-height: 1.2; }
+
+    /* Prose */
+    .tos-prose {
+      font-size: .92rem; color: var(--gray-600); line-height: 1.85;
+    }
+    [data-theme=dark] .tos-prose { color: var(--gray-400); }
+    .tos-prose p  { margin-bottom: 14px; }
+    .tos-prose h3 {
+      font-size: .98rem; font-weight: 800;
+      color: var(--primary); margin: 22px 0 8px;
+    }
+    .tos-prose h3:first-child { margin-top: 0; }
+    .tos-prose ul, .tos-prose ol { padding-left: 22px; margin-bottom: 14px; }
+    .tos-prose li { margin-bottom: 6px; line-height: 1.7; }
+    .tos-prose strong { color: var(--text); }
+    .tos-prose a { color: var(--teal); font-weight: 600; }
+    .tos-prose a:hover { text-decoration: underline; }
+
+    /* Info boxes */
+    .tos-box {
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      padding: 13px 16px; margin: 16px 0;
+      font-size: .88rem; line-height: 1.65;
+    }
+    .tos-box.teal   { background: rgba(13,148,136,.07);  border-left: 3px solid var(--teal); }
+    .tos-box.warn   { background: rgba(245,158,11,.07);  border-left: 3px solid #f59e0b; }
+    .tos-box.danger { background: rgba(239,68,68,.06);   border-left: 3px solid var(--danger); }
+    .tos-box.info   { background: rgba(99,102,241,.06);  border-left: 3px solid #6366f1; }
+    .tos-box.green  { background: rgba(16,185,129,.06);  border-left: 3px solid #059669; }
+
+    /* Table */
+    .tos-table {
+      width: 100%; border-collapse: collapse;
+      margin: 16px 0; font-size: .86rem;
+      border-radius: var(--radius-sm); overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+    .tos-table thead tr { background: linear-gradient(135deg, var(--primary), var(--teal)); color: #fff; }
+    .tos-table thead th { padding: 12px 16px; text-align: left; font-weight: 800; font-size: .82rem; }
+    .tos-table tbody tr { background: var(--surface); }
+    .tos-table tbody tr:nth-child(even) { background: var(--gray-50); }
+    [data-theme=dark] .tos-table tbody tr { background: var(--gray-800); }
+    [data-theme=dark] .tos-table tbody tr:nth-child(even) { background: var(--gray-900); }
+    .tos-table tbody tr:hover { background: rgba(13,148,136,.04); }
+    .tos-table td { padding: 11px 16px; border-bottom: 1px solid var(--gray-100); color: var(--gray-600); line-height: 1.55; vertical-align: top; }
+    [data-theme=dark] .tos-table td { border-color: var(--gray-700); color: var(--gray-400); }
+    .tos-table td:first-child { font-weight: 700; color: var(--text); }
+
+    /* Do/Don't cards */
+    .conduct-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 16px; margin: 18px 0;
+    }
+    @media(max-width:560px) { .conduct-grid { grid-template-columns: 1fr; } }
+
+    .conduct-card {
+      background: var(--surface);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+      padding: 16px;
+    }
+    [data-theme=dark] .conduct-card { border-color: var(--gray-700); background: var(--gray-800); }
+
+    .cc-header {
+      display: flex; align-items: center; gap: 8px;
+      font-size: .82rem; font-weight: 800;
+      text-transform: uppercase; letter-spacing: .4px;
+      margin-bottom: 12px;
+    }
+    .cc-header.do   { color: var(--success); }
+    .cc-header.dont { color: var(--danger); }
+
+    .conduct-card ul { padding-left: 16px; margin: 0; }
+    .conduct-card ul li {
+      font-size: .83rem; color: var(--gray-600);
+      margin-bottom: 7px; line-height: 1.55;
+    }
+    [data-theme=dark] .conduct-card ul li { color: var(--gray-400); }
+
+    /* Prohibited list */
+    .prohibited-list {
+      display: flex; flex-direction: column; gap: 8px;
+      margin: 14px 0;
+    }
+    .prohibited-item {
+      display: flex; align-items: flex-start; gap: 12px;
+      background: rgba(239,68,68,.04);
+      border: 1.5px solid rgba(239,68,68,.12);
+      border-radius: var(--radius-sm);
+      padding: 12px 14px;
+    }
+    [data-theme=dark] .prohibited-item { background: rgba(239,68,68,.06); border-color: rgba(239,68,68,.18); }
+    .pi-num {
+      width: 26px; height: 26px; border-radius: 50%;
+      background: rgba(239,68,68,.1); color: var(--danger);
+      font-weight: 900; font-size: .76rem;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .pi-title { font-size: .88rem; font-weight: 700; color: var(--danger); margin-bottom: 2px; }
+    .pi-desc  { font-size: .8rem; color: var(--gray-500); line-height: 1.5; }
+
+    /* Violation tiers */
+    .tier-list { display: flex; flex-direction: column; gap: 10px; margin: 16px 0; }
+    .tier-item {
+      display: flex; gap: 14px; align-items: flex-start;
+      background: var(--surface);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+      padding: 14px 16px;
+    }
+    [data-theme=dark] .tier-item { border-color: var(--gray-700); background: var(--gray-800); }
+    .tier-badge {
+      font-size: .7rem; font-weight: 800;
+      padding: 3px 10px; border-radius: 6px;
+      white-space: nowrap; flex-shrink: 0; align-self: flex-start;
+    }
+    .tier-badge.warn   { background: rgba(245,158,11,.12); color: #b45309; }
+    .tier-badge.sus    { background: rgba(239,68,68,.1);   color: var(--danger); }
+    .tier-badge.ban    { background: rgba(26,60,94,.1);    color: var(--primary); }
+    .tier-title  { font-size: .88rem; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+    .tier-desc   { font-size: .8rem; color: var(--gray-500); line-height: 1.5; }
+
+    /* Fee highlight box */
+    .fee-highlight {
+      background: linear-gradient(135deg, rgba(13,148,136,.06), rgba(26,60,94,.04));
+      border: 1.5px solid rgba(13,148,136,.18);
+      border-radius: var(--radius);
+      padding: 22px 24px;
+      margin: 18px 0;
+      display: flex; align-items: center;
+      gap: 20px; flex-wrap: wrap;
+    }
+    .fh-num {
+      font-size: 2.4rem; font-weight: 900;
+      color: var(--primary); line-height: 1; flex-shrink: 0;
+    }
+    .fh-label { font-size: .82rem; font-weight: 700; color: var(--teal); margin-bottom: 3px; }
+    .fh-desc  { font-size: .84rem; color: var(--gray-600); line-height: 1.5; }
+    [data-theme=dark] .fh-desc { color: var(--gray-400); }
+
+    /* Version history */
+    .version-list { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
+    .version-item {
+      display: flex; gap: 14px; align-items: flex-start;
+      padding: 14px 16px;
+      background: var(--surface);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+    }
+    [data-theme=dark] .version-item { border-color: var(--gray-700); background: var(--gray-800); }
+    .version-item.current { border-color: var(--teal); background: rgba(13,148,136,.04); }
+
+    .vi-version {
+      font-size: .76rem; font-weight: 800;
+      background: var(--gray-100); color: var(--gray-500);
+      padding: 3px 9px; border-radius: 6px;
+      white-space: nowrap; flex-shrink: 0; align-self: flex-start;
+    }
+    .version-item.current .vi-version { background: rgba(13,148,136,.12); color: var(--teal); }
+    .vi-date    { font-size: .74rem; color: var(--gray-400); margin-bottom: 4px; font-weight: 600; }
+    .vi-changes { font-size: .83rem; color: var(--gray-600); line-height: 1.55; }
+    [data-theme=dark] .vi-changes { color: var(--gray-400); }
+
+    /* Acceptance bar */
+    .acceptance-bar {
+      background: rgba(13,148,136,.06);
+      border: 1.5px solid rgba(13,148,136,.2);
+      border-radius: var(--radius-sm);
+      padding: 16px 20px;
+      display: flex; align-items: center;
+      gap: 14px; flex-wrap: wrap;
+      margin-bottom: 36px;
+    }
+    .ab-icon { font-size: 1.5rem; flex-shrink: 0; }
+    .ab-text { font-size: .86rem; color: var(--gray-600); line-height: 1.6; flex: 1; }
+    .ab-text strong { color: var(--primary); }
+    [data-theme=dark] .ab-text { color: var(--gray-400); }
+
+    /* Final CTA */
+    .tos-cta-card {
+      background: linear-gradient(135deg, #0b1e35 0%, var(--primary) 55%, #0d4f47 100%);
+      border-radius: var(--radius);
+      padding: 40px 32px;
+      text-align: center; color: #fff;
+      position: relative; overflow: hidden;
+      margin-top: 52px;
+    }
+    .tos-cta-card::before {
+      content: "";
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+      background-size: 48px 48px; pointer-events: none;
+    }
+    .tos-cta-inner { position: relative; z-index: 1; max-width: 520px; margin: 0 auto; }
+    .tos-cta-card h3 { font-size: 1.4rem; font-weight: 900; color: #fff; margin-bottom: 8px; }
+    .tos-cta-card p  { font-size: .9rem; color: rgba(255,255,255,.75); margin-bottom: 24px; line-height: 1.65; }
+    .tos-cta-btns    { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .btn-tos-cta-primary {
+      padding: 12px 26px; border-radius: var(--radius-sm);
+      background: #fff; color: var(--primary);
+      font-weight: 800; font-size: .9rem;
+      border: none; cursor: pointer;
+      box-shadow: 0 6px 20px rgba(0,0,0,.18);
+      transition: transform .2s, box-shadow .2s;
+      text-decoration: none;
+      display: inline-flex; align-items: center; gap: 7px;
+    }
+    .btn-tos-cta-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(0,0,0,.24); text-decoration: none; color: var(--primary); }
+    .btn-tos-cta-outline {
+      padding: 11px 22px; border-radius: var(--radius-sm);
+      background: transparent; color: #fff;
+      font-weight: 700; font-size: .88rem;
+      border: 2px solid rgba(255,255,255,.4);
+      cursor: pointer; transition: all .2s; text-decoration: none;
+      display: inline-flex; align-items: center; gap: 7px;
+    }
+    .btn-tos-cta-outline:hover { background: rgba(255,255,255,.1); border-color: rgba(255,255,255,.8); text-decoration: none; color: #fff; }
+
   </style>
 </head>
 <body>
+  <!-- Reading progress bar -->
+  <div class="reading-progress">
+    <div class="reading-progress-bar" id="readingBar"></div>
+  </div>
+
+  <div id="page-loader"></div>
   <div id="announce-bar"></div>
   <nav id="main-nav"></nav>
 
-  <main class="page-wrapper">
-    <div class="legal-wrap">
-      <nav id="breadcrumb" aria-label="breadcrumb"></nav>
+  <main>
 
-      <div class="legal-hero">
-        <h1>📋 Terms of Service</h1>
-        <p>Last updated: March 2026 &nbsp;|&nbsp; Effective immediately upon registration</p>
-      </div>
-
-      <!-- TOC -->
-      <div class="legal-toc">
-        <h4>📌 Table of Contents</h4>
-        <ol>
-          <li><a href="#acceptance">Acceptance of Terms</a></li>
-          <li><a href="#platform">Platform Description</a></li>
-          <li><a href="#accounts">User Accounts</a></li>
-          <li><a href="#gigs">Posting & Accepting Gigs</a></li>
-          <li><a href="#payments">Payments & Fees</a></li>
-          <li><a href="#conduct">Code of Conduct</a></li>
-          <li><a href="#liability">Liability & Disputes</a></li>
-          <li><a href="#termination">Termination</a></li>
-          <li><a href="#contact">Contact Us</a></li>
-        </ol>
-      </div>
-
-      <div class="legal-card" id="acceptance">
-        <div class="legal-section-title">1. ✅ Acceptance of Terms</div>
-        <div class="legal-body">
-          <p>By accessing or using the GigLega platform (available at <strong>giglega.vercel.app</strong>), you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use our platform.</p>
-          <p>GigLega is currently in <strong>Beta</strong> and is operated by GigLega (Gurugram, Haryana, India). These terms may be updated at any time with notice provided on the platform.</p>
-          <div class="highlight-box">⚠️ GigLega is a Beta platform. Features may change, and data may be reset during development phases. Use accordingly.</div>
+    <!-- ══════════════════════════════════
+         HERO
+    ══════════════════════════════════ -->
+    <section class="tos-hero">
+      <div class="tos-hero-inner">
+        <div class="tos-eyebrow">📄 Terms of Service</div>
+        <h1>Rules of the <span>Platform</span><br/>— Simple Language</h1>
+        <div class="tos-hero-meta">
+          <span>📅 Effective: January 1, 2026</span>
+          <span>🔄 Updated: March 14, 2026</span>
+          <span>📄 Version 1.1</span>
+          <span>🇮🇳 Indian Law Governed</span>
+        </div>
+        <div class="tos-hero-chips">
+          <span class="tos-chip">✅ Fair Rules</span>
+          <span class="tos-chip">🚫 No Hidden Clauses</span>
+          <span class="tos-chip">⚖️ IT Act 2000 Compliant</span>
+          <span class="tos-chip">🤝 Worker Protection</span>
+          <span class="tos-chip">📋 DPDP Act 2023</span>
         </div>
       </div>
+    </section>
 
-      <div class="legal-card" id="platform">
-        <div class="legal-section-title">2. 🏗️ Platform Description</div>
-        <div class="legal-body">
-          <p>GigLega is a <strong>hyperlocal and remote gig marketplace</strong> that connects individuals who need short-duration tasks done (Posters) with individuals willing to perform those tasks (Workers) in and around Gurugram, Haryana, India.</p>
-          <p>GigLega acts solely as a <strong>platform intermediary</strong>. We do not employ workers, guarantee gig completion, or guarantee payment beyond our platform mechanisms.</p>
+    <!-- ══════════════════════════════════
+         BODY
+    ══════════════════════════════════ -->
+    <div class="tos-body">
+
+      <!-- ── SIDEBAR TOC ── -->
+      <aside class="tos-toc">
+        <div class="tos-toc-title">Contents</div>
+        <button class="tos-toc-item active" data-sec="overview">📋 Overview</button>
+        <button class="tos-toc-item" data-sec="eligibility">🎂 Eligibility</button>
+        <button class="tos-toc-item" data-sec="accounts">👤 Accounts</button>
+        <button class="tos-toc-item" data-sec="conduct">⚖️ User Conduct</button>
+        <button class="tos-toc-item" data-sec="gigs">📋 Gigs & Work</button>
+        <button class="tos-toc-item" data-sec="payments">💰 Payments & Fees</button>
+        <button class="tos-toc-item" data-sec="ip">🎨 Intellectual Property</button>
+        <button class="tos-toc-item" data-sec="disputes">⚖️ Disputes</button>
+        <button class="tos-toc-item" data-sec="liability">🛡️ Liability</button>
+        <button class="tos-toc-item" data-sec="termination">🚫 Termination</button>
+        <button class="tos-toc-item" data-sec="governing">🏛️ Governing Law</button>
+        <button class="tos-toc-item" data-sec="changes">🔄 Changes</button>
+        <button class="tos-toc-item" data-sec="contact">📩 Contact</button>
+
+        <div class="tos-toc-divider"></div>
+
+        <div class="tos-toc-card">
+          <h4>⚡ Key Points</h4>
           <ul>
-            <li>GigLega does not verify identities beyond basic registration.</li>
-            <li>GigLega does not guarantee the quality of work performed.</li>
-            <li>GigLega is not responsible for disputes between Posters and Workers.</li>
+            <li>18+ users only</li>
+            <li>One account per person</li>
+            <li>6% platform fee on earnings</li>
+            <li>No off-platform payments</li>
+            <li>Disputes via platform first</li>
+            <li>Gurugram courts jurisdiction</li>
           </ul>
+          <a href="contact.html" class="btn-tos-sm">📩 Questions? Contact Us</a>
         </div>
-      </div>
+      </aside>
 
-      <div class="legal-card" id="accounts">
-        <div class="legal-section-title">3. 👤 User Accounts</div>
-        <div class="legal-body">
-          <p>To use GigLega, you must register an account. You agree to:</p>
-          <ul>
-            <li>Provide accurate and truthful information during registration.</li>
-            <li>Keep your login credentials secure and confidential.</li>
-            <li>Be at least <strong>18 years of age</strong> to post or accept gigs.</li>
-            <li>Not create multiple accounts to abuse platform features.</li>
-            <li>Notify us immediately at <strong>Giglega.official@gmail.com</strong> if you suspect unauthorized use.</li>
-          </ul>
-          <p>GigLega reserves the right to suspend or terminate any account at any time for violations of these terms.</p>
+      <!-- ── MAIN ── -->
+      <div class="tos-main">
+
+        <!-- Breadcrumb -->
+        <div id="breadcrumb" style="margin-bottom:24px"></div>
+
+        <!-- Acceptance notice -->
+        <div class="acceptance-bar">
+          <div class="ab-icon">📜</div>
+          <div class="ab-text">
+            GigLega use karke ya account create karke tum in Terms of Service ko
+            <strong>legally accept karte ho</strong>. Agar agree nahi ho toh platform use mat karo.
+            Sawaal hain? <a href="contact.html" style="color:var(--teal)">Contact us</a> before signing up.
+          </div>
         </div>
-      </div>
 
-      <div class="legal-card" id="gigs">
-        <div class="legal-section-title">4. 📝 Posting & Accepting Gigs</div>
-        <div class="legal-body">
-          <p><strong>For Posters:</strong></p>
-          <ul>
-            <li>Gigs must be legal, ethical, and clearly described.</li>
-            <li>Pricing must be within GigLega's allowed range per category.</li>
-            <li>You must honor the posted price once a worker accepts.</li>
-            <li>Gigs are available until one worker accepts — first-come-first-served.</li>
-            <li>You may delete open gigs before acceptance at any time.</li>
-          </ul>
-          <p><strong>For Workers:</strong></p>
-          <ul>
-            <li>By accepting a gig, you commit to completing it as described.</li>
-            <li>You may not accept gigs you posted yourself.</li>
-            <li>Workers are responsible for their own travel, tools, and safety.</li>
-            <li>Incomplete or fraudulent work may result in account suspension.</li>
-          </ul>
-          <div class="highlight-box">🚫 Prohibited gigs include: anything illegal, adult content, dangerous tasks, tasks requiring licensed professionals (e.g., medical, legal advice), or any form of harassment.</div>
+        <!-- Summary cards -->
+        <div class="tos-summary-grid">
+          <div class="tos-sum-card teal">
+            <div class="tsc-icon">🤝</div>
+            <div class="tsc-title">Fair Platform Rules</div>
+            <div class="tsc-text">Workers aur posters dono ke liye equal rules — koi hidden advantage nahi kisi ek side ko.</div>
+          </div>
+          <div class="tos-sum-card green">
+            <div class="tsc-icon">🛡️</div>
+            <div class="tsc-title">Worker Protection</div>
+            <div class="tsc-text">Agreed payment se less nahi milega — platform payment protection guarantee karta hai.</div>
+          </div>
+          <div class="tos-sum-card orange">
+            <div class="tsc-icon">⚠️</div>
+            <div class="tsc-title">Zero Tolerance</div>
+            <div class="tsc-text">Fraud, scam, harassment pe immediate account action — no second chances for serious violations.</div>
+          </div>
         </div>
-      </div>
 
-      <div class="legal-card" id="payments">
-        <div class="legal-section-title">5. 💰 Payments & Fees</div>
-        <div class="legal-body">
-          <p>GigLega charges a <strong>6% Support Fee</strong> on every completed gig, deducted from the worker's earnings.</p>
-          <ul>
-            <li><strong>Pay After Completion:</strong> Poster pays worker directly after completion. GigLega support fee applies.</li>
-            <li><strong>Secure Wallet Payment:</strong> Poster's payment is held in GigLega's secure wallet until the gig is marked complete, then released to the worker minus the support fee.</li>
-            <li><strong>Cash Payment:</strong> Worker is paid in cash by the poster. The GigLega support fee (6%) is collected digitally from the poster after completion.</li>
-          </ul>
-          <p>Prices are set by Posters within GigLega's suggested and maximum ranges per category. Minimum gig price is <strong>₹150/hr</strong> for basic tasks and <strong>₹300/hr</strong> for skilled work.</p>
-          <div class="highlight-box">💡 During Beta, all payments are simulated. No real money is transferred. Real payment integration (Razorpay/UPI) will be activated in the full launch.</div>
+        <!-- ══ 1. OVERVIEW ══ -->
+        <section class="tos-section" id="sec-overview">
+          <div class="tos-section-header">
+            <div class="tos-sec-icon">📋</div>
+            <div>
+              <div class="tos-sec-num">Section 01</div>
+              <div class="tos-sec-title">Overview — Agreement Ki Summary</div>
+            </div>
+          </div>
+          <div class="tos-prose">
+            <p>
+              Yeh Terms of Service ("Terms") ek legal agreement hai tumhare ("User", "you") aur
+              <strong>GigLega Technologies</strong> ("GigLega", "we", "us") ke beech —
+              Gurugram, Haryana, India mein registered.
+            </p>
+            <p>
+              GigLega ek online marketplace hai jo gig workers aur work posters ko connect karta
+              hai primarily NCR (National Capital Region) mein. Hum khud employer ya worker
+              nahi hain — sirf ek platform provide karte hain connections ke liye.
+            </p>
+            <div class="tos-box teal">
+              💡 <strong>Simple Version:</strong> GigLega ek middleman platform hai.
+              Actual work relationship workers aur posters ke beech hoti hai — GigLega
+              directly employ nahi karta kisi ko. Platform use karne ke rules yahan hain.
+            </div>
+            <h3>Inpe Bhi Apply Hota Hai</h3>
+            <p>Yeh Terms apply hoti hain:</p>
+            <ul>
+              <li>Website visit karne pe (giglega.in)</li>
+              <li>Account create karne pe</li>
+              <li>Gig post ya apply karne pe</li>
+              <li>Platform ki koi bhi service use karne pe</li>
+              <li>Mobile app use karne pe (jab launch ho)</li>
+            </ul>
+            <p>
+              Haari <a href="privacy-policy.html">Privacy Policy</a> in Terms ka part hai —
+              dono saath apply hoti hain. Platform use karna = dono accept karna.
+            </p>
+          </div>
+        </section>
+
+        <!-- ══ 2. ELIGIBILITY ══ -->
+        <section class="tos-section" id="sec-eligibility">
+          <div class="tos-section-header">
+            <div class="tos-sec-icon">🎂</div>
+            <div>
+              <div class="tos-sec-num">Section 02</div>
+              <div class="tos-sec-title">Eligibility — Kaun Use Kar Sakta Hai</div>
+            </div>
+          </div>
+          <div class="tos-prose">
+            <div class="tos-box danger">
+              🚫 <strong>Minimum Age: 18 Years.</strong> 18 se kam age ke kisi bhi person
+              ko platform use karna strictly prohibited hai — DPDP Act 2023 Section 9 aur
+              Indian Contract Act 1872 ke under minor contracts void hote hain.
+            </div>
+            <h3>Eligibility Requirements</h3>
+            <ul>
+              <li>✅ 18 years ya usse zyada age</li>
+              <li>✅ Valid Indian phone number (OTP verification)</li>
+              <li>✅ India mein physically present ya operations honi chahiye</li>
+              <li>✅ Legally binding contract karne ki capacity</li>
+              <li>✅ Previously permanently banned user nahi hona chahiye</li>
+            </ul>
+            <h3>For Businesses</h3>
+            <p>
+              Agar tum business ya company ki behalf pe platform use kar rahe ho, tum represent
+              karte ho ki tumhare paas company ko bind karne ka legal authority hai.
+              Company ka accurate information provide karna tumhari responsibility hai.
+            </p>
+            <div class="tos-box warn">
+              ⚠️ <strong>Geographic Scope:</strong> GigLega currently India ke liye hai —
+              primarily NCR region. International use officially supported nahi hai abhi.
+            </div>
+          </div>
+        </section>
+
+        <!-- ══ 3. ACCOUNTS ══ -->
+        <section class="tos-section" id="sec-accounts">
+          <div class="tos-section-header">
+            <div class="tos-sec-icon">👤</div>
+            <div>
+              <div class="tos-sec-num">Section 03</div>
+              <div class="tos-sec-title">Accounts — Registration & Security</div>
+            </div>
+          </div>
+          <div class="tos-prose">
+            <h3>Account Registration</h3>
+            <p>
+              Account create karte waqt tum agree karte ho ki:
+            </p>
+            <ul>
+              <li>Accurate, complete aur up-to-date information provide karoge</li>
+              <li>Ek person = ek account (multiple accounts strictly prohibited)</li>
+              <li>Dusre ki identity se account nahi banayenge (impersonation)</li>
+              <li>Account create karne ka purpose lawful hai</li>
+            </ul>
+            <h3>Account Security</h3>
+            <p>
+              Tumhara account tumhari zimmedari hai. Tum agree karte ho ki:
+            </p>
+            <ul>
+              <li>Password confidential rakhoge</li>
+              <li>Account kisi aur ko share nahi karoge</li>
+              <li>Unauthorized access immediately report karoge</li>
+              <li>Tumhare account se ki gayi sab activities ke liye tum responsible ho</li>
+            </ul>
+            <div class="tos-box warn">
+              ⚠️ Account sharing (e.g., ek gig pe multiple logon ka kaam show karna)
+              Terms violation hai aur account suspension le sakta hai.
+            </div>
+            <h3>Account Verification</h3>
+            <p>
+              GigLega ko right hai kisi bhi time additional verification maangne ka — identity
+              confirm karne ke liye. Verification refuse karne pe account restrict ya suspend
+              ho sakta hai.
+            </p>
+            <h3>One Account Policy</h3>
+            <p>
+              Banned ya suspended account ke baad naya account banana prohibited hai.
+              Violation pe permanently ban hoga aur legal action possible hai agar significant
+              harm hua ho community ko.
+            </p>
+          </div>
+        </section>
+
+        <!-- ══ 4. USER CONDUCT ══ -->
+        <section class="tos-section" id="sec-conduct">
+          <div class="tos-section-header">
+            <div class="tos-sec-icon">⚖️</div>
+            <div>
+              <div class="tos-sec-num">Section 04</div>
+              <div class="tos-sec-title">User Conduct — Rules of Engagement</div>
+            </div>
+          </div>
+          <div class="tos-prose">
+            <p>
+              Platform pe har user se professional, respectful aur honest behavior expected hai.
+              Yeh hai detailed breakdown:
+            </p>
+
+            <div class="conduct-grid">
+              <div class="conduct-card">
+                <div class="cc-header do">✅ Allowed / Expected</div>
+                <ul>
+                  <li>Honest aur accurate information share karna</li>
+                  <li>Agreed kaam time pe professional tarike se karna</li>
+                  <li>Respectful communication maintain karna</li>
+                  <li>Issues pe pehle directly baat karna</li>
+                  <li>Genuine ratings aur reviews dena</li>
+                  <li>Platform ke through payment karna</li>
+                  <li>Safety guidelines follow karna</li>
+                </ul>
+              </div>
+              <div class="conduct-card">
+                <div class="cc-header dont">🚫 Prohibited</div>
+                <ul>
+                  <li>Fake identity ya misleading information</li>
+                  <li>Harassment, threats ya abusive language</li>
+                  <li>Off-platform payment push karna</li>
+                  <li>Fake reviews — positive ya negative</li>
+                  <li>Spam messages ya unsolicited contact</li>
+                  <li>Competitor platforms promote karna</li>
+                  <li>Platform data scraping ya unauthorized access</li>
+                </ul>
+              </div>
+            </div>
+
+            <h3>Strictly Prohibited Content & Actions</h3>
+            <div class="prohibited-list">
+              <div class="prohibited-item">
+                <div class="pi-num">1</div>
+                <div>
+                  <div class="pi-title">Fraud & Financial Scams</div>
+                  <div class="pi-desc">Advance payment maangna, fake payment proofs, phishing links, ya kisi bhi tarah ka financial fraud. Immediate permanent ban + possible police complaint.</div>
+                </div>
+              </div>
+              <div class="prohibited-item">
+                <div class="pi-num">2</div>
+                <div>
+                  <div class="pi-title">Identity Theft & Impersonation</div>
+                  <div class="pi-desc">Kisi doosre person, brand ya organization ki identity se account banana ya kaam karna. IPC Section 419/420 under criminal offense.</div>
+                </div>
+              </div>
+              <div class="prohibited-item">
+                <div class="pi-num">3</div>
+                <div>
+                  <div class="pi-title">Illegal Activities</div>
+                  <div class="pi-desc">Platform ka use kisi bhi illegal gig post, illegal goods/services provide karne, ya any criminal activity ke liye. Zero tolerance.</div>
+                </div>
+              </div>
+              <div class="prohibited-item">
+                <div class="pi-num">4</div>
+                <div>
+                  <div class="pi-title">Harassment & Discrimination</div>
+                  <div class="pi-desc">Sexual harassment, casteist, religious ya gender-based discrimination. Platform pe ya off-platform jo GigLega connections se connected ho.</div>
+                </div>
+              </div>
+              <div class="prohibited-item">
+                <div class="pi-num">5</div>
+                <div>
+                  <div class="pi-title">Platform Manipulation</div>
+                  <div class="pi-desc">Fake accounts se reviews inflate karna, algorithm game karna, ya platform integrity compromise karna.</div>
+                </div>
+              </div>
+              <div class="prohibited-item">
+                <div class="pi-num">6</div>
+                <div>
+                  <div class="pi-title">Circumventing Platform Fees</div>
+                  <div class="pi-desc">Platform use karke connection banane ke baad deliberately off-platform jaana to avoid fees — fee evasion Terms violation hai.</div>
+                </div>
+              </div>
+            </div>
+
+            <h3>Enforcement Tiers</h3>
+            <div class="tier-list">
+              <div class="tier-item">
+                <div class="tier-badge warn">⚠️ Warning</div>
+                <div>
+                  <div class="tier-title">First Minor Violation</div>
+                  <div class="tier-desc">Official warning email + in-app notice. Koi immediate restriction nahi — ek chance milta hai correct karne ka.</div>
+                </div>
+              </div>
+              <div class="tier-item">
+                <div class="tier-badge sus">🔒 Suspension</div>
+                <div>
+                  <div class="tier-title">Repeated/Moderate Violations</div>
+                  <div class="tier-desc">7–30 day account suspension. Active gigs pause ho jaate hain. Earnings withdraw kar sakte ho. Appeal process available.</div>
+                </div>
+              </div>
+              <div class="tier-item">
+                <div class="tier-badge ban">🚫 Permanent Ban</div>
+                <div>
+                  <div class="tier-title">Serious Violations</div>
+                  <div class="tier-desc">Fraud, scam, harassment, illegal activity pe immediate permanent ban. Platform pe wapas aane ka koi rasta nahi. Police complaint possible.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ══ 5. GIGS & WORK ══ -->
+        <section class="tos-section" id="sec-gigs">
+          <div class="tos-section-header">
+            <div class="tos-sec-icon">📋</div>
+            <div>
+              <div class="tos-sec-num">Section 05</div>
+              <div class="tos-sec-title">Gigs & Work — Rules for Both Sides</div>
+            </div>
+          </div>
+          <div class="tos-prose">
+            <h3>For Gig Posters</h3>
+            <p>
+              Gig post karke tum represent karte ho ki:
+            </p>
+            <ul>
+              <li>Kaam real hai aur described as accurately as possible</li>
+              <li>Budget genuine hai — bait-and-switch nahi</li>
+              <li>Agreed payment accepted worker ko milegi bina undue deduction ke</li>
+              <li>Working conditions safe aur legal hain</li>
+              <li>Koi discriminatory requirements (gender, caste, religion) nahi hain</li>
+              <li>Gig India ke labor laws ke against nahi hai</li>
+            </ul>
+
+            <h3>For Workers</h3>
+            <p>
+              Gig accept karke tum agree karte ho ki:
+            </p>
+            <ul>
+              <li>Described kaam professionally complete karoge</li>
+              <li>Agreed time pe show up karoge ya advance mein cancel karoge</li>
+              <li>Platform ke through payment loge — outside nahi</li>
+              <li>Koi misrepresentation nahi karoge apni skills ya experience ki</li>
+              <li>Poster ki reasonable instructions follow karoge (job scope ke andar)</li>
+            </ul>
+
+            <div class="tos-box teal">
+              💡 <strong>Independent Contractor:</strong> GigLega pe workers independent
+              contractors hain — employees nahi. GigLega employer nahi hai. Tax, PF, ESI
+              compliance worker ki apni zimmedari hai (applicable hone pe).
+            </div>
+
+            <h3>Cancellation Policy</h3>
+            <table class="tos-table">
+              <thead>
+                <tr><th>Who Cancels</th><th>When</th><th>Consequence</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Worker</td>
+                  <td>Before gig starts</td>
+                  <td>Poster ko full refund; worker rating impact</td>
+                </tr>
+                <tr>
+                  <td>Worker</td>
+                  <td>After gig starts (partial)</td>
+                  <td>Partial payment for work done; rating impact</td>
+                </tr>
+                <tr>
+                  <td>Poster</td>
+                  <td>Before worker starts</td>
+                  <td>No charge to poster; worker notified</td>
+                </tr>
+                <tr>
+                  <td>Poster</td>
+                  <td>After work started</td>
+                  <td>Worker paid for time/work done; platform reviews</td>
+                </tr>
+                <tr>
+                  <td>Platform</td>
+                  <td>Violation detected</td>
+                  <td>Gig removed; funds held pending review</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <h3>No-Show Policy</h3>
+            <p>
+              Bina notice ke no-show — worker ya poster — serious violation hai.
+              Pehli baar warning, doosri baar account review, teesri baar suspension.
+            </p>
+
+            <h3>Scope of Work</h3>
+            <p>
+              Poster worker se originally agreed scope se zyada kaam nahi karwa sakta without
+              additional compensation agreement. "Scope creep" — bina extra pay ke zyada kaam
+              demand karna — Terms violation hai.
+            </p>
+          </div>
+        </section>
+
+        <!-- ══ 6. PAYMENTS ══ -->
+        <section class="tos-section" id="sec-payments">
+          <div class="tos-section-header">
+            <div class="tos-sec-icon">💰</div>
+            <div>
+              <div class="tos-sec-num">Section 06</div>
+              <div class="tos-sec-title">Payments & Fees</div>
+            </div>
+          </div>
+          <div class="tos-prose">
+
+            <div class="fee-highlight">
+              <div class="fh-num">6%</div>
+              <div>
+                <div class="fh-label">Standard Platform Fee</div>
+                <div class="fh-desc">Worker ki earnings se automatically deducted hoti hai gig complete hone ke baad. Posters ke liye gig posting free hai. Business plan pe 4%, Enterprise pe negotiated rate.</div>
+              </div>
+            </div>
+
+            <h3>Payment Flow</h3>
+            <ol>
+              <li>Poster gig post karta hai with budget</li>
+              <li>Worker apply karta hai → Poster accept karta hai</li>
+              <li>Kaam complete hota hai</li>
+              <li>Poster "Mark Complete" karta hai</li>
+              <li>Platform fee (6%) automatically deducted</li>
+              <li>Net amount worker ke wallet mein credited</li>
+              <li>Worker apni bank account ya UPI pe withdraw karta hai</li>
+            </ol>
+
+            <h3>Mandatory Platform Payment</h3>
+            <div class="tos-box danger">
+              🚫 <strong>Off-Platform Payments Prohibited:</strong> GigLega connections ke through
+              mile workers/posters ke beech platform ke bahar cash, UPI, bank transfer, ya koi bhi
+              payment — Terms violation hai. GigLega off-platform transactions ke liye koi
+              protection ya dispute resolution provide nahi kar sakta.
+            </div>
+
+            <h3>Payment Obligations</h3>
+            <table class="tos-table">
+              <thead>
+                <tr><th>Obligation</th><th>Who</th><th>Details</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Pay agreed amount</td>
+                  <td>Poster</td>
+                  <td>Full agreed budget — no unilateral deduction</td>
+                </tr>
+                <tr>
+                  <td>Complete work</td>
+                  <td>Worker</td>
+                  <td>As described before receiving full payment</td>
+                </tr>
+                <tr>
+                  <td>Mark complete</td>
+                  <td>Poster</td>
+                  <td>Within 24h of gig completion — else auto-released after 72h</td>
+                </tr>
+                <tr>
+                  <td>Dispute window</td>
+                  <td>Both</td>
+                  <td>48 hours after gig completion to raise disputes</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <h3>Auto-Release Policy</h3>
+            <p>
+              Agar poster 72 ghante mein "Mark Complete" nahi karta aur koi dispute nahi raise
+              karta, payment automatically worker ke wallet mein release ho jaati hai. Yeh
+              workers ko protect karta hai undue payment delays se.
+            </p>
+
+            <h3>GST & Taxes</h3>
+            <p>
+              Platform fee pe 18% GST applicable hai (SAC 998314). Workers apni gig income ke
+              liye khud income tax compliance maintain karenge. GigLega TDS deduct nahi karta
+              currently — threshold ke hisaab se future mein change ho sakta hai.
+            </p>
+
+            <h3>Withdrawal</h3>
+            <p>
+              Minimum withdrawal: <strong>₹200</strong>. Processing time: 24–48 hours (working days).
+              UPI instant transfers available. Bank transfers NEFT/IMPS via. Fraudulent withdrawal
+              attempts pe legal action possible hai.
+            </p>
+          </div>
+        </section>
+
+        <!-- ══ 7. INTELLECTUAL PROPERTY ══ -->
+        <section class="tos-section" id="sec-ip">
+          <div class="tos-section-header">
+            <div class="tos-sec-icon">🎨</div>
+            <div>
+              <div class="tos-sec-num">Section 07</div>
+              <div class="tos-sec-title">Intellectual Property</div>
+            </div>
+          </div>
+          <div class="tos-prose">
+            <h3>GigLega's IP</h3>
+            <p>
+              GigLega platform — including naam, logo, website design, code, content,
+              graphics aur trademarks — GigLega Technologies ka exclusive intellectual
+              property hai. Inhe copy, reproduce, distribute ya commercially use karna
+              prohibited hai bina written permission ke.
+            </p>
+
+            <h3>Your Content</h3>
+            <p>
+              Tum jo content platform pe post karte ho — gig descriptions, profile info,
+              reviews, messages — uska ownership tumhara hi rehta hai. Platform pe post karke
+              tum GigLega ko ek <strong>non-exclusive, royalty-free license</strong> dete ho
+              use karne ka — platform operations ke liye (display, matching, analytics).
+            </p>
+            <div class="tos-box teal">
+              💡 Matlab: Tumhara content tumhara hai — hum sirf platform chalane ke liye
+              use karte hain. Koi commercial use, selling ya third-party sharing nahi.
+            </div>
+
+            <h3>Content You Post — Your Responsibility</h3>
+            <p>Tum guarantee karte ho ki:</p>
+            <ul>
+              <li>Posted content tumhara original hai ya tum use karne ke authorized ho</li>
+              <li>Content kisi third party ka copyright, trademark ya privacy violate nahi karta</li>
+              <li>Content defamatory, obscene ya illegal nahi hai</li>
+            </ul>
+
+            <h3>Copyright Complaints</h3>
+            <p>
+              Agar koi tumhara copyrighted content unauthorizedly use kar raha hai platform pe,
+              report karo <a href="mailto:legal@giglega.in">legal@giglega.in</a> pe — DMCA-style
+              takedown process follow hoga.
+            </p>
+
+            <h3>Feedback & Suggestions</h3>
+            <p>
+              Platform improvement ke liye feedback dete ho toh GigLega use implement
+              karne ka right rakhta hai bina compensation ke. Tumhara feedback voluntary
+              contribution maana jaayega.
+            </p>
+          </div>
+        </section>
+
+        <!-- ══ 8. DISPUTES ══ -->
+        <section class="tos-section" id="sec-disputes">
+          <div class="tos-section-header">
+            <div class="tos-sec-icon">⚖️</div>
+            <div>
+              <div class="tos-sec-num">Section 08</div>
+              <div class="tos-sec-title">Dispute Resolution</div>
+            </div>
+          </div>
+          <div class="tos-prose">
+            <h3>Step 1 — Direct Resolution</h3>
+            <p>
+              Koi bhi dispute pehle directly resolve karne ki koshish karo. In-app chat
+              use karo, issue clearly explain karo aur reasonable solution seek karo.
+              Zyaadatar issues is step pe resolve ho jaate hain.
+            </p>
+
+            <h3>Step 2 — Platform Mediation</h3>
+            <p>
+              Direct resolution fail ho jaaye toh platform support se formal dispute raise karo:
+            </p>
+            <ul>
+              <li>Contact support within <strong>48 hours</strong> of gig completion</li>
+              <li>Gig ID, description, aur issue clearly provide karo</li>
+              <li>Relevant chat screenshots ya evidence attach karo</li>
+              <li>GigLega team 5 business days mein decision degi</li>
+            </ul>
+            <div class="tos-box teal">
+              💡 <strong>Platform Decision:</strong> GigLega ki mediation decision final
+              nahi hai legally — tum court mein jaane ka right rakhte ho. Lekin hum
+              practical aur fair solution dene ki koshish karte hain.
+            </div>
+
+            <h3>Step 3 — Legal Recourse</h3>
+            <p>
+              Platform mediation se satisfactory result nahi mila toh legal recourse
+              available hai — Gurugram jurisdiction ke courts mein (Section 11 dekho).
+            </p>
+
+            <h3>Off-Platform Disputes</h3>
+            <p>
+              Platform ke bahar kiye gaye transactions ya agreements ke disputes mein
+              GigLega koi mediation provide nahi karta aur koi liability nahi hai.
+              Yeh ek aur reason hai kyun always platform ke through transact karna chahiye.
+            </p>
+
+            <h3>Dispute Filing Deadlines</h3>
+            <table class="tos-table">
+              <thead>
+                <tr><th>Dispute Type</th><th>Deadline to File</th><th>Resolution SLA</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Payment dispute</td><td>48 hours post-completion</td><td>5 business days</td></tr>
+                <tr><td>Work quality complaint</td><td>24 hours post-completion</td><td>5 business days</td></tr>
+                <tr><td>Safety/harassment report</td><td>Anytime</td><td>24 hours (urgent) / 5 days</td></tr>
+                <tr><td>Fraudulent account report</td><td>Anytime</td><td>24 hours</td></tr>
+                <tr><td>Billing/fee dispute</td><td>30 days of transaction</td><td>7 business days</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ══ 9. LIABILITY ══ -->
+        <section class="tos-section" id="sec-liability">
+          <div class="tos-section-header">
+            <div class="tos-sec-icon">🛡️</div>
+            <div>
+              <div class="tos-sec-num">Section 09</div>
+              <div class="tos-sec-title">Limitation of Liability</div>
+            </div>
+          </div>
+          <div class="tos-prose">
+            <h3>Platform as Intermediary</h3>
+            <p>
+              GigLega ek intermediary platform hai — IT Act 2000 Section 79 ke under.
+              Platform pe listed gigs, workers ya posters ke actions ke liye GigLega
+              directly liable nahi hai jab tak hum reasonably act karte rahe.
+            </p>
+
+            <h3>What GigLega Is NOT Responsible For</h3>
+            <ul>
+              <li>Quality of work done by workers</li>
+              <li>Accuracy of gig descriptions by posters</li>
+              <li>Off-platform transactions ya agreements</li>
+              <li>Physical safety incidents (tum responsible ho safe gig practices ke liye)</li>
+              <li>Third-party service failures (payment processors, internet, etc.)</li>
+              <li>Force majeure events — natural disasters, government actions, etc.</li>
+              <li>Indirect, consequential ya punitive damages</li>
+            </ul>
+
+            <h3>Maximum Liability Cap</h3>
+            <p>
+              Agar kisi bhi circumstance mein GigLega liable ho, maximum liability
+              <strong>last 3 months mein tumhare account pe GigLega ko paid platform fees</strong>
+              tak limited hai — ya ₹10,000 — whichever is lower.
+            </p>
+
+            <div class="tos-box warn">
+              ⚠️ <strong>Important:</strong> Yeh limitation applicable hai maximum extent
+              allowed by Indian law ke andar. Consumer protection rights ke under kuch
+              rights override nahi ho sakte — Indian Consumer Protection Act 2019 applicable hai.
+            </div>
+
+            <h3>Indemnification</h3>
+            <p>
+              Tum agree karte ho GigLega ko indemnify karne ke liye (har ek claim, loss,
+              damage, legal fees se protect karne ke liye) agar:
+            </p>
+            <ul>
+              <li>Tumne in Terms violate kiye</li>
+              <li>Tumne koi third party ke rights violate kiye</li>
+              <li>Tumhare platform use se kisi ko harm hua</li>
+              <li>Tumne false ya misleading information provide ki</li>
+            </ul>
+
+            <h3>"As Is" Service</h3>
+            <p>
+              GigLega platform "as is" aur "as available" basis pe provide kiya jaata hai.
+              Hum 100% uptime, error-free operation, ya specific results guarantee nahi
+              karte — though hum best effort basis pe reliable service maintain karte hain.
+            </p>
+          </div>
+        </section>
+
+        <!-- ══ 10. TERMINATION ══ -->
+        <section class="tos-section" id="sec-termination">
+          <div class="tos-section-header">
+            <div class="tos-sec-icon">🚫</div>
+            <div>
+              <div class="tos-sec-num">Section 10</div>
+              <div class="tos-sec-title">Account Termination</div>
+            </div>
+          </div>
+          <div class="tos-prose">
+            <h3>You Can Leave Anytime</h3>
+            <p>
+              Tum kabhi bhi apna account deactivate ya delete kar sakte ho —
+              Dashboard → Settings → Account. Account delete karne pe:
+            </p>
+            <ul>
+              <li>Personal data 30 days mein remove ho jaayega</li>
+              <li>Pending earnings withdraw kar lo pehle</li>
+              <li>Active gigs complete karo ya cancel karo</li>
+              <li>Legally required records (transaction history) 7 years retain honge</li>
+            </ul>
+
+            <h3>GigLega Can Terminate</h3>
+            <p>GigLega account terminate ya suspend kar sakta hai agar:</p>
+            <ul>
+              <li>Terms of Service violation ho</li>
+              <li>Fraudulent ya illegal activity detect ho</li>
+              <li>Community safety ke liye necessary ho</li>
+              <li>Prolonged inactivity (12+ months) — with advance notice</li>
+              <li>Legal requirement ya court order ho</li>
+            </ul>
+
+            <div class="tos-box info">
+              ℹ️ <strong>Notice:</strong> Minor violations pe pehle warning milegi —
+              except serious violations (fraud, harassment, illegal activity) jahan
+              immediate termination hogi.
+            </div>
+
+            <h3>Effect of Termination</h3>
+            <p>Account terminate hone pe:</p>
+            <ul>
+              <li>Platform access immediately blocked</li>
+              <li>Active gigs cancelled — workers notified</li>
+              <li>Pending earnings: cleared payments released, disputed ones held</li>
+              <li>Reviews aur ratings publicly visible reh sakte hain (anonymised)</li>
+            </ul>
+
+            <h3>Appeal Process</h3>
+            <p>
+              Account wrongly terminate hua lage toh 30 days ke andar appeal karo:
+              <a href="mailto:appeals@giglega.in">appeals@giglega.in</a>.
+              Subject: "Account Appeal — [Phone/Email]". 7 business days mein response milega.
+              Permanent bans rarely reversed hain — serious evidence required.
+            </p>
+          </div>
+        </section>
+
+        <!-- ══ 11. GOVERNING LAW ══ -->
+        <section class="tos-section" id="sec-governing">
+          <div class="tos-section-header">
+            <div class="tos-sec-icon">🏛️</div>
+            <div>
+              <div class="tos-sec-num">Section 11</div>
+              <div class="tos-sec-title">Governing Law & Jurisdiction</div>
+            </div>
+          </div>
+          <div class="tos-prose">
+            <h3>Applicable Law</h3>
+            <p>
+              Yeh Terms aur platform se related koi bhi dispute <strong>Indian law</strong>
+              se governed hai — specifically:
+            </p>
+            <ul>
+              <li>Indian Contract Act, 1872</li>
+              <li>Information Technology Act, 2000</li>
+              <li>Consumer Protection Act, 2019</li>
+              <li>Digital Personal Data Protection Act, 2023</li>
+              <li>Indian Penal Code (where applicable)</li>
+            </ul>
+
+            <h3>Jurisdiction</h3>
+            <p>
+              Koi bhi legal dispute jo platform mediation se resolve na ho,
+              <strong>Gurugram, Haryana ke courts</strong> ki exclusive jurisdiction
+              mein hogi. Tum in Terms accept karke is jurisdiction ko agree karte ho.
+            </p>
+
+            <div class="tos-box teal">
+              💡 <strong>Consumer Disputes:</strong> Consumer Protection Act ke under
+              complaints District Consumer Disputes Redressal Commission mein bhi file
+              ki ja sakti hain — tumhare residence district mein. Yeh right override nahi hota.
+            </div>
+
+            <h3>Arbitration (Optional)</h3>
+            <p>
+              Both parties mutual agreement se disputes Arbitration & Conciliation Act,
+              1996 ke under arbitration se settle kar sakte hain —
+              as an alternative to court proceedings. GigLega kisi ek party pe forcibly
+              arbitration impose nahi karta.
+            </p>
+
+            <h3>Class Action Waiver</h3>
+            <p>
+              Disputes individual basis pe filed honge — class action suits ya
+              representative proceedings ke roop mein nahi. Indian law ke under
+              permissible hone pe yeh clause void ho sakta hai.
+            </p>
+          </div>
+        </section>
+
+        <!-- ══ 12. CHANGES ══ -->
+        <section class="tos-section" id="sec-changes">
+          <div class="tos-section-header">
+            <div class="tos-sec-icon">🔄</div>
+            <div>
+              <div class="tos-sec-num">Section 12</div>
+              <div class="tos-sec-title">Changes to These Terms</div>
+            </div>
+          </div>
+          <div class="tos-prose">
+            <h3>How We Notify You</h3>
+            <p>
+              Material changes hone pe hum notify karenge:
+            </p>
+            <ul>
+              <li>📧 Email/SMS — at least <strong>30 days before</strong> effective date</li>
+              <li>🔔 In-app notification</li>
+              <li>📢 Website announcement banner</li>
+            </ul>
+            <p>
+              Minor changes (typos, clarity, non-material updates) ke liye sirf
+              "Last Updated" date change hogi.
+            </p>
+
+            <div class="tos-box warn">
+              ⚠️ Major changes ke notification ke baad bhi platform use jaari rakhna
+              updated Terms ki acceptance maana jaayega. Disagree ho toh account delete
+              karo effective date se pehle.
+            </div>
+
+            <h3>Version History</h3>
+            <div class="version-list">
+              <div class="version-item current">
+                <div class="vi-version">v1.1</div>
+                <div>
+                  <div class="vi-date">March 14, 2026 — Current Version</div>
+                  <div class="vi-changes">
+                    Auto-release policy clarified (72 hours). Scope creep definition added.
+                    GST section updated with SAC code. Appeal email address added.
+                    Consumer Protection Act reference added to governing law.
+                  </div>
+                </div>
+              </div>
+              <div class="version-item">
+                <div class="vi-version">v1.0</div>
+                <div>
+                  <div class="vi-date">January 1, 2026 — Initial Release</div>
+                  <div class="vi-changes">
+                    First public Terms of Service for GigLega platform launch.
+                    Core sections: accounts, conduct, payments, IP, disputes, liability,
+                    termination aur governing law established.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ══ 13. CONTACT ══ -->
+        <section class="tos-section" id="sec-contact">
+          <div class="tos-section-header">
+            <div class="tos-sec-icon">📩</div>
+            <div>
+              <div class="tos-sec-num">Section 13</div>
+              <div class="tos-sec-title">Contact & Legal Notices</div>
+            </div>
+          </div>
+          <div class="tos-prose">
+            <p>
+              In Terms ke baare mein koi sawaal ho, ya legal notice serve karni ho,
+              yahan contact karo:
+            </p>
+            <table class="tos-table">
+              <thead>
+                <tr><th>Contact Type</th><th>Details</th><th>Response Time</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>📧 General Terms</td>
+                  <td><a href="mailto:legal@giglega.in">legal@giglega.in</a></td>
+                  <td>7 business days</td>
+                </tr>
+                <tr>
+                  <td>⚖️ Account Appeals</td>
+                  <td><a href="mailto:appeals@giglega.in">appeals@giglega.in</a></td>
+                  <td>7 business days</td>
+                </tr>
+                <tr>
+                  <td>🔒 Privacy / Data</td>
+                  <td><a href="mailto:privacy@giglega.in">privacy@giglega.in</a></td>
+                  <td>7 business days</td>
+                </tr>
+                <tr>
+                  <td>🚨 Safety / Urgent</td>
+                  <td><a href="mailto:safety@giglega.in">safety@giglega.in</a></td>
+                  <td>24 hours</td>
+                </tr>
+                <tr>
+                  <td>💬 General Support</td>
+                  <td><a href="contact.html">Contact Form</a></td>
+                  <td>4–6 hours</td>
+                </tr>
+                <tr>
+                  <td>📮 Registered Office</td>
+                  <td>GigLega Technologies, Gurugram, Haryana — 122001</td>
+                  <td>30 days (postal)</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <h3>Legal Notices</h3>
+            <p>
+              GigLega ko serve kiye gaye official legal notices registered office address pe
+              ya <a href="mailto:legal@giglega.in">legal@giglega.in</a> pe bhejni chahiye —
+              "Legal Notice" subject line ke saath. Informal channels (chat, social media)
+              pe diye notices legally valid nahi maane jaate.
+            </p>
+
+            <div class="tos-box green">
+              ✅ <strong>Hindi Support:</strong> Legal queries Hindi mein bhi send kar
+              sakte ho — hum Hindi aur English dono mein respond karne capable hain.
+            </div>
+          </div>
+        </section>
+
+        <!-- Final CTA -->
+        <div class="tos-cta-card">
+          <div class="tos-cta-inner">
+            <h3>📄 Terms Padh Li? Start Karo!</h3>
+            <p>
+              GigLega ke rules simple aur fair hain — workers aur posters dono ke liye.
+              Koi sawaal ho toh contact karo — warna gig dhundo ya post karo aaj hi.
+            </p>
+            <div class="tos-cta-btns">
+              <a href="browse.html" class="btn-tos-cta-primary">🔍 Browse Gigs</a>
+              <a href="contact.html" class="btn-tos-cta-outline">💬 Ask a Question</a>
+            </div>
+          </div>
         </div>
-      </div>
 
-      <div class="legal-card" id="conduct">
-        <div class="legal-section-title">6. 🤝 Code of Conduct</div>
-        <div class="legal-body">
-          <p>All users must maintain respectful conduct. The following are strictly prohibited:</p>
-          <ul>
-            <li>Harassment, abuse, or threatening behavior toward any user.</li>
-            <li>Sharing personal information of other users outside the platform.</li>
-            <li>Attempting to conduct transactions off-platform to avoid support fees.</li>
-            <li>Posting fake reviews, ratings, or misleading gig descriptions.</li>
-            <li>Using automated bots or scripts to interact with the platform.</li>
-            <li>Any form of discrimination based on caste, religion, gender, or origin.</li>
-          </ul>
-          <p>Violations will result in immediate account suspension and may be reported to relevant authorities.</p>
-        </div>
       </div>
-
-      <div class="legal-card" id="liability">
-        <div class="legal-section-title">7. ⚖️ Liability & Disputes</div>
-        <div class="legal-body">
-          <p>GigLega is a platform intermediary and is <strong>not liable</strong> for:</p>
-          <ul>
-            <li>Quality, timeliness, or completion of any gig.</li>
-            <li>Physical injury, property damage, or loss incurred during gig execution.</li>
-            <li>Disputes between Posters and Workers.</li>
-            <li>Loss of data during Beta phase.</li>
-          </ul>
-          <p>In case of disputes, users are encouraged to contact us at <strong>Giglega.official@gmail.com</strong>. GigLega may attempt to mediate but is not obligated to resolve disputes.</p>
-          <p>All disputes are subject to the jurisdiction of courts in <strong>Gurugram, Haryana, India</strong>.</p>
-        </div>
-      </div>
-
-      <div class="legal-card" id="termination">
-        <div class="legal-section-title">8. 🚪 Termination</div>
-        <div class="legal-body">
-          <p>GigLega reserves the right to terminate or suspend your account with or without notice for:</p>
-          <ul>
-            <li>Violation of these Terms of Service.</li>
-            <li>Fraudulent activity or attempted abuse of the platform.</li>
-            <li>Extended inactivity (more than 12 months).</li>
-          </ul>
-          <p>You may delete your account at any time from your Profile settings. Upon deletion, your data will be removed from our active systems.</p>
-        </div>
-      </div>
-
-      <div class="legal-card" id="contact">
-        <div class="legal-section-title">9. 📞 Contact Us</div>
-        <div class="legal-body">
-          <p>For questions, complaints, or legal notices regarding these Terms of Service, please contact:</p>
-          <ul>
-            <li>📧 Email: <strong>Giglega.official@gmail.com</strong></li>
-            <li>📱 WhatsApp/Call: <strong>+91 9319635257</strong></li>
-            <li>📍 Address: H.no 82 Om Vihar Phase 1, Palam Vihar Extn, Opp Sec 23A HUDA Park, Gurugram — 122017, Haryana, India</li>
-          </ul>
-        </div>
-      </div>
-
     </div>
+
   </main>
 
   <footer id="main-footer"></footer>
   <div id="toast-container"></div>
+
   <script>
+  document.addEventListener("DOMContentLoaded", function () {
+
+    /* ── Breadcrumb ── */
     if (typeof buildBreadcrumb === "function") {
       buildBreadcrumb("breadcrumb", [
-        { label: "Home", href: "index.html" },
+        { label: "Home",  href: "index.html" },
         { label: "Terms of Service" }
       ]);
     }
+
+    /* ── Reading progress bar ── */
+    window.addEventListener("scroll", function () {
+      var scrollTop = window.scrollY || document.documentElement.scrollTop;
+      var docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      var progress  = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+      var bar = document.getElementById("readingBar");
+      if (bar) bar.style.width = Math.min(progress, 100) + "%";
+    });
+
+    /* ── TOC scroll spy ── */
+    var sections = document.querySelectorAll(".tos-section[id]");
+    var tocItems = document.querySelectorAll(".tos-toc-item[data-sec]");
+
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          var id = entry.target.id.replace("sec-", "");
+          tocItems.forEach(function (item) {
+            item.classList.toggle("active", item.dataset.sec === id);
+          });
+        }
+      });
+    }, { rootMargin: "-30% 0px -60% 0px" });
+
+    sections.forEach(function (sec) { observer.observe(sec); });
+
+    /* ── TOC click scroll ── */
+    tocItems.forEach(function (item) {
+      item.addEventListener("click", function () {
+        var target = document.getElementById("sec-" + item.dataset.sec);
+        if (target) target.scrollIntoView({ behavior: "smooth" });
+      });
+    });
+
+    /* ── URL hash jump ── */
+    function handleHash() {
+      var hash = window.location.hash;
+      if (!hash) return;
+      var map = {
+        "#payment":   "sec-payments",
+        "#fees":      "sec-payments",
+        "#conduct":   "sec-conduct",
+        "#accounts":  "sec-accounts",
+        "#disputes":  "sec-disputes",
+        "#liability": "sec-liability",
+        "#terminate": "sec-termination",
+        "#contact":   "sec-contact"
+      };
+      var targetId = map[hash] || ("sec-" + hash.replace("#", ""));
+      var target   = document.getElementById(targetId);
+      if (target) {
+        setTimeout(function () {
+          target.scrollIntoView({ behavior: "smooth" });
+        }, 300);
+      }
+    }
+    handleHash();
+    window.addEventListener("hashchange", handleHash);
+
+  });
   </script>
 </body>
 </html>
