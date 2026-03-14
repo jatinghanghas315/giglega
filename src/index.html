@@ -7,7 +7,6 @@
   <meta name="description" content="GigLega pe gig karo ya gig do. Gurugram aur NCR ke best hyperlocal gigs — students, bachelors aur workers ke liye." />
   <meta name="keywords" content="gig work Gurugram, part time jobs Gurugram, freelance Gurugram, gig economy India" />
   <link rel="stylesheet" href="styles.css" />
-  <script src="shared.js"></script>
   <style>
 
     /* ══════════════════════════════════
@@ -550,8 +549,8 @@
         <h2>Ready to start earning or getting help?</h2>
         <p>Join thousands of workers and posters across Gurugram NCR</p>
         <div class="trust-ctas">
-          <a href="signup.html?role=worker" class="btn-trust-primary">⚡ Join as Worker</a>
-          <a href="signup.html?role=poster" class="btn-trust-secondary">📋 Post a Gig</a>
+          <a href="login.html#mode=register&role=worker" class="btn-trust-primary">⚡ Join as Worker</a>
+          <a href="login.html#mode=register&role=poster" class="btn-trust-secondary">📋 Post a Gig</a>
         </div>
       </div>
     </section>
@@ -672,7 +671,7 @@
         <h2>🚀 Shuru Karo Aaj Hi</h2>
         <p>Free mein join karo. Koi subscription nahi, koi hidden fee nahi.<br/>Sirf kaam karo — aur paise kamao.</p>
         <div class="final-cta-btns">
-          <a href="signup.html" class="btn btn-primary btn-lg">Join Free →</a>
+          <a href="login.html#mode=register" class="btn btn-primary btn-lg">Join Free →</a>
           <a href="browse.html" class="btn btn-secondary btn-lg">Browse Gigs</a>
         </div>
       </div>
@@ -682,6 +681,8 @@
 
   <footer id="main-footer"></footer>
   <div id="toast-container"></div>
+
+  <script src="shared.js"></script>
 
   <script>
   document.addEventListener("DOMContentLoaded", function () {
@@ -885,8 +886,8 @@
     var currentUser = (typeof getCurrentUser === "function") ? getCurrentUser() : null;
     if (currentUser) {
       /* Swap "Join Free" CTA to dashboard link */
-      document.querySelectorAll('a[href="signup.html"], a[href="signup.html?role=worker"], a[href="signup.html?role=poster"]').forEach(function(a){
-        if (a.href.includes("signup")) {
+      document.querySelectorAll('a[href="login.html#mode=register"], a[href="login.html#mode=register&role=worker"], a[href="login.html#mode=register&role=poster"]').forEach(function(a){
+        if (a.href.includes("login.html")) {
           a.href = "dashboard.html";
           if (a.textContent.includes("Join")) a.innerHTML = "⚡ Go to Dashboard";
         }

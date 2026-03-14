@@ -9,11 +9,11 @@
    CONFIG
 ══════════════════════════════════ */
 const APP_NAME    = 'GigLega';
-const VERSION     = '1.4.0';
+const VERSION     = '1.4.2';
 const CACHE_NAME  = `giglega-cache-v${VERSION}`;
 const SYNC_TAG    = 'giglega-bg-sync';
 const PUSH_ICON   = '/assets/icons/icon-192.png';
-const PUSH_BADGE  = '/assets/icons/badge-72.png';
+const PUSH_BADGE  = '/assets/icons/icon-72.png';
 
 /* ══════════════════════════════════
    CACHE STRATEGY BUCKETS
@@ -42,13 +42,9 @@ const PRECACHE_SHELL = [
   /* Icons & assets */
   '/assets/icons/icon-72.png',
   '/assets/icons/icon-96.png',
-  '/assets/icons/icon-128.png',
   '/assets/icons/icon-144.png',
-  '/assets/icons/icon-152.png',
   '/assets/icons/icon-192.png',
-  '/assets/icons/icon-384.png',
   '/assets/icons/icon-512.png',
-  '/assets/icons/badge-72.png',
 ];
 
 /** Network-first: always try network, fall back to cache */
@@ -66,7 +62,6 @@ const NETWORK_FIRST_PATTERNS = [
 /** Cache-first: serve from cache, refresh in background */
 const CACHE_FIRST_PATTERNS = [
   /\.css$/,
-  /\.js$/,
   /\.woff2?$/,
   /\.ttf$/,
   /fonts\.googleapis\.com/,
@@ -75,7 +70,6 @@ const CACHE_FIRST_PATTERNS = [
 
 /** Stale-while-revalidate: serve cached + update async */
 const STALE_WHILE_REVALIDATE_PATTERNS = [
-  /\.html$/,
   /\/browse/,
   /\/dashboard/,
 ];
@@ -167,7 +161,7 @@ const OFFLINE_HTML = `<!DOCTYPE html>
   <script>
     window.addEventListener('online', () => location.reload());
     setInterval(() => {
-      fetch('/ping', { method: 'HEAD', cache: 'no-store' })
+      fetch('/index.html', { method: 'HEAD', cache: 'no-store' })
         .then(() => location.reload())
         .catch(() => {});
     }, 8000);
@@ -352,6 +346,18 @@ self.addEventListener('fetch', event => {
 
   // Skip chrome-extension or dev tools requests
   if (!url.protocol.startsWith('http')) return;
+
+  // Always prefer network for full-page navigations so users don't get stuck on stale HTML.
+  if (request.mode === 'navigate') {
+    event.respondWith(networkFirstWithOfflineFallback(request));
+    return;
+  }
+
+  // Always prefer network for shared shell script so header/footer/nav don't get stale.
+  if (url.pathname.endsWith('/shared.js')) {
+    event.respondWith(networkFirst(request));
+    return;
+  }
 
   /* ── Route to correct strategy ── */
   if (matchesPatterns(request.url, IMAGE_PATTERNS)) {
