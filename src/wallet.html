@@ -3,890 +3,1949 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>My Wallet — GigLega</title>
-
-  <script src="shared.js"></script>
+  <title>Wallet — GigLega</title>
+  <meta name="description" content="GigLega Wallet — apni earnings dekho, withdraw karo, transactions track karo." />
   <link rel="stylesheet" href="styles.css" />
-
+  <script src="shared.js"></script>
   <style>
-    .wallet-wrap { max-width: 900px; margin: 0 auto; padding: 28px 16px 80px; }
 
-    /* ── Balance hero card ── */
-    .balance-hero {
-      background: linear-gradient(135deg, var(--primary) 0%, var(--teal) 100%);
-      border-radius: var(--radius);
-      padding: 32px 28px;
-      color: #fff;
-      margin-bottom: 24px;
-      position: relative;
-      overflow: hidden;
+    /* ══════════════════════════════════
+       WRAPPER
+    ══════════════════════════════════ */
+    .wl-wrapper { min-height: 100vh; background: var(--bg); }
+
+    /* ══════════════════════════════════
+       HERO BALANCE CARD
+    ══════════════════════════════════ */
+    .wl-hero {
+      background: linear-gradient(135deg, #0b1e35 0%, #1a3c5e 40%, #064e3b 100%);
+      padding: 36px 20px 80px;
+      position: relative; overflow: hidden;
     }
-    .balance-hero::before {
+    .wl-hero::before {
       content: "";
-      position: absolute;
-      top: -60px; right: -60px;
-      width: 220px; height: 220px;
-      border-radius: 50%;
-      background: rgba(255,255,255,.07);
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse at 10% 90%, rgba(13,148,136,.25) 0%, transparent 50%),
+        radial-gradient(ellipse at 90% 10%, rgba(6,78,59,.4) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 50%, rgba(245,158,11,.04) 0%, transparent 60%);
       pointer-events: none;
     }
-    .balance-hero::after {
+    .wl-hero::after {
       content: "";
-      position: absolute;
-      bottom: -40px; left: -30px;
-      width: 160px; height: 160px;
-      border-radius: 50%;
-      background: rgba(255,255,255,.05);
-      pointer-events: none;
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.02) 1px, transparent 1px);
+      background-size: 48px 48px; pointer-events: none;
     }
-    .balance-top {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 16px;
-      margin-bottom: 24px;
-      position: relative;
-      z-index: 1;
-    }
-    .balance-label { font-size: .8rem; font-weight: 700; opacity: .7; text-transform: uppercase; letter-spacing: .8px; margin-bottom: 6px; }
-    .balance-amount {
-      font-size: clamp(2.2rem, 6vw, 3rem);
-      font-weight: 900;
-      color: #fff;
-      line-height: 1;
-      letter-spacing: -1px;
-    }
-    .balance-amount sup { font-size: 1.1rem; vertical-align: super; font-weight: 700; }
-    .balance-status {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 6px 14px;
-      background: rgba(255,255,255,.15);
-      border: 1px solid rgba(255,255,255,.25);
-      border-radius: 20px;
-      font-size: .78rem;
-      font-weight: 700;
-      color: #fff;
-      margin-top: 8px;
-    }
-    .balance-actions {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      position: relative;
-      z-index: 1;
-    }
-    .btn-wallet-primary {
-      padding: 11px 22px;
-      background: #fff;
-      color: var(--primary);
-      border: none;
-      border-radius: var(--radius-sm);
-      font-size: .88rem;
-      font-weight: 800;
-      cursor: pointer;
-      transition: all .2s;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-family: var(--font);
-    }
-    .btn-wallet-primary:hover { opacity: .9; transform: translateY(-1px); }
-    .btn-wallet-outline {
-      padding: 11px 22px;
-      background: transparent;
-      color: #fff;
-      border: 1.5px solid rgba(255,255,255,.4);
-      border-radius: var(--radius-sm);
-      font-size: .88rem;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all .2s;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-family: var(--font);
-    }
-    .btn-wallet-outline:hover { border-color: #fff; background: rgba(255,255,255,.1); }
 
-    /* Balance mini stats */
-    .balance-stats {
+    .wl-hero-inner {
+      max-width: 1100px; margin: 0 auto;
+      position: relative; z-index: 1;
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 0;
-      border-top: 1px solid rgba(255,255,255,.15);
-      padding-top: 20px;
-      margin-top: 4px;
-      position: relative;
-      z-index: 1;
+      grid-template-columns: 1fr auto;
+      gap: 24px; align-items: start;
     }
-    .balance-stat {
+    @media(max-width:768px) { .wl-hero-inner { grid-template-columns: 1fr; } }
+
+    /* Balance display */
+    .wl-balance-block {}
+    .wlb-tag {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(255,255,255,.1);
+      border: 1px solid rgba(255,255,255,.15);
+      border-radius: var(--radius-full);
+      padding: 4px 14px;
+      font-size: .72rem; font-weight: 700;
+      color: rgba(255,255,255,.75);
+      text-transform: uppercase; letter-spacing: .5px;
+      margin-bottom: 16px;
+    }
+    .wlb-label {
+      font-size: .84rem; font-weight: 600;
+      color: rgba(255,255,255,.6);
+      margin-bottom: 6px;
+    }
+    .wlb-amount {
+      font-size: clamp(2.4rem, 6vw, 3.8rem);
+      font-weight: 900; color: #fff;
+      letter-spacing: -1px; line-height: 1;
+      margin-bottom: 6px;
+    }
+    .wlb-amount span { font-size: 55%; color: rgba(255,255,255,.7); font-weight: 700; vertical-align: top; margin-top: .4em; }
+    .wlb-sub {
+      font-size: .82rem; color: rgba(255,255,255,.5);
+      font-weight: 600; margin-bottom: 24px;
+    }
+    .wlb-sub strong { color: rgba(255,255,255,.8); }
+
+    /* Mini balance chips */
+    .wlb-chips {
+      display: flex; gap: 10px; flex-wrap: wrap;
+    }
+    .wlb-chip {
+      background: rgba(255,255,255,.1);
+      border: 1px solid rgba(255,255,255,.15);
+      border-radius: 10px;
+      padding: 9px 14px;
       text-align: center;
-      padding: 0 12px;
-      border-right: 1px solid rgba(255,255,255,.15);
     }
-    .balance-stat:last-child { border-right: none; }
-    .balance-stat-val { font-size: 1.2rem; font-weight: 800; color: #fff; }
-    .balance-stat-lbl { font-size: .7rem; opacity: .65; text-transform: uppercase; letter-spacing: .5px; margin-top: 3px; }
+    .wlb-chip-val   { font-size: 1rem; font-weight: 900; color: #fff; line-height: 1; }
+    .wlb-chip-label { font-size: .65rem; font-weight: 700; color: rgba(255,255,255,.55); text-transform: uppercase; letter-spacing: .3px; margin-top: 3px; }
 
-    /* ── Quick stats row ── */
-    .stats-row {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-      gap: 14px;
-      margin-bottom: 24px;
+    /* Quick actions */
+    .wl-quick-actions {
+      display: flex; flex-direction: column; gap: 10px;
+      min-width: 200px;
     }
-    .stat-card {
+    @media(max-width:768px) { .wl-quick-actions { flex-direction: row; flex-wrap: wrap; } }
+
+    .btn-wqa {
+      display: flex; align-items: center; gap: 10px;
+      padding: 13px 18px;
+      border-radius: var(--radius-sm);
+      font-size: .88rem; font-weight: 800;
+      cursor: pointer; font-family: var(--font);
+      transition: all .18s; border: none; text-align: left;
+    }
+    .btn-wqa-primary {
+      background: linear-gradient(135deg, #059669, #0d9488);
+      color: #fff;
+      box-shadow: 0 4px 16px rgba(5,150,105,.3);
+    }
+    .btn-wqa-primary:hover { box-shadow: 0 6px 22px rgba(5,150,105,.4); transform: translateY(-1px); }
+    .btn-wqa-glass {
+      background: rgba(255,255,255,.1);
+      border: 1.5px solid rgba(255,255,255,.18) !important;
+      color: rgba(255,255,255,.9);
+    }
+    .btn-wqa-glass:hover { background: rgba(255,255,255,.18); color: #fff; }
+    .wqa-icon { font-size: 1.1rem; width: 22px; text-align: center; flex-shrink: 0; }
+
+    /* ══════════════════════════════════
+       STATS STRIP
+    ══════════════════════════════════ */
+    .wl-stats-strip {
+      max-width: 1100px; margin: -44px auto 0;
+      padding: 0 20px; position: relative; z-index: 10;
+    }
+    .wl-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+    }
+    @media(max-width:900px) { .wl-stats-grid { grid-template-columns: repeat(3,1fr); } }
+    @media(max-width:540px) { .wl-stats-grid { grid-template-columns: repeat(2,1fr); } }
+
+    .wl-stat {
       background: var(--surface);
       border: 1.5px solid var(--gray-200);
       border-radius: var(--radius);
-      padding: 16px 18px;
-      box-shadow: var(--shadow-sm);
+      padding: 16px 14px;
+      box-shadow: var(--shadow);
+      text-align: center;
+      position: relative; overflow: hidden;
+      transition: transform .2s;
     }
-    .stat-label { font-size: .72rem; font-weight: 700; color: var(--gray-400); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 5px; }
-    .stat-value { font-size: 1.4rem; font-weight: 800; color: var(--primary); }
-    .stat-value.green  { color: var(--success); }
-    .stat-value.amber  { color: var(--accent); }
-    .stat-value.danger { color: var(--danger); }
-    .stat-sub { font-size: .73rem; color: var(--gray-400); margin-top: 3px; }
-
-    /* ── Layout ── */
-    .wallet-grid {
-      display: grid;
-      grid-template-columns: 1fr 340px;
-      gap: 20px;
-      align-items: start;
+    .wl-stat:hover { transform: translateY(-2px); }
+    [data-theme=dark] .wl-stat { border-color: var(--gray-700); }
+    .wl-stat::before {
+      content: ""; position: absolute;
+      top: 0; left: 0; right: 0; height: 3px;
     }
-    @media (max-width: 768px) { .wallet-grid { grid-template-columns: 1fr; } }
+    .wl-stat:nth-child(1)::before { background: linear-gradient(90deg,#059669,#34d399); }
+    .wl-stat:nth-child(2)::before { background: linear-gradient(90deg,var(--primary),var(--teal)); }
+    .wl-stat:nth-child(3)::before { background: linear-gradient(90deg,#7c3aed,#a78bfa); }
+    .wl-stat:nth-child(4)::before { background: linear-gradient(90deg,#d97706,#fbbf24); }
+    .wl-stat:nth-child(5)::before { background: linear-gradient(90deg,#dc2626,#f87171); }
 
-    /* ── Transaction list ── */
-    .card {
+    .wls-icon  { font-size: 1.3rem; margin-bottom: 5px; line-height: 1; }
+    .wls-val   { font-size: 1.3rem; font-weight: 900; color: var(--primary); line-height: 1; margin-bottom: 3px; letter-spacing: -.3px; }
+    .wls-label { font-size: .65rem; font-weight: 700; text-transform: uppercase; letter-spacing: .3px; color: var(--gray-400); }
+
+    /* ══════════════════════════════════
+       TAB NAV
+    ══════════════════════════════════ */
+    .wl-tabs-bar {
       background: var(--surface);
-      border: 1.5px solid var(--gray-200);
-      border-radius: var(--radius);
+      border-bottom: 1.5px solid var(--gray-200);
+      position: sticky; top: 0; z-index: 40;
       box-shadow: var(--shadow-sm);
-      overflow: hidden;
+      margin-top: 28px;
     }
-    .card-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 16px 20px;
-      border-bottom: 1.5px solid var(--gray-100);
+    [data-theme=dark] .wl-tabs-bar { border-color: var(--gray-700); }
+    .wl-tabs-inner {
+      max-width: 1100px; margin: 0 auto;
+      padding: 0 20px; display: flex; overflow-x: auto;
     }
-    .card-title { font-size: .95rem; font-weight: 800; color: var(--primary); }
-    .card-action { font-size: .8rem; font-weight: 700; color: var(--teal); cursor: pointer; background: none; border: none; font-family: var(--font); }
-    .card-action:hover { text-decoration: underline; }
+    .wl-tabs-inner::-webkit-scrollbar { display: none; }
 
-    /* Filter chips */
-    .filter-chips {
-      display: flex;
-      gap: 6px;
-      padding: 12px 20px;
-      border-bottom: 1px solid var(--gray-100);
-      overflow-x: auto;
-    }
-    .chip {
-      padding: 5px 14px;
-      border-radius: 16px;
-      border: 1.5px solid var(--gray-200);
-      font-size: .76rem;
-      font-weight: 700;
-      color: var(--gray-500);
-      cursor: pointer;
-      background: transparent;
-      white-space: nowrap;
-      transition: all .2s;
+    .wl-tab {
+      display: flex; align-items: center; gap: 7px;
+      padding: 14px 18px;
+      font-size: .86rem; font-weight: 700;
+      color: var(--gray-500); cursor: pointer;
+      border-bottom: 2.5px solid transparent;
+      white-space: nowrap; background: none;
+      border-left: none; border-right: none; border-top: none;
       font-family: var(--font);
-    }
-    .chip.active { border-color: var(--teal); background: rgba(13,148,136,.08); color: var(--teal); }
-    .chip:hover:not(.active) { border-color: var(--gray-400); color: var(--gray-700); }
-
-    /* Transaction rows */
-    .txn-list { padding: 0; }
-    .txn-row {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 14px 20px;
-      border-bottom: 1px solid var(--gray-100);
-      transition: background .15s;
-    }
-    .txn-row:last-child { border-bottom: none; }
-    .txn-row:hover { background: var(--gray-50); }
-    .txn-icon {
-      width: 40px; height: 40px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.1rem;
+      transition: color .18s, border-color .18s;
       flex-shrink: 0;
     }
-    .txn-icon.credit  { background: rgba(16,185,129,.12); }
-    .txn-icon.debit   { background: rgba(239,68,68,.1); }
-    .txn-icon.pending { background: rgba(245,158,11,.1); }
-    .txn-icon.fee     { background: rgba(107,114,128,.1); }
-    .txn-body { flex: 1; min-width: 0; }
-    .txn-title { font-size: .88rem; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .txn-sub   { font-size: .75rem; color: var(--gray-400); margin-top: 2px; }
-    .txn-right { text-align: right; flex-shrink: 0; }
-    .txn-amount { font-size: .92rem; font-weight: 800; }
-    .txn-amount.credit  { color: var(--success); }
-    .txn-amount.debit   { color: var(--danger); }
-    .txn-amount.pending { color: var(--accent); }
-    .txn-amount.fee     { color: var(--gray-500); }
-    .txn-date { font-size: .72rem; color: var(--gray-400); margin-top: 2px; }
-    .txn-badge {
-      font-size: .65rem;
-      font-weight: 700;
-      padding: 2px 8px;
-      border-radius: 6px;
-      margin-top: 4px;
-      display: inline-block;
+    .wl-tab:hover  { color: var(--primary); }
+    .wl-tab.active { color: var(--primary); border-bottom-color: var(--teal); }
+    [data-theme=dark] .wl-tab { color: var(--gray-400); }
+    .wl-tab-badge {
+      font-size: .6rem; font-weight: 800;
+      padding: 1px 6px; border-radius: 8px;
+      background: var(--danger); color: #fff;
     }
-    .txn-badge.completed { background: rgba(16,185,129,.1); color: var(--success); }
-    .txn-badge.pending   { background: rgba(245,158,11,.1); color: #b45309; }
-    .txn-badge.failed    { background: rgba(239,68,68,.1);  color: var(--danger); }
 
-    /* Empty transactions */
-    .txn-empty {
-      text-align: center;
-      padding: 48px 20px;
-      color: var(--gray-400);
+    /* ══════════════════════════════════
+       BODY
+    ══════════════════════════════════ */
+    .wl-body {
+      max-width: 1100px; margin: 0 auto;
+      padding: 28px 20px 80px;
     }
-    .txn-empty .ei { font-size: 2.5rem; margin-bottom: 10px; display: block; }
-    .txn-empty p   { font-size: .85rem; line-height: 1.6; }
+    .wl-panel { display: none; }
+    .wl-panel.active { display: block; }
 
-    /* ── Right sidebar ── */
-    .sidebar-card {
+    .wl-two-col {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 24px; align-items: start;
+    }
+    @media(max-width:900px) { .wl-two-col { grid-template-columns: 1fr; } }
+
+    /* ══════════════════════════════════
+       CARD BASE
+    ══════════════════════════════════ */
+    .wl-card {
       background: var(--surface);
       border: 1.5px solid var(--gray-200);
       border-radius: var(--radius);
       box-shadow: var(--shadow-sm);
-      margin-bottom: 16px;
       overflow: hidden;
+      margin-bottom: 20px;
     }
-    .sidebar-title {
-      font-size: .88rem;
-      font-weight: 800;
-      color: var(--primary);
-      padding: 14px 18px;
-      border-bottom: 1.5px solid var(--gray-100);
-    }
-    .sidebar-body { padding: 16px 18px; }
+    [data-theme=dark] .wl-card { border-color: var(--gray-700); }
 
-    /* Add Money form */
-    .form-field { margin-bottom: 14px; }
-    .form-field label { display: block; font-size: .82rem; font-weight: 600; color: var(--gray-700); margin-bottom: 5px; }
-    .form-field input,
-    .form-field select {
-      width: 100%;
+    .wl-card-header {
+      padding: 16px 20px;
+      border-bottom: 1.5px solid var(--gray-100);
+      background: linear-gradient(135deg, rgba(26,60,94,.03), rgba(13,148,136,.04));
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 12px; flex-wrap: wrap;
+    }
+    [data-theme=dark] .wl-card-header { border-color: var(--gray-700); }
+    .wl-card-title {
+      font-size: .92rem; font-weight: 800; color: var(--primary);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .btn-card-action {
+      padding: 6px 14px; border-radius: var(--radius-sm);
+      border: 1.5px solid var(--gray-200);
+      background: none; color: var(--gray-600);
+      font-size: .76rem; font-weight: 700;
+      cursor: pointer; font-family: var(--font);
+      transition: all .15s; white-space: nowrap;
+    }
+    .btn-card-action:hover { border-color: var(--teal); color: var(--teal); }
+    [data-theme=dark] .btn-card-action { border-color: var(--gray-600); color: var(--gray-400); }
+
+    .wl-card-body { padding: 20px; }
+
+    /* ══════════════════════════════════
+       INFO BOX
+    ══════════════════════════════════ */
+    .wl-info-box {
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      padding: 11px 14px; margin-bottom: 18px;
+      font-size: .85rem; line-height: 1.65;
+    }
+    .wl-info-box.teal   { background: rgba(13,148,136,.07);  border-left: 3px solid var(--teal); }
+    .wl-info-box.green  { background: rgba(16,185,129,.06);  border-left: 3px solid #059669; }
+    .wl-info-box.warn   { background: rgba(245,158,11,.07);  border-left: 3px solid #f59e0b; color: #92400e; }
+    .wl-info-box.danger { background: rgba(239,68,68,.06);   border-left: 3px solid var(--danger); }
+    [data-theme=dark] .wl-info-box.warn { color: #fbbf24; }
+
+    /* ══════════════════════════════════
+       TRANSACTIONS LIST
+    ══════════════════════════════════ */
+    .txn-filter-row {
+      display: flex; gap: 8px; align-items: center;
+      flex-wrap: wrap;
+    }
+    .txn-filter-btn {
+      padding: 6px 14px; border-radius: var(--radius-full);
+      border: 1.5px solid var(--gray-200);
+      background: none; color: var(--gray-500);
+      font-size: .76rem; font-weight: 700;
+      cursor: pointer; font-family: var(--font);
+      transition: all .15s; white-space: nowrap;
+    }
+    .txn-filter-btn:hover { border-color: var(--teal); color: var(--teal); }
+    .txn-filter-btn.active {
+      background: rgba(13,148,136,.08);
+      border-color: rgba(13,148,136,.3);
+      color: var(--teal);
+    }
+    [data-theme=dark] .txn-filter-btn { border-color: var(--gray-600); }
+
+    .txn-search {
+      margin-left: auto;
+      padding: 6px 12px 6px 28px;
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-full);
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: .78rem;
+      transition: border .2s;
+      width: 180px; box-sizing: border-box;
+    }
+    .txn-search:focus { outline: none; border-color: var(--teal); }
+    [data-theme=dark] .txn-search { border-color: var(--gray-600); background: var(--gray-800); }
+
+    .txn-search-wrap {
+      position: relative; flex-shrink: 0;
+    }
+    .txn-search-icon {
+      position: absolute; left: 9px; top: 50%;
+      transform: translateY(-50%);
+      font-size: .76rem; color: var(--gray-400); pointer-events: none;
+    }
+
+    /* Date group */
+    .txn-date-group { margin-bottom: 4px; }
+    .txn-date-label {
+      font-size: .72rem; font-weight: 800;
+      color: var(--gray-400); text-transform: uppercase;
+      letter-spacing: .4px; padding: 14px 20px 6px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .txn-date-label::after {
+      content: ""; flex: 1; height: 1px; background: var(--gray-100);
+    }
+    [data-theme=dark] .txn-date-label::after { background: var(--gray-700); }
+
+    /* Transaction item */
+    .txn-item {
+      display: flex; align-items: center; gap: 14px;
+      padding: 13px 20px;
+      border-bottom: 1px solid var(--gray-100);
+      transition: background .15s; cursor: pointer;
+    }
+    .txn-item:last-child { border-bottom: none; }
+    .txn-item:hover { background: rgba(13,148,136,.03); }
+    [data-theme=dark] .txn-item { border-color: var(--gray-700); }
+
+    .txn-icon-wrap {
+      width: 42px; height: 42px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem; flex-shrink: 0;
+    }
+    .txn-icon-wrap.credit  { background: rgba(5,150,105,.1); }
+    .txn-icon-wrap.debit   { background: rgba(239,68,68,.08); }
+    .txn-icon-wrap.pending { background: rgba(245,158,11,.08); }
+    .txn-icon-wrap.refund  { background: rgba(99,102,241,.08); }
+
+    .txn-info { flex: 1; min-width: 0; }
+    .txn-title {
+      font-size: .88rem; font-weight: 800; color: var(--text);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      margin-bottom: 3px;
+    }
+    .txn-meta {
+      font-size: .74rem; color: var(--gray-400); font-weight: 600;
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    }
+    .txn-badge {
+      font-size: .66rem; font-weight: 800;
+      padding: 2px 7px; border-radius: 5px;
+    }
+    .txn-badge.credit  { background: rgba(5,150,105,.1);  color: #059669; }
+    .txn-badge.debit   { background: rgba(239,68,68,.1);  color: var(--danger); }
+    .txn-badge.pending { background: rgba(245,158,11,.1); color: #d97706; }
+    .txn-badge.refund  { background: rgba(99,102,241,.1); color: #6366f1; }
+
+    .txn-amount {
+      font-size: .96rem; font-weight: 900; flex-shrink: 0; text-align: right;
+    }
+    .txn-amount.credit  { color: #059669; }
+    .txn-amount.debit   { color: var(--danger); }
+    .txn-amount.pending { color: #d97706; }
+    .txn-amount.refund  { color: #6366f1; }
+
+    .txn-time {
+      font-size: .68rem; font-weight: 600;
+      color: var(--gray-400); margin-top: 2px; text-align: right;
+    }
+
+    /* ══════════════════════════════════
+       WITHDRAW SECTION
+    ══════════════════════════════════ */
+    .withdraw-card {
+      background: linear-gradient(135deg, rgba(5,150,105,.06), rgba(13,148,136,.04));
+      border: 1.5px solid rgba(13,148,136,.2);
+      border-radius: var(--radius); padding: 24px;
+      margin-bottom: 20px;
+    }
+    .wc-title {
+      font-size: 1rem; font-weight: 900; color: var(--primary);
+      margin-bottom: 4px; display: flex; align-items: center; gap: 8px;
+    }
+    .wc-sub {
+      font-size: .82rem; color: var(--gray-400);
+      font-weight: 600; margin-bottom: 20px; line-height: 1.6;
+    }
+
+    /* Amount input */
+    .amount-input-wrap {
+      background: var(--surface);
+      border: 2px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+      display: flex; align-items: center;
+      padding: 4px 14px;
+      margin-bottom: 12px;
+      transition: border .2s, box-shadow .2s;
+    }
+    .amount-input-wrap:focus-within {
+      border-color: var(--teal);
+      box-shadow: 0 0 0 3px rgba(13,148,136,.1);
+    }
+    [data-theme=dark] .amount-input-wrap { border-color: var(--gray-600); background: var(--gray-800); }
+    .amount-currency {
+      font-size: 1.4rem; font-weight: 900; color: var(--gray-400); margin-right: 6px;
+    }
+    .amount-input {
+      flex: 1; border: none; background: none;
+      font-size: 1.8rem; font-weight: 900; color: var(--primary);
+      font-family: var(--font); outline: none; min-width: 0;
+      padding: 8px 0;
+    }
+    .amount-input::placeholder { color: var(--gray-300); }
+    .amount-avail {
+      font-size: .78rem; font-weight: 700;
+      color: var(--gray-400); flex-shrink: 0;
+    }
+    .amount-avail strong { color: #059669; }
+
+    /* Quick amount chips */
+    .quick-amounts {
+      display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 20px;
+    }
+    .qa-chip {
+      padding: 6px 14px; border-radius: var(--radius-full);
+      border: 1.5px solid rgba(13,148,136,.25);
+      background: rgba(13,148,136,.05);
+      color: var(--teal); font-size: .8rem; font-weight: 700;
+      cursor: pointer; font-family: var(--font);
+      transition: all .15s;
+    }
+    .qa-chip:hover { background: rgba(13,148,136,.12); border-color: var(--teal); }
+    .qa-chip.active { background: rgba(13,148,136,.15); border-color: var(--teal); }
+
+    /* UPI selector */
+    .upi-selector {
+      background: var(--surface);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+      padding: 12px 16px;
+      display: flex; align-items: center; gap: 12px;
+      cursor: pointer; margin-bottom: 16px;
+      transition: border .2s;
+    }
+    .upi-selector:hover { border-color: var(--teal); }
+    [data-theme=dark] .upi-selector { border-color: var(--gray-600); }
+    .upi-app-icon {
+      width: 36px; height: 36px; border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; flex-shrink: 0;
+      background: linear-gradient(135deg, #1a73e8, #4285f4);
+    }
+    .upi-info { flex: 1; min-width: 0; }
+    .upi-id    { font-size: .88rem; font-weight: 800; color: var(--text); }
+    .upi-name  { font-size: .74rem; color: var(--gray-400); font-weight: 600; }
+    .upi-arrow { color: var(--gray-400); }
+    .upi-selector:hover .upi-arrow { color: var(--teal); }
+
+    /* Withdraw button */
+    .btn-withdraw {
+      width: 100%; padding: 14px;
+      background: linear-gradient(135deg, #059669, #0d9488);
+      border: none; border-radius: var(--radius-sm);
+      color: #fff; font-size: 1rem; font-weight: 900;
+      cursor: pointer; font-family: var(--font);
+      box-shadow: 0 4px 16px rgba(5,150,105,.3);
+      transition: all .2s; display: flex;
+      align-items: center; justify-content: center; gap: 10px;
+    }
+    .btn-withdraw:hover { box-shadow: 0 6px 22px rgba(5,150,105,.4); transform: translateY(-1px); }
+    .btn-withdraw:active { transform: scale(.98); }
+    .btn-withdraw.loading {
+      background: var(--gray-200); color: var(--gray-500);
+      cursor: not-allowed; box-shadow: none;
+    }
+    [data-theme=dark] .btn-withdraw.loading { background: var(--gray-700); }
+
+    /* Withdraw info */
+    .withdraw-meta {
+      display: flex; justify-content: space-between;
+      font-size: .76rem; color: var(--gray-400); font-weight: 600;
+      margin-top: 12px; flex-wrap: wrap; gap: 6px;
+    }
+    .wm-item { display: flex; align-items: center; gap: 5px; }
+
+    /* ══════════════════════════════════
+       EARNINGS CHART SECTION
+    ══════════════════════════════════ */
+    .earnings-chart-area {
+      position: relative;
+      height: 180px;
+      margin: 4px 0 16px;
+    }
+    .ec-bars {
+      display: flex;
+      align-items: flex-end;
+      gap: 6px;
+      height: 150px;
+      padding-bottom: 0;
+    }
+    .ec-bar-group {
+      flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px;
+    }
+    .ec-bar-track {
+      width: 100%; display: flex; flex-direction: column; justify-content: flex-end;
+      background: rgba(13,148,136,.06);
+      border-radius: 6px 6px 0 0;
+      height: 130px;
+      position: relative; overflow: hidden;
+      cursor: pointer; transition: opacity .15s;
+    }
+    .ec-bar-track:hover { opacity: .85; }
+    .ec-bar-fill {
+      width: 100%; border-radius: 5px 5px 0 0;
+      background: linear-gradient(180deg, #34d399 0%, #059669 100%);
+      transition: height .6s cubic-bezier(.34,1.56,.64,1);
+      position: absolute; bottom: 0; left: 0;
+    }
+    .ec-bar-track.current .ec-bar-fill {
+      background: linear-gradient(180deg, #6ee7b7 0%, var(--teal) 100%);
+    }
+    .ec-bar-track.active {
+      outline: 2px solid var(--teal); outline-offset: 2px;
+    }
+    .ec-bar-label {
+      font-size: .66rem; font-weight: 700;
+      color: var(--gray-400); text-align: center;
+    }
+    .ec-bar-val {
+      font-size: .7rem; font-weight: 800;
+      color: var(--primary); text-align: center;
+    }
+
+    /* Tooltip */
+    .ec-tooltip {
+      position: absolute;
+      background: var(--primary); color: #fff;
+      padding: 6px 12px; border-radius: 8px;
+      font-size: .76rem; font-weight: 700;
+      pointer-events: none;
+      opacity: 0; transition: opacity .2s;
+      white-space: nowrap; z-index: 10;
+      transform: translateX(-50%);
+      bottom: 165px; left: 50%;
+    }
+    .ec-tooltip.show { opacity: 1; }
+    .ec-tooltip::after {
+      content: ""; position: absolute;
+      top: 100%; left: 50%;
+      transform: translateX(-50%);
+      border: 5px solid transparent;
+      border-top-color: var(--primary);
+    }
+
+    /* Earnings breakdown */
+    .earn-breakdown {
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .eb-row {
+      display: flex; align-items: center; gap: 12px;
+    }
+    .eb-dot {
+      width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0;
+    }
+    .eb-label { font-size: .84rem; font-weight: 700; color: var(--text); flex: 1; }
+    .eb-bar-track {
+      width: 100px; height: 7px; background: var(--gray-100);
+      border-radius: 4px; overflow: hidden; flex-shrink: 0;
+    }
+    [data-theme=dark] .eb-bar-track { background: var(--gray-700); }
+    .eb-bar-fill { height: 100%; border-radius: 4px; transition: width .6s ease; }
+    .eb-val { font-size: .84rem; font-weight: 900; color: var(--text); width: 70px; text-align: right; flex-shrink: 0; }
+    .eb-pct { font-size: .72rem; font-weight: 700; color: var(--gray-400); width: 36px; text-align: right; flex-shrink: 0; }
+
+    /* ══════════════════════════════════
+       UPI MANAGEMENT TAB
+    ══════════════════════════════════ */
+    .upi-card-list {
+      display: flex; flex-direction: column; gap: 12px;
+    }
+    .upi-card-item {
+      display: flex; align-items: center; gap: 14px;
+      padding: 14px 16px;
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+      background: var(--surface);
+      transition: all .15s;
+    }
+    .upi-card-item.default {
+      border-color: rgba(13,148,136,.3);
+      background: rgba(13,148,136,.03);
+    }
+    [data-theme=dark] .upi-card-item { border-color: var(--gray-600); }
+    [data-theme=dark] .upi-card-item.default { border-color: rgba(13,148,136,.4); }
+
+    .uci-app-wrap {
+      width: 44px; height: 44px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem; flex-shrink: 0;
+    }
+    .uci-info { flex: 1; min-width: 0; }
+    .uci-id   { font-size: .9rem; font-weight: 800; color: var(--text); margin-bottom: 2px; }
+    .uci-meta { font-size: .74rem; color: var(--gray-400); font-weight: 600; display: flex; gap: 8px; align-items: center; }
+    .uci-default-badge {
+      font-size: .64rem; font-weight: 800;
+      padding: 2px 7px; border-radius: 5px;
+      background: rgba(13,148,136,.1); color: var(--teal);
+    }
+    .uci-actions { display: flex; gap: 6px; flex-shrink: 0; }
+    .btn-uci {
+      padding: 6px 12px; border-radius: var(--radius-sm);
+      font-size: .74rem; font-weight: 700;
+      cursor: pointer; font-family: var(--font);
+      transition: all .15s;
+    }
+    .btn-uci-default {
+      background: none; border: 1.5px solid var(--gray-200); color: var(--gray-500);
+    }
+    .btn-uci-default:hover { border-color: var(--teal); color: var(--teal); }
+    .btn-uci-remove {
+      background: none; border: 1.5px solid rgba(239,68,68,.25); color: var(--danger);
+    }
+    .btn-uci-remove:hover { background: rgba(239,68,68,.05); }
+    [data-theme=dark] .btn-uci-default { border-color: var(--gray-600); color: var(--gray-400); }
+
+    /* Add UPI form */
+    .add-upi-form {
+      display: grid; grid-template-columns: 1fr auto; gap: 10px;
+      align-items: flex-end;
+    }
+    @media(max-width:500px) { .add-upi-form { grid-template-columns: 1fr; } }
+    .ff-label-sm {
+      font-size: .78rem; font-weight: 700;
+      color: var(--gray-600); margin-bottom: 6px; display: block;
+    }
+    [data-theme=dark] .ff-label-sm { color: var(--gray-400); }
+    .ff-input-sm {
       padding: 10px 13px;
       border: 1.5px solid var(--gray-200);
       border-radius: var(--radius-sm);
-      font-size: .88rem;
-      font-family: var(--font);
       background: var(--surface);
       color: var(--text);
-      transition: border .2s;
-      box-sizing: border-box;
+      font-family: var(--font); font-size: .9rem;
+      transition: border .2s, box-shadow .2s;
+      width: 100%; box-sizing: border-box;
     }
-    .form-field input:focus,
-    .form-field select:focus { outline: none; border-color: var(--teal); box-shadow: 0 0 0 3px rgba(13,148,136,.1); }
+    .ff-input-sm:focus {
+      outline: none; border-color: var(--teal);
+      box-shadow: 0 0 0 3px rgba(13,148,136,.1);
+    }
+    [data-theme=dark] .ff-input-sm { border-color: var(--gray-600); background: var(--gray-800); }
 
-    /* Quick amounts */
-    .quick-amounts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; margin-bottom: 14px; }
-    .qa-btn {
-      padding: 8px 4px;
-      border: 1.5px solid var(--gray-200);
-      border-radius: var(--radius-sm);
-      font-size: .8rem;
-      font-weight: 700;
-      color: var(--gray-600);
-      background: transparent;
-      cursor: pointer;
-      text-align: center;
-      transition: all .2s;
-      font-family: var(--font);
-    }
-    .qa-btn:hover,
-    .qa-btn.active { border-color: var(--teal); background: rgba(13,148,136,.08); color: var(--teal); }
-
-    /* Submit btn */
-    .btn-full {
-      width: 100%;
-      padding: 11px;
-      border-radius: var(--radius-sm);
-      font-size: .88rem;
-      font-weight: 800;
-      cursor: pointer;
-      font-family: var(--font);
-      transition: all .2s;
-      border: none;
-    }
-    .btn-full.primary {
+    .btn-add-upi {
+      padding: 10px 20px; border-radius: var(--radius-sm);
       background: linear-gradient(135deg, var(--primary), var(--teal));
-      color: #fff;
-      box-shadow: 0 3px 10px rgba(13,148,136,.3);
+      border: none; color: #fff;
+      font-size: .88rem; font-weight: 800;
+      cursor: pointer; font-family: var(--font);
+      white-space: nowrap; flex-shrink: 0;
+      transition: all .15s;
     }
-    .btn-full.primary:hover { opacity: .88; transform: translateY(-1px); }
-    .btn-full.primary:disabled { opacity: .5; cursor: not-allowed; transform: none; }
-    .btn-full.danger { background: transparent; border: 1.5px solid var(--danger); color: var(--danger); margin-top: 8px; }
-    .btn-full.danger:hover { background: var(--danger); color: #fff; }
+    .btn-add-upi:hover { opacity: .9; }
 
-    /* UPI details */
-    .upi-box {
-      background: var(--gray-50);
-      border: 1.5px solid var(--gray-200);
+    /* ══════════════════════════════════
+       REWARDS / REFER
+    ══════════════════════════════════ */
+    .rewards-hero {
+      background: linear-gradient(135deg, #7c3aed, #a78bfa);
+      border-radius: var(--radius);
+      padding: 28px 24px;
+      position: relative; overflow: hidden;
+      margin-bottom: 20px; text-align: center;
+    }
+    .rewards-hero::before {
+      content: "";
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 50% 100%, rgba(255,255,255,.15) 0%, transparent 60%);
+    }
+    .rh-inner { position: relative; z-index: 1; }
+    .rh-icon  { font-size: 2.8rem; margin-bottom: 10px; line-height: 1; }
+    .rh-title { font-size: 1.2rem; font-weight: 900; color: #fff; margin-bottom: 6px; }
+    .rh-sub   { font-size: .86rem; color: rgba(255,255,255,.75); line-height: 1.6; margin-bottom: 18px; }
+    .rh-code-box {
+      display: flex; align-items: center; justify-content: center;
+      gap: 10px; flex-wrap: wrap;
+    }
+    .rh-code {
+      background: rgba(255,255,255,.2);
+      border: 1.5px solid rgba(255,255,255,.3);
       border-radius: var(--radius-sm);
-      padding: 12px 14px;
-      margin-bottom: 14px;
-      font-size: .82rem;
+      padding: 10px 20px;
+      font-size: 1.1rem; font-weight: 900; color: #fff;
+      letter-spacing: 3px;
     }
-    .upi-label { color: var(--gray-400); font-size: .72rem; font-weight: 700; margin-bottom: 3px; }
-    .upi-id { font-weight: 800; color: var(--primary); font-size: .88rem; display: flex; align-items: center; justify-content: space-between; }
-    .btn-copy { background: none; border: none; cursor: pointer; color: var(--teal); font-size: .75rem; font-weight: 700; padding: 0; font-family: var(--font); }
-    .btn-copy:hover { text-decoration: underline; }
+    .btn-rh-copy {
+      padding: 10px 18px; border-radius: var(--radius-sm);
+      background: rgba(255,255,255,.2);
+      border: 1.5px solid rgba(255,255,255,.3);
+      color: #fff; font-size: .82rem; font-weight: 800;
+      cursor: pointer; font-family: var(--font);
+      transition: background .15s;
+    }
+    .btn-rh-copy:hover { background: rgba(255,255,255,.3); }
 
-    /* ── Withdraw modal ── */
-    .modal-overlay {
+    /* Refer stats */
+    .refer-stats {
+      display: grid; grid-template-columns: repeat(3,1fr); gap: 12px;
+      margin-bottom: 20px;
+    }
+    @media(max-width:480px) { .refer-stats { grid-template-columns: 1fr; } }
+    .rs-card {
+      background: var(--surface);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 16px; text-align: center;
+      box-shadow: var(--shadow-sm);
+    }
+    [data-theme=dark] .rs-card { border-color: var(--gray-700); }
+    .rsc-icon  { font-size: 1.5rem; margin-bottom: 6px; }
+    .rsc-val   { font-size: 1.3rem; font-weight: 900; color: var(--primary); }
+    .rsc-label { font-size: .7rem; font-weight: 700; color: var(--gray-400); text-transform: uppercase; letter-spacing: .3px; }
+
+    /* Referral table */
+    .refer-table { width: 100%; border-collapse: collapse; font-size: .84rem; }
+    .refer-table th {
+      text-align: left; padding: 10px 16px;
+      font-size: .72rem; font-weight: 800;
+      text-transform: uppercase; letter-spacing: .3px;
+      color: var(--gray-400);
+      border-bottom: 1.5px solid var(--gray-100);
+    }
+    [data-theme=dark] .refer-table th { border-color: var(--gray-700); }
+    .refer-table td {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--gray-100);
+      font-weight: 600; color: var(--text);
+    }
+    [data-theme=dark] .refer-table td { border-color: var(--gray-700); }
+    .refer-table tr:last-child td { border-bottom: none; }
+    .refer-table tr:hover td { background: rgba(13,148,136,.03); }
+
+    /* ══════════════════════════════════
+       SIDEBAR WIDGETS
+    ══════════════════════════════════ */
+    .wl-sidebar-card {
+      background: var(--surface);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+    [data-theme=dark] .wl-sidebar-card { border-color: var(--gray-700); }
+    .wsc-header {
+      padding: 14px 16px;
+      border-bottom: 1.5px solid var(--gray-100);
+      font-size: .88rem; font-weight: 800; color: var(--primary);
+      display: flex; align-items: center; gap: 7px;
+    }
+    [data-theme=dark] .wsc-header { border-color: var(--gray-700); }
+    .wsc-body { padding: 16px; }
+
+    .stat-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 9px 0;
+      border-bottom: 1px solid var(--gray-100);
+      font-size: .84rem;
+    }
+    .stat-row:last-child { border-bottom: none; }
+    [data-theme=dark] .stat-row { border-color: var(--gray-700); }
+    .sr-lbl { color: var(--gray-400); font-weight: 600; }
+    .sr-val { font-weight: 800; color: var(--text); }
+    .sr-val.green  { color: #059669; }
+    .sr-val.primary { color: var(--primary); }
+
+    /* Tax note */
+    .tax-note {
+      display: flex; flex-direction: column; gap: 7px;
+    }
+    .tn-row {
+      display: flex; justify-content: space-between;
+      font-size: .82rem; font-weight: 700; padding: 6px 0;
+      border-bottom: 1px dashed var(--gray-100);
+    }
+    .tn-row:last-child { border-bottom: none; border-top: 1.5px solid var(--gray-200); padding-top: 10px; }
+    [data-theme=dark] .tn-row { border-color: var(--gray-700); }
+    .tn-lbl { color: var(--gray-500); }
+    .tn-val { color: var(--text); font-weight: 900; }
+    .tn-row.total .tn-lbl { color: var(--primary); font-size: .9rem; }
+    .tn-row.total .tn-val { color: #059669; font-size: .96rem; }
+
+    /* Pending payout card */
+    .pending-payout {
+      background: linear-gradient(135deg, rgba(245,158,11,.06), rgba(217,119,6,.04));
+      border: 1.5px solid rgba(245,158,11,.25);
+      border-radius: var(--radius);
+      padding: 16px; margin-bottom: 20px;
+      display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    }
+    .pp-icon {
+      width: 44px; height: 44px; border-radius: 12px;
+      background: rgba(245,158,11,.1);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem; flex-shrink: 0;
+    }
+    .pp-info { flex: 1; min-width: 0; }
+    .pp-title { font-size: .9rem; font-weight: 800; color: #92400e; margin-bottom: 3px; }
+    [data-theme=dark] .pp-title { color: #fbbf24; }
+    .pp-sub   { font-size: .78rem; color: #d97706; font-weight: 600; }
+    .pp-amount { font-size: 1.2rem; font-weight: 900; color: #d97706; flex-shrink: 0; }
+
+    /* ══════════════════════════════════
+       TOAST
+    ══════════════════════════════════ */
+    .wl-toast {
+      position: fixed; bottom: 28px; left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--primary); color: #fff;
+      padding: 10px 22px; border-radius: var(--radius-full);
+      font-size: .84rem; font-weight: 700;
+      opacity: 0; transition: all .3s;
+      pointer-events: none; z-index: 200;
+      white-space: nowrap; box-shadow: var(--shadow-md);
+    }
+    .wl-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* Withdraw success modal */
+    .wl-modal-overlay {
       position: fixed; inset: 0;
       background: rgba(0,0,0,.5);
-      z-index: 2000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
-      display: none;
+      z-index: 300;
+      display: none; align-items: center; justify-content: center;
+      padding: 20px;
     }
-    .modal-overlay.open { display: flex; animation: fadeIn .2s ease; }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    .modal-box {
+    .wl-modal-overlay.open { display: flex; }
+    .wl-modal {
       background: var(--surface);
-      border-radius: var(--radius);
-      padding: 28px;
-      max-width: 420px;
-      width: 100%;
+      border-radius: 20px;
+      padding: 32px 28px;
+      max-width: 380px; width: 100%;
+      text-align: center;
       box-shadow: 0 20px 60px rgba(0,0,0,.2);
-      animation: slideUp .25s ease;
+      animation: modalPop .3s cubic-bezier(.34,1.56,.64,1);
     }
-    @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-    .modal-title { font-size: 1rem; font-weight: 800; color: var(--primary); margin-bottom: 6px; }
-    .modal-sub   { font-size: .83rem; color: var(--gray-500); margin-bottom: 20px; line-height: 1.5; }
-    .modal-close { float: right; background: none; border: none; font-size: 1.1rem; cursor: pointer; color: var(--gray-400); margin-top: -4px; }
-    .modal-close:hover { color: var(--danger); }
-    .modal-row   { display: flex; gap: 10px; margin-top: 12px; }
-
-    /* ── Safety note ── */
-    .safety-note {
-      display: flex;
-      gap: 10px;
-      align-items: flex-start;
-      padding: 12px 14px;
-      background: rgba(13,148,136,.06);
-      border: 1px solid rgba(13,148,136,.15);
-      border-radius: var(--radius-sm);
-      font-size: .78rem;
-      color: var(--gray-600);
-      line-height: 1.5;
+    @keyframes modalPop {
+      from { transform: scale(.85); opacity: 0; }
+      to   { transform: scale(1);   opacity: 1; }
     }
-    .safety-note .si { flex-shrink: 0; font-size: 1rem; }
+    .wl-modal-icon { font-size: 3.5rem; margin-bottom: 14px; line-height: 1; }
+    .wl-modal-title { font-size: 1.2rem; font-weight: 900; color: var(--primary); margin-bottom: 8px; }
+    .wl-modal-body  { font-size: .88rem; color: var(--gray-500); line-height: 1.7; margin-bottom: 20px; }
+    .wl-modal-body strong { color: var(--primary); }
+    .wl-modal-ref  { font-size: .76rem; color: var(--gray-400); font-weight: 700; margin-bottom: 20px; }
+    .btn-modal-close {
+      width: 100%; padding: 12px;
+      background: linear-gradient(135deg, var(--primary), var(--teal));
+      border: none; border-radius: var(--radius-sm);
+      color: #fff; font-weight: 800; font-size: .9rem;
+      cursor: pointer; font-family: var(--font);
+    }
 
-    /* Dark mode */
-    [data-theme="dark"] .card         { border-color: var(--gray-700); }
-    [data-theme="dark"] .card-header  { border-color: var(--gray-700); }
-    [data-theme="dark"] .filter-chips { border-color: var(--gray-700); }
-    [data-theme="dark"] .txn-row      { border-color: var(--gray-800); }
-    [data-theme="dark"] .txn-row:hover{ background: var(--gray-800); }
-    [data-theme="dark"] .stat-card    { border-color: var(--gray-700); }
-    [data-theme="dark"] .sidebar-card { border-color: var(--gray-700); }
-    [data-theme="dark"] .sidebar-title{ border-color: var(--gray-700); }
-    [data-theme="dark"] .upi-box      { background: var(--gray-800); border-color: var(--gray-700); }
-    [data-theme="dark"] .form-field input,
-    [data-theme="dark"] .form-field select { background: var(--gray-800); border-color: var(--gray-600); }
-    [data-theme="dark"] .modal-box    { background: var(--gray-900); }
-    [data-theme="dark"] .chip         { border-color: var(--gray-700); color: var(--gray-400); }
-    [data-theme="dark"] .safety-note  { color: var(--gray-400); }
   </style>
 </head>
 <body>
 
+  <div id="page-loader"></div>
   <div id="announce-bar"></div>
   <nav id="main-nav"></nav>
 
-  <main>
-    <div class="wallet-wrap">
+  <div class="wl-toast" id="wlToast"></div>
 
-      <nav id="breadcrumb"></nav>
-
-      <!-- ── Balance Hero ── -->
-      <div class="balance-hero">
-        <div class="balance-top">
-          <div>
-            <div class="balance-label">GigLega Secure Wallet</div>
-            <div class="balance-amount"><sup>₹</sup><span id="balanceDisplay">0.00</span></div>
-            <div class="balance-status">🔒 Secured &amp; Protected</div>
-          </div>
-          <div style="text-align:right;position:relative;z-index:1">
-            <div style="font-size:.75rem;opacity:.6;margin-bottom:4px">Wallet ID</div>
-            <div style="font-size:.82rem;font-weight:700;opacity:.85" id="walletId">GL-XXXX</div>
-            <div style="font-size:.72rem;opacity:.5;margin-top:6px" id="lastUpdated"></div>
-          </div>
-        </div>
-        <div class="balance-actions">
-          <button class="btn-wallet-primary" id="btnAddMoney">➕ Add Money</button>
-          <button class="btn-wallet-outline" id="btnWithdraw">🏦 Withdraw</button>
-          <button class="btn-wallet-outline" id="btnSendMoney">📤 Send</button>
-        </div>
-        <div class="balance-stats">
-          <div class="balance-stat">
-            <div class="balance-stat-val" id="totalIn">₹0</div>
-            <div class="balance-stat-lbl">Total In</div>
-          </div>
-          <div class="balance-stat">
-            <div class="balance-stat-val" id="totalOut">₹0</div>
-            <div class="balance-stat-lbl">Total Out</div>
-          </div>
-          <div class="balance-stat">
-            <div class="balance-stat-val" id="pendingAmt">₹0</div>
-            <div class="balance-stat-lbl">In Escrow</div>
-          </div>
-        </div>
+  <!-- Withdraw Success Modal -->
+  <div class="wl-modal-overlay" id="withdrawModal">
+    <div class="wl-modal">
+      <div class="wl-modal-icon">✅</div>
+      <div class="wl-modal-title">Withdrawal Successful!</div>
+      <div class="wl-modal-body">
+        <strong id="modalAmount">₹2,000</strong> ka withdrawal request bhej diya gaya hai.<br>
+        UPI ID <strong>arjunsingh@okaxis</strong> pe<br>
+        <strong>30 minutes</strong> mein credit ho jayega.
       </div>
-
-      <!-- ── Stats row ── -->
-      <div class="stats-row">
-        <div class="stat-card">
-          <div class="stat-label">Earned</div>
-          <div class="stat-value green" id="statEarned">₹0</div>
-          <div class="stat-sub">From gigs</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Spent</div>
-          <div class="stat-value danger" id="statSpent">₹0</div>
-          <div class="stat-sub">On gigs posted</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Withdrawn</div>
-          <div class="stat-value" id="statWithdrawn">₹0</div>
-          <div class="stat-sub">To bank / UPI</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Fees Paid</div>
-          <div class="stat-value amber" id="statFees">₹0</div>
-          <div class="stat-sub">6% GigLega fee</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Transactions</div>
-          <div class="stat-value" id="statTxns">0</div>
-          <div class="stat-sub">All time</div>
-        </div>
-      </div>
-
-      <!-- ── Main grid ── -->
-      <div class="wallet-grid">
-
-        <!-- LEFT — Transactions -->
-        <div>
-          <div class="card">
-            <div class="card-header">
-              <div class="card-title">📋 Transaction History</div>
-              <button class="card-action" id="btnExport">⬇ Export CSV</button>
-            </div>
-            <div class="filter-chips" id="filterChips">
-              <button class="chip active" data-filter="all">All</button>
-              <button class="chip" data-filter="credit">Money In</button>
-              <button class="chip" data-filter="debit">Money Out</button>
-              <button class="chip" data-filter="pending">Pending</button>
-              <button class="chip" data-filter="fee">Fees</button>
-            </div>
-            <div class="txn-list" id="txnList"></div>
-          </div>
-        </div>
-
-        <!-- RIGHT — Sidebar -->
-        <div>
-
-          <!-- Add Money -->
-          <div class="sidebar-card" id="addMoneyPanel">
-            <div class="sidebar-title">➕ Add Money</div>
-            <div class="sidebar-body">
-              <div class="form-field">
-                <label>Amount (₹)</label>
-                <input type="number" id="addAmount" placeholder="e.g. 500" min="10" max="50000" />
-              </div>
-              <div class="quick-amounts" id="quickAmounts">
-                <button class="qa-btn" data-amount="100">₹100</button>
-                <button class="qa-btn" data-amount="250">₹250</button>
-                <button class="qa-btn" data-amount="500">₹500</button>
-                <button class="qa-btn" data-amount="1000">₹1000</button>
-                <button class="qa-btn" data-amount="2000">₹2000</button>
-                <button class="qa-btn" data-amount="5000">₹5000</button>
-              </div>
-              <div class="form-field">
-                <label>Payment Method</label>
-                <select id="addMethod">
-                  <option value="upi">UPI</option>
-                  <option value="netbanking">Net Banking</option>
-                  <option value="card">Debit / Credit Card</option>
-                </select>
-              </div>
-              <button class="btn-full primary" id="btnConfirmAdd">Add to Wallet</button>
-
-              <div style="margin-top:14px">
-                <div class="safety-note">
-                  <span class="si">🔒</span>
-                  <span>Your payment is secured. Money reflects instantly after successful payment.</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Withdraw Panel -->
-          <div class="sidebar-card">
-            <div class="sidebar-title">🏦 Withdraw to Bank</div>
-            <div class="sidebar-body">
-              <div class="form-field">
-                <label>Amount (₹)</label>
-                <input type="number" id="withdrawAmount" placeholder="Min ₹100" min="100" />
-              </div>
-              <div class="form-field">
-                <label>Withdraw To</label>
-                <select id="withdrawTo">
-                  <option value="upi">UPI ID</option>
-                  <option value="bank">Bank Account</option>
-                </select>
-              </div>
-              <div class="form-field">
-                <label>UPI ID / Account Number</label>
-                <input type="text" id="withdrawDest" placeholder="e.g. name@upi or 9319635257" />
-              </div>
-              <button class="btn-full primary" id="btnConfirmWithdraw">Request Withdrawal</button>
-              <div style="margin-top:10px;font-size:.76rem;color:var(--gray-400);line-height:1.5;text-align:center">
-                Withdrawals processed within 24 hours on business days.
-              </div>
-            </div>
-          </div>
-
-          <!-- Safety info -->
-          <div class="sidebar-card">
-            <div class="sidebar-title">🛡️ Wallet Safety</div>
-            <div class="sidebar-body" style="display:flex;flex-direction:column;gap:10px">
-              <div class="safety-note"><span class="si">🔒</span><span>Funds in escrow are held until both parties confirm gig completion.</span></div>
-              <div class="safety-note"><span class="si">⚡</span><span>Payments release automatically when a gig is marked complete.</span></div>
-              <div class="safety-note"><span class="si">🚫</span><span>Never share your wallet PIN or OTP with anyone — including support staff.</span></div>
-              <a href="trust-safety.html" style="font-size:.8rem;font-weight:700;color:var(--teal);text-decoration:none;text-align:center;display:block;margin-top:4px">View full safety guide →</a>
-            </div>
-          </div>
-
-        </div>
-      </div>
-    </div>
-  </main>
-
-  <!-- ── Withdraw modal ── -->
-  <div class="modal-overlay" id="withdrawModal">
-    <div class="modal-box">
-      <button class="modal-close" id="closeWithdrawModal">✕</button>
-      <div class="modal-title">🏦 Confirm Withdrawal</div>
-      <div class="modal-sub" id="withdrawModalSub">Withdrawing ₹0 to your UPI.</div>
-      <div class="form-field">
-        <label>Enter your Wallet PIN</label>
-        <input type="password" id="walletPin" maxlength="4" placeholder="4-digit PIN" style="letter-spacing:8px;font-size:1.2rem;text-align:center" />
-      </div>
-      <div class="modal-row">
-        <button class="btn-full primary" id="btnFinalWithdraw">Confirm</button>
-      </div>
-      <div style="font-size:.75rem;color:var(--gray-400);text-align:center;margin-top:10px">
-        Default PIN is <strong>1234</strong> — change in Profile settings.
-      </div>
+      <div class="wl-modal-ref" id="modalRef">Ref: GL-WD-2026031401</div>
+      <button class="btn-modal-close" onclick="closeWithdrawModal()">🏠 Back to Wallet</button>
     </div>
   </div>
 
-  <footer id="main-footer"></footer>
-  <div id="toast-container"></div>
+  <main class="wl-wrapper">
+
+    <!-- ══════════════════════════════════
+         HERO
+    ══════════════════════════════════ -->
+    <section class="wl-hero">
+      <div class="wl-hero-inner">
+        <div class="wl-balance-block">
+          <div class="wlb-tag">💳 GigLega Wallet</div>
+          <div class="wlb-label">Available Balance</div>
+          <div class="wlb-amount">
+            <span>₹</span><span id="heroBalance">8,240</span>
+          </div>
+          <div class="wlb-sub">
+            Last updated: <strong>Today, 5:14 PM</strong> · Auto-refreshes every 60s
+          </div>
+          <div class="wlb-chips">
+            <div class="wlb-chip">
+              <div class="wlb-chip-val">₹1,128</div>
+              <div class="wlb-chip-label">⏳ Pending</div>
+            </div>
+            <div class="wlb-chip">
+              <div class="wlb-chip-val">₹41,200</div>
+              <div class="wlb-chip-label">📈 All-time</div>
+            </div>
+            <div class="wlb-chip">
+              <div class="wlb-chip-val">₹8,400</div>
+              <div class="wlb-chip-label">📅 This Month</div>
+            </div>
+            <div class="wlb-chip">
+              <div class="wlb-chip-val">14</div>
+              <div class="wlb-chip-label">✅ Gigs Done</div>
+            </div>
+          </div>
+        </div>
+        <div class="wl-quick-actions">
+          <button class="btn-wqa btn-wqa-primary" onclick="openTab('withdraw')">
+            <span class="wqa-icon">💸</span> Withdraw Money
+          </button>
+          <button class="btn-wqa btn-wqa-glass" onclick="openTab('transactions')">
+            <span class="wqa-icon">📋</span> Transaction History
+          </button>
+          <button class="btn-wqa btn-wqa-glass" onclick="openTab('upi')">
+            <span class="wqa-icon">📱</span> Manage UPI
+          </button>
+          <button class="btn-wqa btn-wqa-glass" onclick="openTab('rewards')">
+            <span class="wqa-icon">🎁</span> Refer & Earn
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════
+         STATS STRIP
+    ══════════════════════════════════ -->
+    <div class="wl-stats-strip">
+      <div class="wl-stats-grid">
+        <div class="wl-stat">
+          <div class="wls-icon">💰</div>
+          <div class="wls-val">₹8.4k</div>
+          <div class="wls-label">This Month</div>
+        </div>
+        <div class="wl-stat">
+          <div class="wls-icon">📤</div>
+          <div class="wls-val">₹5.2k</div>
+          <div class="wls-label">Withdrawn</div>
+        </div>
+        <div class="wl-stat">
+          <div class="wls-icon">⏳</div>
+          <div class="wls-val">₹1.1k</div>
+          <div class="wls-label">Pending</div>
+        </div>
+        <div class="wl-stat">
+          <div class="wls-icon">🎁</div>
+          <div class="wls-val">₹450</div>
+          <div class="wls-label">Bonus Earned</div>
+        </div>
+        <div class="wl-stat">
+          <div class="wls-icon">📊</div>
+          <div class="wls-val">14</div>
+          <div class="wls-label">Transactions</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════
+         TAB NAV
+    ══════════════════════════════════ -->
+    <div class="wl-tabs-bar">
+      <div class="wl-tabs-inner" id="wlTabs">
+        <button class="wl-tab active" data-tab="overview">📊 Overview</button>
+        <button class="wl-tab" data-tab="transactions">
+          📋 Transactions <span class="wl-tab-badge">3</span>
+        </button>
+        <button class="wl-tab" data-tab="withdraw">💸 Withdraw</button>
+        <button class="wl-tab" data-tab="upi">📱 UPI / Bank</button>
+        <button class="wl-tab" data-tab="rewards">🎁 Rewards</button>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════
+         BODY
+    ══════════════════════════════════ -->
+    <div class="wl-body">
+
+      <!-- ════ OVERVIEW ════ -->
+      <div class="wl-panel active" id="panel-overview">
+        <div class="wl-two-col">
+          <div>
+
+            <!-- Pending payout alert -->
+            <div class="pending-payout">
+              <div class="pp-icon">⏰</div>
+              <div class="pp-info">
+                <div class="pp-title">₹1,128 ka payment pending hai</div>
+                <div class="pp-sub">Warehouse Packing Gig (#GL-2026-0314) — gig complete hone ke baad auto-release hoga</div>
+              </div>
+              <div class="pp-amount">₹1,128</div>
+            </div>
+
+            <!-- Monthly earnings chart -->
+            <div class="wl-card">
+              <div class="wl-card-header">
+                <div class="wl-card-title">📈 Monthly Earnings — 2026</div>
+                <div style="display:flex;gap:6px">
+                  <button class="btn-card-action" onclick="showToast('Exporting data…')">📥 Export</button>
+                </div>
+              </div>
+              <div class="wl-card-body">
+                <div class="earnings-chart-area" id="earningsChart">
+                  <div class="ec-tooltip" id="ecTooltip">₹8,400</div>
+                  <div class="ec-bars" id="ecBars"></div>
+                </div>
+                <div style="display:flex;justify-content:space-between;font-size:.78rem;color:var(--gray-400);font-weight:600;margin-top:4px;padding:0 2px">
+                  <span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span>
+                  <span>Jul</span><span>Aug</span><span>Sep</span><span>Oct</span><span>Nov</span><span>Dec</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Earnings breakdown -->
+            <div class="wl-card">
+              <div class="wl-card-header">
+                <div class="wl-card-title">🗂️ Earnings by Category</div>
+                <span style="font-size:.76rem;color:var(--gray-400);font-weight:700">March 2026</span>
+              </div>
+              <div class="wl-card-body">
+                <div class="earn-breakdown" id="earnBreakdown"></div>
+              </div>
+            </div>
+
+            <!-- Recent transactions -->
+            <div class="wl-card">
+              <div class="wl-card-header">
+                <div class="wl-card-title">🔄 Recent Transactions</div>
+                <button class="btn-card-action" onclick="openTab('transactions')">View All →</button>
+              </div>
+              <div id="recentTxns"></div>
+            </div>
+
+          </div>
+
+          <!-- SIDEBAR -->
+          <div>
+
+            <!-- Balance breakdown -->
+            <div class="wl-sidebar-card">
+              <div class="wsc-header">💳 Balance Breakdown</div>
+              <div class="wsc-body">
+                <div class="stat-row">
+                  <span class="sr-lbl">Available</span>
+                  <span class="sr-val green">₹8,240</span>
+                </div>
+                <div class="stat-row">
+                  <span class="sr-lbl">Pending Release</span>
+                  <span class="sr-val" style="color:#d97706">₹1,128</span>
+                </div>
+                <div class="stat-row">
+                  <span class="sr-lbl">On Hold</span>
+                  <span class="sr-val">₹0</span>
+                </div>
+                <div class="stat-row">
+                  <span class="sr-lbl">Total Balance</span>
+                  <span class="sr-val primary">₹9,368</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tax summary -->
+            <div class="wl-sidebar-card">
+              <div class="wsc-header">🧾 Tax Summary (Mar 2026)</div>
+              <div class="wsc-body">
+                <div class="wl-info-box warn" style="margin-bottom:12px;border-radius:var(--radius-sm)">
+                  ⚠️ ₹1 lakh se zyada annual income pe TDS applicable hai. Ab tak safe hoon!
+                </div>
+                <div class="tax-note">
+                  <div class="tn-row">
+                    <span class="tn-lbl">Gross Earnings</span>
+                    <span class="tn-val">₹41,200</span>
+                  </div>
+                  <div class="tn-row">
+                    <span class="tn-lbl">Platform Fee (2%)</span>
+                    <span class="tn-val" style="color:var(--danger)">−₹824</span>
+                  </div>
+                  <div class="tn-row">
+                    <span class="tn-lbl">TDS Deducted</span>
+                    <span class="tn-val">₹0</span>
+                  </div>
+                  <div class="tn-row total">
+                    <span class="tn-lbl">Net Payout</span>
+                    <span class="tn-val">₹40,376</span>
+                  </div>
+                </div>
+                <button class="btn-card-action" style="width:100%;margin-top:12px;text-align:center" onclick="showToast('Downloading tax report…')">
+                  📥 Download Tax Report
+                </button>
+              </div>
+            </div>
+
+            <!-- Payout method -->
+            <div class="wl-sidebar-card">
+              <div class="wsc-header">📱 Default Payout Method</div>
+              <div class="wsc-body">
+                <div class="upi-selector" style="margin-bottom:12px" onclick="openTab('upi')">
+                  <div class="upi-app-icon">G</div>
+                  <div class="upi-info">
+                    <div class="upi-id">arjunsingh@okaxis</div>
+                    <div class="upi-name">Google Pay · Primary</div>
+                  </div>
+                  <div class="upi-arrow">›</div>
+                </div>
+                <button class="btn-card-action" style="width:100%;text-align:center" onclick="openTab('withdraw')">
+                  💸 Withdraw Now
+                </button>
+              </div>
+            </div>
+
+            <!-- Quick links -->
+            <div class="wl-sidebar-card">
+              <div class="wsc-header">⚡ Quick Links</div>
+              <a href="dashboard-worker.html" style="display:flex;align-items:center;gap:10px;padding:11px 16px;border-bottom:1px solid var(--gray-100);cursor:pointer;text-decoration:none;transition:background .15s" onmouseover="this.style.background='rgba(13,148,136,.04)'" onmouseout="this.style.background=''">
+                <span>💼</span><span style="font-size:.84rem;font-weight:700;color:var(--text);flex:1">Worker Dashboard</span><span style="color:var(--gray-400);font-size:.8rem">→</span>
+              </a>
+              <a href="browse.html" style="display:flex;align-items:center;gap:10px;padding:11px 16px;border-bottom:1px solid var(--gray-100);cursor:pointer;text-decoration:none;transition:background .15s" onmouseover="this.style.background='rgba(13,148,136,.04)'" onmouseout="this.style.background=''">
+                <span>🔍</span><span style="font-size:.84rem;font-weight:700;color:var(--text);flex:1">Browse Gigs</span><span style="color:var(--gray-400);font-size:.8rem">→</span>
+              </a>
+              <a href="profile.html" style="display:flex;align-items:center;gap:10px;padding:11px 16px;cursor:pointer;text-decoration:none;transition:background .15s" onmouseover="this.style.background='rgba(13,148,136,.04)'" onmouseout="this.style.background=''">
+                <span>👤</span><span style="font-size:.84rem;font-weight:700;color:var(--text);flex:1">My Profile</span><span style="color:var(--gray-400);font-size:.8rem">→</span>
+              </a>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- ════ TRANSACTIONS ════ -->
+      <div class="wl-panel" id="panel-transactions">
+
+        <div class="wl-card">
+          <div class="wl-card-header">
+            <div class="wl-card-title">📋 All Transactions</div>
+            <button class="btn-card-action" onclick="showToast('Exporting CSV…')">📥 Export CSV</button>
+          </div>
+          <div style="padding:14px 20px;border-bottom:1.5px solid var(--gray-100);display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+            <button class="txn-filter-btn active" data-txn-filter="all">All</button>
+            <button class="txn-filter-btn" data-txn-filter="credit">💰 Credits</button>
+            <button class="txn-filter-btn" data-txn-filter="debit">📤 Debits</button>
+            <button class="txn-filter-btn" data-txn-filter="pending">⏳ Pending</button>
+            <button class="txn-filter-btn" data-txn-filter="refund">↩️ Refunds</button>
+            <div class="txn-search-wrap" style="margin-left:auto">
+              <span class="txn-search-icon">🔍</span>
+              <input type="text" class="txn-search" id="txnSearch" placeholder="Search…" />
+            </div>
+          </div>
+          <div id="allTxns"></div>
+          <div style="padding:16px 20px;text-align:center;border-top:1.5px solid var(--gray-100)">
+            <button class="btn-card-action" onclick="showToast('Loading more…')">Load More Transactions →</button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ════ WITHDRAW ════ -->
+      <div class="wl-panel" id="panel-withdraw">
+        <div class="wl-two-col">
+          <div>
+
+            <div class="wl-info-box green">
+              ✅ <strong>Instant Withdrawal Available!</strong> UPI payments 30 minutes mein credit hote hain — 24/7.
+            </div>
+
+            <!-- Withdraw form -->
+            <div class="withdraw-card">
+              <div class="wc-title">💸 Withdraw Money</div>
+              <div class="wc-sub">Apna available balance seedha UPI account mein transfer karo</div>
+
+              <label style="font-size:.8rem;font-weight:700;color:rgba(255,255,255,.7);display:block;margin-bottom:8px">Amount (₹)</label>
+              <div class="amount-input-wrap">
+                <div class="amount-currency">₹</div>
+                <input
+                  type="number"
+                  class="amount-input"
+                  id="withdrawAmount"
+                  placeholder="0"
+                  min="100" max="8240"
+                  oninput="handleAmountInput(this)"
+                />
+                <div class="amount-avail">
+                  Available: <strong id="availBal">₹8,240</strong>
+                </div>
+              </div>
+
+              <div class="quick-amounts" id="quickAmounts">
+                <button class="qa-chip" onclick="setAmount(500)">₹500</button>
+                <button class="qa-chip" onclick="setAmount(1000)">₹1,000</button>
+                <button class="qa-chip" onclick="setAmount(2000)">₹2,000</button>
+                <button class="qa-chip" onclick="setAmount(5000)">₹5,000</button>
+                <button class="qa-chip" onclick="setAmount(8240)">All ₹8,240</button>
+              </div>
+
+              <label style="font-size:.8rem;font-weight:700;color:rgba(255,255,255,.7);display:block;margin-bottom:8px">Withdraw To</label>
+              <div class="upi-selector" id="upiSelectorWithdraw" onclick="openTab('upi')">
+                <div class="upi-app-icon">G</div>
+                <div class="upi-info">
+                  <div class="upi-id">arjunsingh@okaxis</div>
+                  <div class="upi-name">Google Pay · Primary · ✅ Verified</div>
+                </div>
+                <div class="upi-arrow">✏️</div>
+              </div>
+
+              <button class="btn-withdraw" id="btnWithdraw" onclick="initiateWithdraw()">
+                💸 Withdraw Now
+              </button>
+
+              <div class="withdraw-meta">
+                <span class="wm-item">⚡ Instant (within 30 min)</span>
+                <span class="wm-item">🔒 256-bit encrypted</span>
+                <span class="wm-item">🆓 Zero fees</span>
+              </div>
+            </div>
+
+            <!-- Withdrawal history -->
+            <div class="wl-card">
+              <div class="wl-card-header">
+                <div class="wl-card-title">📤 Recent Withdrawals</div>
+              </div>
+              <div id="withdrawHistory"></div>
+            </div>
+
+          </div>
+
+          <!-- Withdraw sidebar -->
+          <div>
+
+            <div class="wl-sidebar-card">
+              <div class="wsc-header">ℹ️ Withdrawal Info</div>
+              <div class="wsc-body">
+                <div class="stat-row">
+                  <span class="sr-lbl">Min Withdrawal</span>
+                  <span class="sr-val">₹100</span>
+                </div>
+                <div class="stat-row">
+                  <span class="sr-lbl">Max per day</span>
+                  <span class="sr-val">₹50,000</span>
+                </div>
+                <div class="stat-row">
+                  <span class="sr-lbl">Processing Time</span>
+                  <span class="sr-val green">~30 min</span>
+                </div>
+                <div class="stat-row">
+                  <span class="sr-lbl">Platform Fee</span>
+                  <span class="sr-val green">FREE</span>
+                </div>
+                <div class="stat-row">
+                  <span class="sr-lbl">Today Withdrawn</span>
+                  <span class="sr-val">₹0</span>
+                </div>
+                <div class="stat-row">
+                  <span class="sr-lbl">Today Remaining</span>
+                  <span class="sr-val primary">₹50,000</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="wl-info-box teal" style="border-radius:var(--radius)">
+              💡 <strong>Pro Tip:</strong> ₹500 se zyada ek baar mein withdraw karo — instant settlement milti hai UPI pe!
+            </div>
+
+            <div class="wl-sidebar-card">
+              <div class="wsc-header">🔒 Security</div>
+              <div class="wsc-body">
+                <div class="stat-row">
+                  <span class="sr-lbl">2-step Verify</span>
+                  <span class="sr-val green">✓ On</span>
+                </div>
+                <div class="stat-row">
+                  <span class="sr-lbl">UPI PIN</span>
+                  <span class="sr-val green">✓ Set</span>
+                </div>
+                <div class="stat-row">
+                  <span class="sr-lbl">Device Trust</span>
+                  <span class="sr-val green">✓ Trusted</span>
+                </div>
+                <div class="stat-row">
+                  <span class="sr-lbl">Last Login</span>
+                  <span class="sr-val">Today 5:10 PM</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- ════ UPI / BANK ════ -->
+      <div class="wl-panel" id="panel-upi">
+        <div class="wl-two-col">
+          <div>
+
+            <div class="wl-info-box teal">
+              🔒 Tumhare UPI details fully encrypted hain — GigLega kabhi bhi directly access nahi karta. Sirf verified UPI IDs linked ho sakti hain.
+            </div>
+
+            <!-- Linked UPIs -->
+            <div class="wl-card">
+              <div class="wl-card-header">
+                <div class="wl-card-title">📱 Linked UPI IDs (2)</div>
+              </div>
+              <div class="wl-card-body">
+                <div class="upi-card-list" id="upiCardList">
+
+                  <div class="upi-card-item default">
+                    <div class="uci-app-wrap" style="background:linear-gradient(135deg,#1a73e8,#4285f4)">G</div>
+                    <div class="uci-info">
+                      <div class="uci-id">arjunsingh@okaxis</div>
+                      <div class="uci-meta">
+                        Google Pay · Linked Mar 2026
+                        <span class="uci-default-badge">✓ Default</span>
+                        <span class="uci-default-badge" style="background:rgba(16,185,129,.1);color:#059669">✓ Verified</span>
+                      </div>
+                    </div>
+                    <div class="uci-actions">
+                      <button class="btn-uci btn-uci-default" style="color:var(--teal);border-color:rgba(13,148,136,.3);cursor:default">Default</button>
+                    </div>
+                  </div>
+
+                  <div class="upi-card-item">
+                    <div class="uci-app-wrap" style="background:linear-gradient(135deg,#5f259f,#7b2ff7)">P</div>
+                    <div class="uci-info">
+                      <div class="uci-id">9876543210@ybl</div>
+                      <div class="uci-meta">
+                        PhonePe · Linked Feb 2026
+                        <span class="uci-default-badge" style="background:rgba(16,185,129,.1);color:#059669">✓ Verified</span>
+                      </div>
+                    </div>
+                    <div class="uci-actions">
+                      <button class="btn-uci btn-uci-default" onclick="setDefaultUPI(this,'9876543210@ybl')">Set Default</button>
+                      <button class="btn-uci btn-uci-remove" onclick="removeUPI(this,'9876543210@ybl')">Remove</button>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+            <!-- Add UPI -->
+            <div class="wl-card">
+              <div class="wl-card-header">
+                <div class="wl-card-title">➕ Add New UPI ID</div>
+              </div>
+              <div class="wl-card-body">
+                <div class="add-upi-form">
+                  <div>
+                    <label class="ff-label-sm">UPI ID <span style="color:var(--danger)">*</span></label>
+                    <input class="ff-input-sm" type="text" id="newUpiInput" placeholder="yourname@upi or number@ybl" />
+                  </div>
+                  <div>
+                    <label class="ff-label-sm" style="opacity:0">Add</label>
+                    <button class="btn-add-upi" onclick="addUPI()">➕ Add & Verify</button>
+                  </div>
+                </div>
+                <div class="ff-hint" style="margin-top:8px">
+                  Supported: Google Pay (@okaxis), PhonePe (@ybl), Paytm (@paytm), any UPI handle
+                </div>
+
+                <!-- UPI app quick select -->
+                <div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap">
+                  <button class="btn-card-action" style="display:flex;align-items:center;gap:6px" onclick="prefillUPI('@okaxis')">
+                    <span>G</span> Google Pay
+                  </button>
+                  <button class="btn-card-action" style="display:flex;align-items:center;gap:6px" onclick="prefillUPI('@ybl')">
+                    <span>P</span> PhonePe
+                  </button>
+                  <button class="btn-card-action" style="display:flex;align-items:center;gap:6px" onclick="prefillUPI('@paytm')">
+                    <span>💰</span> Paytm
+                  </button>
+                  <button class="btn-card-action" style="display:flex;align-items:center;gap:6px" onclick="prefillUPI('@upi')">
+                    <span>🏦</span> Other
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Bank account -->
+            <div class="wl-card">
+              <div class="wl-card-header">
+                <div class="wl-card-title">🏦 Bank Account (optional)</div>
+                <span style="font-size:.74rem;color:var(--gray-400);font-weight:700">For large payouts</span>
+              </div>
+              <div class="wl-card-body">
+                <div class="wl-info-box teal">
+                  🏦 Bank account optional hai — sirf ₹10,000+ ke payouts ke liye useful hai. UPI se chhoti payments auto-process hoti hain.
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+                  <div>
+                    <label class="ff-label-sm">Account Holder Name</label>
+                    <input class="ff-input-sm" type="text" placeholder="Arjun Singh" />
+                  </div>
+                  <div>
+                    <label class="ff-label-sm">Account Number</label>
+                    <input class="ff-input-sm" type="text" placeholder="XXXXXXXXXXXX" />
+                  </div>
+                  <div>
+                    <label class="ff-label-sm">IFSC Code</label>
+                    <input class="ff-input-sm" type="text" placeholder="SBIN0001234" />
+                  </div>
+                  <div>
+                    <label class="ff-label-sm">Bank Name</label>
+                    <input class="ff-input-sm" type="text" placeholder="State Bank of India" />
+                  </div>
+                </div>
+                <button class="btn-add-upi" style="margin-top:16px" onclick="showToast('Bank account verification initiated!')">
+                  🏦 Save & Verify Bank Account
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- UPI sidebar -->
+          <div>
+            <div class="wl-sidebar-card">
+              <div class="wsc-header">🔒 Security Settings</div>
+              <div class="wsc-body">
+                <div class="stat-row">
+                  <span class="sr-lbl">Withdrawal OTP</span>
+                  <span class="sr-val green">✓ Enabled</span>
+                </div>
+                <div class="stat-row">
+                  <span class="sr-lbl">Large Txn Alert</span>
+                  <span class="sr-val green">✓ On (>₹1k)</span>
+                </div>
+                <div class="stat-row">
+                  <span class="sr-lbl">Unknown Device</span>
+                  <span class="sr-val green">✓ Block</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="wl-info-box teal" style="border-radius:var(--radius)">
+              ✅ <strong>2 UPI IDs linked</strong> hain — bahut badhiya! Aagar primary fail ho toh backup automatically use hota hai.
+            </div>
+
+            <div class="wl-sidebar-card">
+              <div class="wsc-header">❓ UPI Help</div>
+              <div class="wsc-body" style="padding:0">
+                <div onclick="showToast('Opening help…')" style="display:flex;align-items:center;gap:10px;padding:11px 16px;border-bottom:1px solid var(--gray-100);cursor:pointer;font-size:.84rem;font-weight:700;color:var(--text)">
+                  <span>🔍</span> UPI ID kahan milta hai?
+                </div>
+                <div onclick="showToast('Opening help…')" style="display:flex;align-items:center;gap:10px;padding:11px 16px;border-bottom:1px solid var(--gray-100);cursor:pointer;font-size:.84rem;font-weight:700;color:var(--text)">
+                  <span>⏱️</span> Payment delay ho gayi?
+                </div>
+                <div onclick="showToast('Opening support…')" style="display:flex;align-items:center;gap:10px;padding:11px 16px;cursor:pointer;font-size:.84rem;font-weight:700;color:var(--text)">
+                  <span>🆘</span> Support se baat karo
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- ════ REWARDS ════ -->
+      <div class="wl-panel" id="panel-rewards">
+
+        <!-- Hero -->
+        <div class="rewards-hero">
+          <div class="rh-inner">
+            <div class="rh-icon">🎁</div>
+            <div class="rh-title">Refer & Earn ₹100 per Referral!</div>
+            <div class="rh-sub">
+              Apne dost ko GigLega join karo — unka pehla gig complete hone pe<br>
+              tumhe <strong>₹100 bonus</strong> milega aur unhe bhi <strong>₹50 welcome bonus</strong>!
+            </div>
+            <div class="rh-code-box">
+              <div class="rh-code">ARJUN100</div>
+              <button class="btn-rh-copy" onclick="copyCode()">📋 Copy Code</button>
+              <button class="btn-rh-copy" onclick="showToast('WhatsApp share opened!')">📱 Share on WhatsApp</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Refer stats -->
+        <div class="refer-stats">
+          <div class="rs-card">
+            <div class="rsc-icon">👥</div>
+            <div class="rsc-val">4</div>
+            <div class="rsc-label">Friends Invited</div>
+          </div>
+          <div class="rs-card">
+            <div class="rsc-icon">✅</div>
+            <div class="rsc-val">3</div>
+            <div class="rsc-label">Gigs Completed</div>
+          </div>
+          <div class="rs-card">
+            <div class="rsc-icon">💰</div>
+            <div class="rsc-val">₹300</div>
+            <div class="rsc-label">Bonus Earned</div>
+          </div>
+        </div>
+
+        <div class="wl-two-col">
+          <div>
+
+            <!-- Referral history -->
+            <div class="wl-card">
+              <div class="wl-card-header">
+                <div class="wl-card-title">👥 Referral History</div>
+              </div>
+              <div style="overflow-x:auto">
+                <table class="refer-table">
+                  <thead>
+                    <tr>
+                      <th>Friend</th>
+                      <th>Joined</th>
+                      <th>Status</th>
+                      <th>Bonus</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <div style="display:flex;align-items:center;gap:9px">
+                          <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#059669,#34d399);display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:800;color:#fff;flex-shrink:0">RV</div>
+                          <div>
+                            <div style="font-size:.86rem;font-weight:800">Rohan Verma</div>
+                            <div style="font-size:.72rem;color:var(--gray-400)">+91 98xx xxxx 12</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td>Mar 2, 2026</td>
+                      <td><span class="txn-badge credit">✅ Gig Done</span></td>
+                      <td style="color:#059669;font-weight:900">+₹100</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <div style="display:flex;align-items:center;gap:9px">
+                          <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#a78bfa);display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:800;color:#fff;flex-shrink:0">SK</div>
+                          <div>
+                            <div style="font-size:.86rem;font-weight:800">Sunil Kumar</div>
+                            <div style="font-size:.72rem;color:var(--gray-400)">+91 97xx xxxx 44</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td>Mar 8, 2026</td>
+                      <td><span class="txn-badge credit">✅ Gig Done</span></td>
+                      <td style="color:#059669;font-weight:900">+₹100</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <div style="display:flex;align-items:center;gap:9px">
+                          <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#d97706,#fbbf24);display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:800;color:#fff;flex-shrink:0">PD</div>
+                          <div>
+                            <div style="font-size:.86rem;font-weight:800">Pankaj Das</div>
+                            <div style="font-size:.72rem;color:var(--gray-400)">+91 99xx xxxx 77</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td>Mar 11, 2026</td>
+                      <td><span class="txn-badge credit">✅ Gig Done</span></td>
+                      <td style="color:#059669;font-weight:900">+₹100</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <div style="display:flex;align-items:center;gap:9px">
+                          <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#dc2626,#f87171);display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:800;color:#fff;flex-shrink:0">AS</div>
+                          <div>
+                            <div style="font-size:.86rem;font-weight:800">Amit Singh</div>
+                            <div style="font-size:.72rem;color:var(--gray-400)">+91 88xx xxxx 23</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td>Mar 14, 2026</td>
+                      <td><span class="txn-badge pending">⏳ Pending</span></td>
+                      <td style="color:#d97706;font-weight:900">Pending</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+          </div>
+          <div>
+
+            <!-- Bonus wallet -->
+            <div class="wl-sidebar-card">
+              <div class="wsc-header">🎁 Bonus Wallet</div>
+              <div class="wsc-body">
+                <div style="text-align:center;padding:10px 0 16px">
+                  <div style="font-size:2rem;font-weight:900;color:#7c3aed">₹450</div>
+                  <div style="font-size:.76rem;font-weight:700;color:var(--gray-400);margin-top:3px">Total Bonus Earned</div>
+                </div>
+                <div class="stat-row">
+                  <span class="sr-lbl">Referral Bonus</span>
+                  <span class="sr-val" style="color:#7c3aed">₹300</span>
+                </div>
+                <div class="stat-row">
+                  <span class="sr-lbl">Welcome Bonus</span>
+                  <span class="sr-val" style="color:#7c3aed">₹100</span>
+                </div>
+                <div class="stat-row">
+                  <span class="sr-lbl">Achievement Bonus</span>
+                  <span class="sr-val" style="color:#7c3aed">₹50</span>
+                </div>
+                <button class="btn-add-upi" style="width:100%;margin-top:12px;justify-content:center" onclick="showToast('Bonus transferred to main wallet!')">
+                  Transfer to Main Wallet
+                </button>
+              </div>
+            </div>
+
+            <div class="wl-info-box teal" style="border-radius:var(--radius)">
+              🚀 <strong>Aur ₹700 kamao</strong> — 7 aur dosto ko refer karo. Ek hi mahine mein ₹1,000 extra bonus possible hai!
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /wl-body -->
+  </main>
 
   <script>
-  (function () {
 
-    /* ── Auth ── */
-    var user = (function () {
-      try {
-        var u = JSON.parse(localStorage.getItem("gl_user") || "null");
-        return (u && u.id) ? u : null;
-      } catch(e) { return null; }
-    })();
-    if (!user) { window.location.href = "login.html?redirect=wallet.html"; return; }
+    /* ══════════════════════════════════
+       TRANSACTION DATA
+    ══════════════════════════════════ */
+    const TRANSACTIONS = [
+      { date:"Today, Mar 14", items:[
+        { type:"credit",  icon:"📦", title:"Warehouse Packing Gig Payment", meta:"#GL-2026-0314 · Auto-released", amount:"+₹1,128", time:"5:14 PM" },
+        { type:"debit",   icon:"📤", title:"Withdrawal to arjunsingh@okaxis", meta:"UPI · Google Pay · Ref: GL-WD-031401", amount:"−₹2,000", time:"11:30 AM" },
+        { type:"credit",  icon:"🎁", title:"Referral Bonus — Pankaj Das", meta:"First gig completed · Code: ARJUN100", amount:"+₹100", time:"9:15 AM" },
+      ]},
+      { date:"Yesterday, Mar 13", items:[
+        { type:"pending", icon:"⏳", title:"Grocery Delivery Payment — Pending Release", meta:"#GL-2026-0316 · Awaiting completion", amount:"₹1,504", time:"7:00 PM" },
+        { type:"credit",  icon:"🎁", title:"Referral Bonus — Sunil Kumar", meta:"First gig completed · Code: ARJUN100", amount:"+₹100", time:"3:40 PM" },
+      ]},
+      { date:"Mar 5, 2026", items:[
+        { type:"credit",  icon:"🚛", title:"Office Relocation Gig Payment", meta:"#GL-2026-0305 · Gurugram", amount:"+₹3,290", time:"9:00 PM" },
+        { type:"debit",   icon:"📤", title:"Withdrawal to arjunsingh@okaxis", meta:"UPI · Ref: GL-WD-030501", amount:"−₹3,000", time:"9:15 PM" },
+      ]},
+      { date:"Feb 28, 2026", items:[
+        { type:"credit",  icon:"🛵", title:"Grocery Delivery Gig Payment", meta:"#GL-2026-0228 · Sector 29", amount:"+₹1,504", time:"6:30 PM" },
+        { type:"refund",  icon:"↩️", title:"Cancelled Gig Refund", meta:"Event Setup cancelled by client · Auto-refund", amount:"+₹200", time:"2:15 PM" },
+      ]},
+      { date:"Feb 20, 2026", items:[
+        { type:"credit",  icon:"🎪", title:"Corporate Event Setup Payment", meta:"#GL-2026-0220 · DLF Cyber Hub", amount:"+₹1,410", time:"11:00 PM" },
+        { type:"debit",   icon:"📤", title:"Withdrawal to 9876543210@ybl", meta:"PhonePe · Ref: GL-WD-022001", amount:"−₹1,400", time:"11:05 PM" },
+      ]},
+    ];
 
-    /* ── Breadcrumb ── */
-    if (typeof buildBreadcrumb === "function") {
-      buildBreadcrumb("breadcrumb", [
-        { label: "Home", href: "index.html" },
-        { label: "Wallet" }
-      ]);
-    }
+    const WITHDRAW_HISTORY = [
+      { icon:"📤", title:"Withdrawal to arjunsingh@okaxis", meta:"Google Pay · Today 11:30 AM · Ref: GL-WD-031401", amount:"−₹2,000", time:"Today", status:"credit" },
+      { icon:"📤", title:"Withdrawal to arjunsingh@okaxis", meta:"Google Pay · Mar 5 · Ref: GL-WD-030501", amount:"−₹3,000", time:"Mar 5", status:"credit" },
+      { icon:"📤", title:"Withdrawal to 9876543210@ybl", meta:"PhonePe · Feb 20 · Ref: GL-WD-022001", amount:"−₹1,400", time:"Feb 20", status:"credit" },
+      { icon:"📤", title:"Withdrawal to arjunsingh@okaxis", meta:"Google Pay · Feb 12 · Ref: GL-WD-021201", amount:"−₹2,800", time:"Feb 12", status:"credit" },
+    ];
 
-    /* ── Wallet storage ── */
-    var WALLET_KEY = "gl_wallet_" + user.id;
-    var TXN_KEY    = "gl_txns_"   + user.id;
-
-    function getWallet() {
-      return JSON.parse(localStorage.getItem(WALLET_KEY) || JSON.stringify({
-        balance: 0, totalIn: 0, totalOut: 0, pending: 0,
-        earned: 0, spent: 0, withdrawn: 0, fees: 0,
-        createdAt: new Date().toISOString()
-      }));
-    }
-    function saveWallet(w) { localStorage.setItem(WALLET_KEY, JSON.stringify(w)); }
-    function getTxns()     { return JSON.parse(localStorage.getItem(TXN_KEY) || "[]"); }
-    function saveTxns(t)   { localStorage.setItem(TXN_KEY, JSON.stringify(t)); }
-
-    function addTxn(type, title, sub, amount, status) {
-      var txns = getTxns();
-      txns.unshift({
-        id:     "txn_" + Date.now(),
-        type:   type,
-        title:  title,
-        sub:    sub,
-        amount: amount,
-        status: status || "completed",
-        date:   new Date().toISOString()
+    /* ══════════════════════════════════
+       RENDER TRANSACTIONS
+    ══════════════════════════════════ */
+    function renderTxns(containerId, data, limit) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      let html = "";
+      let count = 0;
+      data.forEach(group => {
+        if (limit && count >= limit) return;
+        html += `<div class="txn-date-label">${group.date}</div>`;
+        group.items.forEach(item => {
+          if (limit && count >= limit) return;
+          html += `
+            <div class="txn-item" onclick="showToast('Transaction detail opening…')">
+              <div class="txn-icon-wrap ${item.type}">${item.icon}</div>
+              <div class="txn-info">
+                <div class="txn-title">${item.title}</div>
+                <div class="txn-meta">
+                  ${item.meta}
+                  <span class="txn-badge ${item.type}">${item.type==='credit'?'Credit':item.type==='debit'?'Debit':item.type==='pending'?'Pending':'Refund'}</span>
+                </div>
+              </div>
+              <div>
+                <div class="txn-amount ${item.type}">${item.amount}</div>
+                <div class="txn-time">${item.time}</div>
+              </div>
+            </div>`;
+          count++;
+        });
       });
-      saveTxns(txns);
+      container.innerHTML = html;
     }
 
-    /* ── Seed demo transactions if empty ── */
-    (function seedDemo() {
-      var txns = getTxns();
-      if (txns.length > 0) return;
-      var wallet = getWallet();
-      wallet.balance   = 1250;
-      wallet.totalIn   = 2000;
-      wallet.totalOut  = 750;
-      wallet.earned    = 1500;
-      wallet.spent     = 500;
-      wallet.withdrawn = 250;
-      wallet.fees      = 90;
-      saveWallet(wallet);
-      saveTxns([
-        { id:"txn_1", type:"credit", title:"Payment received — Delivery Gig", sub:"Gig completed · Poster: Rahul S.", amount:500, status:"completed", date: new Date(Date.now()-3600000).toISOString() },
-        { id:"txn_2", type:"fee",    title:"GigLega service fee", sub:"6% on ₹500 gig", amount:-30, status:"completed", date: new Date(Date.now()-3600000+100).toISOString() },
-        { id:"txn_3", type:"credit", title:"Payment received — Data Entry Task", sub:"Gig completed · Poster: Priya M.", amount:1000, status:"completed", date: new Date(Date.now()-86400000).toISOString() },
-        { id:"txn_4", type:"fee",    title:"GigLega service fee", sub:"6% on ₹1000 gig", amount:-60, status:"completed", date: new Date(Date.now()-86400000+100).toISOString() },
-        { id:"txn_5", type:"debit",  title:"Withdrawal to UPI", sub:"name@upi · Processed", amount:-250, status:"completed", date: new Date(Date.now()-172800000).toISOString() },
-        { id:"txn_6", type:"pending",title:"Escrow — Cleaning Gig", sub:"Gig in progress · Release on completion", amount:500, status:"pending", date: new Date(Date.now()-7200000).toISOString() },
-        { id:"txn_7", type:"credit", title:"Top-up via UPI", sub:"Added via PhonePe", amount:500, status:"completed", date: new Date(Date.now()-259200000).toISOString() }
-      ]);
-    })();
-
-    /* ── Helpers ── */
-    function fmt(n) { return "₹" + Math.abs(Number(n || 0)).toLocaleString("en-IN"); }
-    function escH(s) { return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
-    function fmtDate(iso) {
-      var d = new Date(iso);
-      return d.toLocaleDateString("en-IN", { day:"numeric", month:"short", year:"numeric" }) +
-             " · " + d.toLocaleTimeString("en-IN", { hour:"2-digit", minute:"2-digit" });
-    }
-    function timeAgo(iso) {
-      var s = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
-      if (s < 60)    return s + "s ago";
-      if (s < 3600)  return Math.floor(s/60) + "m ago";
-      if (s < 86400) return Math.floor(s/3600) + "h ago";
-      return Math.floor(s/86400) + "d ago";
+    function renderWithdrawHistory() {
+      const c = document.getElementById("withdrawHistory");
+      if (!c) return;
+      let html = "";
+      WITHDRAW_HISTORY.forEach(item => {
+        html += `
+          <div class="txn-item" onclick="showToast('Withdrawal detail opening…')">
+            <div class="txn-icon-wrap debit">${item.icon}</div>
+            <div class="txn-info">
+              <div class="txn-title">${item.title}</div>
+              <div class="txn-meta">${item.meta}</div>
+            </div>
+            <div>
+              <div class="txn-amount debit">${item.amount}</div>
+              <div class="txn-time">${item.time}</div>
+            </div>
+          </div>`;
+      });
+      c.innerHTML = html;
     }
 
-    var txnIcons = { credit:"💰", debit:"📤", pending:"⏳", fee:"📋" };
+    /* ══════════════════════════════════
+       EARNINGS CHART
+    ══════════════════════════════════ */
+    const MONTHLY = [
+      { m:"Jan", v:6200 }, { m:"Feb", v:12600 },
+      { m:"Mar", v:8400, current:true }, { m:"Apr", v:0 },
+      { m:"May", v:0 }, { m:"Jun", v:0 },
+      { m:"Jul", v:0 }, { m:"Aug", v:0 },
+      { m:"Sep", v:0 }, { m:"Oct", v:0 },
+      { m:"Nov", v:0 }, { m:"Dec", v:0 },
+    ];
+    const maxV = Math.max(...MONTHLY.map(m => m.v), 1);
 
-    /* ── Render ── */
-    var currentFilter = "all";
-
-    function render() {
-      var w = getWallet();
-
-      /* Balance hero */
-      document.getElementById("balanceDisplay").textContent = Number(w.balance).toLocaleString("en-IN", { minimumFractionDigits: 2 });
-      document.getElementById("walletId").textContent = "GL-" + user.id.slice(-6).toUpperCase();
-      document.getElementById("lastUpdated").textContent = "Updated just now";
-      document.getElementById("totalIn").textContent   = fmt(w.totalIn);
-      document.getElementById("totalOut").textContent  = fmt(w.totalOut);
-      document.getElementById("pendingAmt").textContent= fmt(w.pending);
-
-      /* Stats */
-      document.getElementById("statEarned").textContent   = fmt(w.earned);
-      document.getElementById("statSpent").textContent    = fmt(w.spent);
-      document.getElementById("statWithdrawn").textContent= fmt(w.withdrawn);
-      document.getElementById("statFees").textContent     = fmt(w.fees);
-
-      /* Transactions */
-      var txns = getTxns();
-      var filtered = currentFilter === "all" ? txns : txns.filter(function(t){ return t.type === currentFilter; });
-      document.getElementById("statTxns").textContent = txns.length;
-      renderTxns(filtered);
+    function buildChart() {
+      const bars = document.getElementById("ecBars");
+      if (!bars) return;
+      const tooltip = document.getElementById("ecTooltip");
+      let html = "";
+      MONTHLY.forEach((m, i) => {
+        const pct = Math.round((m.v / maxV) * 100);
+        html += `
+          <div class="ec-bar-group">
+            <div class="ec-bar-track ${m.current ? 'current' : ''} ${m.v === 0 ? '' : ''}"
+                 data-val="${m.v}" data-month="${m.m}"
+                 onmouseenter="showBarTooltip(this,event)"
+                 onmouseleave="hideBarTooltip()">
+              <div class="ec-bar-fill" style="height:${pct}%"></div>
+            </div>
+          </div>`;
+      });
+      bars.innerHTML = html;
     }
 
-    function renderTxns(txns) {
-      var el = document.getElementById("txnList");
-      if (!txns.length) {
-        el.innerHTML = '<div class="txn-empty"><span class="ei">📭</span><p>No transactions found.<br>Add money or complete a gig to see activity here.</p></div>';
-        return;
-      }
-      el.innerHTML = txns.map(function (t) {
-        var isPos = t.amount > 0;
-        var cls   = t.type === "pending" ? "pending" : t.type === "fee" ? "fee" : isPos ? "credit" : "debit";
-        var amtTxt = (isPos ? "+" : "") + fmt(t.amount);
-        return '<div class="txn-row">' +
-          '<div class="txn-icon ' + cls + '">' + (txnIcons[t.type] || "💳") + '</div>' +
-          '<div class="txn-body">' +
-            '<div class="txn-title">' + escH(t.title) + '</div>' +
-            '<div class="txn-sub">' + escH(t.sub || "") + '</div>' +
-          '</div>' +
-          '<div class="txn-right">' +
-            '<div class="txn-amount ' + cls + '">' + amtTxt + '</div>' +
-            '<div class="txn-date">' + timeAgo(t.date) + '</div>' +
-            '<div class="txn-badge ' + (t.status||"completed") + '">' + (t.status||"completed") + '</div>' +
-          '</div>' +
-        '</div>';
+    function showBarTooltip(el, e) {
+      const v = parseInt(el.dataset.val);
+      const m = el.dataset.month;
+      const tooltip = document.getElementById("ecTooltip");
+      if (!v) return;
+      tooltip.textContent = m + ": ₹" + v.toLocaleString("en-IN");
+      tooltip.classList.add("show");
+      const rect = el.getBoundingClientRect();
+      const chartRect = el.closest(".earnings-chart-area").getBoundingClientRect();
+      tooltip.style.left = (rect.left - chartRect.left + rect.width/2) + "px";
+    }
+    function hideBarTooltip() {
+      document.getElementById("ecTooltip").classList.remove("show");
+    }
+
+    /* ══════════════════════════════════
+       EARNINGS BREAKDOWN
+    ══════════════════════════════════ */
+    const BREAKDOWN = [
+      { label:"📦 Warehouse / Packing", val: 2256, color:"#059669" },
+      { label:"🚛 Relocation / Moving",  val: 3290, color:"var(--primary)" },
+      { label:"🛵 Delivery",             val: 1504, color:"#7c3aed" },
+      { label:"🎪 Event Setup",          val: 1350, color:"#d97706" },
+    ];
+    const totalBreak = BREAKDOWN.reduce((s,b) => s + b.val, 0);
+
+    function buildBreakdown() {
+      const c = document.getElementById("earnBreakdown");
+      if (!c) return;
+      c.innerHTML = BREAKDOWN.map(b => {
+        const pct = Math.round((b.val / totalBreak) * 100);
+        return `
+          <div class="eb-row">
+            <div class="eb-dot" style="background:${b.color}"></div>
+            <div class="eb-label">${b.label}</div>
+            <div class="eb-bar-track">
+              <div class="eb-bar-fill" style="width:${pct}%;background:${b.color}"></div>
+            </div>
+            <div class="eb-val">₹${b.val.toLocaleString("en-IN")}</div>
+            <div class="eb-pct">${pct}%</div>
+          </div>`;
       }).join("");
     }
 
-    /* ── Filter chips ── */
-    document.getElementById("filterChips").addEventListener("click", function (e) {
-      var chip = e.target.closest(".chip");
-      if (!chip) return;
-      currentFilter = chip.dataset.filter;
-      document.querySelectorAll(".chip").forEach(function (c) { c.classList.remove("active"); });
-      chip.classList.add("active");
-      render();
-    });
-
-    /* ── Quick amounts ── */
-    document.getElementById("quickAmounts").addEventListener("click", function (e) {
-      var btn = e.target.closest(".qa-btn");
-      if (!btn) return;
-      document.getElementById("addAmount").value = btn.dataset.amount;
-      document.querySelectorAll(".qa-btn").forEach(function (b) { b.classList.remove("active"); });
-      btn.classList.add("active");
-    });
-
-    /* ── Scroll to add money ── */
-    document.getElementById("btnAddMoney").addEventListener("click", function () {
-      document.getElementById("addMoneyPanel").scrollIntoView({ behavior: "smooth", block: "start" });
-      document.getElementById("addAmount").focus();
-    });
-
-    /* ── Confirm Add Money ── */
-    document.getElementById("btnConfirmAdd").addEventListener("click", function () {
-      var amt    = parseFloat(document.getElementById("addAmount").value);
-      var method = document.getElementById("addMethod").value;
-      if (!amt || amt < 10) {
-        if (typeof showToast === "function") showToast("Minimum add amount is ₹10.", "error");
-        return;
-      }
-      var btn = this;
-      btn.disabled    = true;
-      btn.textContent = "⏳ Processing...";
-
-      setTimeout(function () {
-        var w = getWallet();
-        w.balance += amt;
-        w.totalIn += amt;
-        saveWallet(w);
-        addTxn("credit", "Top-up via " + method.toUpperCase(), "Added to GigLega Wallet", amt);
-        document.getElementById("addAmount").value = "";
-        document.querySelectorAll(".qa-btn").forEach(function (b) { b.classList.remove("active"); });
-        btn.disabled    = false;
-        btn.textContent = "Add to Wallet";
-        render();
-        if (typeof showToast === "function") showToast("✅ ₹" + amt + " added to your wallet!", "success");
-      }, 1200);
-    });
-
-    /* ── Open Withdraw Modal ── */
-    function openWithdrawModal() {
-      var amt  = parseFloat(document.getElementById("withdrawAmount").value);
-      var dest = document.getElementById("withdrawDest").value.trim();
-      var to   = document.getElementById("withdrawTo").value;
-      var w    = getWallet();
-
-      if (!amt || amt < 100) { if (typeof showToast === "function") showToast("Minimum withdrawal is ₹100.", "error"); return; }
-      if (amt > w.balance)   { if (typeof showToast === "function") showToast("Insufficient wallet balance.", "error"); return; }
-      if (!dest)             { if (typeof showToast === "function") showToast("Enter your UPI ID or account number.", "error"); return; }
-
-      document.getElementById("withdrawModalSub").textContent =
-        "Withdrawing ₹" + amt + " to your " + to.toUpperCase() + " (" + dest + ").";
-      document.getElementById("walletPin").value = "";
-      document.getElementById("withdrawModal").classList.add("open");
+    /* ══════════════════════════════════
+       TAB SYSTEM
+    ══════════════════════════════════ */
+    function openTab(name) {
+      document.querySelectorAll(".wl-tab").forEach(t => t.classList.remove("active"));
+      document.querySelectorAll(".wl-panel").forEach(p => p.classList.remove("active"));
+      const tab = document.querySelector(`.wl-tab[data-tab="${name}"]`);
+      const panel = document.getElementById(`panel-${name}`);
+      if (tab) tab.classList.add("active");
+      if (panel) panel.classList.add("active");
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
-    document.getElementById("btnWithdraw").addEventListener("click", openWithdrawModal);
-    document.getElementById("btnConfirmWithdraw").addEventListener("click", openWithdrawModal);
-    document.getElementById("closeWithdrawModal").addEventListener("click", function () {
-      document.getElementById("withdrawModal").classList.remove("open");
-    });
-    document.getElementById("withdrawModal").addEventListener("click", function (e) {
-      if (e.target === this) this.classList.remove("open");
+    document.querySelectorAll(".wl-tab").forEach(btn => {
+      btn.addEventListener("click", () => openTab(btn.dataset.tab));
     });
 
-    /* ── Final Withdraw ── */
-    document.getElementById("btnFinalWithdraw").addEventListener("click", function () {
-      var pin = document.getElementById("walletPin").value;
-      if (pin !== "1234") {
-        if (typeof showToast === "function") showToast("Incorrect PIN. Default is 1234.", "error");
-        return;
+    /* ══════════════════════════════════
+       WITHDRAW LOGIC
+    ══════════════════════════════════ */
+    let currentBalance = 8240;
+
+    function handleAmountInput(el) {
+      const val = parseInt(el.value) || 0;
+      const btn = document.getElementById("btnWithdraw");
+      document.querySelectorAll(".qa-chip").forEach(c => c.classList.remove("active"));
+      if (val >= 100 && val <= currentBalance) {
+        btn.classList.remove("loading");
+        btn.textContent = "💸 Withdraw ₹" + val.toLocaleString("en-IN");
+      } else {
+        btn.innerHTML = "💸 Withdraw Now";
+        if (val > currentBalance) showToast("⚠️ Balance se zyada amount nahi withdraw kar sakte!");
       }
-      var amt  = parseFloat(document.getElementById("withdrawAmount").value);
-      var dest = document.getElementById("withdrawDest").value.trim();
-      var btn  = this;
+    }
 
-      btn.disabled    = true;
-      btn.textContent = "⏳ Processing...";
-
-      setTimeout(function () {
-        var w = getWallet();
-        w.balance   -= amt;
-        w.totalOut  += amt;
-        w.withdrawn += amt;
-        saveWallet(w);
-        addTxn("debit", "Withdrawal to " + dest, "Processing — 24hr settlement", -amt, "pending");
-
-        document.getElementById("withdrawModal").classList.remove("open");
-        document.getElementById("withdrawAmount").value = "";
-        document.getElementById("withdrawDest").value   = "";
-        btn.disabled    = false;
-        btn.textContent = "Confirm";
-        render();
-        if (typeof showToast === "function") showToast("✅ Withdrawal of ₹" + amt + " initiated! 24hr processing.", "success");
-      }, 1400);
-    });
-
-    /* ── Send Money ── */
-    document.getElementById("btnSendMoney").addEventListener("click", function () {
-      if (typeof showToast === "function") showToast("Send Money feature coming soon!", "info");
-    });
-
-    /* ── Export CSV ── */
-    document.getElementById("btnExport").addEventListener("click", function () {
-      var txns = getTxns();
-      if (!txns.length) { if (typeof showToast === "function") showToast("No transactions to export.", "info"); return; }
-      var rows = ["Type,Title,Sub,Amount,Status,Date"];
-      txns.forEach(function (t) {
-        rows.push([t.type, '"' + t.title + '"', '"' + (t.sub||"") + '"', t.amount, t.status, t.date].join(","));
+    function setAmount(val) {
+      const inp = document.getElementById("withdrawAmount");
+      inp.value = val;
+      handleAmountInput(inp);
+      document.querySelectorAll(".qa-chip").forEach(c => {
+        c.classList.toggle("active", parseInt(c.textContent.replace(/[₹,]/g,"").split(" ")[0]) === val ||
+          c.textContent.includes(val.toLocaleString("en-IN")));
       });
-      var blob = new Blob([rows.join("\n")], { type: "text/csv" });
-      var a    = document.createElement("a");
-      a.href   = URL.createObjectURL(blob);
-      a.download = "giglega-wallet-" + user.id.slice(-4) + ".csv";
-      a.click();
-      if (typeof showToast === "function") showToast("✅ Transactions exported!", "success");
+    }
+
+    function initiateWithdraw() {
+      const amount = parseInt(document.getElementById("withdrawAmount").value) || 0;
+      if (amount < 100) { showToast("⚠️ Minimum ₹100 withdraw karo!"); return; }
+      if (amount > currentBalance) { showToast("⚠️ Insufficient balance!"); return; }
+
+      const btn = document.getElementById("btnWithdraw");
+      btn.classList.add("loading");
+      btn.textContent = "⏳ Processing…";
+
+      setTimeout(() => {
+        btn.classList.remove("loading");
+        btn.innerHTML = "💸 Withdraw Now";
+        document.getElementById("withdrawAmount").value = "";
+        currentBalance -= amount;
+        document.getElementById("heroBalance").textContent = currentBalance.toLocaleString("en-IN");
+        document.getElementById("availBal").textContent = "₹" + currentBalance.toLocaleString("en-IN");
+
+        document.getElementById("modalAmount").textContent = "₹" + amount.toLocaleString("en-IN");
+        document.getElementById("modalRef").textContent = "Ref: GL-WD-2026031401";
+        document.getElementById("withdrawModal").classList.add("open");
+      }, 2000);
+    }
+
+    function closeWithdrawModal() {
+      document.getElementById("withdrawModal").classList.remove("open");
+    }
+
+    /* ══════════════════════════════════
+       TRANSACTION FILTER
+    ══════════════════════════════════ */
+    document.querySelectorAll(".txn-filter-btn").forEach(btn => {
+      btn.addEventListener("click", function() {
+        document.querySelectorAll(".txn-filter-btn").forEach(b => b.classList.remove("active"));
+        this.classList.add("active");
+        const f = this.dataset.txnFilter;
+        document.querySelectorAll(".txn-item").forEach(item => {
+          if (f === "all") { item.style.display = ""; return; }
+          const has = item.querySelector(".txn-badge");
+          if (!has) { item.style.display = "none"; return; }
+          item.style.display = has.classList.contains(f) ? "" : "none";
+        });
+      });
     });
 
-    render();
+    /* Search */
+    const txnSearchEl = document.getElementById("txnSearch");
+    if (txnSearchEl) {
+      txnSearchEl.addEventListener("input", function() {
+        const q = this.value.toLowerCase();
+        document.querySelectorAll("#allTxns .txn-item").forEach(item => {
+          const txt = item.querySelector(".txn-title")?.textContent.toLowerCase() || "";
+          const meta = item.querySelector(".txn-meta")?.textContent.toLowerCase() || "";
+          item.style.display = (txt.includes(q) || meta.includes(q)) ? "" : "none";
+        });
+      });
+    }
 
-  })();
-  </script>
+    /* ══════════════════════════════════
+       UPI MANAGEMENT
+    ══════════════════════════════════ */
+    function addUPI() {
+      const inp = document.getElementById("newUpiInput");
+      const val = inp.value.trim();
+      if (!val || !val.includes("@")) { showToast("⚠️ Valid UPI ID enter karo (jaise arjun@okaxis)"); return; }
+      showToast(`✅ ${val} — OTP verification bhej diya!`);
+      inp.value = "";
+    }
 
-</body>
-</html>
+    function prefillUPI(suffix) {
+      const inp = document.getElementById("newUpiInput");
+      inp.value = inp.value.split("@")[0] + suffix;
+      inp.focus();
+    }
+
+    function setDefaultUPI(btn, id) {
+      showToast(`✅ ${id} ko default UPI set kar diya!`);
+      btn.textContent = "Default";
+      btn.style.color = "var(--teal)";
+      btn.style.borderColor = "rgba(13,148,136,.3)";
+      btn.style.cursor = "default";
+    }
+
+    function removeUPI(btn, id) {
+      if (confirm(`${id} remove karna chahte ho?`)) {
+        btn.closest(".upi-card-item").remove();
+        showToast(`${id} removed!`);
+      }
+    }
+
+    /* ══════════════════════════════════
+       REFER CODE COPY
+    ══════════════════════════════════ */
+    function copyCode() {
+      navigator.clipboard?.writeText("ARJUN100").catch(() => {});
+      showToast("✅
