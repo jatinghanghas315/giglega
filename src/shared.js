@@ -1,685 +1,785 @@
-/* ── PWA Meta Tags — auto inject on every page ── */
-(function injectPWAMeta() {
-  var tags = [
-    { rel: "manifest", href: "/manifest.json" },
-    { name: "theme-color", content: "#1a3c5e" },
-    { name: "mobile-web-app-capable", content: "yes" },
-    { name: "apple-mobile-web-app-capable", content: "yes" },
-    { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
-    { name: "apple-mobile-web-app-title", content: "GigLega" }
-  ];
-
-  tags.forEach(function (t) {
-    /* Skip if already exists */
-    if (t.rel) {
-      if (document.querySelector('link[rel="' + t.rel + '"]')) return;
-      var link = document.createElement("link");
-      link.rel  = t.rel;
-      link.href = t.href;
-      document.head.appendChild(link);
-    } else {
-      if (document.querySelector('meta[name="' + t.name + '"]')) return;
-      var meta = document.createElement("meta");
-      meta.name    = t.name;
-      meta.content = t.content;
-      document.head.appendChild(meta);
-    }
-  });
-
-  /* Apple touch icon */
-  if (!document.querySelector('link[rel="apple-touch-icon"]')) {
-    var icon = document.createElement("link");
-    icon.rel  = "apple-touch-icon";
-    icon.href = "/assets/icons/icon-192.png";
-    document.head.appendChild(icon);
-  }
-})();
 /* ============================================================
-   shared.js — GigLega Master Script
-   Load in <head> WITHOUT defer or async:
-   <script src="shared.js"></script>
+   GigLega v1.1 — shared.js
+   Foundation: config, auth, navbar, footer, toast, breadcrumb
    ============================================================ */
 
-/* ══════════════════════════════════════════════════════════
-   PART 1 — IMMEDIATE EXECUTION
-   Runs before ANY inline script on the page.
-   Auth, constants, and utilities are available instantly.
-══════════════════════════════════════════════════════════ */
+(function (global) {
+  "use strict";
 
-/* ── Global constants ── */
-var GL = {
-  STORAGE_KEY_USER:  "gl_user",
-  STORAGE_KEY_USERS: "gl_users",
-  STORAGE_KEY_GIGS:  "gl_gigs",
-  STORAGE_KEY_CHATS: "gl_chats",
-  FEE_RATE:          0.06,
-  VERSION:           "1.0.0-beta",
-  APP_NAME:          "GigLega",
-  SUPPORT_EMAIL:     "Giglega.official@gmail.com",
-  SUPPORT_PHONE:     "+91 9319635257"
-};
+  /* ══════════════════════════════════════════════════════════
+     1. CONFIG & STORAGE KEYS
+  ══════════════════════════════════════════════════════════ */
+  var GL = {
+    VERSION:          "1.1",
+    APP_NAME:         "GigLega",
+    TAGLINE:          "Gurugram ka #1 Gig Platform",
+    FEE_RATE:         0.06,
 
-/* ── Auth helpers ── */
-function getCurrentUser() {
-  try {
-    var raw = localStorage.getItem(GL.STORAGE_KEY_USER);
-    if (!raw) return null;
-    var u = JSON.parse(raw);
-    return (u && u.id) ? u : null;
-  } catch (e) { return null; }
-}
+    // Storage keys — single source of truth
+    STORAGE_KEY_USER:   "gl_user",
+    STORAGE_KEY_USERS:  "gl_users",
+    STORAGE_KEY_GIGS:   "gl_gigs",
+    STORAGE_KEY_CHATS:  "gl_chats",
+    STORAGE_KEY_WALLET: "gl_wallet",
+    STORAGE_KEY_NOTIFS: "gl_notifs",
+    STORAGE_KEY_THEME:  "gl_theme",
 
-function safeLogout() {
-  localStorage.removeItem(GL.STORAGE_KEY_USER);
-  window.location.href = "index.html";
-}
+    // Nav links shown to everyone
+    PUBLIC_NAV: [
+      { label: "Browse Gigs",  href: "browse.html",     icon: "🔍" },
+      { label: "How It Works", href: "about.html",      icon: "💡" },
+      { label: "Enterprise",   href: "enterprise.html", icon: "🏢" }
+    ],
 
-function requireAuth(redirectPage) {
-  var user = getCurrentUser();
-  if (!user) {
-    var page = redirectPage || window.location.pathname.split("/").pop() || "index.html";
-    window.location.href = "login.html?redirect=" + encodeURIComponent(page);
-    return null;
-  }
-  return user;
-}
+    // Pages that require login — redirect if not authed
+    PROTECTED_PAGES: [
+      "post-gig.html", "gig-edit.html",
+      "dashboard.html", "dashboard-worker.html", "dashboard-client.html",
+      "chat.html", "profile.html", "wallet.html",
+      "notifications.html", "reviews.html"
+    ]
+  };
 
-/* ── Utility: escape HTML ── */
-function escHtml(str) {
-  return String(str || "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
-}
-
-/* ── Utility: time ago ── */
-function timeAgo(isoStr) {
-  var diff = Math.floor((Date.now() - new Date(isoStr).getTime()) / 1000);
-  if (diff < 60)    return diff + "s ago";
-  if (diff < 3600)  return Math.floor(diff / 60) + "m ago";
-  if (diff < 86400) return Math.floor(diff / 3600) + "h ago";
-  return Math.floor(diff / 86400) + "d ago";
-}
-
-/* ── Utility: URL param ── */
-function getParam(name) {
-  return new URLSearchParams(window.location.search).get(name);
-}
-
-/* ── Utility: current page name ── */
-function currentPage() {
-  return window.location.pathname.split("/").pop() || "index.html";
-}
+  // Expose GL globally
+  global.GL = GL;
 
 
-/* ══════════════════════════════════════════════════════════
-   TOAST NOTIFICATIONS
-   showToast(message, type)
-   type: "success" | "error" | "info" | "warning"
-══════════════════════════════════════════════════════════ */
-(function () {
-  var _style = document.createElement("style");
-  _style.textContent = [
-    "#toast-container{position:fixed;bottom:24px;right:24px;z-index:99999;display:flex;flex-direction:column;gap:10px;pointer-events:none}",
-    ".gl-toast{display:flex;align-items:center;gap:10px;padding:13px 18px;border-radius:12px;font-size:.88rem;font-weight:600;color:#fff;box-shadow:0 4px 20px rgba(0,0,0,.18);pointer-events:all;animation:toastIn .3s ease;max-width:320px;line-height:1.4}",
-    ".gl-toast.removing{animation:toastOut .3s ease forwards}",
-    ".gl-toast.success{background:linear-gradient(135deg,#059669,#0d9488)}",
-    ".gl-toast.error{background:linear-gradient(135deg,#dc2626,#b91c1c)}",
-    ".gl-toast.info{background:linear-gradient(135deg,#1a3c5e,#0d9488)}",
-    ".gl-toast.warning{background:linear-gradient(135deg,#b45309,#d97706)}",
-    ".gl-toast-close{margin-left:auto;background:none;border:none;color:rgba(255,255,255,.7);font-size:1rem;cursor:pointer;padding:0;line-height:1;flex-shrink:0}",
-    ".gl-toast-close:hover{color:#fff}",
-    "@keyframes toastIn{from{opacity:0;transform:translateY(12px) scale(.95)}to{opacity:1;transform:translateY(0) scale(1)}}",
-    "@keyframes toastOut{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(8px)}}"
-  ].join("");
-  document.head.appendChild(_style);
-})();
+  /* ══════════════════════════════════════════════════════════
+     2. AUTH HELPERS
+  ══════════════════════════════════════════════════════════ */
 
-function showToast(message, type, duration) {
-  type     = type     || "info";
-  duration = duration || 3500;
-
-  var container = document.getElementById("toast-container");
-  if (!container) {
-    container = document.createElement("div");
-    container.id = "toast-container";
-    document.body.appendChild(container);
+  /**
+   * getCurrentUser()
+   * Safe user read — checks localStorage only.
+   * Returns user object {id, name, email, ...} or null.
+   */
+  function getCurrentUser() {
+    try {
+      var raw = localStorage.getItem(GL.STORAGE_KEY_USER);
+      if (!raw) return null;
+      var u = JSON.parse(raw);
+      return (u && u.id) ? u : null;
+    } catch (e) { return null; }
   }
 
-  var icons = { success: "✅", error: "❌", info: "ℹ️", warning: "⚠️" };
+  /**
+   * setCurrentUser(user)
+   * Saves user to localStorage.
+   */
+  function setCurrentUser(user) {
+    try { localStorage.setItem(GL.STORAGE_KEY_USER, JSON.stringify(user)); }
+    catch (e) {}
+  }
 
-  var toast = document.createElement("div");
-  toast.className = "gl-toast " + type;
-  toast.innerHTML =
-    "<span>" + icons[type] + "</span>" +
-    "<span>" + escHtml(message) + "</span>" +
-    '<button class="gl-toast-close" aria-label="Close">✕</button>';
+  /**
+   * logoutUser()
+   * Clears session and redirects to index.
+   */
+  function logoutUser() {
+    localStorage.removeItem(GL.STORAGE_KEY_USER);
+    sessionStorage.removeItem(GL.STORAGE_KEY_USER);
+    showToast("👋 Logged out successfully.", "success");
+    setTimeout(function () { window.location.href = "index.html"; }, 900);
+  }
 
-  container.appendChild(toast);
+  /**
+   * requireAuth(redirectBack)
+   * Call at top of protected pages.
+   * If not logged in → shows error UI and returns null (NO redirect loop).
+   * Returns user object if logged in.
+   */
+  function requireAuth(redirectBack) {
+    var user = getCurrentUser();
+    if (!user) {
+      var page = redirectBack || (window.location.pathname.split("/").pop() || "index.html");
+      // Show a full-page auth wall instead of redirecting
+      document.addEventListener("DOMContentLoaded", function () {
+        var main = document.querySelector("main") || document.body;
+        var wall = document.createElement("div");
+        wall.style.cssText = "text-align:center;padding:80px 24px;";
+        wall.innerHTML =
+          '<div style="font-size:3rem;margin-bottom:16px">🔐</div>' +
+          '<h2 style="font-size:1.2rem;font-weight:800;color:var(--primary);margin-bottom:8px">Login Required</h2>' +
+          '<p style="font-size:.88rem;color:var(--gray-500);margin-bottom:24px;line-height:1.6">' +
+            'You need to be logged in to view this page.' +
+          '</p>' +
+          '<a href="login.html?redirect=' + encodeURIComponent(page) + '" ' +
+            'style="display:inline-block;padding:12px 28px;background:linear-gradient(135deg,var(--primary),var(--teal));' +
+            'color:#fff;border-radius:var(--radius-sm);font-weight:700;text-decoration:none;font-size:.9rem">' +
+            '→ Login to Continue' +
+          '</a>' +
+          '<p style="margin-top:14px;font-size:.82rem;color:var(--gray-400)">' +
+            'Don\'t have an account? <a href="signup.html" style="color:var(--teal);font-weight:600">Register free</a>' +
+          '</p>';
+        // Replace main content with wall
+        if (main.firstChild) {
+          main.innerHTML = "";
+          main.appendChild(wall);
+        } else {
+          main.appendChild(wall);
+        }
+      });
+      return null;
+    }
+    return user;
+  }
 
-  function remove() {
-    toast.classList.add("removing");
+  // Expose auth functions globally
+  global.getCurrentUser = getCurrentUser;
+  global.setCurrentUser = setCurrentUser;
+  global.logoutUser     = logoutUser;
+  global.requireAuth    = requireAuth;
+
+
+  /* ══════════════════════════════════════════════════════════
+     3. THEME (DARK / LIGHT)
+  ══════════════════════════════════════════════════════════ */
+
+  function getTheme() {
+    return localStorage.getItem(GL.STORAGE_KEY_THEME) || "light";
+  }
+
+  function applyTheme(theme) {
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem(GL.STORAGE_KEY_THEME, theme);
+    // Update toggle button if it exists
+    var btn = document.getElementById("themeToggle");
+    if (btn) btn.textContent = theme === "dark" ? "☀️" : "🌙";
+  }
+
+  function toggleTheme() {
+    applyTheme(getTheme() === "dark" ? "light" : "dark");
+  }
+
+  global.toggleTheme = toggleTheme;
+  global.applyTheme  = applyTheme;
+
+
+  /* ══════════════════════════════════════════════════════════
+     4. TOAST NOTIFICATIONS
+  ══════════════════════════════════════════════════════════ */
+
+  function showToast(message, type, duration) {
+    type     = type     || "info";
+    duration = duration || 3200;
+
+    var container = document.getElementById("toast-container");
+    if (!container) {
+      container = document.createElement("div");
+      container.id = "toast-container";
+      document.body.appendChild(container);
+    }
+
+    var icons = { success: "✅", error: "❌", warning: "⚠️", info: "ℹ️" };
+    var toast = document.createElement("div");
+    toast.className = "toast toast-" + type;
+    toast.innerHTML =
+      '<span class="toast-icon">' + (icons[type] || "ℹ️") + '</span>' +
+      '<span class="toast-msg">'  + escHtml(String(message)) + '</span>' +
+      '<button class="toast-close" aria-label="Close">✕</button>';
+
+    toast.querySelector(".toast-close").addEventListener("click", function () {
+      dismissToast(toast);
+    });
+
+    container.appendChild(toast);
+
+    // Animate in
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () { toast.classList.add("show"); });
+    });
+
+    // Auto dismiss
+    var timer = setTimeout(function () { dismissToast(toast); }, duration);
+    toast.dataset.timer = timer;
+  }
+
+  function dismissToast(toast) {
+    clearTimeout(toast.dataset.timer);
+    toast.classList.remove("show");
+    toast.classList.add("hide");
     setTimeout(function () {
       if (toast.parentNode) toast.parentNode.removeChild(toast);
-    }, 300);
+    }, 350);
   }
 
-  toast.querySelector(".gl-toast-close").addEventListener("click", remove);
-  setTimeout(remove, duration);
-}
+  global.showToast = showToast;
 
 
-/* ══════════════════════════════════════════════════════════
-   BREADCRUMB
-   buildBreadcrumb(elementId, items)
-   items: [{ label, href }] — last item has no href
-══════════════════════════════════════════════════════════ */
-(function () {
-  var _style = document.createElement("style");
-  _style.textContent = [
-    ".gl-breadcrumb{display:flex;align-items:center;flex-wrap:wrap;gap:4px;font-size:.78rem;color:var(--gray-400,#9ca3af);margin-bottom:20px;padding:0}",
-    ".gl-breadcrumb a{color:var(--teal,#0d9488);text-decoration:none;font-weight:600}",
-    ".gl-breadcrumb a:hover{text-decoration:underline}",
-    ".gl-breadcrumb .sep{opacity:.5}",
-    ".gl-breadcrumb .current{color:var(--gray-600,#4b5563);font-weight:600}"
-  ].join("");
-  document.head.appendChild(_style);
-})();
+  /* ══════════════════════════════════════════════════════════
+     5. ANNOUNCEMENT BAR
+  ══════════════════════════════════════════════════════════ */
 
-function buildBreadcrumb(elementId, items) {
-  var el = document.getElementById(elementId);
-  if (!el || !items || !items.length) return;
+  function renderAnnounceBar() {
+    var el = document.getElementById("announce-bar");
+    if (!el) return;
 
-  var html = items.map(function (item, i) {
-    var isLast = i === items.length - 1;
-    var part   = isLast
-      ? '<span class="current">' + escHtml(item.label) + '</span>'
-      : '<a href="' + escHtml(item.href) + '">' + escHtml(item.label) + '</a>';
-    return part + (isLast ? "" : '<span class="sep"> / </span>');
-  }).join("");
+    var msg = "🚀 GigLega v1.1 is live! Gurugram ke best gigs abhi browse karo.";
+    var dismissed = sessionStorage.getItem("gl_announce_dismissed");
+    if (dismissed) { el.style.display = "none"; return; }
 
-  el.innerHTML = '<nav class="gl-breadcrumb" aria-label="breadcrumb">' + html + '</nav>';
-}
+    el.className  = "announce-bar";
+    el.innerHTML  =
+      '<span>' + msg + '</span>' +
+      '<button class="announce-close" aria-label="Dismiss" id="announceClose">✕</button>';
 
-
-/* ══════════════════════════════════════════════════════════
-   PART 2 — DOM-DEPENDENT
-   Everything below needs HTML elements to exist.
-   Runs after DOMContentLoaded.
-══════════════════════════════════════════════════════════ */
-document.addEventListener("DOMContentLoaded", function () {
-
-  initTheme();
-  renderAnnounceBar();
-  renderNav();
-  renderFooter();
-
-});
-
-
-/* ══════════════════════════════════════════════════════════
-   DARK MODE
-══════════════════════════════════════════════════════════ */
-(function () {
-  /* Apply saved theme immediately — prevents flash */
-  var saved = localStorage.getItem("gl_theme") || "light";
-  document.documentElement.setAttribute("data-theme", saved);
-})();
-
-function initTheme() {
-  var saved = localStorage.getItem("gl_theme") || "light";
-  document.documentElement.setAttribute("data-theme", saved);
-}
-
-function toggleTheme() {
-  var current = document.documentElement.getAttribute("data-theme") || "light";
-  var next    = current === "dark" ? "light" : "dark";
-  document.documentElement.setAttribute("data-theme", next);
-  localStorage.setItem("gl_theme", next);
-  updateThemeBtn();
-}
-
-function updateThemeBtn() {
-  var btn = document.getElementById("themToggleBtn");
-  if (!btn) return;
-  var isDark = document.documentElement.getAttribute("data-theme") === "dark";
-  btn.textContent = isDark ? "☀️" : "🌙";
-  btn.setAttribute("aria-label", isDark ? "Switch to light mode" : "Switch to dark mode");
-  btn.title = isDark ? "Light mode" : "Dark mode";
-}
-
-
-/* ══════════════════════════════════════════════════════════
-   ANNOUNCE BAR
-══════════════════════════════════════════════════════════ */
-function renderAnnounceBar() {
-  var el = document.getElementById("announce-bar");
-  if (!el) return;
-
-  var msg = "🚀 GigLega Beta is LIVE in Gurugram! &nbsp;·&nbsp; Post or find gigs instantly &nbsp;·&nbsp; 6% support fee only on completion";
-
-  el.innerHTML = [
-    '<div class="announce-bar">',
-      '<span class="announce-text">' + msg + '</span>',
-      '<button class="announce-close" id="announceClose" aria-label="Close">✕</button>',
-    '</div>'
-  ].join("");
-
-  var style = document.createElement("style");
-  style.textContent = [
-    ".announce-bar{background:linear-gradient(90deg,var(--primary,#1a3c5e) 0%,var(--teal,#0d9488) 100%);color:#fff;text-align:center;padding:9px 48px 9px 16px;font-size:.8rem;font-weight:600;position:relative;line-height:1.5}",
-    ".announce-close{position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;color:rgba(255,255,255,.7);font-size:1rem;cursor:pointer;padding:4px;line-height:1}",
-    ".announce-close:hover{color:#fff}"
-  ].join("");
-  document.head.appendChild(style);
-
-  var closeBtn = document.getElementById("announceClose");
-  if (closeBtn) {
-    closeBtn.addEventListener("click", function () {
-      el.style.display = "none";
-      sessionStorage.setItem("gl_announce_closed", "1");
+    document.getElementById("announceClose").addEventListener("click", function () {
+      el.style.height = el.offsetHeight + "px";
+      requestAnimationFrame(function () {
+        el.style.transition = "height .3s, opacity .3s";
+        el.style.height  = "0";
+        el.style.opacity = "0";
+        setTimeout(function () { el.style.display = "none"; }, 320);
+      });
+      sessionStorage.setItem("gl_announce_dismissed", "1");
     });
   }
 
-  if (sessionStorage.getItem("gl_announce_closed") === "1") {
-    el.style.display = "none";
+
+  /* ══════════════════════════════════════════════════════════
+     6. NAVBAR
+  ══════════════════════════════════════════════════════════ */
+
+  function renderNav() {
+    var el = document.getElementById("main-nav");
+    if (!el) return;
+
+    var user      = getCurrentUser();
+    var theme     = getTheme();
+    var notifCount = getUnreadNotifCount();
+    var currentPage = window.location.pathname.split("/").pop() || "index.html";
+
+    // Build public nav links
+    var pubLinks = GL.PUBLIC_NAV.map(function (link) {
+      var active = (currentPage === link.href) ? " active" : "";
+      return '<a href="' + link.href + '" class="nav-link' + active + '">' +
+               link.icon + ' ' + link.label +
+             '</a>';
+    }).join("");
+
+    // Auth section
+    var authSection = "";
+    if (!user) {
+      authSection =
+        '<a href="login.html" class="btn btn-ghost nav-btn-login">Login</a>' +
+        '<a href="signup.html" class="btn btn-primary nav-btn-signup">Join Free →</a>';
+    } else {
+      var initials = (user.name || "U").split(" ").map(function (w) { return w[0]; }).join("").slice(0,2).toUpperCase();
+      var notifBadge = notifCount > 0
+        ? '<span class="nav-notif-badge">' + (notifCount > 9 ? "9+" : notifCount) + '</span>'
+        : "";
+
+      authSection =
+        '<a href="post-gig.html" class="btn btn-primary nav-post-btn">+ Post Gig</a>' +
+
+        '<div class="nav-user-menu" id="navUserMenu">' +
+          '<button class="nav-avatar-btn" id="navAvatarBtn" aria-expanded="false" aria-haspopup="true">' +
+            '<div class="nav-avatar">' + initials + '</div>' +
+            '<span class="nav-username">' + escHtml(user.name ? user.name.split(" ")[0] : "Me") + '</span>' +
+            notifBadge +
+            '<span class="nav-chevron">▾</span>' +
+          '</button>' +
+
+          '<div class="nav-dropdown" id="navDropdown" role="menu">' +
+            '<div class="nav-dropdown-header">' +
+              '<div class="nav-dropdown-name">' + escHtml(user.name || "User") + '</div>' +
+              '<div class="nav-dropdown-email">' + escHtml(user.email || user.phone || "") + '</div>' +
+            '</div>' +
+            '<div class="nav-dropdown-divider"></div>' +
+
+            dropdownItem("⚡", "Worker Dashboard", "dashboard-worker.html", currentPage) +
+            dropdownItem("📋", "Poster Dashboard",  "dashboard-client.html", currentPage) +
+            dropdownItem("👤", "My Profile",         "profile.html",          currentPage) +
+
+            '<div class="nav-dropdown-divider"></div>' +
+
+            dropdownItem("🔍", "Browse Gigs",  "browse.html",    currentPage) +
+            dropdownItem("➕", "Post a Gig",   "post-gig.html",  currentPage) +
+
+            '<div class="nav-dropdown-divider"></div>' +
+
+            dropdownItem("💰", "My Wallet",       "wallet.html",        currentPage) +
+            '<a href="notifications.html" class="nav-dd-item" role="menuitem">' +
+              '<span class="nav-dd-icon">🔔</span>' +
+              '<span>Notifications</span>' +
+              (notifCount > 0 ? '<span class="dd-badge">' + notifCount + '</span>' : '') +
+            '</a>' +
+            dropdownItem("⭐", "My Reviews",    "reviews.html",       currentPage) +
+            dropdownItem("❓", "Help Center",   "help-center.html",   currentPage) +
+
+            '<div class="nav-dropdown-divider"></div>' +
+            '<button class="nav-dd-item nav-dd-logout" id="navLogoutBtn" role="menuitem">' +
+              '<span class="nav-dd-icon">🚪</span><span>Logout</span>' +
+            '</button>' +
+          '</div>' +
+        '</div>';
+    }
+
+    el.className = "main-nav";
+    el.innerHTML =
+      '<div class="nav-inner">' +
+        '<a href="index.html" class="nav-logo" aria-label="GigLega Home">' +
+          'Gig<span>Lega</span>' +
+        '</a>' +
+
+        '<div class="nav-links" id="navLinks">' +
+          pubLinks +
+        '</div>' +
+
+        '<div class="nav-right">' +
+          '<button class="nav-icon-btn" id="themeToggle" aria-label="Toggle theme" title="Toggle theme">' +
+            (theme === "dark" ? "☀️" : "🌙") +
+          '</button>' +
+          authSection +
+        '</div>' +
+
+        '<button class="nav-hamburger" id="navHamburger" aria-label="Toggle menu" aria-expanded="false">' +
+          '<span></span><span></span><span></span>' +
+        '</button>' +
+      '</div>' +
+
+      /* Mobile menu */
+      '<div class="nav-mobile-menu" id="navMobileMenu" aria-hidden="true">' +
+        pubLinks +
+        '<div class="nav-mobile-divider"></div>' +
+        (user
+          ? '<a href="dashboard-worker.html" class="nav-mobile-link">⚡ Worker Dashboard</a>' +
+            '<a href="dashboard-client.html" class="nav-mobile-link">📋 Poster Dashboard</a>' +
+            '<a href="post-gig.html"         class="nav-mobile-link">➕ Post a Gig</a>' +
+            '<a href="profile.html"          class="nav-mobile-link">👤 My Profile</a>' +
+            '<a href="wallet.html"           class="nav-mobile-link">💰 My Wallet</a>' +
+            '<a href="notifications.html"    class="nav-mobile-link">🔔 Notifications' +
+              (notifCount > 0 ? ' <span class="dd-badge">' + notifCount + '</span>' : '') +
+            '</a>' +
+            '<div class="nav-mobile-divider"></div>' +
+            '<button class="nav-mobile-link nav-mobile-logout" id="mobileLogoutBtn">🚪 Logout</button>'
+          : '<a href="login.html"  class="nav-mobile-link">🔑 Login</a>' +
+            '<a href="signup.html" class="nav-mobile-link">✨ Register Free</a>'
+        ) +
+      '</div>';
+
+    bindNavEvents();
   }
-}
 
+  function dropdownItem(icon, label, href, currentPage) {
+    var active = (currentPage === href) ? ' style="background:rgba(13,148,136,.07);color:var(--teal)"' : "";
+    return '<a href="' + href + '" class="nav-dd-item" role="menuitem"' + active + '>' +
+             '<span class="nav-dd-icon">' + icon + '</span>' +
+             '<span>' + label + '</span>' +
+           '</a>';
+  }
 
-/* ══════════════════════════════════════════════════════════
-   NAVIGATION
-══════════════════════════════════════════════════════════ */
-(function () {
-  var _style = document.createElement("style");
-  _style.textContent = [
-    /* Nav base */
-    ".gl-nav{background:var(--surface,#fff);border-bottom:1.5px solid var(--gray-200,#e5e7eb);position:sticky;top:0;z-index:1000;box-shadow:0 1px 8px rgba(0,0,0,.06)}",
-    ".gl-nav-inner{max-width:1200px;margin:0 auto;padding:0 16px;display:flex;align-items:center;height:64px;gap:12px}",
-
-    /* Logo */
-    ".gl-logo{font-size:1.4rem;font-weight:900;color:var(--primary,#1a3c5e);text-decoration:none;letter-spacing:-1px;flex-shrink:0}",
-    ".gl-logo span{color:var(--teal,#0d9488)}",
-    ".gl-logo .badge-beta{font-size:.55rem;font-weight:800;background:var(--accent,#f59e0b);color:#fff;padding:2px 6px;border-radius:8px;vertical-align:super;letter-spacing:.3px;margin-left:3px}",
-
-    /* Desktop links */
-    ".gl-nav-links{display:flex;align-items:center;gap:2px;margin-left:16px}",
-    ".gl-nav-link{padding:8px 14px;border-radius:8px;font-size:.875rem;font-weight:600;color:var(--gray-600,#4b5563);text-decoration:none;transition:all .2s;white-space:nowrap}",
-    ".gl-nav-link:hover{background:var(--gray-50,#f9fafb);color:var(--primary,#1a3c5e)}",
-    ".gl-nav-link.active{background:rgba(13,148,136,.1);color:var(--teal,#0d9488)}",
-
-    /* Spacer */
-    ".gl-nav-spacer{flex:1}",
-
-    /* Right actions */
-    ".gl-nav-actions{display:flex;align-items:center;gap:8px}",
-
+  function bindNavEvents() {
     /* Theme toggle */
-    ".gl-theme-btn{background:none;border:1.5px solid var(--gray-200,#e5e7eb);border-radius:10px;width:38px;height:38px;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:all .2s;color:var(--gray-600,#4b5563);flex-shrink:0}",
-    ".gl-theme-btn:hover{border-color:var(--teal,#0d9488);color:var(--teal,#0d9488)}",
+    var themeBtn = document.getElementById("themeToggle");
+    if (themeBtn) {
+      themeBtn.addEventListener("click", function () {
+        toggleTheme();
+        // Re-render nav so moon/sun icon updates
+        renderNav();
+        renderFooter();
+      });
+    }
 
-    /* CTA buttons */
-    ".gl-btn-ghost{padding:8px 16px;border:1.5px solid var(--gray-200,#e5e7eb);border-radius:10px;font-size:.85rem;font-weight:700;color:var(--gray-600,#4b5563);background:transparent;cursor:pointer;text-decoration:none;transition:all .2s;white-space:nowrap}",
-    ".gl-btn-ghost:hover{border-color:var(--teal,#0d9488);color:var(--teal,#0d9488)}",
-    ".gl-btn-cta{padding:8px 18px;background:linear-gradient(135deg,var(--primary,#1a3c5e) 0%,var(--teal,#0d9488) 100%);color:#fff;border:none;border-radius:10px;font-size:.85rem;font-weight:700;cursor:pointer;text-decoration:none;transition:opacity .2s,transform .15s;white-space:nowrap}",
-    ".gl-btn-cta:hover{opacity:.88;transform:translateY(-1px)}",
+    /* Avatar dropdown */
+    var avatarBtn = document.getElementById("navAvatarBtn");
+    var dropdown  = document.getElementById("navDropdown");
+    if (avatarBtn && dropdown) {
+      avatarBtn.addEventListener("click", function (e) {
+        e.stopPropagation();
+        var isOpen = dropdown.classList.contains("open");
+        closeAllDropdowns();
+        if (!isOpen) {
+          dropdown.classList.add("open");
+          avatarBtn.setAttribute("aria-expanded", "true");
+        }
+      });
+    }
 
-    /* User menu */
-    ".gl-user-menu{position:relative}",
-    ".gl-user-trigger{display:flex;align-items:center;gap:8px;padding:6px 12px 6px 6px;border:1.5px solid var(--gray-200,#e5e7eb);border-radius:12px;background:var(--surface,#fff);cursor:pointer;transition:border .2s;font-size:.85rem;font-weight:600;color:var(--gray-700,#374151)}",
-    ".gl-user-trigger:hover{border-color:var(--teal,#0d9488)}",
-    ".gl-user-avatar{width:30px;height:30px;border-radius:50%;background:var(--primary,#1a3c5e);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;overflow:hidden;flex-shrink:0}",
-    ".gl-user-avatar img{width:100%;height:100%;object-fit:cover}",
-    ".gl-user-name{max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}",
+    /* Close dropdown on outside click */
+    document.addEventListener("click", function () { closeAllDropdowns(); });
+    if (dropdown) dropdown.addEventListener("click", function (e) { e.stopPropagation(); });
 
-    /* Dropdown */
-    ".gl-dropdown{position:absolute;top:calc(100% + 8px);right:0;background:var(--surface,#fff);border:1.5px solid var(--gray-200,#e5e7eb);border-radius:14px;box-shadow:0 8px 30px rgba(0,0,0,.12);min-width:200px;z-index:1001;overflow:hidden;display:none}",
-    ".gl-dropdown.open{display:block;animation:ddIn .18s ease}",
-    "@keyframes ddIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}",
-    ".gl-dd-header{padding:14px 16px;border-bottom:1px solid var(--gray-100,#f3f4f6)}",
-    ".gl-dd-name{font-size:.9rem;font-weight:700;color:var(--primary,#1a3c5e)}",
-    ".gl-dd-email{font-size:.75rem;color:var(--gray-400,#9ca3af);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}",
-    ".gl-dd-item{display:flex;align-items:center;gap:10px;padding:11px 16px;font-size:.85rem;font-weight:600;color:var(--gray-700,#374151);text-decoration:none;cursor:pointer;transition:background .15s;border:none;background:none;width:100%;text-align:left}",
-    ".gl-dd-item:hover{background:var(--gray-50,#f9fafb);color:var(--primary,#1a3c5e)}",
-    ".gl-dd-item.danger{color:var(--danger,#ef4444)}",
-    ".gl-dd-item.danger:hover{background:rgba(239,68,68,.06)}",
-    ".gl-dd-divider{height:1px;background:var(--gray-100,#f3f4f6);margin:4px 0}",
+    /* Logout buttons */
+    var logoutBtn = document.getElementById("navLogoutBtn");
+    if (logoutBtn) logoutBtn.addEventListener("click", logoutUser);
+    var mobileLogout = document.getElementById("mobileLogoutBtn");
+    if (mobileLogout) mobileLogout.addEventListener("click", logoutUser);
 
     /* Hamburger */
-    ".gl-hamburger{display:none;flex-direction:column;justify-content:center;gap:5px;width:38px;height:38px;border:1.5px solid var(--gray-200,#e5e7eb);border-radius:10px;background:none;cursor:pointer;padding:8px;flex-shrink:0}",
-    ".gl-hamburger span{display:block;height:2px;background:var(--gray-600,#4b5563);border-radius:1px;transition:all .25s}",
-    ".gl-hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}",
-    ".gl-hamburger.open span:nth-child(2){opacity:0;transform:scaleX(0)}",
-    ".gl-hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}",
+    var hamburger  = document.getElementById("navHamburger");
+    var mobileMenu = document.getElementById("navMobileMenu");
+    if (hamburger && mobileMenu) {
+      hamburger.addEventListener("click", function (e) {
+        e.stopPropagation();
+        var isOpen = mobileMenu.classList.contains("open");
+        mobileMenu.classList.toggle("open", !isOpen);
+        hamburger.classList.toggle("open", !isOpen);
+        hamburger.setAttribute("aria-expanded", String(!isOpen));
+        mobileMenu.setAttribute("aria-hidden", String(isOpen));
+      });
+      /* Close mobile menu on outside click */
+      document.addEventListener("click", function () {
+        mobileMenu.classList.remove("open");
+        hamburger.classList.remove("open");
+        hamburger.setAttribute("aria-expanded", "false");
+        mobileMenu.setAttribute("aria-hidden", "true");
+      });
+      mobileMenu.addEventListener("click", function (e) { e.stopPropagation(); });
+    }
+  }
 
-    /* Mobile drawer */
-    ".gl-mobile-menu{display:none;flex-direction:column;border-top:1.5px solid var(--gray-200,#e5e7eb);background:var(--surface,#fff);padding:12px 16px 16px}",
-    ".gl-mobile-menu.open{display:flex}",
-    ".gl-mobile-link{padding:11px 14px;border-radius:10px;font-size:.9rem;font-weight:600;color:var(--gray-700,#374151);text-decoration:none;transition:background .15s;border:none;background:none;cursor:pointer;text-align:left;width:100%}",
-    ".gl-mobile-link:hover{background:var(--gray-50,#f9fafb);color:var(--primary,#1a3c5e)}",
-    ".gl-mobile-link.active{color:var(--teal,#0d9488);background:rgba(13,148,136,.08)}",
-    ".gl-mobile-divider{height:1px;background:var(--gray-200,#e5e7eb);margin:8px 0}",
-    ".gl-mobile-actions{display:flex;gap:8px;margin-top:8px}",
-    ".gl-mobile-actions .gl-btn-ghost,.gl-mobile-actions .gl-btn-cta{flex:1;text-align:center;padding:10px}",
+  function closeAllDropdowns() {
+    var dropdown  = document.getElementById("navDropdown");
+    var avatarBtn = document.getElementById("navAvatarBtn");
+    if (dropdown)  dropdown.classList.remove("open");
+    if (avatarBtn) avatarBtn.setAttribute("aria-expanded", "false");
+  }
 
-    /* Dark mode nav overrides */
-    "[data-theme=dark] .gl-nav{background:var(--gray-900,#111827);border-color:var(--gray-700,#374151)}",
-    "[data-theme=dark] .gl-dropdown{background:var(--gray-900,#111827);border-color:var(--gray-700,#374151)}",
-    "[data-theme=dark] .gl-dd-header{border-color:var(--gray-700,#374151)}",
-    "[data-theme=dark] .gl-dd-item:hover{background:var(--gray-800,#1f2937)}",
-    "[data-theme=dark] .gl-dd-divider{background:var(--gray-700,#374151)}",
-    "[data-theme=dark] .gl-user-trigger{background:var(--gray-900,#111827);border-color:var(--gray-700,#374151);color:var(--gray-200,#e5e7eb)}",
-    "[data-theme=dark] .gl-mobile-menu{background:var(--gray-900,#111827);border-color:var(--gray-700,#374151)}",
-    "[data-theme=dark] .gl-nav-link:hover{background:var(--gray-800,#1f2937)}",
-    "[data-theme=dark] .gl-mobile-link:hover{background:var(--gray-800,#1f2937)}",
-    "[data-theme=dark] .gl-theme-btn{border-color:var(--gray-600,#4b5563);color:var(--gray-300,#d1d5db)}",
-    "[data-theme=dark] .gl-btn-ghost{border-color:var(--gray-600,#4b5563);color:var(--gray-300,#d1d5db)}",
 
-    /* Responsive */
-    "@media(max-width:768px){.gl-nav-links{display:none}.gl-hamburger{display:flex}.gl-user-name{display:none}}"
-  ].join("");
-  document.head.appendChild(_style);
-})();
+  /* ══════════════════════════════════════════════════════════
+     7. FOOTER
+  ══════════════════════════════════════════════════════════ */
 
-function renderNav() {
-  var el = document.getElementById("main-nav");
-  if (!el) return;
+  function renderFooter() {
+    var el = document.getElementById("main-footer");
+    if (!el) return;
 
-  var user    = getCurrentUser();
-  var page    = currentPage();
-  var isDark  = document.documentElement.getAttribute("data-theme") === "dark";
+    el.className = "main-footer";
+    el.innerHTML =
+      '<div class="footer-inner">' +
 
-  var navLinks = [
-    { label: "Browse Gigs",  href: "browse.html" },
-    { label: "Post a Gig",   href: "post-gig.html" },
-    { label: "How It Works", href: "about.html" },
-    { label: "Enterprise",   href: "enterprise.html" }
-  ];
-
-  /* Desktop nav links */
-  var linksHtml = navLinks.map(function (l) {
-    var active = page === l.href ? " active" : "";
-    return '<a href="' + l.href + '" class="gl-nav-link' + active + '">' + l.label + '</a>';
-  }).join("");
-
-  /* Mobile nav links */
-  var mobileLinksHtml = navLinks.map(function (l) {
-    var active = page === l.href ? " active" : "";
-    return '<a href="' + l.href + '" class="gl-mobile-link' + active + '">' + l.label + '</a>';
-  }).join("");
-
-  /* Right actions — logged in vs logged out */
-  var rightHtml = "";
-  var mobileActionsHtml = "";
-
-  if (user) {
-    /* Avatar initials or photo */
-    var initials = (user.name || "GL").split(" ").map(function (w) { return w[0]; }).join("").slice(0, 2).toUpperCase();
-    var avatarInner = user.avatar
-      ? '<img src="' + user.avatar + '" alt="avatar" />'
-      : initials;
-
-    var firstName  = (user.name || "User").split(" ")[0];
-    var emailOrPh  = user.email || user.phone || "";
-
-    rightHtml =
-      '<div class="gl-user-menu" id="userMenu">' +
-        '<button class="gl-user-trigger" id="userTrigger" aria-haspopup="true" aria-expanded="false">' +
-          '<div class="gl-user-avatar">' + avatarInner + '</div>' +
-          '<span class="gl-user-name">' + escHtml(firstName) + '</span>' +
-          '<span>▾</span>' +
-        '</button>' +
-        '<div class="gl-dropdown" id="userDropdown" role="menu">' +
-          '<div class="gl-dd-header">' +
-            '<div class="gl-dd-name">' + escHtml(user.name || "User") + '</div>' +
-            '<div class="gl-dd-email">' + escHtml(emailOrPh) + '</div>' +
-          '</div>' +
-          '<a href="dashboard-worker.html" class="gl-dd-item" role="menuitem">⚡ Worker Dashboard</a>' +
-          '<a href="dashboard-client.html" class="gl-dd-item" role="menuitem">📋 Poster Dashboard</a>' +
-          '<a href="profile.html" class="gl-dd-item" role="menuitem">👤 My Profile</a>' +
-          '<div class="gl-dd-divider"></div>' +
-          '<a href="browse.html" class="gl-dd-item" role="menuitem">🔍 Browse Gigs</a>' +
-          '<a href="post-gig.html" class="gl-dd-item" role="menuitem">➕ Post a Gig</a>' +
-          '<div class="gl-dd-divider"></div>' +
-          '<a href="wallet.html" class="gl-dd-item" role="menuitem">💰 My Wallet</a>' +
-         '<a href="notifications.html" class="gl-dd-item" role="menuitem">🔔 Notifications</a>' +
-         '<a href="reviews.html" class="gl-dd-item" role="menuitem">⭐ My Reviews</a>' +
-         '<a href="help-center.html" class="gl-dd-item" role="menuitem">❓ Help Center</a>' +
-          '<button class="gl-dd-item danger" id="ddLogout" role="menuitem">🚪 Logout</button>' +
+        '<div class="footer-brand">' +
+          '<a href="index.html" class="footer-logo">Gig<span>Lega</span></a>' +
+          '<p class="footer-tagline">' + GL.TAGLINE + '</p>' +
+          '<p class="footer-city">📍 Gurugram, Haryana</p>' +
         '</div>' +
-      '</div>';
 
-    mobileActionsHtml =
-      '<div class="gl-mobile-divider"></div>' +
-      '<a href="dashboard-worker.html" class="gl-mobile-link">⚡ Worker Dashboard</a>' +
-      '<a href="dashboard-client.html" class="gl-mobile-link">📋 Poster Dashboard</a>' +
-      '<a href="profile.html" class="gl-mobile-link">👤 My Profile</a>' +
-'<a href="wallet.html" class="gl-mobile-link">💰 My Wallet</a>' +
-'<a href="notifications.html" class="gl-mobile-link">🔔 Notifications</a>' +
-'<a href="reviews.html" class="gl-mobile-link">⭐ My Reviews</a>' +
-'<div class="gl-mobile-divider"></div>' +
-'<button class="gl-mobile-link" id="mobileLogout" style="color:var(--danger)">🚪 Logout</button>';
-  } else {
-    rightHtml =
-      '<a href="login.html" class="gl-btn-ghost">Login</a>' +
-      '<a href="login.html?tab=register" class="gl-btn-cta">Register Free →</a>';
-
-    mobileActionsHtml =
-      '<div class="gl-mobile-divider"></div>' +
-      '<div class="gl-mobile-actions">' +
-        '<a href="login.html" class="gl-btn-ghost">Login</a>' +
-        '<a href="login.html?tab=register" class="gl-btn-cta">Register Free →</a>' +
-      '</div>';
-  }
-
-  el.innerHTML =
-    '<div class="gl-nav">' +
-      '<div class="gl-nav-inner">' +
-        '<a href="index.html" class="gl-logo">Gig<span>Lega</span><span class="badge-beta">BETA</span></a>' +
-        '<nav class="gl-nav-links" aria-label="Main navigation">' + linksHtml + '</nav>' +
-        '<div class="gl-nav-spacer"></div>' +
-        '<div class="gl-nav-actions">' +
-          '<button class="gl-theme-btn" id="themToggleBtn" aria-label="Toggle theme">' + (isDark ? "☀️" : "🌙") + '</button>' +
-          rightHtml +
-          '<button class="gl-hamburger" id="hamburger" aria-label="Open menu" aria-expanded="false">' +
-            '<span></span><span></span><span></span>' +
-          '</button>' +
-        '</div>' +
-      '</div>' +
-      '<div class="gl-mobile-menu" id="mobileMenu">' +
-        mobileLinksHtml +
-        mobileActionsHtml +
-      '</div>' +
-    '</div>';
-
-  /* ── Theme toggle ── */
-  document.getElementById("themToggleBtn").addEventListener("click", function () {
-    toggleTheme();
-  });
-
-  /* ── User dropdown ── */
-  var userTrigger  = document.getElementById("userTrigger");
-  var userDropdown = document.getElementById("userDropdown");
-  if (userTrigger && userDropdown) {
-    userTrigger.addEventListener("click", function (e) {
-      e.stopPropagation();
-      var isOpen = userDropdown.classList.toggle("open");
-      userTrigger.setAttribute("aria-expanded", isOpen);
-    });
-    document.addEventListener("click", function () {
-      userDropdown.classList.remove("open");
-      if (userTrigger) userTrigger.setAttribute("aria-expanded", "false");
-    });
-    userDropdown.addEventListener("click", function (e) { e.stopPropagation(); });
-  }
-
-  /* ── Logout buttons ── */
-  var ddLogout = document.getElementById("ddLogout");
-  if (ddLogout) ddLogout.addEventListener("click", function () {
-    if (confirm("Are you sure you want to log out?")) safeLogout();
-  });
-
-  var mobileLogout = document.getElementById("mobileLogout");
-  if (mobileLogout) mobileLogout.addEventListener("click", function () {
-    if (confirm("Are you sure you want to log out?")) safeLogout();
-  });
-
-  /* ── Hamburger ── */
-  var hamburger  = document.getElementById("hamburger");
-  var mobileMenu = document.getElementById("mobileMenu");
-  if (hamburger && mobileMenu) {
-    hamburger.addEventListener("click", function () {
-      var isOpen = mobileMenu.classList.toggle("open");
-      hamburger.classList.toggle("open", isOpen);
-      hamburger.setAttribute("aria-expanded", isOpen);
-    });
-  }
-
-  /* ── Handle register tab param ── */
-  if (page === "login.html" && getParam("tab") === "register") {
-    var regTab = document.querySelector('[data-tab="register"]');
-    if (regTab) regTab.click();
-  }
-}
-
-
-/* ══════════════════════════════════════════════════════════
-   FOOTER
-══════════════════════════════════════════════════════════ */
-(function () {
-  var _style = document.createElement("style");
-  _style.textContent = [
-    ".gl-footer{background:var(--primary,#1a3c5e);color:#fff;padding:48px 16px 24px;margin-top:auto}",
-    ".gl-footer-inner{max-width:1200px;margin:0 auto}",
-    ".gl-footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;margin-bottom:40px}",
-    "@media(max-width:768px){.gl-footer-grid{grid-template-columns:1fr 1fr;gap:28px}}",
-    "@media(max-width:480px){.gl-footer-grid{grid-template-columns:1fr}}",
-
-    ".gl-footer-brand .logo{font-size:1.4rem;font-weight:900;letter-spacing:-1px;margin-bottom:10px}",
-    ".gl-footer-brand .logo span{color:var(--teal,#0d9488)}",
-    ".gl-footer-brand p{font-size:.83rem;color:rgba(255,255,255,.6);line-height:1.7;max-width:240px;margin-bottom:16px}",
-    ".gl-footer-contact{display:flex;flex-direction:column;gap:6px}",
-    ".gl-footer-contact a{font-size:.8rem;color:rgba(255,255,255,.65);text-decoration:none;display:flex;align-items:center;gap:6px;transition:color .2s}",
-    ".gl-footer-contact a:hover{color:#fff}",
-
-    ".gl-footer-col h4{font-size:.82rem;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:rgba(255,255,255,.5);margin-bottom:14px}",
-    ".gl-footer-col a{display:block;font-size:.85rem;color:rgba(255,255,255,.7);text-decoration:none;margin-bottom:8px;transition:color .2s}",
-    ".gl-footer-col a:hover{color:#fff}",
-
-    ".gl-footer-bottom{border-top:1px solid rgba(255,255,255,.12);padding-top:20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}",
-    ".gl-footer-bottom-left{font-size:.78rem;color:rgba(255,255,255,.45);line-height:1.6}",
-    ".gl-footer-bottom-right{display:flex;gap:16px}",
-    ".gl-footer-bottom-right a{font-size:.78rem;color:rgba(255,255,255,.5);text-decoration:none;transition:color .2s}",
-    ".gl-footer-bottom-right a:hover{color:#fff}",
-
-    ".gl-footer-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.1);padding:6px 12px;border-radius:8px;font-size:.75rem;color:rgba(255,255,255,.7);margin-top:6px}"
-  ].join("");
-  document.head.appendChild(_style);
-})();
-
-function renderFooter() {
-  var el = document.getElementById("main-footer");
-  if (!el) return;
-
-  var year = new Date().getFullYear();
-
-  el.innerHTML =
-    '<footer class="gl-footer">' +
-      '<div class="gl-footer-inner">' +
-        '<div class="gl-footer-grid">' +
-
-          /* Brand col */
-          '<div class="gl-footer-brand">' +
-            '<div class="logo">Gig<span>Lega</span></div>' +
-            '<p>Gurugram ka #1 hyperlocal & remote gig platform. Bachelors, students, and professionals — karo kaam, kamao daam.</p>' +
-            '<div class="gl-footer-contact">' +
-              '<a href="mailto:Giglega.official@gmail.com">📧 Giglega.official@gmail.com</a>' +
-              '<a href="tel:+919319635257">📱 +91 9319635257</a>' +
-              '<a href="#">📍 Gurugram, Haryana — 122017</a>' +
-            '</div>' +
-            '<div class="gl-footer-badge">🚀 Beta v1.0 — Launching 2026</div>' +
-          '</div>' +
-
-          /* For Workers col */
-          '<div class="gl-footer-col">' +
-            '<h4>For Workers</h4>' +
+        '<div class="footer-links">' +
+          '<div class="footer-col">' +
+            '<div class="footer-col-title">Platform</div>' +
             '<a href="browse.html">Browse Gigs</a>' +
-            '<a href="dashboard-worker.html">My Dashboard</a>' +
-            '<a href="profile.html">My Profile</a>' +
-            '<a href="trust-safety.html">Trust & Safety</a>' +
-            '<a href="help-center.html">Help Center</a>' +
-            '<a href="index.html#faq">FAQ</a>' +
-          '</div>' +
-
-          /* For Posters col */
-          '<div class="gl-footer-col">' +
-            '<h4>For Posters</h4>' +
             '<a href="post-gig.html">Post a Gig</a>' +
-            '<a href="dashboard-client.html">My Posted Gigs</a>' +
+            '<a href="dashboard-worker.html">Worker Dashboard</a>' +
+            '<a href="dashboard-client.html">Poster Dashboard</a>' +
+          '</div>' +
+          '<div class="footer-col">' +
+            '<div class="footer-col-title">Company</div>' +
+            '<a href="about.html">About Us</a>' +
             '<a href="enterprise.html">Enterprise</a>' +
-            '<a href="trust-safety.html">Safety Tips</a>' +
-            '<a href="index.html#faq">FAQ</a>' +
-          '</div>' +
-
-          /* Company col */
-          '<div class="gl-footer-col">' +
-            '<h4>Company</h4>' +
-            '<a href="about.html">About GigLega</a>' +
-            '<a href="contact.html">Contact Us</a>' +
-            '<a href="terms.html">Terms of Service</a>' +
-            '<a href="privacy-policy.html">Privacy Policy</a>' +
             '<a href="trust-safety.html">Trust & Safety</a>' +
-          '</div>' +
-
-        '</div>' +
-
-        '<div class="gl-footer-bottom">' +
-          '<div class="gl-footer-bottom-left">' +
-            '© ' + year + ' GigLega. All rights reserved. &nbsp;·&nbsp; Made with ❤️ in Gurugram, India' +
-          '</div>' +
-          '<div class="gl-footer-bottom-right">' +
-            '<a href="terms.html">Terms</a>' +
-            '<a href="privacy-policy.html">Privacy</a>' +
             '<a href="contact.html">Contact</a>' +
           '</div>' +
+          '<div class="footer-col">' +
+            '<div class="footer-col-title">Support</div>' +
+            '<a href="help-center.html">Help Center</a>' +
+            '<a href="privacy-policy.html">Privacy Policy</a>' +
+            '<a href="terms.html">Terms of Service</a>' +
+            '<a href="sitemap.xml">Sitemap</a>' +
+          '</div>' +
         '</div>' +
 
       '</div>' +
-    '</footer>';
-   /* ── PWA: Register Service Worker ── */
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", function () {
-    navigator.serviceWorker.register("/service-worker.js")
-      .then(function (reg) {
-        console.log("[GigLega] SW registered:", reg.scope);
-      })
-      .catch(function (err) {
-        console.warn("[GigLega] SW failed:", err);
-      });
-  });
-}
 
-/* ── PWA: Install prompt ── */
-var deferredPrompt = null;
-window.addEventListener("beforeinstallprompt", function (e) {
-  e.preventDefault();
-  deferredPrompt = e;
-
-  /* Show "Install App" button if it exists on the page */
-  var installBtn = document.getElementById("btnInstallApp");
-  if (installBtn) {
-    installBtn.style.display = "inline-flex";
-    installBtn.addEventListener("click", function () {
-      deferredPrompt.prompt();
-      deferredPrompt.userChoice.then(function (result) {
-        if (result.outcome === "accepted") {
-          if (typeof showToast === "function") showToast("🎉 GigLega installed!", "success");
-        }
-        deferredPrompt = null;
-        installBtn.style.display = "none";
-      });
-    });
+      '<div class="footer-bottom">' +
+        '<span>© ' + new Date().getFullYear() + ' GigLega. All rights reserved.</span>' +
+        '<span>Made with ❤️ in Gurugram</span>' +
+      '</div>';
   }
-});
-}
+
+
+  /* ══════════════════════════════════════════════════════════
+     8. BREADCRUMB
+  ══════════════════════════════════════════════════════════ */
+
+  /**
+   * buildBreadcrumb(elementId, items)
+   * items = [{label, href}, ..., {label}]  ← last item has no href (current page)
+   */
+  function buildBreadcrumb(elementId, items) {
+    var el = document.getElementById(elementId);
+    if (!el || !items || !items.length) return;
+
+    el.className = "breadcrumb";
+    var html = '<ol class="breadcrumb-list" itemscope itemtype="https://schema.org/BreadcrumbList">';
+    items.forEach(function (item, i) {
+      var isLast = i === items.length - 1;
+      html +=
+        '<li class="breadcrumb-item' + (isLast ? " active" : "") + '" ' +
+          'itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">' +
+          (isLast
+            ? '<span itemprop="name">' + escHtml(item.label) + '</span>'
+            : '<a href="' + item.href + '" itemprop="item"><span itemprop="name">' + escHtml(item.label) + '</span></a>' +
+              '<span class="breadcrumb-sep" aria-hidden="true">›</span>'
+          ) +
+          '<meta itemprop="position" content="' + (i + 1) + '" />' +
+        '</li>';
+    });
+    html += '</ol>';
+    el.innerHTML = html;
+  }
+
+  global.buildBreadcrumb = buildBreadcrumb;
+
+
+  /* ══════════════════════════════════════════════════════════
+     9. NOTIFICATIONS HELPER
+  ══════════════════════════════════════════════════════════ */
+
+  function getNotifs() {
+    try { return JSON.parse(localStorage.getItem(GL.STORAGE_KEY_NOTIFS) || "[]"); }
+    catch (e) { return []; }
+  }
+
+  function getUnreadNotifCount() {
+    return getNotifs().filter(function (n) { return !n.read; }).length;
+  }
+
+  function pushNotif(notif) {
+    var notifs = getNotifs();
+    notifs.unshift({
+      id:        "notif_" + Date.now(),
+      read:      false,
+      createdAt: new Date().toISOString(),
+      icon:      notif.icon  || "🔔",
+      title:     notif.title || "Notification",
+      body:      notif.body  || "",
+      href:      notif.href  || null
+    });
+    // Keep max 50
+    if (notifs.length > 50) notifs = notifs.slice(0, 50);
+    try { localStorage.setItem(GL.STORAGE_KEY_NOTIFS, JSON.stringify(notifs)); }
+    catch (e) {}
+  }
+
+  global.getNotifs          = getNotifs;
+  global.getUnreadNotifCount = getUnreadNotifCount;
+  global.pushNotif           = pushNotif;
+
+
+  /* ══════════════════════════════════════════════════════════
+     10. UTILITY HELPERS
+  ══════════════════════════════════════════════════════════ */
+
+  function escHtml(str) {
+    return String(str || "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  function timeAgo(isoStr) {
+    var diff = Math.floor((Date.now() - new Date(isoStr).getTime()) / 1000);
+    if (diff < 60)    return diff + "s ago";
+    if (diff < 3600)  return Math.floor(diff / 60) + "m ago";
+    if (diff < 86400) return Math.floor(diff / 3600) + "h ago";
+    return Math.floor(diff / 86400) + "d ago";
+  }
+
+  function getParam(name) {
+    return new URLSearchParams(window.location.search).get(name);
+  }
+
+  function formatCurrency(amount) {
+    return "₹" + Number(amount || 0).toLocaleString("en-IN");
+  }
+
+  function generateId(prefix) {
+    return (prefix || "id") + "_" + Date.now() + "_" + Math.random().toString(36).slice(2, 7);
+  }
+
+  // Expose utilities
+  global.escHtml        = escHtml;
+  global.timeAgo        = timeAgo;
+  global.getParam       = getParam;
+  global.formatCurrency = formatCurrency;
+  global.generateId     = generateId;
+
+
+  /* ══════════════════════════════════════════════════════════
+     11. PAGE LOADER
+  ══════════════════════════════════════════════════════════ */
+
+  function showPageLoader() {
+    var loader = document.getElementById("page-loader");
+    if (loader) loader.classList.add("show");
+  }
+
+  function hidePageLoader() {
+    var loader = document.getElementById("page-loader");
+    if (loader) {
+      setTimeout(function () {
+        loader.classList.remove("show");
+        loader.classList.add("hide");
+      }, 200);
+    }
+  }
+
+  global.showPageLoader = showPageLoader;
+  global.hidePageLoader = hidePageLoader;
+
+
+  /* ══════════════════════════════════════════════════════════
+     12. AUTO-INIT ON DOM READY
+  ══════════════════════════════════════════════════════════ */
+
+  function init() {
+    // Apply saved theme immediately (prevents flash)
+    applyTheme(getTheme());
+
+    // Render shared components
+    renderAnnounceBar();
+    renderNav();
+    renderFooter();
+
+    // Hide page loader when page is ready
+    hidePageLoader();
+
+    // Add toast styles if not already in CSS
+    injectToastStyles();
+  }
+
+  // Run as soon as DOM is ready
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
+
+
+  /* ══════════════════════════════════════════════════════════
+     13. INJECT TOAST + NAV STYLES (self-contained)
+  ══════════════════════════════════════════════════════════ */
+
+  function injectToastStyles() {
+    if (document.getElementById("gl-shared-styles")) return;
+    var style = document.createElement("style");
+    style.id  = "gl-shared-styles";
+    style.textContent = [
+
+      /* ── Toast ── */
+      "#toast-container{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:10px;pointer-events:none}",
+      ".toast{display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:10px;background:var(--surface);border:1.5px solid var(--gray-200);box-shadow:0 8px 24px rgba(0,0,0,.12);font-size:.88rem;font-weight:600;color:var(--text);min-width:260px;max-width:360px;pointer-events:all;opacity:0;transform:translateY(12px);transition:opacity .3s,transform .3s}",
+      ".toast.show{opacity:1;transform:translateY(0)}",
+      ".toast.hide{opacity:0;transform:translateY(12px)}",
+      ".toast-success{border-color:rgba(16,185,129,.4);background:rgba(16,185,129,.06)}",
+      ".toast-error{border-color:rgba(239,68,68,.4);background:rgba(239,68,68,.06)}",
+      ".toast-warning{border-color:rgba(245,158,11,.4);background:rgba(245,158,11,.06)}",
+      ".toast-info{border-color:rgba(99,102,241,.4);background:rgba(99,102,241,.06)}",
+      ".toast-icon{font-size:1rem;flex-shrink:0}",
+      ".toast-msg{flex:1;line-height:1.4}",
+      ".toast-close{background:none;border:none;cursor:pointer;color:var(--gray-400);font-size:.9rem;padding:2px 4px;line-height:1;margin-left:4px}",
+      ".toast-close:hover{color:var(--gray-700)}",
+
+      /* ── Announce bar ── */
+      ".announce-bar{background:linear-gradient(90deg,var(--primary) 0%,var(--teal) 100%);color:#fff;text-align:center;padding:9px 40px;font-size:.82rem;font-weight:600;position:relative;overflow:hidden}",
+      ".announce-close{position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;color:rgba(255,255,255,.75);font-size:1rem;cursor:pointer;padding:4px;line-height:1}",
+      ".announce-close:hover{color:#fff}",
+
+      /* ── Navbar ── */
+      ".main-nav{background:var(--surface);border-bottom:1.5px solid var(--gray-200);position:sticky;top:0;z-index:1000;box-shadow:0 2px 12px rgba(0,0,0,.06)}",
+      ".nav-inner{max-width:1200px;margin:0 auto;padding:0 20px;height:62px;display:flex;align-items:center;gap:20px}",
+      ".nav-logo{font-size:1.4rem;font-weight:900;letter-spacing:-1px;color:var(--primary);text-decoration:none;flex-shrink:0}",
+      ".nav-logo span{color:var(--teal)}",
+      ".nav-links{display:flex;align-items:center;gap:4px;flex:1}",
+      ".nav-link{padding:8px 12px;border-radius:8px;font-size:.86rem;font-weight:600;color:var(--gray-600);text-decoration:none;transition:all .2s;white-space:nowrap}",
+      ".nav-link:hover,.nav-link.active{color:var(--primary);background:rgba(26,60,94,.06)}",
+      ".nav-right{display:flex;align-items:center;gap:10px;flex-shrink:0}",
+      ".nav-icon-btn{background:none;border:1.5px solid var(--gray-200);border-radius:8px;width:36px;height:36px;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:all .2s}",
+      ".nav-icon-btn:hover{border-color:var(--teal)}",
+      ".nav-btn-login{font-size:.86rem;padding:8px 16px}",
+      ".nav-btn-signup{font-size:.86rem;padding:8px 16px}",
+      ".nav-post-btn{font-size:.84rem;padding:8px 16px;white-space:nowrap}",
+
+      /* Avatar button */
+      ".nav-user-menu{position:relative}",
+      ".nav-avatar-btn{display:flex;align-items:center;gap:8px;background:none;border:1.5px solid var(--gray-200);border-radius:10px;padding:6px 12px 6px 6px;cursor:pointer;transition:all .2s;color:var(--text)}",
+      ".nav-avatar-btn:hover{border-color:var(--teal)}",
+      ".nav-avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--teal));color:#fff;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:800;flex-shrink:0}",
+      ".nav-username{font-size:.84rem;font-weight:700;color:var(--text);max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}",
+      ".nav-chevron{font-size:.7rem;color:var(--gray-400);transition:transform .2s}",
+      ".nav-avatar-btn[aria-expanded=true] .nav-chevron{transform:rotate(180deg)}",
+      ".nav-notif-badge{background:var(--danger);color:#fff;font-size:.65rem;font-weight:800;border-radius:10px;padding:1px 6px;min-width:18px;text-align:center}",
+
+      /* Dropdown */
+      ".nav-dropdown{position:absolute;top:calc(100% + 10px);right:0;background:var(--surface);border:1.5px solid var(--gray-200);border-radius:14px;box-shadow:0 12px 40px rgba(0,0,0,.14);min-width:220px;padding:6px;z-index:2000;opacity:0;visibility:hidden;transform:translateY(-8px);transition:all .2s}",
+      ".nav-dropdown.open{opacity:1;visibility:visible;transform:translateY(0)}",
+      ".nav-dropdown-header{padding:10px 12px 8px}",
+      ".nav-dropdown-name{font-weight:800;font-size:.9rem;color:var(--text)}",
+      ".nav-dropdown-email{font-size:.74rem;color:var(--gray-400);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}",
+      ".nav-dropdown-divider{height:1px;background:var(--gray-200);margin:4px 0}",
+      ".nav-dd-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;font-size:.86rem;font-weight:600;color:var(--gray-700);text-decoration:none;cursor:pointer;transition:all .15s;background:none;border:none;width:100%;text-align:left}",
+      ".nav-dd-item:hover{background:rgba(13,148,136,.07);color:var(--teal)}",
+      ".nav-dd-icon{font-size:1rem;width:20px;text-align:center;flex-shrink:0}",
+      ".nav-dd-logout{color:var(--danger)}",
+      ".nav-dd-logout:hover{background:rgba(239,68,68,.07);color:var(--danger)}",
+      ".dd-badge{background:var(--danger);color:#fff;font-size:.65rem;font-weight:800;border-radius:10px;padding:1px 6px;margin-left:auto}",
+
+      /* Hamburger */
+      ".nav-hamburger{display:none;flex-direction:column;gap:5px;background:none;border:1.5px solid var(--gray-200);border-radius:8px;padding:8px;cursor:pointer;margin-left:auto}",
+      ".nav-hamburger span{display:block;width:18px;height:2px;background:var(--gray-600);border-radius:2px;transition:all .3s}",
+      ".nav-hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}",
+      ".nav-hamburger.open span:nth-child(2){opacity:0}",
+      ".nav-hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}",
+
+      /* Mobile menu */
+      ".nav-mobile-menu{display:none;flex-direction:column;gap:2px;padding:12px 16px 16px;border-top:1.5px solid var(--gray-200);background:var(--surface)}",
+      ".nav-mobile-menu.open{display:flex}",
+      ".nav-mobile-link{display:block;padding:11px 14px;border-radius:8px;font-size:.9rem;font-weight:600;color:var(--gray-700);text-decoration:none;transition:all .2s;background:none;border:none;text-align:left;cursor:pointer;width:100%}",
+      ".nav-mobile-link:hover{background:rgba(13,148,136,.07);color:var(--teal)}",
+      ".nav-mobile-divider{height:1px;background:var(--gray-200);margin:6px 0}",
+      ".nav-mobile-logout{color:var(--danger)}",
+
+      /* Responsive */
+      "@media(max-width:768px){",
+        ".nav-links{display:none}",
+        ".nav-right .nav-btn-login,.nav-right .nav-btn-signup,.nav-right .nav-post-btn{display:none}",
+        ".nav-hamburger{display:flex}",
+        ".nav-username{display:none}",
+      "}",
+
+      /* ── Breadcrumb ── */
+      ".breadcrumb{margin-bottom:20px}",
+      ".breadcrumb-list{display:flex;flex-wrap:wrap;align-items:center;gap:4px;list-style:none;padding:0;margin:0;font-size:.8rem}",
+      ".breadcrumb-item{display:flex;align-items:center;gap:4px;color:var(--gray-400)}",
+      ".breadcrumb-item a{color:var(--gray-500);text-decoration:none;font-weight:600;transition:color .2s}",
+      ".breadcrumb-item a:hover{color:var(--teal)}",
+      ".breadcrumb-item.active{color:var(--gray-600);font-weight:700}",
+      ".breadcrumb-sep{color:var(--gray-300);font-size:.75rem}",
+
+      /* ── Footer ── */
+      ".main-footer{background:var(--gray-900);color:var(--gray-300);padding:48px 20px 0;margin-top:80px}",
+      ".footer-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 2fr;gap:48px;padding-bottom:40px}",
+      ".footer-logo{font-size:1.5rem;font-weight:900;letter-spacing:-1px;color:#fff;text-decoration:none;display:inline-block;margin-bottom:10px}",
+      ".footer-logo span{color:var(--teal)}",
+      ".footer-tagline{font-size:.83rem;color:var(--gray-400);line-height:1.5;margin-bottom:6px}",
+      ".footer-city{font-size:.78rem;color:var(--gray-500)}",
+      ".footer-links{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}",
+      ".footer-col{display:flex;flex-direction:column;gap:10px}",
+      ".footer-col-title{font-size:.78rem;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:var(--gray-400);margin-bottom:4px}",
+      ".footer-col a{font-size:.83rem;color:var(--gray-400);text-decoration:none;transition:color .2s}",
+      ".footer-col a:hover{color:var(--teal)}",
+      ".footer-bottom{max-width:1200px;margin:0 auto;border-top:1px solid rgba(255,255,255,.08);padding:16px 0;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font-size:.76rem;color:var(--gray-500)}",
+      "@media(max-width:768px){.footer-inner{grid-template-columns:1fr}.footer-links{grid-template-columns:repeat(2,1fr)}.footer-bottom{flex-direction:column;text-align:center}}",
+
+      /* ── Dark mode overrides ── */
+      "[data-theme=dark] .main-nav{border-color:var(--gray-700);background:var(--gray-900)}",
+      "[data-theme=dark] .nav-link:hover,[data-theme=dark] .nav-link.active{background:rgba(13,148,136,.1)}",
+      "[data-theme=dark] .nav-icon-btn{border-color:var(--gray-700);color:var(--gray-300)}",
+      "[data-theme=dark] .nav-avatar-btn{border-color:var(--gray-700)}",
+      "[data-theme=dark] .nav-dropdown{border-color:var(--gray-700);background:var(--gray-900)}",
+      "[data-theme=dark] .nav-dropdown-divider{background:var(--gray-700)}",
+      "[data-theme=dark] .nav-dd-item{color:var(--gray-300)}",
+      "[data-theme=dark] .nav-mobile-menu{border-color:var(--gray-700)}",
+      "[data-theme=dark] .nav-mobile-link{color:var(--gray-300)}",
+      "[data-theme=dark] .nav-hamburger{border-color:var(--gray-700)}",
+      "[data-theme=dark] .nav-hamburger span{background:var(--gray-300)}",
+      "[data-theme=dark] .announce-bar{opacity:.9}",
+      "[data-theme=dark] .toast{border-color:var(--gray-700);background:var(--gray-900)}"
+
+    ].join("\n");
+    document.head.appendChild(style);
+  }
+
+})(window);
