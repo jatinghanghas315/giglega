@@ -6,7 +6,6 @@
   <title>Login — GigLega</title>
   <meta name="description" content="GigLega mein login karo. Gig economy ka sabse smart platform." />
   <link rel="stylesheet" href="styles.css" />
-  <script src="shared.js"></script>
   <style>
     .auth-page {
       min-height: 100vh;
@@ -377,7 +376,10 @@
     </div>
   </main>
 
+  <footer id="main-footer"></footer>
   <div id="toast-container"></div>
+
+  <script src="shared.js"></script>
 
   <script>
   document.addEventListener("DOMContentLoaded", function () {
@@ -388,6 +390,8 @@
 
     /* ── Redirect destination ── */
     var redirectTo = getParam("redirect") || "index.html";
+    var mode = (getParam("mode") || "").toLowerCase();
+    var prefRole = (getParam("role") || "worker").toLowerCase();
     /* Safety: never redirect back to login or signup */
     if (!redirectTo || /login|signup/i.test(redirectTo)) redirectTo = "index.html";
 
@@ -400,7 +404,13 @@
     var otpTimer    = null;
 
     /* ── Helpers ── */
-    function getParam(n) { return new URLSearchParams(window.location.search).get(n); }
+    function getParam(n) {
+      var q = new URLSearchParams(window.location.search).get(n);
+      if (q) return q;
+      var hash = (window.location.hash || "").replace(/^#/, "");
+      if (!hash) return null;
+      return new URLSearchParams(hash).get(n);
+    }
     function safeParseUser() {
       try { var u = JSON.parse(localStorage.getItem(USER_KEY)||"null"); return (u&&u.id)?u:null; } catch(e){return null;}
     }
@@ -460,6 +470,10 @@
       t.addEventListener("click", function(){ showPanel(t.dataset.tab); });
     });
     document.getElementById("switchToRegister").addEventListener("click", function(){ showPanel("register"); });
+
+    if (mode === "register") {
+      showPanel("register");
+    }
     document.getElementById("switchToLogin").addEventListener("click", function(){ showPanel("login"); });
 
     /* ── Eye toggles ── */
@@ -584,8 +598,8 @@
           skills:    [],
           avatar:    null,
           bio:       "",
-          workType:  ""
-                  role:        "worker",
+          workType:  "",
+          role:      (prefRole === "poster" ? "poster" : "worker"),
         };
         var users = getUsers();
         users.push(newUser);
@@ -596,7 +610,7 @@
         document.getElementById("authTabs").style.display         = "none";
         document.getElementById("registerSuccess").classList.add("show");
         showToast("🎉 Welcome to GigLega, " + name + "!", "success");
-                setTimeout(function(){ window.location.replace("dashboard-worker.html"); }, 1800);
+                setTimeout(function(){ window.location.replace(prefRole === "poster" ? "dashboard-client.html" : "dashboard-worker.html"); }, 1800);
       }, 1000);
     }
 

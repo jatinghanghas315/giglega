@@ -1948,4 +1948,26 @@
     ══════════════════════════════════ */
     function copyCode() {
       navigator.clipboard?.writeText("ARJUN100").catch(() => {});
-      showToast("✅
+      showToast("✅ Referral code copied!");
+    }
+
+    function shareCode() {
+      const text = "Join GigLega with my code ARJUN100 and start earning!";
+      if (navigator.share) {
+        navigator.share({ title: "GigLega Referral", text }).catch(() => {});
+      } else {
+        navigator.clipboard?.writeText(text).catch(() => {});
+        showToast("Referral invite copied for sharing.", "info");
+      }
+    }
+
+    // boot
+    drawEarningsBars();
+    buildBreakdown();
+
+  </script>
+
+  <footer id="main-footer"></footer>
+  <div id="toast-container"></div>
+</body>
+</html>

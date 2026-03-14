@@ -2,282 +2,73 @@
   "name": "GigLega — Gig Karo, Paise Kamao",
   "short_name": "GigLega",
   "description": "India ka #1 hyperlocal gig platform — bachelors, students aur gig workers ke liye. Gig dhundo, apply karo, paise kamao.",
-  "start_url": "/index.html?source=pwa",
-  "scope": "/",
   "id": "giglega-app-v1",
   "lang": "hi-IN",
   "dir": "ltr",
-
+  "start_url": "./index.html?source=pwa",
+  "scope": "./",
   "display": "standalone",
-  "display_override": ["window-controls-overlay", "standalone", "minimal-ui", "browser"],
-
   "orientation": "portrait-primary",
-
   "theme_color": "#0d9488",
   "background_color": "#0b1e35",
-
   "categories": ["business", "finance", "productivity", "lifestyle"],
-
-  "iarc_rating_id": "",
-
   "prefer_related_applications": false,
-
-  "handle_links": "preferred",
-
-  "launch_handler": {
-    "client_mode": ["navigate-existing", "auto"]
-  },
-
-  /* ══════════════════════════════════
-     ICONS
-  ══════════════════════════════════ */
   "icons": [
     {
-      "src": "/assets/icons/icon-72.png",
+      "src": "./assets/icons/icon-72.png",
       "sizes": "72x72",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/assets/icons/icon-96.png",
+      "src": "./assets/icons/icon-96.png",
       "sizes": "96x96",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/assets/icons/icon-128.png",
-      "sizes": "128x128",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/assets/icons/icon-144.png",
+      "src": "./assets/icons/icon-144.png",
       "sizes": "144x144",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/assets/icons/icon-152.png",
-      "sizes": "152x152",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/assets/icons/icon-192.png",
+      "src": "./assets/icons/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/assets/icons/icon-192-maskable.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "maskable"
-    },
-    {
-      "src": "/assets/icons/icon-384.png",
-      "sizes": "384x384",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/assets/icons/icon-512.png",
+      "src": "./assets/icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
-    },
-    {
-      "src": "/assets/icons/icon-512-maskable.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
-    },
-    {
-      "src": "/assets/icons/badge-72.png",
-      "sizes": "72x72",
-      "type": "image/png",
-      "purpose": "monochrome"
     }
   ],
-
-  /* ══════════════════════════════════
-     SCREENSHOTS
-     (shown in install prompt on Android/Chrome)
-  ══════════════════════════════════ */
-  "screenshots": [
-    {
-      "src": "/assets/screenshots/screen-home.png",
-      "sizes": "1080x1920",
-      "type": "image/png",
-      "platform": "narrow",
-      "label": "GigLega Home — Gig dhundo ya post karo"
-    },
-    {
-      "src": "/assets/screenshots/screen-browse.png",
-      "sizes": "1080x1920",
-      "type": "image/png",
-      "platform": "narrow",
-      "label": "Browse Gigs — Location aur category se filter karo"
-    },
-    {
-      "src": "/assets/screenshots/screen-wallet.png",
-      "sizes": "1080x1920",
-      "type": "image/png",
-      "platform": "narrow",
-      "label": "Wallet — Earnings track karo, UPI se withdraw karo"
-    },
-    {
-      "src": "/assets/screenshots/screen-dashboard.png",
-      "sizes": "1080x1920",
-      "type": "image/png",
-      "platform": "narrow",
-      "label": "Dashboard — Apne sab gigs ek jagah dekho"
-    },
-    {
-      "src": "/assets/screenshots/screen-desktop-home.png",
-      "sizes": "1920x1080",
-      "type": "image/png",
-      "platform": "wide",
-      "label": "GigLega Desktop — Full gig management experience"
-    }
-  ],
-
-  /* ══════════════════════════════════
-     SHORTCUTS
-     (long-press app icon on Android)
-  ══════════════════════════════════ */
   "shortcuts": [
     {
       "name": "Gigs Browse Karo",
       "short_name": "Browse",
       "description": "Apne aas-paas ke gigs dhundo",
-      "url": "/browse.html?source=shortcut",
-      "icons": [
-        {
-          "src": "/assets/icons/shortcut-browse.png",
-          "sizes": "96x96",
-          "type": "image/png"
-        }
-      ]
+      "url": "./browse.html?source=shortcut"
     },
     {
       "name": "My Wallet",
       "short_name": "Wallet",
       "description": "Apni earnings aur wallet dekho",
-      "url": "/wallet.html?source=shortcut",
-      "icons": [
-        {
-          "src": "/assets/icons/shortcut-wallet.png",
-          "sizes": "96x96",
-          "type": "image/png"
-        }
-      ]
+      "url": "./wallet.html?source=shortcut"
     },
     {
       "name": "Notifications",
       "short_name": "Alerts",
       "description": "Naye gig alerts aur messages dekho",
-      "url": "/notifications.html?source=shortcut",
-      "icons": [
-        {
-          "src": "/assets/icons/shortcut-notif.png",
-          "sizes": "96x96",
-          "type": "image/png"
-        }
-      ]
+      "url": "./notifications.html?source=shortcut"
     },
     {
       "name": "Post a Gig",
       "short_name": "Post Gig",
       "description": "Workers hire karne ke liye gig post karo",
-      "url": "/post-gig.html?source=shortcut",
-      "icons": [
-        {
-          "src": "/assets/icons/shortcut-post.png",
-          "sizes": "96x96",
-          "type": "image/png"
-        }
-      ]
+      "url": "./post-gig.html?source=shortcut"
     }
-  ],
-
-  /* ══════════════════════════════════
-     FILE HANDLERS
-     (open CSV/JSON gig files directly in app)
-  ══════════════════════════════════ */
-  "file_handlers": [
-    {
-      "action": "/post-gig.html",
-      "accept": {
-        "text/csv":        [".csv"],
-        "application/json":[".json"]
-      }
-    }
-  ],
-
-  /* ══════════════════════════════════
-     PROTOCOL HANDLERS
-     (giglega:// deep links)
-  ══════════════════════════════════ */
-  "protocol_handlers": [
-    {
-      "protocol": "web+giglega",
-      "url": "/browse.html?ref=%s"
-    }
-  ],
-
-  /* ══════════════════════════════════
-     SHARE TARGET
-     (accept shares from other apps — e.g. share a location)
-  ══════════════════════════════════ */
-  "share_target": {
-    "action": "/post-gig.html",
-    "method": "POST",
-    "enctype": "multipart/form-data",
-    "params": {
-      "title": "title",
-      "text":  "text",
-      "url":   "url",
-      "files": [
-        {
-          "name":   "media",
-          "accept": ["image/*", "text/plain", "application/json"]
-        }
-      ]
-    }
-  },
-
-  /* ══════════════════════════════════
-     RELATED APPLICATIONS
-  ══════════════════════════════════ */
-  "related_applications": [
-    {
-      "platform": "play",
-      "url":      "https://play.google.com/store/apps/details?id=in.giglega.app",
-      "id":       "in.giglega.app"
-    },
-    {
-      "platform": "itunes",
-      "url":      "https://apps.apple.com/in/app/giglega/id0000000000"
-    },
-    {
-      "platform": "webapp",
-      "url":      "https://giglega.in/manifest.json"
-    }
-  ],
-
-  /* ══════════════════════════════════
-     EDGE SIDE PANEL (Windows)
-  ══════════════════════════════════ */
-  "edge_side_panel": {
-    "preferred_width": 400
-  },
-
-  /* ══════════════════════════════════
-     WINDOW CONTROLS OVERLAY
-  ══════════════════════════════════ */
-  "window_controls_overlay": {
-    "color":         "#0b1e35",
-    "height":        38
-  }
+  ]
 }
