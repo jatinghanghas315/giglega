@@ -4,352 +4,1424 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Edit Gig — GigLega</title>
-  <meta name="robots" content="noindex, nofollow" />
-
-  <script src="shared.js"></script>
+  <meta name="description" content="Apna gig edit karo — title, description, budget, location, timing sab update karo." />
   <link rel="stylesheet" href="styles.css" />
-
+  <script src="shared.js"></script>
   <style>
-    .edit-wrap {
-      max-width: 760px;
-      margin: 0 auto;
-      padding: 32px 16px 80px;
+
+    /* ══════════════════════════════════
+       AUTOSAVE BAR
+    ══════════════════════════════════ */
+    .autosave-bar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+      height: 3px;
+      background: var(--gray-200);
+      pointer-events: none;
+    }
+    .autosave-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--teal));
+      width: 0%;
+      transition: width .4s ease;
+    }
+    .autosave-bar-fill.saved { background: var(--success); }
+
+    /* ══════════════════════════════════
+       HERO
+    ══════════════════════════════════ */
+    .ge-hero {
+      background: linear-gradient(135deg, #0b2240 0%, var(--primary) 55%, #0d4f47 100%);
+      padding: 36px 20px 48px;
+      color: #fff; position: relative; overflow: hidden;
+    }
+    .ge-hero::before {
+      content: "";
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse at 20% 70%, rgba(13,148,136,.2) 0%, transparent 55%),
+        radial-gradient(ellipse at 80% 15%, rgba(99,102,241,.1) 0%, transparent 50%);
+      pointer-events: none;
+    }
+    .ge-hero::after {
+      content: "";
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+      background-size: 48px 48px; pointer-events: none;
+    }
+    .ge-hero-inner {
+      position: relative; z-index: 1;
+      max-width: 1100px; margin: 0 auto;
+      display: flex; align-items: flex-start;
+      justify-content: space-between; gap: 20px; flex-wrap: wrap;
+    }
+    .ge-eyebrow {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: rgba(255,255,255,.12);
+      border: 1px solid rgba(255,255,255,.2);
+      border-radius: var(--radius-full);
+      padding: 5px 14px;
+      font-size: .74rem; font-weight: 700; color: rgba(255,255,255,.9);
+      margin-bottom: 14px;
+    }
+    .ge-hero h1 {
+      font-size: clamp(1.4rem, 3vw, 2.1rem);
+      font-weight: 900; color: #fff;
+      line-height: 1.2; margin-bottom: 8px; letter-spacing: -.5px;
+    }
+    .ge-hero h1 span { color: #6ee7b7; }
+    .ge-hero-sub {
+      font-size: .88rem; color: rgba(255,255,255,.7);
+      line-height: 1.6; max-width: 520px;
     }
 
-    /* ── Page header ── */
-    .edit-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-bottom: 28px;
-    }
-    .edit-header-left h1 {
-      font-size: 1.4rem;
-      font-weight: 900;
-      color: var(--primary);
-      margin-bottom: 4px;
-    }
-    .edit-header-left p {
-      font-size: .84rem;
-      color: var(--gray-500);
-    }
-    .btn-back-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: .85rem;
-      font-weight: 700;
-      color: var(--gray-500);
-      text-decoration: none;
-      padding: 8px 14px;
-      border: 1.5px solid var(--gray-200);
-      border-radius: var(--radius-sm);
-      transition: all .2s;
-    }
-    .btn-back-link:hover { border-color: var(--teal); color: var(--teal); text-decoration: none; }
-
-    /* ── Status banner ── */
-    .gig-status-bar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 10px;
-      padding: 14px 18px;
-      border-radius: var(--radius-sm);
-      margin-bottom: 24px;
-      border: 1.5px solid;
-    }
-    .gig-status-bar.open   { background: rgba(16,185,129,.06); border-color: rgba(16,185,129,.2); }
-    .gig-status-bar.closed { background: rgba(239,68,68,.06);  border-color: rgba(239,68,68,.2); }
-    .gig-status-bar.filled { background: rgba(245,158,11,.06); border-color: rgba(245,158,11,.2); }
-    .status-left { display: flex; align-items: center; gap: 10px; }
-    .status-dot  { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-    .status-dot.open   { background: var(--success); animation: pulse 1.5s ease-in-out infinite; }
-    .status-dot.closed { background: var(--danger); }
-    .status-dot.filled { background: var(--accent); }
-    .status-label { font-size: .88rem; font-weight: 700; color: var(--gray-700); }
-    .status-sub   { font-size: .78rem; color: var(--gray-400); margin-top: 2px; }
-    .btn-toggle-status {
+    /* Status pill */
+    .ge-status-pill {
+      display: inline-flex; align-items: center; gap: 7px;
       padding: 7px 16px;
-      border-radius: var(--radius-xs);
-      font-size: .82rem;
-      font-weight: 700;
-      cursor: pointer;
-      border: 1.5px solid;
-      background: transparent;
+      border-radius: var(--radius-full);
+      font-size: .82rem; font-weight: 700;
+      cursor: pointer; border: none;
       font-family: var(--font);
-      transition: all .2s;
+      transition: opacity .2s;
     }
-    .btn-toggle-status.close-gig { border-color: var(--danger); color: var(--danger); }
-    .btn-toggle-status.close-gig:hover { background: var(--danger); color: #fff; }
-    .btn-toggle-status.reopen-gig { border-color: var(--success); color: var(--success); }
-    .btn-toggle-status.reopen-gig:hover { background: var(--success); color: #fff; }
+    .ge-status-pill.active   { background: rgba(16,185,129,.2);  color: #6ee7b7; border: 1.5px solid rgba(110,231,183,.3); }
+    .ge-status-pill.paused   { background: rgba(245,158,11,.2);  color: #fcd34d; border: 1.5px solid rgba(252,211,77,.3); }
+    .ge-status-pill.closed   { background: rgba(239,68,68,.2);   color: #fca5a5; border: 1.5px solid rgba(252,165,165,.3); }
+    .ge-status-pill:hover    { opacity: .85; }
 
-    /* ── Form card ── */
-    .edit-card {
+    .ge-hero-right {
+      display: flex; flex-direction: column; align-items: flex-end;
+      gap: 10px; flex-shrink: 0;
+    }
+    .ge-gig-id {
+      font-size: .76rem; font-weight: 600;
+      color: rgba(255,255,255,.5); letter-spacing: .3px;
+    }
+
+    /* ══════════════════════════════════
+       STICKY ACTION BAR
+    ══════════════════════════════════ */
+    .ge-action-bar {
+      background: var(--surface);
+      border-bottom: 1.5px solid var(--gray-200);
+      padding: 12px 20px;
+      position: sticky; top: 0; z-index: 50;
+      box-shadow: var(--shadow-sm);
+      transition: box-shadow .2s;
+    }
+    [data-theme=dark] .ge-action-bar { border-color: var(--gray-700); }
+
+    .ge-action-inner {
+      max-width: 1100px; margin: 0 auto;
+      display: flex; align-items: center;
+      justify-content: space-between; gap: 14px; flex-wrap: wrap;
+    }
+    .ge-action-left {
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    }
+    .ge-save-indicator {
+      display: flex; align-items: center; gap: 6px;
+      font-size: .8rem; font-weight: 700; color: var(--gray-400);
+    }
+    .ge-save-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--gray-300);
+      transition: background .3s;
+    }
+    .ge-save-dot.unsaved { background: #f59e0b; }
+    .ge-save-dot.saving  { background: var(--teal); animation: blink .7s ease-in-out infinite; }
+    .ge-save-dot.saved   { background: var(--success); }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+    .ge-action-right { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+
+    .btn-ge {
+      padding: 9px 20px; border-radius: var(--radius-sm);
+      font-weight: 700; font-size: .86rem; cursor: pointer;
+      font-family: var(--font); transition: all .18s;
+      display: inline-flex; align-items: center; gap: 7px;
+      text-decoration: none;
+    }
+    .btn-ge-outline {
+      background: transparent; border: 1.5px solid var(--gray-200);
+      color: var(--gray-600);
+    }
+    .btn-ge-outline:hover { border-color: var(--gray-400); color: var(--text); }
+    [data-theme=dark] .btn-ge-outline { border-color: var(--gray-600); color: var(--gray-400); }
+
+    .btn-ge-danger {
+      background: transparent; border: 1.5px solid rgba(239,68,68,.3);
+      color: var(--danger);
+    }
+    .btn-ge-danger:hover { background: rgba(239,68,68,.06); border-color: var(--danger); }
+
+    .btn-ge-primary {
+      background: linear-gradient(135deg, var(--primary), var(--teal));
+      border: none; color: #fff;
+      box-shadow: 0 3px 10px rgba(13,148,136,.2);
+    }
+    .btn-ge-primary:hover { box-shadow: 0 5px 16px rgba(13,148,136,.3); transform: translateY(-1px); }
+    .btn-ge-primary:disabled { opacity: .55; cursor: not-allowed; transform: none; box-shadow: none; }
+
+    /* ══════════════════════════════════
+       UNSAVED CHANGES BANNER
+    ══════════════════════════════════ */
+    .unsaved-banner {
+      background: rgba(245,158,11,.09);
+      border-bottom: 1.5px solid rgba(245,158,11,.25);
+      padding: 10px 20px;
+      display: none;
+    }
+    .unsaved-banner.show { display: flex; align-items: center; gap: 10px; }
+    .unsaved-banner-inner {
+      max-width: 1100px; margin: 0 auto; width: 100%;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .ub-icon { font-size: 1rem; flex-shrink: 0; }
+    .ub-text { font-size: .84rem; color: #b45309; font-weight: 600; }
+    [data-theme=dark] .ub-text { color: #fcd34d; }
+
+    /* ══════════════════════════════════
+       BODY LAYOUT
+    ══════════════════════════════════ */
+    .ge-body {
+      max-width: 1100px; margin: 0 auto;
+      padding: 32px 20px 80px;
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 28px;
+      align-items: start;
+    }
+    @media(max-width:900px) { .ge-body { grid-template-columns: 1fr; } }
+
+    /* ══════════════════════════════════
+       SECTION CARDS
+    ══════════════════════════════════ */
+    .ge-section {
       background: var(--surface);
       border: 1.5px solid var(--gray-200);
       border-radius: var(--radius);
-      padding: 28px;
       box-shadow: var(--shadow-sm);
-      margin-bottom: 20px;
+      overflow: hidden;
+      margin-bottom: 22px;
     }
-    .edit-card-title {
-      font-size: .95rem;
-      font-weight: 800;
-      color: var(--primary);
-      margin-bottom: 20px;
-      padding-bottom: 14px;
+    [data-theme=dark] .ge-section { border-color: var(--gray-700); }
+
+    .ge-section-header {
+      display: flex; align-items: center; gap: 13px;
+      padding: 18px 22px;
       border-bottom: 1.5px solid var(--gray-100);
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      background: linear-gradient(135deg, rgba(26,60,94,.03), rgba(13,148,136,.04));
+    }
+    [data-theme=dark] .ge-section-header { border-color: var(--gray-700); }
+
+    .ge-sec-icon {
+      width: 40px; height: 40px; border-radius: 11px;
+      background: linear-gradient(135deg, var(--primary), var(--teal));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem; flex-shrink: 0;
+    }
+    .ge-sec-title { font-size: .96rem; font-weight: 800; color: var(--primary); }
+    .ge-sec-sub   { font-size: .76rem; color: var(--gray-400); margin-top: 1px; }
+
+    .ge-sec-badge {
+      margin-left: auto;
+      font-size: .68rem; font-weight: 700;
+      padding: 3px 9px; border-radius: 6px;
+    }
+    .ge-sec-badge.required { background: rgba(239,68,68,.1); color: var(--danger); }
+    .ge-sec-badge.optional { background: rgba(13,148,136,.1); color: var(--teal); }
+
+    .ge-section-body { padding: 22px; }
+
+    /* ══════════════════════════════════
+       FORM ELEMENTS
+    ══════════════════════════════════ */
+    .form-group { margin-bottom: 20px; }
+    .form-group:last-child { margin-bottom: 0; }
+
+    .form-label {
+      display: flex; align-items: center; gap: 6px;
+      font-size: .82rem; font-weight: 700;
+      color: var(--gray-600); margin-bottom: 7px;
+    }
+    .form-label .lbl-req { color: var(--danger); font-size: .9rem; }
+    .form-label .lbl-tip {
+      font-size: .72rem; font-weight: 600; color: var(--gray-400);
+      margin-left: auto;
     }
 
-    /* ── Form fields ── */
-    .field { margin-bottom: 18px; }
-    .field label {
-      display: block;
-      font-size: .84rem;
-      font-weight: 600;
-      color: var(--gray-700);
-      margin-bottom: 6px;
-    }
-    .field label .req { color: var(--danger); margin-left: 2px; }
-    .field input,
-    .field select,
-    .field textarea {
+    .form-input,
+    .form-select,
+    .form-textarea {
       width: 100%;
       padding: 11px 14px;
       border: 1.5px solid var(--gray-200);
       border-radius: var(--radius-sm);
-      font-size: .9rem;
-      font-family: var(--font);
-      background: var(--surface);
-      color: var(--text);
+      background: var(--surface); color: var(--text);
+      font-family: var(--font); font-size: .92rem;
       transition: border .2s, box-shadow .2s;
       box-sizing: border-box;
     }
-    .field input:focus,
-    .field select:focus,
-    .field textarea:focus {
+    .form-input:focus,
+    .form-select:focus,
+    .form-textarea:focus {
       outline: none;
       border-color: var(--teal);
       box-shadow: 0 0 0 3px rgba(13,148,136,.1);
     }
-    .field textarea { resize: vertical; min-height: 110px; line-height: 1.6; }
-    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-    @media (max-width: 520px) { .field-row { grid-template-columns: 1fr; } }
-    .field-hint { font-size: .76rem; color: var(--gray-400); margin-top: 5px; line-height: 1.4; }
-    .char-count { font-size: .73rem; color: var(--gray-400); text-align: right; margin-top: 4px; }
-    .char-count.warn { color: var(--accent); }
-    .char-count.over { color: var(--danger); }
-
-    /* ── Pay type toggle ── */
-    .pay-type-wrap { display: flex; gap: 8px; margin-bottom: 12px; }
-    .pay-type-btn {
-      flex: 1;
-      padding: 9px;
-      border: 1.5px solid var(--gray-200);
-      border-radius: var(--radius-sm);
-      font-size: .84rem;
-      font-weight: 700;
-      color: var(--gray-500);
-      background: transparent;
-      cursor: pointer;
-      transition: all .2s;
-      font-family: var(--font);
-      text-align: center;
+    .form-input.error,
+    .form-textarea.error { border-color: var(--danger); box-shadow: 0 0 0 3px rgba(239,68,68,.08); }
+    [data-theme=dark] .form-input,
+    [data-theme=dark] .form-select,
+    [data-theme=dark] .form-textarea {
+      border-color: var(--gray-600); background: var(--gray-800);
     }
-    .pay-type-btn.active { border-color: var(--teal); background: rgba(13,148,136,.08); color: var(--teal); }
 
-    /* ── Tags input ── */
+    .form-textarea { resize: vertical; min-height: 100px; line-height: 1.65; }
+    .form-select   { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7280' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; cursor: pointer; }
+
+    .form-hint {
+      font-size: .76rem; color: var(--gray-400);
+      margin-top: 5px; line-height: 1.5;
+    }
+    .form-error-msg {
+      font-size: .76rem; color: var(--danger);
+      margin-top: 5px; display: none;
+    }
+    .form-error-msg.show { display: block; }
+
+    .char-count {
+      font-size: .72rem; color: var(--gray-400);
+      text-align: right; margin-top: 4px;
+    }
+    .char-count.warn  { color: #f59e0b; }
+    .char-count.limit { color: var(--danger); }
+
+    /* Input with icon */
+    .input-icon-wrap {
+      position: relative;
+    }
+    .input-icon-wrap .iw-icon {
+      position: absolute; left: 13px; top: 50%;
+      transform: translateY(-50%);
+      font-size: 1rem; pointer-events: none; z-index: 1;
+    }
+    .input-icon-wrap .form-input { padding-left: 38px; }
+    .input-icon-wrap .iw-suffix {
+      position: absolute; right: 13px; top: 50%;
+      transform: translateY(-50%);
+      font-size: .82rem; font-weight: 700; color: var(--gray-400);
+      pointer-events: none;
+    }
+
+    /* Budget row */
+    .budget-row {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+    }
+    @media(max-width:500px) { .budget-row { grid-template-columns: 1fr; } }
+
+    /* Date-time row */
+    .datetime-row {
+      display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px;
+    }
+    @media(max-width:600px) { .datetime-row { grid-template-columns: 1fr 1fr; } }
+    @media(max-width:400px) { .datetime-row { grid-template-columns: 1fr; } }
+
+    /* ══════════════════════════════════
+       CATEGORY SELECTOR (visual)
+    ══════════════════════════════════ */
+    .cat-grid {
+      display: grid; grid-template-columns: repeat(4,1fr); gap: 10px;
+      margin-bottom: 4px;
+    }
+    @media(max-width:560px) { .cat-grid { grid-template-columns: repeat(3,1fr); } }
+    @media(max-width:380px) { .cat-grid { grid-template-columns: repeat(2,1fr); } }
+
+    .cat-btn {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 6px; padding: 12px 8px;
+      border: 2px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+      background: var(--surface); cursor: pointer;
+      font-family: var(--font); transition: all .18s;
+    }
+    .cat-btn:hover { border-color: rgba(13,148,136,.3); background: rgba(13,148,136,.03); }
+    .cat-btn.selected { border-color: var(--teal); background: rgba(13,148,136,.08); }
+    [data-theme=dark] .cat-btn { border-color: var(--gray-600); background: var(--gray-800); }
+    [data-theme=dark] .cat-btn.selected { border-color: var(--teal); background: rgba(13,148,136,.12); }
+
+    .cat-emoji { font-size: 1.5rem; line-height: 1; }
+    .cat-label { font-size: .72rem; font-weight: 700; color: var(--gray-600); text-align: center; line-height: 1.3; }
+    .cat-btn.selected .cat-label { color: var(--teal); }
+
+    /* ══════════════════════════════════
+       SKILLS / TAGS INPUT
+    ══════════════════════════════════ */
     .tags-wrap {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
+      display: flex; flex-wrap: wrap; gap: 7px;
       padding: 10px 12px;
       border: 1.5px solid var(--gray-200);
       border-radius: var(--radius-sm);
-      min-height: 48px;
-      cursor: text;
-      transition: border .2s;
+      min-height: 46px; cursor: text;
       background: var(--surface);
+      transition: border .2s;
     }
     .tags-wrap:focus-within { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(13,148,136,.1); }
+    [data-theme=dark] .tags-wrap { border-color: var(--gray-600); background: var(--gray-800); }
+
     .tag-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 4px 10px;
+      display: inline-flex; align-items: center; gap: 5px;
       background: rgba(13,148,136,.1);
-      color: var(--teal);
-      border-radius: 12px;
-      font-size: .78rem;
-      font-weight: 700;
+      border: 1px solid rgba(13,148,136,.2);
+      border-radius: 5px;
+      padding: 3px 8px;
+      font-size: .78rem; font-weight: 700; color: var(--teal);
     }
-    .tag-remove {
-      background: none;
-      border: none;
-      color: var(--teal);
-      cursor: pointer;
-      font-size: .75rem;
-      padding: 0;
-      line-height: 1;
-      opacity: .7;
+    .tag-chip-remove {
+      background: none; border: none; cursor: pointer;
+      color: var(--teal); font-size: .75rem; padding: 0 1px;
+      line-height: 1; transition: color .15s;
     }
-    .tag-remove:hover { opacity: 1; }
-    .tag-input {
-      border: none !important;
-      outline: none !important;
-      padding: 0 !important;
-      font-size: .85rem;
-      background: transparent !important;
-      color: var(--text);
-      min-width: 100px;
-      flex: 1;
-      box-shadow: none !important;
+    .tag-chip-remove:hover { color: var(--danger); }
+    .tags-input {
+      border: none; background: none; outline: none;
+      font-family: var(--font); font-size: .88rem; color: var(--text);
+      flex: 1; min-width: 100px;
     }
 
-    /* ── Urgency selector ── */
-    .urgency-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-    .urgency-btn {
-      padding: 10px 8px;
+    /* Suggested tags */
+    .suggested-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+    .sug-tag {
+      padding: 4px 10px; border-radius: var(--radius-full);
+      border: 1.5px dashed var(--gray-300);
+      font-size: .76rem; font-weight: 600; color: var(--gray-500);
+      cursor: pointer; background: none; font-family: var(--font);
+      transition: all .15s;
+    }
+    .sug-tag:hover { border-color: var(--teal); color: var(--teal); border-style: solid; }
+    [data-theme=dark] .sug-tag { border-color: var(--gray-600); }
+
+    /* ══════════════════════════════════
+       POSITIONS STEPPER
+    ══════════════════════════════════ */
+    .stepper-row {
+      display: flex; align-items: center; gap: 14px;
+    }
+    .stepper-btn {
+      width: 36px; height: 36px; border-radius: 50%;
       border: 1.5px solid var(--gray-200);
-      border-radius: var(--radius-sm);
-      font-size: .82rem;
-      font-weight: 700;
-      color: var(--gray-500);
-      background: transparent;
-      cursor: pointer;
-      transition: all .2s;
-      font-family: var(--font);
-      text-align: center;
+      background: var(--surface); color: var(--text);
+      font-size: 1.2rem; font-weight: 700; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all .15s; font-family: var(--font); flex-shrink: 0;
     }
-    .urgency-btn.active.low    { border-color: var(--success); background: rgba(16,185,129,.08); color: var(--success); }
-    .urgency-btn.active.medium { border-color: var(--accent);  background: rgba(245,158,11,.08); color: #b45309; }
-    .urgency-btn.active.high   { border-color: var(--danger);  background: rgba(239,68,68,.08);  color: var(--danger); }
+    .stepper-btn:hover:not(:disabled) { border-color: var(--teal); color: var(--teal); }
+    .stepper-btn:disabled { opacity: .35; cursor: not-allowed; }
+    [data-theme=dark] .stepper-btn { border-color: var(--gray-600); }
+    .stepper-val {
+      font-size: 1.3rem; font-weight: 900; color: var(--primary);
+      min-width: 36px; text-align: center; line-height: 1;
+    }
+    .stepper-label { font-size: .82rem; color: var(--gray-500); font-weight: 600; }
 
-    /* ── Danger zone ── */
-    .danger-zone {
-      background: rgba(239,68,68,.04);
-      border: 1.5px solid rgba(239,68,68,.2);
+    /* ══════════════════════════════════
+       TOGGLE SWITCH
+    ══════════════════════════════════ */
+    .toggle-row {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 16px; padding: 12px 0;
+      border-bottom: 1px solid var(--gray-100);
+    }
+    .toggle-row:last-child { border-bottom: none; }
+    [data-theme=dark] .toggle-row { border-color: var(--gray-700); }
+    .tr-left h4  { font-size: .88rem; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+    .tr-left p   { font-size: .76rem; color: var(--gray-400); line-height: 1.45; }
+
+    .toggle-switch {
+      width: 44px; height: 24px; border-radius: 12px;
+      background: var(--gray-300); border: none; cursor: pointer;
+      position: relative; flex-shrink: 0; transition: background .2s;
+    }
+    .toggle-switch.on { background: var(--teal); }
+    .toggle-knob {
+      position: absolute; top: 3px; left: 3px;
+      width: 18px; height: 18px; border-radius: 50%;
+      background: #fff; transition: transform .2s;
+      box-shadow: 0 1px 4px rgba(0,0,0,.2);
+    }
+    .toggle-switch.on .toggle-knob { transform: translateX(20px); }
+
+    /* ══════════════════════════════════
+       PHOTO UPLOAD
+    ══════════════════════════════════ */
+    .photo-grid {
+      display: grid; grid-template-columns: repeat(4,1fr); gap: 10px;
+      margin-bottom: 12px;
+    }
+    @media(max-width:480px) { .photo-grid { grid-template-columns: repeat(3,1fr); } }
+
+    .photo-slot {
+      aspect-ratio: 1;
+      border: 2px dashed var(--gray-300);
+      border-radius: var(--radius-sm);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 4px; cursor: pointer; transition: all .18s;
+      background: var(--gray-50); overflow: hidden;
+      position: relative;
+    }
+    .photo-slot:hover { border-color: var(--teal); background: rgba(13,148,136,.04); }
+    [data-theme=dark] .photo-slot { background: var(--gray-800); border-color: var(--gray-600); }
+
+    .photo-slot.has-image { border-style: solid; border-color: var(--gray-200); }
+    .photo-slot.has-image img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; }
+    .photo-slot-icon  { font-size: 1.3rem; color: var(--gray-400); }
+    .photo-slot-label { font-size: .68rem; font-weight: 600; color: var(--gray-400); text-align: center; line-height: 1.3; }
+    .photo-remove-btn {
+      position: absolute; top: 4px; right: 4px;
+      width: 20px; height: 20px; border-radius: 50%;
+      background: rgba(0,0,0,.6); border: none; color: #fff;
+      font-size: .65rem; cursor: pointer; z-index: 2;
+      display: none; align-items: center; justify-content: center;
+      transition: background .15s;
+    }
+    .photo-slot.has-image:hover .photo-remove-btn { display: flex; }
+    .photo-remove-btn:hover { background: rgba(239,68,68,.85); }
+
+    /* ══════════════════════════════════
+       CHANGE LOG (diff view)
+    ══════════════════════════════════ */
+    .change-log {
+      display: none;
+    }
+    .change-log.show { display: block; }
+    .change-item {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--gray-100);
+      font-size: .82rem;
+    }
+    .change-item:last-child { border-bottom: none; }
+    [data-theme=dark] .change-item { border-color: var(--gray-700); }
+    .ci-field { font-weight: 700; color: var(--primary); min-width: 90px; flex-shrink: 0; }
+    .ci-old   { color: var(--gray-400); text-decoration: line-through; }
+    .ci-arrow { color: var(--gray-300); }
+    .ci-new   { color: var(--success); font-weight: 600; }
+
+    /* ══════════════════════════════════
+       SIDEBAR
+    ══════════════════════════════════ */
+    .ge-sidebar {}
+
+    /* Preview card */
+    .preview-card {
+      background: var(--surface);
+      border: 1.5px solid var(--gray-200);
       border-radius: var(--radius);
-      padding: 22px 24px;
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      margin-bottom: 20px;
+      position: sticky; top: 80px;
+    }
+    [data-theme=dark] .preview-card { border-color: var(--gray-700); }
+
+    .preview-header {
+      padding: 14px 18px;
+      border-bottom: 1.5px solid var(--gray-100);
+      display: flex; align-items: center; justify-content: space-between;
+      background: linear-gradient(135deg, rgba(26,60,94,.04), rgba(13,148,136,.05));
+    }
+    [data-theme=dark] .preview-header { border-color: var(--gray-700); }
+    .preview-title-text { font-size: .86rem; font-weight: 800; color: var(--primary); }
+    .preview-live-dot {
+      display: flex; align-items: center; gap: 5px;
+      font-size: .72rem; font-weight: 700; color: var(--success);
+    }
+    .live-pulse {
+      width: 7px; height: 7px; border-radius: 50%; background: var(--success);
+      animation: livePulse 1.5s ease-in-out infinite;
+    }
+    @keyframes livePulse { 0%,100%{opacity:1; transform:scale(1)} 50%{opacity:.5; transform:scale(.8)} }
+
+    /* Gig preview card inside sidebar */
+    .gig-preview {
+      padding: 18px;
+    }
+    .gp-cat-tag {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: rgba(13,148,136,.1);
+      border-radius: 6px; padding: 3px 9px;
+      font-size: .72rem; font-weight: 700; color: var(--teal);
+      margin-bottom: 10px;
+    }
+    .gp-title {
+      font-size: 1rem; font-weight: 900; color: var(--primary);
+      line-height: 1.3; margin-bottom: 6px;
+      min-height: 1.4em;
+    }
+    .gp-meta {
+      display: flex; flex-wrap: wrap; gap: 8px;
+      margin-bottom: 10px;
+    }
+    .gp-meta-chip {
+      display: flex; align-items: center; gap: 4px;
+      font-size: .76rem; color: var(--gray-500); font-weight: 600;
+    }
+    .gp-desc {
+      font-size: .82rem; color: var(--gray-600);
+      line-height: 1.65; margin-bottom: 12px;
+      max-height: 60px; overflow: hidden;
+      display: -webkit-box; -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+    }
+    [data-theme=dark] .gp-desc { color: var(--gray-400); }
+
+    .gp-footer {
+      display: flex; align-items: center; justify-content: space-between;
+      padding-top: 10px;
+      border-top: 1px solid var(--gray-100);
+    }
+    [data-theme=dark] .gp-footer { border-color: var(--gray-700); }
+    .gp-budget { font-size: 1.1rem; font-weight: 900; color: var(--primary); }
+    .gp-budget span { font-size: .76rem; color: var(--gray-400); font-weight: 500; }
+
+    /* Score card */
+    .score-card {
+      background: var(--surface);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 18px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow-sm);
+    }
+    [data-theme=dark] .score-card { border-color: var(--gray-700); }
+    .sc-title { font-size: .86rem; font-weight: 800; color: var(--primary); margin-bottom: 14px; display: flex; align-items: center; gap: 7px; }
+    .sc-meter {
+      background: var(--gray-100); border-radius: 6px; height: 8px; overflow: hidden; margin-bottom: 6px;
+    }
+    [data-theme=dark] .sc-meter { background: var(--gray-700); }
+    .sc-fill {
+      height: 100%; border-radius: 6px;
+      background: linear-gradient(90deg, #dc2626, #f59e0b, #059669);
+      transition: width .4s ease;
+    }
+    .sc-pct { font-size: .78rem; font-weight: 700; color: var(--text); margin-bottom: 12px; }
+
+    .sc-items { display: flex; flex-direction: column; gap: 6px; }
+    .sc-item {
+      display: flex; align-items: center; gap: 8px;
+      font-size: .78rem; color: var(--gray-500);
+    }
+    .sc-item .sci-dot {
+      width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+    }
+    .sc-item.done   { color: var(--success); }
+    .sc-item.done .sci-dot   { background: var(--success); }
+    .sc-item.pending .sci-dot { background: var(--gray-300); }
+
+    /* Quick tips */
+    .tips-card {
+      background: rgba(13,148,136,.04);
+      border: 1.5px solid rgba(13,148,136,.14);
+      border-radius: var(--radius);
+      padding: 16px 18px;
       margin-bottom: 20px;
     }
-    .danger-zone-title {
-      font-size: .9rem;
-      font-weight: 800;
-      color: var(--danger);
-      margin-bottom: 6px;
-      display: flex;
-      align-items: center;
-      gap: 7px;
+    .tips-title { font-size: .82rem; font-weight: 800; color: var(--teal); margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+    .tip-item {
+      display: flex; align-items: flex-start; gap: 8px;
+      font-size: .78rem; color: var(--gray-600); line-height: 1.5;
+      margin-bottom: 7px;
     }
-    .danger-zone-desc { font-size: .84rem; color: var(--gray-500); margin-bottom: 14px; line-height: 1.5; }
-    .btn-delete {
-      padding: 9px 20px;
-      background: transparent;
-      color: var(--danger);
-      border: 1.5px solid var(--danger);
-      border-radius: var(--radius-sm);
-      font-size: .85rem;
-      font-weight: 700;
-      cursor: pointer;
-      font-family: var(--font);
-      transition: all .2s;
-    }
-    .btn-delete:hover { background: var(--danger); color: #fff; }
+    .tip-item:last-child { margin-bottom: 0; }
+    [data-theme=dark] .tip-item { color: var(--gray-400); }
+    .tip-icon { flex-shrink: 0; }
 
-    /* ── Save bar ── */
-    .save-bar {
-      position: sticky;
-      bottom: 0;
+    /* Action card (publish / preview) */
+    .action-card {
       background: var(--surface);
-      border-top: 1.5px solid var(--gray-200);
-      padding: 14px 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      flex-wrap: wrap;
-      z-index: 100;
-      box-shadow: 0 -4px 16px rgba(0,0,0,.07);
-      margin: 0 -16px;
-    }
-    .save-bar-left { font-size: .82rem; color: var(--gray-400); }
-    .save-bar-left.unsaved { color: var(--accent); font-weight: 700; }
-    .save-bar-actions { display: flex; gap: 10px; }
-    .btn-discard {
-      padding: 10px 20px;
-      background: transparent;
       border: 1.5px solid var(--gray-200);
-      border-radius: var(--radius-sm);
-      font-size: .88rem;
-      font-weight: 700;
-      color: var(--gray-600);
-      cursor: pointer;
-      font-family: var(--font);
-      transition: all .2s;
+      border-radius: var(--radius);
+      padding: 18px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow-sm);
     }
-    .btn-discard:hover { border-color: var(--danger); color: var(--danger); }
-    .btn-save {
-      padding: 10px 24px;
+    [data-theme=dark] .action-card { border-color: var(--gray-700); }
+
+    .btn-full {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      width: 100%; padding: 13px;
+      border-radius: var(--radius-sm);
+      font-weight: 800; font-size: .92rem; cursor: pointer;
+      font-family: var(--font); transition: all .2s;
+      text-decoration: none; border: none;
+    }
+    .btn-full-primary {
       background: linear-gradient(135deg, var(--primary), var(--teal));
       color: #fff;
-      border: none;
+      box-shadow: 0 3px 12px rgba(13,148,136,.22);
+      margin-bottom: 10px;
+    }
+    .btn-full-primary:hover { box-shadow: 0 6px 20px rgba(13,148,136,.32); transform: translateY(-1px); color: #fff; text-decoration: none; }
+    .btn-full-outline {
+      background: transparent; border: 1.5px solid var(--gray-200);
+      color: var(--gray-600); margin-bottom: 8px;
+    }
+    .btn-full-outline:hover { border-color: var(--gray-400); color: var(--text); text-decoration: none; }
+    .btn-full-danger {
+      background: transparent; border: 1.5px solid rgba(239,68,68,.25);
+      color: var(--danger);
+    }
+    .btn-full-danger:hover { background: rgba(239,68,68,.05); border-color: var(--danger); text-decoration: none; }
+    [data-theme=dark] .btn-full-outline { border-color: var(--gray-600); }
+
+    /* ══════════════════════════════════
+       CONFIRM DELETE MODAL
+    ══════════════════════════════════ */
+    .modal-overlay {
+      position: fixed; inset: 0; z-index: 300;
+      background: rgba(0,0,0,.5); backdrop-filter: blur(4px);
+      display: none; align-items: center; justify-content: center; padding: 20px;
+    }
+    .modal-overlay.show { display: flex; }
+
+    .modal-box {
+      background: var(--surface);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius);
+      max-width: 440px; width: 100%;
+      box-shadow: var(--shadow-xl);
+      animation: modalSlide .22s ease;
+      overflow: hidden;
+    }
+    @keyframes modalSlide { from{transform:translateY(20px);opacity:0} to{transform:none;opacity:1} }
+    [data-theme=dark] .modal-box { border-color: var(--gray-700); }
+
+    .modal-header {
+      padding: 18px 22px;
+      border-bottom: 1.5px solid var(--gray-200);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    [data-theme=dark] .modal-header { border-color: var(--gray-700); }
+    .modal-title { font-size: 1rem; font-weight: 800; color: var(--danger); }
+    .modal-close-btn { background: none; border: none; cursor: pointer; font-size: 1.1rem; color: var(--gray-400); padding: 2px; transition: color .15s; }
+    .modal-close-btn:hover { color: var(--danger); }
+
+    .modal-body { padding: 22px; }
+    .modal-body p { font-size: .9rem; color: var(--gray-600); line-height: 1.7; margin-bottom: 14px; }
+    [data-theme=dark] .modal-body p { color: var(--gray-400); }
+
+    .modal-confirm-input {
+      width: 100%; padding: 10px 13px;
+      border: 1.5px solid var(--gray-200);
       border-radius: var(--radius-sm);
-      font-size: .88rem;
-      font-weight: 800;
-      cursor: pointer;
-      font-family: var(--font);
-      transition: opacity .2s, transform .15s;
-      box-shadow: 0 3px 10px rgba(13,148,136,.3);
-      display: flex;
-      align-items: center;
-      gap: 6px;
+      background: var(--surface); color: var(--text);
+      font-family: var(--font); font-size: .9rem;
+      box-sizing: border-box; transition: border .2s;
     }
-    .btn-save:hover { opacity: .88; transform: translateY(-1px); }
-    .btn-save:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+    .modal-confirm-input:focus { outline: none; border-color: var(--danger); }
+    [data-theme=dark] .modal-confirm-input { border-color: var(--gray-600); background: var(--gray-800); }
 
-    /* ── Not found / unauthorized ── */
-    .not-found-state {
-      text-align: center;
-      padding: 80px 24px;
+    .modal-footer {
+      padding: 14px 22px;
+      border-top: 1.5px solid var(--gray-200);
+      display: flex; gap: 10px; justify-content: flex-end;
     }
-    .not-found-state .icon { font-size: 3.5rem; margin-bottom: 16px; display: block; }
-    .not-found-state h2 { font-size: 1.2rem; font-weight: 800; color: var(--primary); margin-bottom: 8px; }
-    .not-found-state p  { font-size: .88rem; color: var(--gray-500); margin-bottom: 20px; line-height: 1.6; }
+    [data-theme=dark] .modal-footer { border-color: var(--gray-700); }
 
-    /* Dark mode */
-    [data-theme="dark"] .edit-card      { border-color: var(--gray-700); }
-    [data-theme="dark"] .edit-card-title{ border-color: var(--gray-700); }
-    [data-theme="dark"] .field label    { color: var(--gray-300); }
-    [data-theme="dark"] .field input,
-    [data-theme="dark"] .field select,
-    [data-theme="dark"] .field textarea { background: var(--gray-800); border-color: var(--gray-600); }
-    [data-theme="dark"] .tags-wrap      { background: var(--gray-800); border-color: var(--gray-600); }
-    [data-theme="dark"] .pay-type-btn   { border-color: var(--gray-600); color: var(--gray-400); }
-    [data-theme="dark"] .urgency-btn    { border-color: var(--gray-600); color: var(--gray-400); }
-    [data-theme="dark"] .save-bar       { border-color: var(--gray-700); }
-    [data-theme="dark"] .btn-discard    { border-color: var(--gray-600); color: var(--gray-400); }
-    [data-theme="dark"] .btn-back-link  { border-color: var(--gray-700); color: var(--gray-400); }
+    .btn-modal-cancel {
+      padding: 10px 20px; border-radius: var(--radius-sm);
+      border: 1.5px solid var(--gray-200); background: none;
+      color: var(--gray-500); font-weight: 700; font-size: .86rem;
+      cursor: pointer; font-family: var(--font); transition: all .15s;
+    }
+    .btn-modal-cancel:hover { border-color: var(--gray-400); }
+    [data-theme=dark] .btn-modal-cancel { border-color: var(--gray-600); }
+
+    .btn-modal-delete {
+      padding: 10px 22px; border-radius: var(--radius-sm);
+      background: var(--danger); color: #fff; border: none;
+      font-weight: 700; font-size: .86rem; cursor: pointer;
+      font-family: var(--font); transition: opacity .2s;
+    }
+    .btn-modal-delete:hover { opacity: .88; }
+    .btn-modal-delete:disabled { opacity: .4; cursor: not-allowed; }
+
+    /* ══════════════════════════════════
+       INFO BOX
+    ══════════════════════════════════ */
+    .ge-info-box {
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      padding: 11px 14px; margin: 12px 0;
+      font-size: .85rem; line-height: 1.65;
+    }
+    .ge-info-box.teal   { background: rgba(13,148,136,.07);  border-left: 3px solid var(--teal); }
+    .ge-info-box.warn   { background: rgba(245,158,11,.07);  border-left: 3px solid #f59e0b; }
+    .ge-info-box.danger { background: rgba(239,68,68,.06);   border-left: 3px solid var(--danger); }
+
+    /* ══════════════════════════════════
+       SAVED SUCCESS TOAST (big)
+    ══════════════════════════════════ */
+    .save-success-banner {
+      position: fixed; bottom: 24px; left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: linear-gradient(135deg, #064e3b, #059669);
+      color: #fff; border-radius: var(--radius);
+      padding: 14px 28px;
+      display: flex; align-items: center; gap: 12px;
+      font-weight: 700; font-size: .92rem;
+      box-shadow: 0 8px 28px rgba(5,150,105,.35);
+      z-index: 400;
+      transition: transform .35s cubic-bezier(.34,1.56,.64,1), opacity .3s;
+      opacity: 0; pointer-events: none;
+    }
+    .save-success-banner.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1; pointer-events: auto;
+    }
+
   </style>
 </head>
 <body>
 
+  <!-- Delete Confirm Modal -->
+  <div class="modal-overlay" id="deleteModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title">🗑️ Gig Delete Karo</div>
+        <button class="modal-close-btn" id="deleteModalClose">✕</button>
+      </div>
+      <div class="modal-body">
+        <p>
+          Yeh action <strong>permanent hai</strong> — gig aur saari applications delete ho
+          jaayenge. Workers ko notification jaayegi.
+        </p>
+        <p>Confirm karne ke liye neeche <strong>"DELETE"</strong> type karo:</p>
+        <input class="modal-confirm-input" id="deleteConfirmInput"
+          placeholder='Type "DELETE" to confirm' autocomplete="off" />
+      </div>
+      <div class="modal-footer">
+        <button class="btn-modal-cancel" id="deleteCancel">Cancel</button>
+        <button class="btn-modal-delete" id="btnConfirmDelete" disabled>🗑️ Delete Gig</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Save success banner -->
+  <div class="save-success-banner" id="saveBanner">
+    ✅ Changes saved successfully!
+    <button onclick="document.getElementById('saveBanner').classList.remove('show')"
+      style="background:rgba(255,255,255,.2);border:none;color:#fff;border-radius:6px;padding:3px 9px;cursor:pointer;font-weight:700;font-size:.8rem">✕</button>
+  </div>
+
+  <!-- Autosave progress bar -->
+  <div class="autosave-bar">
+    <div class="autosave-bar-fill" id="autosaveBar"></div>
+  </div>
+
+  <div id="page-loader"></div>
   <div id="announce-bar"></div>
   <nav id="main-nav"></nav>
 
   <main>
-    <div class="edit-wrap">
 
-      <!-- Populated by JS -->
-      <div id="editContent"></div>
+    <!-- ══════════════════════════════════
+         HERO
+    ══════════════════════════════════ -->
+    <section class="ge-hero">
+      <div class="ge-hero-inner">
+        <div>
+          <div class="ge-eyebrow">✏️ Edit Gig</div>
+          <h1>Gig <span>Update</span> Karo</h1>
+          <p class="ge-hero-sub">
+            Title, budget, location, requirements — sab edit karo.
+            Changes auto-save hote hain, publish karne pe live ho jaayenge.
+          </p>
+        </div>
+        <div class="ge-hero-right">
+          <div class="ge-gig-id">GIG #GL-2026-0314</div>
+          <button class="ge-status-pill active" id="statusPill" title="Click to change status">
+            <span id="statusDot">🟢</span>
+            <span id="statusLabel">Active</span>
+            <span style="font-size:.8rem;opacity:.7">▾</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════
+         STICKY ACTION BAR
+    ══════════════════════════════════ -->
+    <div class="ge-action-bar" id="actionBar">
+      <div class="ge-action-inner">
+        <div class="ge-action-left">
+          <div class="ge-save-indicator">
+            <div class="ge-save-dot unsaved" id="saveDot"></div>
+            <span id="saveLabel">Unsaved changes</span>
+          </div>
+          <button class="btn-ge btn-ge-outline" id="btnPreviewGig">👁️ Preview</button>
+        </div>
+        <div class="ge-action-right">
+          <a href="dashboard.html" class="btn-ge btn-ge-outline">← Back</a>
+          <button class="btn-ge btn-ge-danger" id="btnDeleteGig">🗑️ Delete</button>
+          <button class="btn-ge btn-ge-primary" id="btnSaveGig">💾 Save Changes</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Unsaved changes banner -->
+    <div class="unsaved-banner show" id="unsavedBanner">
+      <div class="unsaved-banner-inner">
+        <span class="ub-icon">⚠️</span>
+        <span class="ub-text">Unsaved changes hain — "Save Changes" press karo publish karne ke liye.</span>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════
+         BODY
+    ══════════════════════════════════ -->
+    <div class="ge-body">
+
+      <!-- ── LEFT: FORM ── -->
+      <div class="ge-left">
+
+        <!-- Breadcrumb -->
+        <div id="breadcrumb" style="margin-bottom:20px"></div>
+
+        <!-- ════ SECTION 1: BASICS ════ -->
+        <div class="ge-section">
+          <div class="ge-section-header">
+            <div class="ge-sec-icon">📋</div>
+            <div>
+              <div class="ge-sec-title">Basic Information</div>
+              <div class="ge-sec-sub">Title, category aur description</div>
+            </div>
+            <span class="ge-sec-badge required">Required</span>
+          </div>
+          <div class="ge-section-body">
+
+            <!-- Title -->
+            <div class="form-group">
+              <label class="form-label" for="gigTitle">
+                Gig Title <span class="lbl-req">*</span>
+                <span class="lbl-tip">Be specific!</span>
+              </label>
+              <input type="text" class="form-input" id="gigTitle"
+                value="Weekend Warehouse Packing Helper"
+                placeholder="e.g. Weekend Delivery Helper — Gurugram Sector 14"
+                maxlength="80" autocomplete="off" />
+              <div class="char-count"><span id="titleCount">39</span>/80</div>
+              <div class="form-error-msg" id="titleError">Title kam se kam 10 characters ka hona chahiye.</div>
+            </div>
+
+            <!-- Category -->
+            <div class="form-group">
+              <label class="form-label">
+                Category <span class="lbl-req">*</span>
+              </label>
+              <div class="cat-grid" id="catGrid">
+                <button class="cat-btn" data-cat="delivery">
+                  <span class="cat-emoji">🛵</span>
+                  <span class="cat-label">Delivery</span>
+                </button>
+                <button class="cat-btn" data-cat="cleaning">
+                  <span class="cat-emoji">🧹</span>
+                  <span class="cat-label">Cleaning</span>
+                </button>
+                <button class="cat-btn selected" data-cat="warehouse">
+                  <span class="cat-emoji">📦</span>
+                  <span class="cat-label">Warehouse</span>
+                </button>
+                <button class="cat-btn" data-cat="moving">
+                  <span class="cat-emoji">🚛</span>
+                  <span class="cat-label">Moving</span>
+                </button>
+                <button class="cat-btn" data-cat="teaching">
+                  <span class="cat-emoji">📚</span>
+                  <span class="cat-label">Teaching</span>
+                </button>
+                <button class="cat-btn" data-cat="tech">
+                  <span class="cat-emoji">💻</span>
+                  <span class="cat-label">Tech Help</span>
+                </button>
+                <button class="cat-btn" data-cat="event">
+                  <span class="cat-emoji">🎪</span>
+                  <span class="cat-label">Event Help</span>
+                </button>
+                <button class="cat-btn" data-cat="other">
+                  <span class="cat-emoji">🔧</span>
+                  <span class="cat-label">Other</span>
+                </button>
+              </div>
+              <div class="form-error-msg" id="catError">Category select karo.</div>
+            </div>
+
+            <!-- Description -->
+            <div class="form-group">
+              <label class="form-label" for="gigDesc">
+                Description <span class="lbl-req">*</span>
+                <span class="lbl-tip">Be detailed for better applications</span>
+              </label>
+              <textarea class="form-textarea" id="gigDesc"
+                placeholder="Kya kaam karna hai? Kya equipment/skills chahiye? Koi specific requirements?" maxlength="1000"
+                style="min-height:140px">Warehouse mein weekend packing kaam. Boxes pack karni hain, labeling karni hai aur shelves organize karni hain. Physical work hai — standing aur lifting involved. Experience preferred but not required.</textarea>
+              <div class="char-count"><span id="descCount">185</span>/1000</div>
+              <div class="form-error-msg" id="descError">Description kam se kam 30 characters ka hona chahiye.</div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ════ SECTION 2: LOCATION & TIMING ════ -->
+        <div class="ge-section">
+          <div class="ge-section-header">
+            <div class="ge-sec-icon">📍</div>
+            <div>
+              <div class="ge-sec-title">Location & Timing</div>
+              <div class="ge-sec-sub">Kahan aur kab kaam hoga</div>
+            </div>
+            <span class="ge-sec-badge required">Required</span>
+          </div>
+          <div class="ge-section-body">
+
+            <!-- Location -->
+            <div class="form-group">
+              <label class="form-label" for="gigLocation">
+                Location / Area <span class="lbl-req">*</span>
+              </label>
+              <div class="input-icon-wrap">
+                <span class="iw-icon">📍</span>
+                <input type="text" class="form-input" id="gigLocation"
+                  value="Sector 14, Gurugram"
+                  placeholder="e.g. Sector 14, Gurugram near Huda City Centre"
+                  maxlength="100" />
+              </div>
+              <div class="form-hint">
+                Exact address workers ko accept hone ke baad share karo chat mein — public nahi hogi.
+              </div>
+            </div>
+
+            <!-- City -->
+            <div class="form-group">
+              <label class="form-label" for="gigCity">City <span class="lbl-req">*</span></label>
+              <select class="form-select" id="gigCity">
+                <option value="">Select city…</option>
+                <optgroup label="NCR">
+                  <option value="gurugram" selected>Gurugram</option>
+                  <option value="delhi">Delhi</option>
+                  <option value="noida">Noida</option>
+                  <option value="faridabad">Faridabad</option>
+                  <option value="ghaziabad">Ghaziabad</option>
+                </optgroup>
+                <optgroup label="Other">
+                  <option value="mumbai">Mumbai</option>
+                  <option value="bangalore">Bangalore</option>
+                  <option value="hyderabad">Hyderabad</option>
+                  <option value="pune">Pune</option>
+                  <option value="other">Other</option>
+                </optgroup>
+              </select>
+            </div>
+
+            <!-- Work Mode -->
+            <div class="form-group">
+              <label class="form-label">Work Mode</label>
+              <div style="display:flex;gap:10px;flex-wrap:wrap">
+                <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.88rem;font-weight:600;color:var(--gray-600)">
+                  <input type="radio" name="workMode" value="onsite" checked style="accent-color:var(--teal)">
+                  📍 On-Site
+                </label>
+                <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.88rem;font-weight:600;color:var(--gray-600)">
+                  <input type="radio" name="workMode" value="remote" style="accent-color:var(--teal)">
+                  💻 Remote
+                </label>
+                <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.88rem;font-weight:600;color:var(--gray-600)">
+                  <input type="radio" name="workMode" value="hybrid" style="accent-color:var(--teal)">
+                  🔄 Hybrid
+                </label>
+              </div>
+            </div>
+
+            <!-- Date & Time -->
+            <div class="form-group">
+              <label class="form-label">
+                Date & Time <span class="lbl-req">*</span>
+              </label>
+              <div class="datetime-row">
+                <div>
+                  <div style="font-size:.76rem;font-weight:700;color:var(--gray-400);margin-bottom:5px">Start Date</div>
+                  <input type="date" class="form-input" id="gigDate" value="2026-03-14" />
+                </div>
+                <div>
+                  <div style="font-size:.76rem;font-weight:700;color:var(--gray-400);margin-bottom:5px">Start Time</div>
+                  <input type="time" class="form-input" id="gigTimeStart" value="09:00" />
+                </div>
+                <div>
+                  <div style="font-size:.76rem;font-weight:700;color:var(--gray-400);margin-bottom:5px">End Time</div>
+                  <input type="time" class="form-input" id="gigTimeEnd" value="17:00" />
+                </div>
+              </div>
+            </div>
+
+            <!-- Duration type -->
+            <div class="form-group">
+              <label class="form-label" for="gigDuration">Gig Duration / Type</label>
+              <select class="form-select" id="gigDuration">
+                <option value="oneday" selected>📅 One Day</option>
+                <option value="weekend">🗓️ Weekend (2 days)</option>
+                <option value="week">📆 1 Week</option>
+                <option value="fortnight">📆 2 Weeks</option>
+                <option value="month">🗓️ 1 Month</option>
+                <option value="ongoing">🔄 Ongoing / Recurring</option>
+                <option value="flexible">⏰ Flexible / To Be Discussed</option>
+              </select>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ════ SECTION 3: BUDGET & PAYMENT ════ -->
+        <div class="ge-section">
+          <div class="ge-section-header">
+            <div class="ge-sec-icon">💰</div>
+            <div>
+              <div class="ge-sec-title">Budget & Payment</div>
+              <div class="ge-sec-sub">Kitna pay karoge aur kaise</div>
+            </div>
+            <span class="ge-sec-badge required">Required</span>
+          </div>
+          <div class="ge-section-body">
+
+            <div class="budget-row">
+              <div class="form-group" style="margin-bottom:0">
+                <label class="form-label" for="gigBudget">
+                  Budget <span class="lbl-req">*</span>
+                </label>
+                <div class="input-icon-wrap">
+                  <span class="iw-icon">₹</span>
+                  <input type="number" class="form-input" id="gigBudget"
+                    value="1200" min="100" max="999999"
+                    placeholder="e.g. 1200" />
+                </div>
+                <div class="form-error-msg" id="budgetError">Minimum ₹100 enter karo.</div>
+              </div>
+              <div class="form-group" style="margin-bottom:0">
+                <label class="form-label" for="gigPayType">Payment Type</label>
+                <select class="form-select" id="gigPayType">
+                  <option value="fixed" selected>💰 Fixed Amount</option>
+                  <option value="perhour">⏱️ Per Hour</option>
+                  <option value="perday">📅 Per Day</option>
+                  <option value="negotiate">🤝 Negotiable</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="ge-info-box teal" id="feeBreakdownBox" style="margin-top:16px">
+              💡 <strong>Platform fee (6%):</strong> Worker ko milega
+              <strong id="workerGets">₹1,128</strong>
+              (₹1,200 − <span id="feeAmt">₹72</span>).
+              Poster ke liye koi extra charge nahi.
+            </div>
+
+            <!-- Payment method -->
+            <div class="form-group" style="margin-top:16px">
+              <label class="form-label">Payment Method</label>
+              <div style="display:flex;gap:10px;flex-wrap:wrap">
+                <label style="display:flex;align-items:center;gap:7px;cursor:pointer;font-size:.88rem;font-weight:600;color:var(--gray-600)">
+                  <input type="checkbox" name="payMethod" value="platform" checked style="accent-color:var(--teal)"> 🏦 Platform Wallet
+                </label>
+                <label style="display:flex;align-items:center;gap:7px;cursor:pointer;font-size:.88rem;font-weight:600;color:var(--gray-600)">
+                  <input type="checkbox" name="payMethod" value="upi" style="accent-color:var(--teal)"> 📱 UPI (via platform)
+                </label>
+              </div>
+              <div class="ge-info-box warn" style="margin-top:10px">
+                ⚠️ Off-platform payments (direct cash/UPI) Terms violation hai — GigLega koi protection nahi deta.
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ════ SECTION 4: REQUIREMENTS ════ -->
+        <div class="ge-section">
+          <div class="ge-section-header">
+            <div class="ge-sec-icon">📝</div>
+            <div>
+              <div class="ge-sec-title">Requirements & Skills</div>
+              <div class="ge-sec-sub">Worker se kya chahiye</div>
+            </div>
+            <span class="ge-sec-badge optional">Optional</span>
+          </div>
+          <div class="ge-section-body">
+
+            <!-- Skills Tags -->
+            <div class="form-group">
+              <label class="form-label">Required Skills / Tags</label>
+              <div class="tags-wrap" id="tagsWrap">
+                <span class="tag-chip" data-tag="Physical Work">Physical Work <button class="tag-chip-remove" data-remove="Physical Work">✕</button></span>
+                <span class="tag-chip" data-tag="Lifting">Lifting <button class="tag-chip-remove" data-remove="Lifting">✕</button></span>
+                <span class="tag-chip" data-tag="Weekend">Weekend <button class="tag-chip-remove" data-remove="Weekend">✕</button></span>
+                <input class="tags-input" id="tagsInput" placeholder="Add skill…" maxlength="30" />
+              </div>
+              <div class="form-hint">Enter ya comma press karo tag add karne ke liye. Max 8 tags.</div>
+              <div class="suggested-tags" id="suggestedTags">
+                <button class="sug-tag" data-sug="No Experience Needed">+ No Experience</button>
+                <button class="sug-tag" data-sug="Fresher OK">+ Fresher OK</button>
+                <button class="sug-tag" data-sug="Driving License">+ Driving License</button>
+                <button class="sug-tag" data-sug="Own Vehicle">+ Own Vehicle</button>
+                <button class="sug-tag" data-sug="English Speaking">+ English Speaking</button>
+                <button class="sug-tag" data-sug="Laptop Required">+ Laptop Required</button>
+              </div>
+            </div>
+
+            <!-- Number of positions -->
+            <div class="form-group">
+              <label class="form-label">Number of Positions</label>
+              <div class="stepper-row">
+                <button class="stepper-btn" id="stepperMinus">−</button>
+                <div class="stepper-val" id="stepperVal">2</div>
+                <button class="stepper-btn" id="stepperPlus">+</button>
+                <div class="stepper-label" id="stepperLabel">positions available</div>
+              </div>
+              <div class="form-hint">Ek se zyada workers hire karne hain? Positions badhao.</div>
+            </div>
+
+            <!-- Experience level -->
+            <div class="form-group">
+              <label class="form-label" for="gigExp">Experience Required</label>
+              <select class="form-select" id="gigExp">
+                <option value="none">🟢 No Experience Required</option>
+                <option value="basic" selected>🔵 Basic (1–6 months)</option>
+                <option value="intermediate">🟡 Intermediate (6m–2yr)</option>
+                <option value="experienced">🟠 Experienced (2yr+)</option>
+              </select>
+            </div>
+
+            <!-- Gender preference -->
+            <div class="form-group">
+              <label class="form-label" for="gigGender">Gender Preference</label>
+              <select class="form-select" id="gigGender">
+                <option value="any" selected>👥 Any / No Preference</option>
+                <option value="male">👨 Male</option>
+                <option value="female">👩 Female</option>
+              </select>
+              <div class="form-hint">Bina genuine reason ke gender filter avoid karo — inclusivity badhaata hai.</div>
+            </div>
+
+            <!-- Additional requirements text -->
+            <div class="form-group">
+              <label class="form-label" for="gigReqs">Additional Requirements (Optional)</label>
+              <textarea class="form-textarea" id="gigReqs"
+                placeholder="Koi special requirements — dress code, tools/equipment lana, certification, etc."
+                maxlength="400" style="min-height:80px">Comfortable clothes pehno. Heavy lifting hogi — back issues wale avoid karein.</textarea>
+              <div class="char-count"><span id="reqsCount">71</span>/400</div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ════ SECTION 5: PHOTOS ════ -->
+        <div class="ge-section">
+          <div class="ge-section-header">
+            <div class="ge-sec-icon">📸</div>
+            <div>
+              <div class="ge-sec-title">Photos</div>
+              <div class="ge-sec-sub">Work location ya kaam ki photos (optional but recommended)</div>
+            </div>
+            <span class="ge-sec-badge optional">Optional</span>
+          </div>
+          <div class="ge-section-body">
+
+            <div class="photo-grid" id="photoGrid">
+              <!-- Slot 1 — has image -->
+              <div class="photo-slot has-image" data-slot="0">
+                <img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=200&q=60" alt="Warehouse" />
+                <button class="photo-remove-btn" data-remove="0">✕</button>
+              </div>
+              <!-- Slot 2 — empty -->
+              <div class="photo-slot" data-slot="1">
+                <div class="photo-slot-icon">📷</div>
+                <div class="photo-slot-label">Add Photo</div>
+              </div>
+              <!-- Slot 3 — empty -->
+              <div class="photo-slot" data-slot="2">
+                <div class="photo-slot-icon">📷</div>
+                <div class="photo-slot-label">Add Photo</div>
+              </div>
+              <!-- Slot 4 — empty -->
+              <div class="photo-slot" data-slot="3">
+                <div class="photo-slot-icon">📷</div>
+                <div class="photo-slot-label">Add Photo</div>
+              </div>
+            </div>
+            <input type="file" id="photoInput" accept="image/*" style="display:none" multiple />
+            <div class="form-hint">Max 4 photos. JPG/PNG, 5MB each. Photos se gig 40% better visible hota hai.</div>
+
+          </div>
+        </div>
+
+        <!-- ════ SECTION 6: SETTINGS ════ -->
+        <div class="ge-section">
+          <div class="ge-section-header">
+            <div class="ge-sec-icon">⚙️</div>
+            <div>
+              <div class="ge-sec-title">Gig Settings</div>
+              <div class="ge-sec-sub">Visibility aur notification preferences</div>
+            </div>
+            <span class="ge-sec-badge optional">Optional</span>
+          </div>
+          <div class="ge-section-body">
+
+            <div class="toggle-row">
+              <div class="tr-left">
+                <h4>🔍 Publicly Visible</h4>
+                <p>Browse page pe sab users ko dikhega</p>
+              </div>
+              <button class="toggle-switch on" id="toggleVisible">
+                <div class="toggle-knob"></div>
+              </button>
+            </div>
+            <div class="toggle-row">
+              <div class="tr-left">
+                <h4>🔔 Application Notifications</h4>
+                <p>Naya application aane pe email/SMS</p>
+              </div>
+              <button class="toggle-switch on" id="toggleNotif">
+                <div class="toggle-knob"></div>
+              </button>
+            </div>
+            <div class="toggle-row">
+              <div class="tr-left">
+                <h4>⚡ Instant Hire Mode</h4>
+                <p>First eligible applicant auto-accept (no review needed)</p>
+              </div>
+              <button class="toggle-switch" id="toggleInstant">
+                <div class="toggle-knob"></div>
+              </button>
+            </div>
+            <div class="toggle-row">
+              <div class="tr-left">
+                <h4>🎖️ Show Verified Badge Only</h4>
+                <p>Sirf verified accounts se applications</p>
+              </div>
+              <button class="toggle-switch" id="toggleVerified">
+                <div class="toggle-knob"></div>
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ════ CHANGE LOG ════ -->
+        <div class="ge-section" id="changeLogSection" style="display:none">
+          <div class="ge-section-header">
+            <div class="ge-sec-icon">📊</div>
+            <div>
+              <div class="ge-sec-title">Changes Summary</div>
+              <div class="ge-sec-sub">Kya-kya update hua is session mein</div>
+            </div>
+          </div>
+          <div class="ge-section-body">
+            <div class="change-log show" id="changeLogList"></div>
+          </div>
+        </div>
+
+      </div>
+      <!-- /ge-left -->
+
+      <!-- ── RIGHT SIDEBAR ── -->
+      <div class="ge-sidebar">
+
+        <!-- Live Preview -->
+        <div class="preview-card">
+          <div class="preview-header">
+            <div class="preview-title-text">👁️ Live Preview</div>
+            <div class="preview-live-dot">
+              <div class="live-pulse"></div>
+              Updates as you type
+            </div>
+          </div>
+          <div class="gig-preview">
+            <div class="gp-cat-tag" id="pvCat">📦 Warehouse</div>
+            <div class="gp-title" id="pvTitle">Weekend Warehouse Packing Helper</div>
+            <div class="gp-meta">
+              <span class="gp-meta-chip">📍 <span id="pvLocation">Sec 14, Gurugram</span></span>
+              <span class="gp-meta-chip">📅 <span id="pvDate">Mar 14</span></span>
+              <span class="gp-meta-chip">👥 <span id="pvPositions">2</span> positions</span>
+            </div>
+            <div class="gp-desc" id="pvDesc">
+              Warehouse mein weekend packing kaam. Boxes pack karni hain, labeling karni hai aur shelves organize karni hain.
+            </div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px" id="pvTags">
+              <span style="background:rgba(13,148,136,.08);border:1px solid rgba(13,148,136,.15);border-radius:5px;padding:2px 8px;font-size:.72rem;font-weight:700;color:var(--teal)">Physical Work</span>
+              <span style="background:rgba(13,148,136,.08);border:1px solid rgba(13,148,136,.15);border-radius:5px;padding:2px 8px;font-size:.72rem;font-weight:700;color:var(--teal)">Lifting</span>
+              <span style="background:rgba(13,148,136,.08);border:1px solid rgba(13,148,136,.15);border-radius:5px;padding:2px 8px;font-size:.72rem;font-weight:700;color:var(--teal)">Weekend</span>
+            </div>
+            <div class="gp-footer">
+              <div class="gp-budget" id="pvBudget">₹1,200 <span>/fixed</span></div>
+              <div style="display:flex;gap:5px;align-items:center">
+                <span style="font-size:.78rem;font-weight:700;color:var(--gray-400)">⭐ Your Gig</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Completion Score -->
+        <div class="score-card">
+          <div class="sc-title">📊 Listing Score</div>
+          <div class="sc-meter">
+            <div class="sc-fill" id="scoreFill" style="width:72%"></div>
+          </div>
+          <div class="sc-pct" id="scorePct">72% — Good</div>
+          <div class="sc-items" id="scoreItems">
+            <div class="sc-item done"><div class="sci-dot"></div>Title added ✓</div>
+            <div class="sc-item done"><div class="sci-dot"></div>Category selected ✓</div>
+            <div class="sc-item done"><div class="sci-dot"></div>Description written ✓</div>
+            <div class="sc-item done"><div class="sci-dot"></div>Budget set ✓</div>
+            <div class="sc-item done"><div class="sci-dot"></div>Location added ✓</div>
+            <div class="sc-item done"><div class="sci-dot"></div>Date & time set ✓</div>
+            <div class="sc-item pending"><div class="sci-dot"></div>Add photos (recommended)</div>
+            <div class="sc-item pending"><div class="sci-dot"></div>Add skill tags</div>
+          </div>
+        </div>
+
+        <!-- Tips -->
+        <div class="tips-card">
+          <div class="tips-title">💡 Pro Tips</div>
+          <div class="tip-item">
+            <span class="tip-icon">📝</span>
+            <span>Title mein location include karo — e.g. "Gurugram Sector 14". 2x better visibility.</span>
+          </div>
+          <div class="tip-item">
+            <span class="tip-icon">💰</span>
+            <span>Market rate se 10–15% zyada budget rakho — quality applications aati hain.</span>
+          </div>
+          <div class="tip-item">
+            <span class="tip-icon">📸</span>
+            <span>Ek real photo add karo workspace ka — applications 40% badh jaati hain.</span>
+          </div>
+          <div class="tip-item">
+            <span class="tip-icon">⏰</span>
+            <span>Weekday mornings mein post karo — zyada workers online hote hain 9–11 AM.</span>
+          </div>
+        </div>
+
+        <!-- Sidebar Actions -->
+        <div class="action-card">
+          <button class="btn-full btn-full-primary" id="btnSaveSidebar">💾 Save Changes</button>
+          <button class="btn-full btn-full-outline" id="btnPauseSidebar">⏸️ Pause Gig</button>
+          <button class="btn-full btn-full-outline" onclick="window.location.href='post-gig-form.html'">
+            ➕ Post Another Gig
+          </button>
+          <div style="height:1px;background:var(--gray-100);margin:10px 0"></div>
+          <button class="btn-full btn-full-danger" id="btnDeleteSidebar">🗑️ Delete Gig</button>
+        </div>
+
+      </div>
+      <!-- /ge-sidebar -->
 
     </div>
   </main>
@@ -358,423 +1430,514 @@
   <div id="toast-container"></div>
 
   <script>
-  (function () {
+  document.addEventListener("DOMContentLoaded", function () {
 
-    /* ── Auth guard ── */
-    var user = (function () {
-      try {
-        var u = JSON.parse(localStorage.getItem("gl_user") || "null");
-        return (u && u.id) ? u : null;
-      } catch(e) { return null; }
-    })();
+    /* ══════════════════════════════════
+       INITIAL DATA SNAPSHOT
+    ══════════════════════════════════ */
+    var ORIGINAL = {
+      title:    document.getElementById("gigTitle").value,
+      desc:     document.getElementById("gigDesc").value,
+      location: document.getElementById("gigLocation").value,
+      budget:   document.getElementById("gigBudget").value,
+      city:     document.getElementById("gigCity").value,
+      cat:      "warehouse"
+    };
 
-    if (!user) {
-      window.location.href = "login.html?redirect=gig-edit.html";
-      return;
+    /* ══════════════════════════════════
+       BREADCRUMB
+    ══════════════════════════════════ */
+    if (typeof buildBreadcrumb === "function") {
+      buildBreadcrumb("breadcrumb", [
+        { label: "Home",      href: "index.html" },
+        { label: "Dashboard", href: "dashboard.html" },
+        { label: "Edit Gig — #GL-2026-0314" }
+      ]);
     }
 
-    var gigId  = new URLSearchParams(window.location.search).get("id");
-    var gigs   = JSON.parse(localStorage.getItem("gl_gigs") || "[]");
-    var gigIdx = gigs.findIndex(function (g) { return g.id === gigId; });
-    var gig    = gigs[gigIdx];
-    var wrap   = document.getElementById("editContent");
+    /* ══════════════════════════════════
+       UNSAVED STATE TRACKING
+    ══════════════════════════════════ */
+    var hasChanges  = true;   // demo starts with unsaved
+    var autoSaveTimer = null;
 
-    /* ── Gig not found ── */
-    if (!gig) {
-      wrap.innerHTML =
-        '<div class="not-found-state">' +
-          '<span class="icon">🔍</span>' +
-          '<h2>Gig not found</h2>' +
-          '<p>This gig doesn\'t exist or may have been deleted.</p>' +
-          '<a href="dashboard-client.html" class="btn btn-primary">← Back to Dashboard</a>' +
-        '</div>';
-      return;
+    function markUnsaved() {
+      hasChanges = true;
+      setSaveState("unsaved");
+      document.getElementById("unsavedBanner").classList.add("show");
+      clearTimeout(autoSaveTimer);
+      autoSaveTimer = setTimeout(autoSave, 4000); // auto-save after 4s idle
     }
 
-    /* ── Unauthorized ── */
-    if (gig.postedBy !== user.id && gig.posterEmail !== user.email) {
-      wrap.innerHTML =
-        '<div class="not-found-state">' +
-          '<span class="icon">🔒</span>' +
-          '<h2>Access Denied</h2>' +
-          '<p>You can only edit gigs that you posted.</p>' +
-          '<a href="dashboard-client.html" class="btn btn-primary">← Back to Dashboard</a>' +
-        '</div>';
-      return;
+    function setSaveState(state) {
+      var dot   = document.getElementById("saveDot");
+      var label = document.getElementById("saveLabel");
+      dot.className = "ge-save-dot " + state;
+      var labels = { unsaved: "Unsaved changes", saving: "Saving…", saved: "All changes saved" };
+      label.textContent = labels[state] || "";
     }
 
-    /* ── State ── */
-    var tags    = (gig.tags || []).slice();
-    var payType = gig.payType || "hourly";
-    var urgency = gig.urgency || "medium";
-    var isDirty = false;
-
-    /* ── Helpers ── */
-    function escH(s) {
-      return String(s || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
-    }
-    function statusLabel(s) {
-      return s === "open" ? "Open — Accepting applications" :
-             s === "closed" ? "Closed — Not accepting applications" :
-             "Filled — Worker hired";
+    function autoSave() {
+      if (!hasChanges) return;
+      setSaveState("saving");
+      animateAutosaveBar();
+      setTimeout(function () {
+        setSaveState("saved");
+        hasChanges = false;
+        document.getElementById("unsavedBanner").classList.remove("show");
+      }, 800);
     }
 
-    /* ── Render page ── */
-    var statusClass = gig.status || "open";
+    function animateAutosaveBar() {
+      var bar = document.getElementById("autosaveBar");
+      bar.style.width = "0%";
+      bar.classList.remove("saved");
+      setTimeout(function () { bar.style.width = "100%"; }, 50);
+      setTimeout(function () {
+        bar.classList.add("saved");
+        setTimeout(function () { bar.style.width = "0%"; }, 800);
+      }, 850);
+    }
 
-    wrap.innerHTML =
-      /* Header */
-      '<div class="edit-header">' +
-        '<div class="edit-header-left">' +
-          '<h1>✏️ Edit Gig</h1>' +
-          '<p>Changes will be visible to workers immediately after saving.</p>' +
-        '</div>' +
-        '<a href="dashboard-client.html" class="btn-back-link">← My Dashboard</a>' +
-      '</div>' +
+    /* Warn on leave with unsaved */
+    window.addEventListener("beforeunload", function (e) {
+      if (hasChanges) { e.preventDefault(); e.returnValue = ""; }
+    });
 
-      /* Status bar */
-      '<div class="gig-status-bar ' + statusClass + '" id="statusBar">' +
-        '<div class="status-left">' +
-          '<div class="status-dot ' + statusClass + '" id="statusDot"></div>' +
-          '<div>' +
-            '<div class="status-label" id="statusLabelTxt">' + statusLabel(statusClass) + '</div>' +
-            '<div class="status-sub">Gig ID: ' + escH(gigId) + '</div>' +
-          '</div>' +
-        '</div>' +
-        (statusClass === "open"
-          ? '<button class="btn-toggle-status close-gig" id="btnToggleStatus">⏸ Close Gig</button>'
-          : '<button class="btn-toggle-status reopen-gig" id="btnToggleStatus">▶ Reopen Gig</button>') +
-      '</div>' +
+    /* ══════════════════════════════════
+       CHAR COUNTERS
+    ══════════════════════════════════ */
+    function initCharCount(inputId, countId, max) {
+      var el = document.getElementById(inputId);
+      var ct = document.getElementById(countId);
+      if (!el || !ct) return;
+      function update() {
+        var len = el.value.length;
+        ct.textContent = len;
+        ct.parentElement.className = "char-count" +
+          (len >= max ? " limit" : len >= max * .85 ? " warn" : "");
+        markUnsaved();
+        updatePreview();
+        updateScore();
+        updateChangeLog();
+      }
+      el.addEventListener("input", update);
+    }
+    initCharCount("gigTitle", "titleCount", 80);
+    initCharCount("gigDesc",  "descCount",  1000);
+    initCharCount("gigReqs",  "reqsCount",  400);
 
-      /* Basic Info */
-      '<div class="edit-card">' +
-        '<div class="edit-card-title">📋 Basic Information</div>' +
+    /* ══════════════════════════════════
+       CATEGORY BUTTONS
+    ══════════════════════════════════ */
+    var selectedCat = "warehouse";
+    var CAT_MAP = {
+      delivery: "🛵 Delivery",  cleaning: "🧹 Cleaning",
+      warehouse: "📦 Warehouse", moving: "🚛 Moving",
+      teaching: "📚 Teaching",  tech: "💻 Tech Help",
+      event: "🎪 Event Help",   other: "🔧 Other"
+    };
+    document.getElementById("catGrid").querySelectorAll(".cat-btn").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        document.querySelectorAll(".cat-btn").forEach(function (b) { b.classList.remove("selected"); });
+        btn.classList.add("selected");
+        selectedCat = btn.dataset.cat;
+        markUnsaved(); updatePreview(); updateScore(); updateChangeLog();
+      });
+    });
 
-        '<div class="field">' +
-          '<label>Gig Title <span class="req">*</span></label>' +
-          '<input type="text" id="fTitle" maxlength="80" value="' + escH(gig.title) + '" placeholder="e.g. Need a delivery person for 2 hours" />' +
-          '<div class="char-count" id="titleCount">' + (gig.title || "").length + '/80</div>' +
-        '</div>' +
+    /* ══════════════════════════════════
+       BUDGET — live fee calc
+    ══════════════════════════════════ */
+    document.getElementById("gigBudget").addEventListener("input", function () {
+      var v = parseFloat(this.value) || 0;
+      var fee = Math.round(v * 0.06);
+      var net = v - fee;
+      document.getElementById("workerGets").textContent = "₹" + net.toLocaleString("en-IN");
+      document.getElementById("feeAmt").textContent = "₹" + fee.toLocaleString("en-IN");
+      markUnsaved(); updatePreview(); updateChangeLog();
+    });
 
-        '<div class="field">' +
-          '<label>Description <span class="req">*</span></label>' +
-          '<textarea id="fDesc" maxlength="1000" placeholder="Describe exactly what needs to be done, any requirements, tools needed...">' + escH(gig.description) + '</textarea>' +
-          '<div class="char-count" id="descCount">' + (gig.description || "").length + '/1000</div>' +
-        '</div>' +
+    document.getElementById("gigLocation").addEventListener("input", function () {
+      markUnsaved(); updatePreview(); updateChangeLog();
+    });
 
-        '<div class="field-row">' +
-          '<div class="field">' +
-            '<label>Category <span class="req">*</span></label>' +
-            '<select id="fCategory">' +
-              ['Delivery','Cleaning','Moving Help','Tech Support','Tutoring','Cooking','Design','Photography','Plumbing','Electrical','Data Entry','Event Help','Security','Gardening','Other'].map(function(c){
-                return '<option value="' + c + '"' + (gig.category === c ? " selected" : "") + '>' + c + '</option>';
-              }).join("") +
-            '</select>' +
-          '</div>' +
-          '<div class="field">' +
-            '<label>Work Type</label>' +
-            '<select id="fWorkType">' +
-              ['On-site','Remote','Both'].map(function(w){
-                return '<option value="' + w + '"' + (gig.workType === w ? " selected" : "") + '>' + w + '</option>';
-              }).join("") +
-            '</select>' +
-          '</div>' +
-        '</div>' +
-      '</div>' +
+    document.getElementById("gigDate").addEventListener("change", function () {
+      markUnsaved(); updatePreview();
+    });
 
-      /* Location & Time */
-      '<div class="edit-card">' +
-        '<div class="edit-card-title">📍 Location & Timing</div>' +
-        '<div class="field-row">' +
-          '<div class="field">' +
-            '<label>City / Area <span class="req">*</span></label>' +
-            '<input type="text" id="fCity" value="' + escH(gig.city) + '" placeholder="e.g. Sector 45, Gurugram" />' +
-          '</div>' +
-          '<div class="field">' +
-            '<label>Full Address / Landmark</label>' +
-            '<input type="text" id="fAddress" value="' + escH(gig.address) + '" placeholder="Specific address or landmark" />' +
-          '</div>' +
-        '</div>' +
-        '<div class="field-row">' +
-          '<div class="field">' +
-            '<label>Start Date</label>' +
-            '<input type="date" id="fDate" value="' + escH(gig.date) + '" />' +
-          '</div>' +
-          '<div class="field">' +
-            '<label>Duration / Hours</label>' +
-            '<input type="text" id="fDuration" value="' + escH(gig.duration) + '" placeholder="e.g. 3 hours, 2 days" />' +
-          '</div>' +
-        '</div>' +
+    document.getElementById("gigCity").addEventListener("change", function () {
+      markUnsaved();
+    });
 
-        /* Urgency */
-        '<div class="field">' +
-          '<label>Urgency Level</label>' +
-          '<div class="urgency-grid" id="urgencyGrid">' +
-            '<button class="urgency-btn low'   + (urgency==="low"    ? " active" : "") + '" data-urgency="low">🟢 Low — Flexible</button>' +
-            '<button class="urgency-btn medium' + (urgency==="medium" ? " active" : "") + '" data-urgency="medium">🟡 Medium — Soon</button>' +
-            '<button class="urgency-btn high'  + (urgency==="high"   ? " active" : "") + '" data-urgency="high">🔴 High — Urgent</button>' +
-          '</div>' +
-        '</div>' +
-      '</div>' +
+    /* ══════════════════════════════════
+       STEPPER (positions)
+    ══════════════════════════════════ */
+    var positions = 2;
+    document.getElementById("stepperMinus").addEventListener("click", function () {
+      if (positions > 1) {
+        positions--;
+        document.getElementById("stepperVal").textContent = positions;
+        document.getElementById("stepperMinus").disabled = positions <= 1;
+        document.getElementById("stepperLabel").textContent =
+          positions === 1 ? "position available" : "positions available";
+        markUnsaved(); updatePreview();
+      }
+    });
+    document.getElementById("stepperPlus").addEventListener("click", function () {
+      if (positions < 50) {
+        positions++;
+        document.getElementById("stepperVal").textContent = positions;
+        document.getElementById("stepperMinus").disabled = false;
+        document.getElementById("stepperLabel").textContent = "positions available";
+        markUnsaved(); updatePreview();
+      }
+    });
+    document.getElementById("stepperMinus").disabled = positions <= 1;
 
-      /* Pay */
-      '<div class="edit-card">' +
-        '<div class="edit-card-title">💸 Payment Details</div>' +
-        '<div class="field">' +
-          '<label>Pay Type</label>' +
-          '<div class="pay-type-wrap" id="payTypeWrap">' +
-            '<button class="pay-type-btn' + (payType==="hourly" ? " active" : "") + '" data-pay="hourly">⏱ Hourly</button>' +
-            '<button class="pay-type-btn' + (payType==="fixed"  ? " active" : "") + '" data-pay="fixed">💰 Fixed Price</button>' +
-            '<button class="pay-type-btn' + (payType==="daily"  ? " active" : "") + '" data-pay="daily">📅 Daily Rate</button>' +
-          '</div>' +
-        '</div>' +
-        '<div class="field-row">' +
-          '<div class="field">' +
-            '<label>Amount (₹) <span class="req">*</span></label>' +
-            '<input type="number" id="fPay" min="0" value="' + escH(gig.pricePerHr || gig.pay) + '" placeholder="e.g. 300" />' +
-            '<div class="field-hint" id="payHint">Amount per ' + (payType==="fixed" ? "project" : payType==="daily" ? "day" : "hour") + '</div>' +
-          '</div>' +
-          '<div class="field">' +
-            '<label>Payment Method</label>' +
-            '<select id="fPayMethod">' +
-              ['Cash on Completion','UPI / Online','GigLega Secure Wallet','Negotiable'].map(function(m){
-                return '<option value="' + m + '"' + (gig.payMethod === m ? " selected" : "") + '>' + m + '</option>';
-              }).join("") +
-            '</select>' +
-          '</div>' +
-        '</div>' +
-      '</div>' +
+    /* ══════════════════════════════════
+       TAGS INPUT
+    ══════════════════════════════════ */
+    var tags = ["Physical Work", "Lifting", "Weekend"];
+    var MAX_TAGS = 8;
 
-      /* Requirements */
-      '<div class="edit-card">' +
-        '<div class="edit-card-title">✅ Requirements & Tags</div>' +
-        '<div class="field">' +
-          '<label>Worker Requirements</label>' +
-          '<textarea id="fRequirements" maxlength="400" placeholder="Any specific skills, experience, tools, or qualities needed...">' + escH(gig.requirements) + '</textarea>' +
-        '</div>' +
-        '<div class="field">' +
-          '<label>Tags <span style="font-weight:400;color:var(--gray-400)">(press Enter or comma to add)</span></label>' +
-          '<div class="tags-wrap" id="tagsWrap">' +
-            '<input type="text" class="tag-input" id="tagInput" placeholder="Add a tag..." />' +
-          '</div>' +
-          '<div class="field-hint">Add up to 8 tags to help workers find your gig. e.g. "urgent", "flexible hours"</div>' +
-        '</div>' +
-      '</div>' +
-
-      /* Danger zone */
-      '<div class="danger-zone">' +
-        '<div class="danger-zone-title">🗑️ Danger Zone</div>' +
-        '<div class="danger-zone-desc">Permanently delete this gig. This action cannot be undone. All applications will also be removed.</div>' +
-        '<button class="btn-delete" id="btnDelete">Delete This Gig</button>' +
-      '</div>' +
-
-      /* Sticky save bar */
-      '<div class="save-bar">' +
-        '<div class="save-bar-left" id="saveBarMsg">All changes saved</div>' +
-        '<div class="save-bar-actions">' +
-          '<button class="btn-discard" id="btnDiscard">Discard Changes</button>' +
-          '<button class="btn-save" id="btnSave" disabled>💾 Save Changes</button>' +
-        '</div>' +
-      '</div>';
-
-    /* ── Render existing tags ── */
     function renderTags() {
-      var wrap2  = document.getElementById("tagsWrap");
-      var input  = document.getElementById("tagInput");
-      wrap2.innerHTML = "";
+      var wrap  = document.getElementById("tagsWrap");
+      var input = document.getElementById("tagsInput");
+      var chips = wrap.querySelectorAll(".tag-chip");
+      chips.forEach(function (c) { c.remove(); });
       tags.forEach(function (t) {
         var chip = document.createElement("span");
         chip.className = "tag-chip";
-        chip.innerHTML = escH(t) + '<button class="tag-remove" data-tag="' + escH(t) + '">✕</button>';
-        wrap2.appendChild(chip);
-      });
-      wrap2.appendChild(input);
-      wrap2.querySelectorAll(".tag-remove").forEach(function (btn) {
-        btn.addEventListener("click", function () {
-          tags = tags.filter(function (t) { return t !== btn.dataset.tag; });
-          renderTags();
-          markDirty();
+        chip.innerHTML = t + ' <button class="tag-chip-remove">✕</button>';
+        chip.querySelector("button").addEventListener("click", function () {
+          tags = tags.filter(function (x) { return x !== t; });
+          renderTags(); markUnsaved(); updatePreview(); updateScore();
         });
+        wrap.insertBefore(chip, input);
       });
+      input.disabled = tags.length >= MAX_TAGS;
+      input.placeholder = tags.length >= MAX_TAGS ? "Max " + MAX_TAGS + " tags" : "Add skill…";
     }
-    renderTags();
 
-    /* ── Tag input ── */
+    function addTag(val) {
+      var t = val.trim().replace(/,$/, "");
+      if (t && !tags.includes(t) && tags.length < MAX_TAGS) {
+        tags.push(t);
+        renderTags(); markUnsaved(); updatePreview(); updateScore();
+      }
+      document.getElementById("tagsInput").value = "";
+    }
+
+    document.getElementById("tagsInput").addEventListener("keydown", function (e) {
+      if (e.key === "Enter" || e.key === ",") {
+        e.preventDefault(); addTag(this.value);
+      } else if (e.key === "Backspace" && this.value === "" && tags.length > 0) {
+        tags.pop(); renderTags(); markUnsaved(); updatePreview();
+      }
+    });
+
     document.getElementById("tagsWrap").addEventListener("click", function () {
-      document.getElementById("tagInput").focus();
+      document.getElementById("tagsInput").focus();
     });
-    document.getElementById("tagInput").addEventListener("keydown", function (e) {
-      if ((e.key === "Enter" || e.key === ",") && this.value.trim()) {
-        e.preventDefault();
-        var val = this.value.trim().replace(/,/g,"");
-        if (val && tags.length < 8 && !tags.includes(val)) {
-          tags.push(val);
-          renderTags();
-          markDirty();
-        }
-        document.getElementById("tagInput").value = "";
+
+    document.getElementById("suggestedTags").querySelectorAll(".sug-tag").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        addTag(btn.dataset.sug);
+      });
+    });
+
+    /* ══════════════════════════════════
+       TOGGLE SWITCHES
+    ══════════════════════════════════ */
+    document.querySelectorAll(".toggle-switch").forEach(function (sw) {
+      sw.addEventListener("click", function () {
+        sw.classList.toggle("on");
+        markUnsaved();
+      });
+    });
+
+    /* ══════════════════════════════════
+       PHOTO UPLOAD (demo)
+    ══════════════════════════════════ */
+    var photoInput = document.getElementById("photoInput");
+    document.querySelectorAll(".photo-slot:not(.has-image)").forEach(function (slot) {
+      slot.addEventListener("click", function () {
+        photoInput.dataset.slot = slot.dataset.slot;
+        photoInput.click();
+      });
+    });
+    document.querySelectorAll(".photo-remove-btn").forEach(function (btn) {
+      btn.addEventListener("click", function (e) {
+        e.stopPropagation();
+        var slot = btn.closest(".photo-slot");
+        slot.classList.remove("has-image");
+        slot.querySelector("img") && slot.querySelector("img").remove();
+        btn.style.display = "none";
+        slot.innerHTML = '<div class="photo-slot-icon">📷</div><div class="photo-slot-label">Add Photo</div>';
+        slot.addEventListener("click", function () { photoInput.dataset.slot = slot.dataset.slot; photoInput.click(); });
+        markUnsaved(); updateScore();
+      });
+    });
+    photoInput.addEventListener("change", function () {
+      var file = this.files[0];
+      if (!file) return;
+      var slotIdx = this.dataset.slot;
+      var slot    = document.querySelector(".photo-slot[data-slot='" + slotIdx + "']");
+      if (!slot) return;
+      var reader  = new FileReader();
+      reader.onload = function (e) {
+        slot.innerHTML =
+          '<img src="' + e.target.result + '" alt="Photo" />' +
+          '<button class="photo-remove-btn">✕</button>';
+        slot.classList.add("has-image");
+        slot.querySelector(".photo-remove-btn").addEventListener("click", function (ev) {
+          ev.stopPropagation();
+          slot.classList.remove("has-image");
+          slot.innerHTML = '<div class="photo-slot-icon">📷</div><div class="photo-slot-label">Add Photo</div>';
+          markUnsaved(); updateScore();
+        });
+        markUnsaved(); updateScore();
+      };
+      reader.readAsDataURL(file);
+      this.value = "";
+    });
+
+    /* ══════════════════════════════════
+       STATUS PILL
+    ══════════════════════════════════ */
+    var statuses = ["active","paused","closed"];
+    var statusIdx = 0;
+    var statusConfig = {
+      active:  { dot: "🟢", label: "Active",  cls: "active" },
+      paused:  { dot: "🟡", label: "Paused",  cls: "paused" },
+      closed:  { dot: "🔴", label: "Closed",  cls: "closed" }
+    };
+    document.getElementById("statusPill").addEventListener("click", function () {
+      statusIdx = (statusIdx + 1) % statuses.length;
+      var s = statusConfig[statuses[statusIdx]];
+      this.className = "ge-status-pill " + s.cls;
+      document.getElementById("statusDot").textContent   = s.dot;
+      document.getElementById("statusLabel").textContent = s.label;
+      markUnsaved();
+      if (typeof showToast === "function") {
+        showToast("Status changed to " + s.label, "info");
       }
     });
 
-    /* ── Pay type ── */
-    document.getElementById("payTypeWrap").addEventListener("click", function (e) {
-      var btn = e.target.closest(".pay-type-btn");
-      if (!btn) return;
-      payType = btn.dataset.pay;
-      document.querySelectorAll(".pay-type-btn").forEach(function (b) { b.classList.remove("active"); });
-      btn.classList.add("active");
-      document.getElementById("payHint").textContent = "Amount per " + (payType==="fixed" ? "project" : payType==="daily" ? "day" : "hour");
-      markDirty();
-    });
+    /* ══════════════════════════════════
+       LIVE PREVIEW
+    ══════════════════════════════════ */
+    function updatePreview() {
+      var title = document.getElementById("gigTitle").value || "Gig Title…";
+      var desc  = document.getElementById("gigDesc").value  || "Description…";
+      var loc   = document.getElementById("gigLocation").value || "Location…";
+      var bud   = parseFloat(document.getElementById("gigBudget").value) || 0;
+      var date  = document.getElementById("gigDate").value || "";
+      var payT  = document.getElementById("gigPayType").value || "fixed";
 
-    /* ── Urgency ── */
-    document.getElementById("urgencyGrid").addEventListener("click", function (e) {
-      var btn = e.target.closest(".urgency-btn");
-      if (!btn) return;
-      urgency = btn.dataset.urgency;
-      document.querySelectorAll(".urgency-btn").forEach(function (b) { b.classList.remove("active"); });
-      btn.classList.add("active");
-      markDirty();
-    });
+      document.getElementById("pvTitle").textContent = title;
+      document.getElementById("pvDesc").textContent  = desc;
+      document.getElementById("pvLocation").textContent = loc.split(",")[0];
+      document.getElementById("pvBudget").innerHTML  = "₹" + bud.toLocaleString("en-IN") + ' <span>/' + payT + '</span>';
+      document.getElementById("pvPositions").textContent = positions;
+      document.getElementById("pvCat").textContent   = CAT_MAP[selectedCat] || "Category";
 
-    /* ── Char counters ── */
-    function charCount(inputId, countId, max) {
-      var el = document.getElementById(inputId);
-      var cl = document.getElementById(countId);
-      if (!el || !cl) return;
-      el.addEventListener("input", function () {
-        var len = el.value.length;
-        cl.textContent = len + "/" + max;
-        cl.className = "char-count" + (len > max * .9 ? (len >= max ? " over" : " warn") : "");
-        markDirty();
+      if (date) {
+        var d = new Date(date);
+        document.getElementById("pvDate").textContent =
+          d.toLocaleDateString("en-IN", { month: "short", day: "numeric" });
+      }
+
+      /* Preview tags */
+      var tagsEl = document.getElementById("pvTags");
+      tagsEl.innerHTML = "";
+      tags.slice(0, 4).forEach(function (t) {
+        tagsEl.innerHTML += '<span style="background:rgba(13,148,136,.08);border:1px solid rgba(13,148,136,.15);border-radius:5px;padding:2px 8px;font-size:.72rem;font-weight:700;color:var(--teal)">' + t + '</span>';
       });
     }
-    charCount("fTitle", "titleCount", 80);
-    charCount("fDesc",  "descCount",  1000);
 
-    /* ── Dirty tracking ── */
-    ["fTitle","fDesc","fCategory","fWorkType","fCity","fAddress","fDate","fDuration","fPay","fPayMethod","fRequirements"].forEach(function (id) {
-      var el = document.getElementById(id);
-      if (el) el.addEventListener("input", markDirty);
-    });
+    /* ══════════════════════════════════
+       SCORE CALCULATOR
+    ══════════════════════════════════ */
+    function updateScore() {
+      var checks = [
+        !!document.getElementById("gigTitle").value.trim(),
+        !!selectedCat,
+        document.getElementById("gigDesc").value.trim().length >= 30,
+        parseFloat(document.getElementById("gigBudget").value) >= 100,
+        !!document.getElementById("gigLocation").value.trim(),
+        !!document.getElementById("gigDate").value,
+        document.querySelectorAll(".photo-slot.has-image").length > 0,
+        tags.length >= 2
+      ];
+      var score = Math.round((checks.filter(Boolean).length / checks.length) * 100);
+      var fill  = document.getElementById("scoreFill");
+      var pct   = document.getElementById("scorePct");
+      fill.style.width = score + "%";
+      var label = score >= 90 ? "Excellent 🏆" : score >= 75 ? "Good 👍" : score >= 50 ? "Fair 📝" : "Needs Work ⚠️";
+      pct.textContent = score + "% — " + label;
 
-    function markDirty() {
-      isDirty = true;
-      document.getElementById("saveBarMsg").textContent = "⚠️ Unsaved changes";
-      document.getElementById("saveBarMsg").className = "save-bar-left unsaved";
-      document.getElementById("btnSave").disabled = false;
+      var labels = [
+        "Title added", "Category selected", "Description written",
+        "Budget set", "Location added", "Date & time set",
+        "Add photos (recommended)", "Add skill tags"
+      ];
+      var items = document.getElementById("scoreItems");
+      items.innerHTML = "";
+      checks.forEach(function (ok, i) {
+        items.innerHTML +=
+          '<div class="sc-item ' + (ok ? "done" : "pending") + '">' +
+          '<div class="sci-dot"></div>' + labels[i] + (ok ? " ✓" : "") +
+          "</div>";
+      });
     }
 
-    function markClean() {
-      isDirty = false;
-      document.getElementById("saveBarMsg").textContent = "✅ All changes saved";
-      document.getElementById("saveBarMsg").className = "save-bar-left";
-      document.getElementById("btnSave").disabled = true;
+    /* ══════════════════════════════════
+       CHANGE LOG
+    ══════════════════════════════════ */
+    var changeLogs = {};
+    function updateChangeLog() {
+      var current = {
+        "Title":       document.getElementById("gigTitle").value,
+        "Description": document.getElementById("gigDesc").value.substring(0,50) + "…",
+        "Budget":      "₹" + (document.getElementById("gigBudget").value || "0"),
+        "Location":    document.getElementById("gigLocation").value,
+        "Category":    selectedCat
+      };
+      Object.keys(current).forEach(function (k) {
+        var orig = {
+          "Title":       ORIGINAL.title,
+          "Description": ORIGINAL.desc.substring(0,50) + "…",
+          "Budget":      "₹" + ORIGINAL.budget,
+          "Location":    ORIGINAL.location,
+          "Category":    ORIGINAL.cat
+        }[k];
+        if (current[k] !== orig) {
+          changeLogs[k] = { old: orig, new: current[k] };
+        } else {
+          delete changeLogs[k];
+        }
+      });
+
+      var keys = Object.keys(changeLogs);
+      var section = document.getElementById("changeLogSection");
+      section.style.display = keys.length > 0 ? "block" : "none";
+
+      var list = document.getElementById("changeLogList");
+      list.innerHTML = "";
+      keys.forEach(function (k) {
+        list.innerHTML +=
+          '<div class="change-item">' +
+          '<span class="ci-field">' + k + '</span>' +
+          '<span class="ci-old">' + changeLogs[k].old + '</span>' +
+          '<span class="ci-arrow"> → </span>' +
+          '<span class="ci-new">' + changeLogs[k].new + '</span>' +
+          '</div>';
+      });
     }
 
-    /* ── Toggle status ── */
-    document.getElementById("btnToggleStatus").addEventListener("click", function () {
-      var current = gig.status || "open";
-      var next    = current === "open" ? "closed" : "open";
-      var label   = next === "open" ? "reopen" : "close";
-      if (!confirm("Are you sure you want to " + label + " this gig?")) return;
+    /* ══════════════════════════════════
+       SAVE FLOW
+    ══════════════════════════════════ */
+    function validateForm() {
+      var ok = true;
+      var title = document.getElementById("gigTitle").value.trim();
+      var desc  = document.getElementById("gigDesc").value.trim();
+      var bud   = parseFloat(document.getElementById("gigBudget").value);
 
-      gig.status = next;
-      gigs[gigIdx] = gig;
-      localStorage.setItem("gl_gigs", JSON.stringify(gigs));
+      document.getElementById("titleError").classList.toggle("show", title.length < 10);
+      document.getElementById("descError").classList.toggle("show", desc.length < 30);
+      document.getElementById("budgetError").classList.toggle("show", isNaN(bud) || bud < 100);
+      document.getElementById("catError").classList.toggle("show", !selectedCat);
 
-      /* Update UI */
-      var bar = document.getElementById("statusBar");
-      bar.className = "gig-status-bar " + next;
-      document.getElementById("statusDot").className = "status-dot " + next;
-      document.getElementById("statusLabelTxt").textContent = statusLabel(next);
-      var toggleBtn = document.getElementById("btnToggleStatus");
-      if (next === "open") {
-        toggleBtn.className = "btn-toggle-status close-gig";
-        toggleBtn.textContent = "⏸ Close Gig";
-      } else {
-        toggleBtn.className = "btn-toggle-status reopen-gig";
-        toggleBtn.textContent = "▶ Reopen Gig";
-      }
+      if (title.length < 10 || desc.length < 30 || isNaN(bud) || bud < 100 || !selectedCat) ok = false;
+      return ok;
+    }
 
-      if (typeof showToast === "function") showToast("Gig " + (next === "open" ? "reopened" : "closed") + " successfully.", "success");
-    });
-
-    /* ── Save ── */
-    document.getElementById("btnSave").addEventListener("click", function () {
-      var title = document.getElementById("fTitle").value.trim();
-      var desc  = document.getElementById("fDesc").value.trim();
-      var city  = document.getElementById("fCity").value.trim();
-      var pay   = document.getElementById("fPay").value.trim();
-
-      if (!title || !desc || !city || !pay) {
-        if (typeof showToast === "function") showToast("Please fill all required fields.", "error");
+    function saveGig(btn) {
+      if (!validateForm()) {
+        if (typeof showToast === "function") showToast("⚠️ Form mein errors hain — fix karo.", "error");
         return;
       }
-
-      var btn = this;
-      btn.disabled    = true;
-      btn.textContent = "⏳ Saving...";
-
-      /* Update gig object */
-      gig.title        = title;
-      gig.description  = desc;
-      gig.category     = document.getElementById("fCategory").value;
-      gig.workType     = document.getElementById("fWorkType").value;
-      gig.city         = city;
-      gig.address      = document.getElementById("fAddress").value.trim();
-      gig.date         = document.getElementById("fDate").value;
-      gig.duration     = document.getElementById("fDuration").value.trim();
-      gig.pricePerHr   = pay;
-      gig.payType      = payType;
-      gig.payMethod    = document.getElementById("fPayMethod").value;
-      gig.requirements = document.getElementById("fRequirements").value.trim();
-      gig.tags         = tags;
-      gig.urgency      = urgency;
-      gig.updatedAt    = new Date().toISOString();
-
-      gigs[gigIdx] = gig;
-      localStorage.setItem("gl_gigs", JSON.stringify(gigs));
-
+      if (btn) { btn.disabled = true; btn.innerHTML = "⏳ Saving…"; }
+      setSaveState("saving");
+      animateAutosaveBar();
       setTimeout(function () {
-        btn.innerHTML = "💾 Save Changes";
-        markClean();
-        if (typeof showToast === "function") showToast("Gig updated successfully!", "success");
-      }, 600);
+        hasChanges = false;
+        setSaveState("saved");
+        document.getElementById("unsavedBanner").classList.remove("show");
+        if (btn) { btn.disabled = false; btn.innerHTML = btn.id === "btnSaveGig" ? "💾 Save Changes" : "💾 Save Changes"; }
+        var banner = document.getElementById("saveBanner");
+        banner.classList.add("show");
+        setTimeout(function () { banner.classList.remove("show"); }, 3500);
+        if (typeof showToast === "function") showToast("✅ Gig updated successfully!", "success");
+        changeLogs = {};
+        updateChangeLog();
+        ORIGINAL.title    = document.getElementById("gigTitle").value;
+        ORIGINAL.desc     = document.getElementById("gigDesc").value;
+        ORIGINAL.budget   = document.getElementById("gigBudget").value;
+        ORIGINAL.location = document.getElementById("gigLocation").value;
+        ORIGINAL.cat      = selectedCat;
+      }, 1000);
+    }
+
+    document.getElementById("btnSaveGig").addEventListener("click",     function () { saveGig(this); });
+    document.getElementById("btnSaveSidebar").addEventListener("click", function () { saveGig(this); });
+
+    /* ══════════════════════════════════
+       PREVIEW BUTTON
+    ══════════════════════════════════ */
+    document.getElementById("btnPreviewGig").addEventListener("click", function () {
+      if (typeof showToast === "function") showToast("🔍 Preview mode — browse.html?preview=GL-2026-0314", "info");
     });
 
-    /* ── Discard ── */
-    document.getElementById("btnDiscard").addEventListener("click", function () {
-      if (!isDirty) return;
-      if (confirm("Discard all unsaved changes?")) {
-        window.location.reload();
-      }
+    /* ══════════════════════════════════
+       PAUSE BUTTON
+    ══════════════════════════════════ */
+    document.getElementById("btnPauseSidebar").addEventListener("click", function () {
+      this.innerHTML = "▶️ Resume Gig";
+      if (typeof showToast === "function") showToast("⏸️ Gig paused — applications temporarily stopped.", "warning");
     });
 
-    /* ── Delete ── */
-    document.getElementById("btnDelete").addEventListener("click", function () {
-      if (!confirm("Permanently delete this gig? This cannot be undone.")) return;
-      if (!confirm("Are you 100% sure? All applications will also be removed.")) return;
+    /* ══════════════════════════════════
+       DELETE FLOW
+    ══════════════════════════════════ */
+    var deleteModal  = document.getElementById("deleteModal");
+    var deleteInput  = document.getElementById("deleteConfirmInput");
+    var btnConfirmDel = document.getElementById("btnConfirmDelete");
 
-      gigs.splice(gigIdx, 1);
-      localStorage.setItem("gl_gigs", JSON.stringify(gigs));
+    function openDeleteModal() { deleteModal.classList.add("show"); deleteInput.value = ""; btnConfirmDel.disabled = true; }
+    function closeDeleteModal(){ deleteModal.classList.remove("show"); }
 
-      if (typeof showToast === "function") showToast("Gig deleted.", "info");
+    document.getElementById("btnDeleteGig").addEventListener("click", openDeleteModal);
+    document.getElementById("btnDeleteSidebar").addEventListener("click", openDeleteModal);
+    document.getElementById("deleteModalClose").addEventListener("click", closeDeleteModal);
+    document.getElementById("deleteCancel").addEventListener("click", closeDeleteModal);
+    deleteModal.addEventListener("click", function (e) { if (e.target === deleteModal) closeDeleteModal(); });
+
+    deleteInput.addEventListener("input", function () {
+      btnConfirmDel.disabled = this.value.trim() !== "DELETE";
+    });
+
+    btnConfirmDel.addEventListener("click", function () {
+      this.disabled = true;
+      this.textContent = "⏳ Deleting…";
       setTimeout(function () {
-        window.location.href = "dashboard-client.html";
-      }, 1200);
+        closeDeleteModal();
+        if (typeof showToast === "function") showToast("🗑️ Gig deleted.", "error");
+        setTimeout(function () { window.location.href = "dashboard.html"; }, 1200);
+      }, 1000);
     });
 
-    /* ── Warn before leaving with unsaved changes ── */
-    window.addEventListener("beforeunload", function (e) {
-      if (isDirty) {
-        e.preventDefault();
-        e.returnValue = "";
-      }
-    });
+    /* ══════════════════════════════════
+       INITIAL RENDER
+    ══════════════════════════════════ */
+    renderTags();
+    updatePreview();
+    updateScore();
 
-  })();
+  });
   </script>
-
 </body>
 </html>
