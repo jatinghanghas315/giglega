@@ -59,7 +59,7 @@
       if (!raw) return null;
       var u = JSON.parse(raw);
       return (u && u.id) ? u : null;
-    } catch (e) { return null; }
+    } catch (_e) { return null; }
   }
 
   /**
@@ -68,7 +68,7 @@
    */
   function setCurrentUser(user) {
     try { localStorage.setItem(GL.STORAGE_KEY_USER, JSON.stringify(user)); }
-    catch (e) {}
+    catch (_e) {}
   }
 
   /**
@@ -528,7 +528,7 @@
 
   function getNotifs() {
     try { return JSON.parse(localStorage.getItem(GL.STORAGE_KEY_NOTIFS) || "[]"); }
-    catch (e) { return []; }
+    catch (_e) { return []; }
   }
 
   function getUnreadNotifCount() {
@@ -549,7 +549,7 @@
     // Keep max 50
     if (notifs.length > 50) notifs = notifs.slice(0, 50);
     try { localStorage.setItem(GL.STORAGE_KEY_NOTIFS, JSON.stringify(notifs)); }
-    catch (e) {}
+    catch (_e) {}
   }
 
   global.getNotifs           = getNotifs;

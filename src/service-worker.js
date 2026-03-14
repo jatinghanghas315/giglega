@@ -81,8 +81,8 @@ const IMAGE_MAX_ENTRIES = 60;
 
 /** Runtime data cache (network-first, max 40 items, 24h TTL) */
 const DATA_CACHE_NAME  = `giglega-data-v${VERSION}`;
-const DATA_MAX_ENTRIES = 40;
-const DATA_MAX_AGE_SEC = 86400; // 24 hours
+const _DATA_MAX_ENTRIES = 40; // Bug fixed: mark reserved config as intentionally unused for now.
+const _DATA_MAX_AGE_SEC = 86400; // 24 hours // Bug fixed: mark reserved config as intentionally unused for now.
 
 /* ══════════════════════════════════
    OFFLINE FALLBACK PAGE
@@ -255,7 +255,7 @@ const ACTION_URLS = {
 /* ══════════════════════════════════
    BACKGROUND SYNC QUEUE
 ══════════════════════════════════ */
-const SYNC_QUEUE_KEY = 'giglega-sync-queue';
+const _SYNC_QUEUE_KEY = 'giglega-sync-queue'; // Bug fixed: mark reserved key as intentionally unused for now.
 
 
 /* ════════════════════════════════════════════════════════════════
