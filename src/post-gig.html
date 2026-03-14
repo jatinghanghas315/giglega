@@ -3,187 +3,164 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Gig Complete — GigLega</title>
-  <meta name="description" content="Gig complete karo, payment release karo, rating do aur next steps dekho." />
+  <title>Post a Gig — GigLega</title>
+  <meta name="description" content="GigLega pe apna gig post karo — workers hire karo, kaam karwao, fast payment karo." />
   <link rel="stylesheet" href="styles.css" />
   <script src="shared.js"></script>
   <style>
 
     /* ══════════════════════════════════
-       CSS VARIABLES (local overrides)
+       WRAPPER
     ══════════════════════════════════ */
-    :root {
-      --pg-green:  #059669;
-      --pg-amber:  #d97706;
-      --pg-red:    #dc2626;
-      --pg-purple: #7c3aed;
-    }
+    .pg-wrapper { min-height: 100vh; background: var(--bg); }
 
     /* ══════════════════════════════════
-       PAGE WRAPPER
-    ══════════════════════════════════ */
-    .pg-wrapper {
-      min-height: 100vh;
-      background: var(--bg);
-    }
-
-    /* ══════════════════════════════════
-       HERO BANNER (dynamic by state)
+       HERO
     ══════════════════════════════════ */
     .pg-hero {
-      padding: 48px 20px 60px;
-      text-align: center;
+      background: linear-gradient(135deg, #0b1e35 0%, #1a3c5e 45%, #064e3b 100%);
+      padding: 36px 20px 80px;
       position: relative; overflow: hidden;
-      transition: background .4s;
-    }
-    .pg-hero.state-complete {
-      background: linear-gradient(135deg, #064e3b 0%, #059669 50%, #0d9488 100%);
-    }
-    .pg-hero.state-pending {
-      background: linear-gradient(135deg, #78350f 0%, var(--pg-amber) 55%, #b45309 100%);
-    }
-    .pg-hero.state-dispute {
-      background: linear-gradient(135deg, #7f1d1d 0%, var(--pg-red) 55%, #b91c1c 100%);
-    }
-    .pg-hero.state-review {
-      background: linear-gradient(135deg, #1e1b4b 0%, var(--pg-purple) 55%, #4338ca 100%);
     }
     .pg-hero::before {
       content: "";
       position: absolute; inset: 0;
-      background-image:
-        linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px);
-      background-size: 48px 48px; pointer-events: none;
+      background:
+        radial-gradient(ellipse at 10% 80%, rgba(13,148,136,.22) 0%, transparent 50%),
+        radial-gradient(ellipse at 90% 15%, rgba(110,231,183,.08) 0%, transparent 50%);
+      pointer-events: none;
     }
     .pg-hero::after {
       content: "";
       position: absolute; inset: 0;
-      background: radial-gradient(ellipse at 50% 100%, rgba(255,255,255,.07) 0%, transparent 65%);
-      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+      background-size: 52px 52px; pointer-events: none;
     }
-
     .pg-hero-inner {
+      max-width: 860px; margin: 0 auto;
       position: relative; z-index: 1;
-      max-width: 640px; margin: 0 auto;
+      display: flex; align-items: flex-start;
+      justify-content: space-between; gap: 24px; flex-wrap: wrap;
     }
-
-    /* Animated check / icon */
-    .pg-status-icon {
-      width: 80px; height: 80px;
-      border-radius: 50%;
-      background: rgba(255,255,255,.18);
-      border: 3px solid rgba(255,255,255,.35);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 2.2rem; margin: 0 auto 20px;
-      animation: popIn .5s cubic-bezier(.34,1.56,.64,1);
-    }
-    @keyframes popIn {
-      from { transform: scale(0); opacity: 0; }
-      to   { transform: scale(1); opacity: 1; }
-    }
-
-    .pg-hero-badge {
+    .pgh-tag {
       display: inline-flex; align-items: center; gap: 6px;
-      background: rgba(255,255,255,.15);
-      border: 1px solid rgba(255,255,255,.25);
-      border-radius: var(--radius-full);
-      padding: 4px 14px;
-      font-size: .74rem; font-weight: 700; color: rgba(255,255,255,.9);
-      margin-bottom: 14px;
-    }
-
-    .pg-hero h1 {
-      font-size: clamp(1.5rem, 3.5vw, 2.4rem);
-      font-weight: 900; color: #fff;
-      line-height: 1.2; margin-bottom: 10px; letter-spacing: -.6px;
-    }
-    .pg-hero-sub {
-      font-size: .95rem; color: rgba(255,255,255,.75);
-      margin-bottom: 28px; line-height: 1.65;
-    }
-
-    /* Gig ID pill */
-    .pg-gig-id {
-      display: inline-flex; align-items: center; gap: 8px;
-      background: rgba(0,0,0,.18);
+      background: rgba(255,255,255,.1);
       border: 1px solid rgba(255,255,255,.15);
       border-radius: var(--radius-full);
-      padding: 7px 18px;
-      font-size: .82rem; font-weight: 700; color: rgba(255,255,255,.85);
-      letter-spacing: .3px;
+      padding: 4px 14px;
+      font-size: .72rem; font-weight: 700;
+      color: rgba(255,255,255,.75);
+      text-transform: uppercase; letter-spacing: .5px;
+      margin-bottom: 14px;
     }
-    .pg-gig-id span { color: rgba(255,255,255,.5); font-weight: 500; }
+    .pgh-title {
+      font-size: clamp(1.6rem, 3.5vw, 2.2rem);
+      font-weight: 900; color: #fff;
+      letter-spacing: -.4px; line-height: 1.18;
+      margin-bottom: 8px;
+    }
+    .pgh-title span { color: #6ee7b7; }
+    .pgh-sub {
+      font-size: .9rem; color: rgba(255,255,255,.6);
+      font-weight: 600; line-height: 1.65;
+      max-width: 420px;
+    }
+
+    /* Progress steps (right side) */
+    .pgh-steps {
+      display: flex; flex-direction: column; gap: 8px;
+      flex-shrink: 0;
+    }
+    @media(max-width:640px) { .pgh-steps { flex-direction: row; flex-wrap: wrap; } }
+    .pgh-step {
+      display: flex; align-items: center; gap: 10px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 10px;
+      padding: 9px 14px; min-width: 180px;
+      transition: background .2s;
+    }
+    .pgh-step.active {
+      background: rgba(13,148,136,.2);
+      border-color: rgba(13,148,136,.35);
+    }
+    .pgh-step.done {
+      background: rgba(5,150,105,.15);
+      border-color: rgba(5,150,105,.3);
+    }
+    .pgs-num {
+      width: 26px; height: 26px; border-radius: 50%;
+      background: rgba(255,255,255,.12);
+      display: flex; align-items: center; justify-content: center;
+      font-size: .76rem; font-weight: 900; color: rgba(255,255,255,.7);
+      flex-shrink: 0;
+    }
+    .pgh-step.active .pgs-num { background: var(--teal); color: #fff; }
+    .pgh-step.done   .pgs-num { background: #059669; color: #fff; }
+    .pgs-info {}
+    .pgs-label { font-size: .78rem; font-weight: 800; color: rgba(255,255,255,.85); }
+    .pgs-sub   { font-size: .66rem; font-weight: 600; color: rgba(255,255,255,.45); }
 
     /* ══════════════════════════════════
-       STEP PROGRESS BAR
+       PROGRESS BAR (sticky)
     ══════════════════════════════════ */
-    .pg-steps-bar {
+    .pg-progress-bar {
       background: var(--surface);
       border-bottom: 1.5px solid var(--gray-200);
-      padding: 16px 20px;
       position: sticky; top: 0; z-index: 40;
       box-shadow: var(--shadow-sm);
     }
-    [data-theme=dark] .pg-steps-bar { border-color: var(--gray-700); }
-
-    .pg-steps-inner {
-      max-width: 700px; margin: 0 auto;
-      display: flex; align-items: center; gap: 0;
+    [data-theme=dark] .pg-progress-bar { border-color: var(--gray-700); }
+    .pgpb-inner {
+      max-width: 860px; margin: 0 auto;
+      padding: 12px 20px;
+      display: flex; align-items: center; gap: 16px;
     }
-    .pg-step {
-      display: flex; align-items: center; gap: 8px;
-      flex: 1;
+    .pgpb-label {
+      font-size: .78rem; font-weight: 800;
+      color: var(--gray-500); white-space: nowrap; flex-shrink: 0;
     }
-    .pg-step-circle {
-      width: 30px; height: 30px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: .75rem; font-weight: 800; flex-shrink: 0;
-      border: 2px solid var(--gray-300);
-      background: var(--surface); color: var(--gray-400);
-      transition: all .3s;
+    .pgpb-track {
+      flex: 1; height: 6px; background: var(--gray-100);
+      border-radius: 4px; overflow: hidden;
     }
-    .pg-step.done .pg-step-circle {
-      background: var(--success); border-color: var(--success); color: #fff;
+    [data-theme=dark] .pgpb-track { background: var(--gray-700); }
+    .pgpb-fill {
+      height: 100%; border-radius: 4px;
+      background: linear-gradient(90deg, var(--primary), var(--teal));
+      transition: width .4s ease;
     }
-    .pg-step.active .pg-step-circle {
-      background: var(--primary); border-color: var(--primary); color: #fff;
-      box-shadow: 0 0 0 4px rgba(13,148,136,.15);
+    .pgpb-pct {
+      font-size: .76rem; font-weight: 900;
+      color: var(--teal); flex-shrink: 0;
     }
-    .pg-step-label {
-      font-size: .74rem; font-weight: 700; color: var(--gray-400);
-      white-space: nowrap;
+    .pgpb-steps {
+      display: flex; gap: 6px; flex-shrink: 0;
     }
-    .pg-step.done   .pg-step-label { color: var(--success); }
-    .pg-step.active .pg-step-label { color: var(--primary); }
-
-    .pg-step-line {
-      flex: 1; height: 2px; background: var(--gray-200);
-      margin: 0 6px; transition: background .3s;
+    .pgpb-step-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--gray-200); transition: background .3s;
     }
-    .pg-step-line.done { background: var(--success); }
-    [data-theme=dark] .pg-step-line { background: var(--gray-700); }
-
-    @media(max-width:500px) {
-      .pg-step-label { display: none; }
-      .pg-step-circle { width: 26px; height: 26px; font-size: .7rem; }
-    }
+    .pgpb-step-dot.done   { background: #059669; }
+    .pgpb-step-dot.active { background: var(--teal); }
+    [data-theme=dark] .pgpb-step-dot { background: var(--gray-600); }
 
     /* ══════════════════════════════════
-       MAIN LAYOUT
+       MAIN BODY
     ══════════════════════════════════ */
     .pg-body {
-      max-width: 900px; margin: 0 auto;
-      padding: 36px 20px 80px;
+      max-width: 860px; margin: 0 auto;
+      padding: 28px 20px 80px;
       display: grid;
-      grid-template-columns: 1fr 340px;
-      gap: 28px;
-      align-items: start;
+      grid-template-columns: 1fr 280px;
+      gap: 24px; align-items: start;
     }
-    @media(max-width:820px) { .pg-body { grid-template-columns: 1fr; } }
+    @media(max-width:800px) { .pg-body { grid-template-columns: 1fr; } }
 
     /* ══════════════════════════════════
-       CARDS — shared
+       FORM CARD
     ══════════════════════════════════ */
     .pg-card {
       background: var(--surface);
@@ -196,743 +173,673 @@
     [data-theme=dark] .pg-card { border-color: var(--gray-700); }
 
     .pg-card-header {
-      padding: 18px 22px 0;
-      display: flex; align-items: center;
-      justify-content: space-between; gap: 12px;
-    }
-    .pg-card-title {
-      font-size: 1rem; font-weight: 800; color: var(--primary);
-      display: flex; align-items: center; gap: 8px;
-    }
-    .pg-card-body { padding: 16px 22px 22px; }
-
-    /* ══════════════════════════════════
-       GIG SUMMARY CARD
-    ══════════════════════════════════ */
-    .gig-summary-row {
-      display: flex; justify-content: space-between;
-      align-items: flex-start; gap: 12px;
-      padding: 10px 0;
-      border-bottom: 1px solid var(--gray-100);
-      font-size: .88rem;
-    }
-    .gig-summary-row:last-child { border-bottom: none; }
-    [data-theme=dark] .gig-summary-row { border-color: var(--gray-700); }
-    .gsr-label { color: var(--gray-400); font-weight: 600; flex-shrink: 0; }
-    .gsr-value { font-weight: 700; color: var(--text); text-align: right; }
-    .gsr-value.green  { color: var(--pg-green); }
-    .gsr-value.amber  { color: var(--pg-amber); }
-    .gsr-value.red    { color: var(--pg-red); }
-
-    /* Participant row */
-    .participant-row {
-      display: flex; align-items: center; gap: 12px;
-      padding: 12px 0;
-      border-bottom: 1px solid var(--gray-100);
-    }
-    .participant-row:last-child { border-bottom: none; }
-    [data-theme=dark] .participant-row { border-color: var(--gray-700); }
-
-    .part-avatar {
-      width: 42px; height: 42px; border-radius: 50%;
-      background: linear-gradient(135deg, var(--primary), var(--teal));
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1rem; color: #fff; font-weight: 700; flex-shrink: 0;
-    }
-    .part-name  { font-size: .9rem; font-weight: 700; color: var(--text); }
-    .part-role  { font-size: .74rem; color: var(--gray-400); font-weight: 600; }
-    .part-badge {
-      margin-left: auto;
-      font-size: .68rem; font-weight: 700;
-      padding: 3px 9px; border-radius: 6px;
-    }
-    .part-badge.poster { background: rgba(26,60,94,.1); color: var(--primary); }
-    .part-badge.worker { background: rgba(13,148,136,.1); color: var(--teal); }
-
-    /* ══════════════════════════════════
-       MARK COMPLETE SECTION
-    ══════════════════════════════════ */
-    .mark-complete-card {
-      background: linear-gradient(135deg, rgba(5,150,105,.05), rgba(13,148,136,.08));
-      border: 2px solid rgba(5,150,105,.2);
-      border-radius: var(--radius);
-      padding: 24px;
-      margin-bottom: 20px;
-      text-align: center;
-    }
-    .mc-icon { font-size: 2.8rem; margin-bottom: 12px; line-height: 1; }
-    .mc-title { font-size: 1.1rem; font-weight: 900; color: var(--primary); margin-bottom: 6px; }
-    .mc-sub   { font-size: .86rem; color: var(--gray-500); margin-bottom: 20px; line-height: 1.6; }
-
-    .btn-mark-complete {
-      display: inline-flex; align-items: center; gap: 9px;
-      padding: 14px 32px;
-      background: linear-gradient(135deg, #059669, #0d9488);
-      color: #fff; border: none; border-radius: var(--radius-sm);
-      font-weight: 900; font-size: 1rem; cursor: pointer;
-      font-family: var(--font);
-      box-shadow: 0 4px 16px rgba(5,150,105,.3);
-      transition: transform .2s, box-shadow .2s;
-      width: 100%; justify-content: center;
-    }
-    .btn-mark-complete:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(5,150,105,.38); }
-    .btn-mark-complete:disabled { opacity: .6; cursor: not-allowed; transform: none; }
-
-    /* Checklist before marking complete */
-    .mc-checklist { margin-bottom: 20px; }
-    .mc-check-item {
+      padding: 16px 22px;
+      border-bottom: 1.5px solid var(--gray-100);
+      background: linear-gradient(135deg, rgba(26,60,94,.03), rgba(13,148,136,.04));
       display: flex; align-items: center; gap: 10px;
-      padding: 9px 12px;
-      background: var(--surface);
-      border: 1.5px solid var(--gray-200);
-      border-radius: var(--radius-sm);
-      margin-bottom: 8px;
-      cursor: pointer;
-      transition: border-color .18s;
     }
-    .mc-check-item:hover { border-color: rgba(13,148,136,.3); }
-    [data-theme=dark] .mc-check-item { border-color: var(--gray-700); background: var(--gray-800); }
-    .mc-check-item.checked { border-color: var(--success); background: rgba(16,185,129,.04); }
-
-    .mcc-box {
-      width: 20px; height: 20px; border-radius: 5px;
-      border: 2px solid var(--gray-300); flex-shrink: 0;
-      display: flex; align-items: center; justify-content: center;
-      font-size: .75rem; transition: all .18s;
-    }
-    .mc-check-item.checked .mcc-box { background: var(--success); border-color: var(--success); color: #fff; }
-    .mcc-text { font-size: .86rem; font-weight: 600; color: var(--gray-600); }
-    .mc-check-item.checked .mcc-text { color: var(--success); }
-    [data-theme=dark] .mcc-text { color: var(--gray-400); }
-
-    /* ══════════════════════════════════
-       PAYMENT BREAKDOWN
-    ══════════════════════════════════ */
-    .payment-breakdown {
-      background: var(--gray-50);
-      border-radius: var(--radius-sm);
-      padding: 16px;
-      margin: 14px 0;
-    }
-    [data-theme=dark] .payment-breakdown { background: var(--gray-800); }
-
-    .pb-row {
-      display: flex; justify-content: space-between;
-      align-items: center;
-      padding: 7px 0;
-      font-size: .88rem;
-      border-bottom: 1px dashed var(--gray-200);
-    }
-    .pb-row:last-child { border-bottom: none; }
-    [data-theme=dark] .pb-row { border-color: var(--gray-700); }
-    .pb-label  { color: var(--gray-500); font-weight: 600; display: flex; align-items: center; gap: 6px; }
-    .pb-amount { font-weight: 700; color: var(--text); }
-    .pb-amount.deduct { color: var(--pg-red); }
-    .pb-amount.total  { color: var(--pg-green); font-size: 1.05rem; }
-
-    .pb-divider {
-      height: 1.5px;
-      background: var(--gray-200);
-      margin: 8px 0;
-    }
-    [data-theme=dark] .pb-divider { background: var(--gray-700); }
-
-    /* ══════════════════════════════════
-       RATING SECTION
-    ══════════════════════════════════ */
-    .rating-card {
-      background: var(--surface);
-      border: 1.5px solid var(--gray-200);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow-sm);
-      overflow: hidden;
-      margin-bottom: 20px;
-    }
-    [data-theme=dark] .rating-card { border-color: var(--gray-700); }
-
-    .rating-card-header {
-      background: linear-gradient(135deg, rgba(26,60,94,.04), rgba(13,148,136,.06));
-      padding: 18px 22px;
-      border-bottom: 1.5px solid var(--gray-200);
-      display: flex; align-items: center; gap: 12px;
-    }
-    [data-theme=dark] .rating-card-header { border-color: var(--gray-700); }
-
-    .rch-icon {
-      width: 44px; height: 44px; border-radius: 12px;
+    [data-theme=dark] .pg-card-header { border-color: var(--gray-700); }
+    .pgch-num {
+      width: 30px; height: 30px; border-radius: 50%;
       background: linear-gradient(135deg, var(--primary), var(--teal));
       display: flex; align-items: center; justify-content: center;
-      font-size: 1.3rem; flex-shrink: 0;
+      font-size: .8rem; font-weight: 900; color: #fff; flex-shrink: 0;
     }
-    .rch-title { font-size: 1rem; font-weight: 800; color: var(--primary); }
-    .rch-sub   { font-size: .78rem; color: var(--gray-400); }
+    .pgch-title {
+      font-size: .96rem; font-weight: 800; color: var(--primary); flex: 1;
+    }
+    .pgch-optional {
+      font-size: .7rem; font-weight: 700; color: var(--gray-400);
+      background: var(--gray-100); padding: 2px 8px; border-radius: 5px;
+    }
+    [data-theme=dark] .pgch-optional { background: var(--gray-700); color: var(--gray-400); }
 
-    /* Star rating widget */
-    .star-rating-group { margin: 16px 0 12px; }
-    .srg-label {
+    .pg-card-body { padding: 22px; }
+
+    /* ══════════════════════════════════
+       FORM FIELDS
+    ══════════════════════════════════ */
+    .ff-group { margin-bottom: 20px; }
+    .ff-group:last-child { margin-bottom: 0; }
+
+    .ff-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    @media(max-width:560px) { .ff-row { grid-template-columns: 1fr; } }
+
+    .ff-row-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 14px;
+    }
+    @media(max-width:640px) { .ff-row-3 { grid-template-columns: 1fr 1fr; } }
+    @media(max-width:400px) { .ff-row-3 { grid-template-columns: 1fr; } }
+
+    .ff-label {
+      display: block;
       font-size: .8rem; font-weight: 700;
-      color: var(--gray-500); margin-bottom: 8px;
-      text-transform: uppercase; letter-spacing: .4px;
+      color: var(--gray-600); margin-bottom: 7px;
     }
-    .star-row {
-      display: flex; gap: 6px; align-items: center;
-      margin-bottom: 4px;
-    }
-    .star-btn {
-      background: none; border: none;
-      font-size: 1.8rem; cursor: pointer;
-      padding: 2px; line-height: 1;
-      transition: transform .12s;
-      filter: grayscale(1); opacity: .4;
-    }
-    .star-btn:hover, .star-btn.lit {
-      filter: none; opacity: 1;
-      transform: scale(1.15);
-    }
-    .star-label-text {
-      font-size: .82rem; font-weight: 700;
-      color: var(--teal); margin-left: 6px;
-      min-width: 80px; opacity: 0;
-      transition: opacity .2s;
-    }
-    .star-label-text.show { opacity: 1; }
-
-    /* Sub-ratings */
-    .sub-ratings { margin: 12px 0; }
-    .sub-rating-row {
-      display: flex; align-items: center; gap: 12px;
-      padding: 8px 0;
-      border-bottom: 1px solid var(--gray-100);
-    }
-    .sub-rating-row:last-child { border-bottom: none; }
-    [data-theme=dark] .sub-rating-row { border-color: var(--gray-700); }
-    .srr-label { font-size: .82rem; font-weight: 600; color: var(--gray-500); width: 110px; flex-shrink: 0; }
-    .srr-stars { display: flex; gap: 3px; }
-    .srr-star {
-      font-size: 1.1rem; cursor: pointer;
-      filter: grayscale(1); opacity: .35;
-      transition: filter .1s, opacity .1s, transform .1s;
-    }
-    .srr-star.lit { filter: none; opacity: 1; }
-    .srr-star:hover { transform: scale(1.2); }
-
-    /* Review text area */
-    .review-textarea {
-      width: 100%;
-      padding: 12px 14px;
-      border: 1.5px solid var(--gray-200);
-      border-radius: var(--radius-sm);
-      background: var(--surface);
-      color: var(--text); font-family: var(--font);
-      font-size: .9rem; line-height: 1.65;
-      resize: vertical; min-height: 90px;
-      transition: border .2s;
-      box-sizing: border-box;
-    }
-    .review-textarea:focus { outline: none; border-color: var(--teal); }
-    [data-theme=dark] .review-textarea { border-color: var(--gray-600); background: var(--gray-800); }
-
-    .review-char-count {
-      font-size: .74rem; color: var(--gray-400);
-      text-align: right; margin-top: 4px;
+    [data-theme=dark] .ff-label { color: var(--gray-400); }
+    .ff-required { color: var(--danger); margin-left: 2px; }
+    .ff-hint {
+      font-size: .72rem; font-weight: 600;
+      color: var(--gray-400); margin-top: 5px;
+      display: flex; align-items: center; gap: 4px;
     }
 
-    /* Tag chips for review */
-    .review-tags { display: flex; flex-wrap: wrap; gap: 7px; margin: 12px 0; }
-    .review-tag {
-      padding: 5px 12px;
-      border: 1.5px solid var(--gray-200);
-      border-radius: var(--radius-full);
-      font-size: .78rem; font-weight: 600;
-      color: var(--gray-500); cursor: pointer;
-      transition: all .15s; background: none;
-      font-family: var(--font);
-    }
-    .review-tag:hover { border-color: var(--teal); color: var(--teal); }
-    .review-tag.selected { background: rgba(13,148,136,.1); border-color: var(--teal); color: var(--teal); }
-    [data-theme=dark] .review-tag { border-color: var(--gray-600); }
-
-    .btn-submit-rating {
-      display: flex; align-items: center; justify-content: center; gap: 8px;
-      width: 100%; padding: 13px;
-      background: linear-gradient(135deg, var(--primary), var(--teal));
-      color: #fff; border: none; border-radius: var(--radius-sm);
-      font-weight: 800; font-size: .95rem; cursor: pointer;
-      font-family: var(--font);
-      box-shadow: 0 3px 12px rgba(13,148,136,.2);
-      transition: opacity .2s, transform .2s;
-      margin-top: 16px;
-    }
-    .btn-submit-rating:hover { opacity: .9; transform: translateY(-1px); }
-    .btn-submit-rating:disabled { opacity: .55; cursor: not-allowed; transform: none; }
-
-    /* Rating submitted state */
-    .rating-submitted {
-      text-align: center; padding: 24px;
-      display: none;
-    }
-    .rating-submitted.show { display: block; animation: fadeSlide .3s ease; }
-    .rs-icon  { font-size: 2.6rem; margin-bottom: 10px; }
-    .rs-title { font-size: 1rem; font-weight: 800; color: var(--success); margin-bottom: 5px; }
-    .rs-sub   { font-size: .84rem; color: var(--gray-500); }
-
-    @keyframes fadeSlide {
-      from { opacity: 0; transform: translateY(12px); }
-      to   { opacity: 1; transform: none; }
-    }
-
-    /* ══════════════════════════════════
-       SIDEBAR — right column
-    ══════════════════════════════════ */
-    .pg-sidebar {}
-
-    /* Timer card */
-    .timer-card {
-      background: var(--surface);
-      border: 1.5px solid var(--gray-200);
-      border-radius: var(--radius);
-      padding: 20px;
-      margin-bottom: 20px;
-      text-align: center;
-      box-shadow: var(--shadow-sm);
-    }
-    [data-theme=dark] .timer-card { border-color: var(--gray-700); }
-
-    .tc-label  { font-size: .76rem; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--gray-400); margin-bottom: 8px; }
-    .tc-timer  {
-      font-size: 2rem; font-weight: 900; color: var(--primary);
-      font-variant-numeric: tabular-nums; letter-spacing: -.5px;
-      line-height: 1;
-    }
-    .tc-timer.urgent { color: var(--pg-red); animation: pulse 1s ease-in-out infinite; }
-    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .6; } }
-    .tc-sub { font-size: .76rem; color: var(--gray-400); margin-top: 6px; line-height: 1.5; }
-
-    .tc-bar-wrap {
-      background: var(--gray-100);
-      border-radius: 4px; height: 5px; margin: 12px 0 6px; overflow: hidden;
-    }
-    [data-theme=dark] .tc-bar-wrap { background: var(--gray-700); }
-    .tc-bar {
-      height: 100%; border-radius: 4px;
-      background: linear-gradient(90deg, var(--primary), var(--teal));
-      transition: width .5s linear;
-    }
-    .tc-bar.urgent { background: var(--pg-red); }
-
-    /* Quick actions card */
-    .quick-actions-card {
-      background: var(--surface);
-      border: 1.5px solid var(--gray-200);
-      border-radius: var(--radius);
-      overflow: hidden;
-      margin-bottom: 20px;
-      box-shadow: var(--shadow-sm);
-    }
-    [data-theme=dark] .quick-actions-card { border-color: var(--gray-700); }
-
-    .qa-title {
-      font-size: .76rem; font-weight: 800;
-      text-transform: uppercase; letter-spacing: .5px;
-      color: var(--gray-400); padding: 14px 18px 8px;
-    }
-    .qa-btn {
-      display: flex; align-items: center; gap: 12px;
-      padding: 13px 18px;
-      border-bottom: 1px solid var(--gray-100);
-      background: none; border-left: none; border-right: none; border-top: none;
-      width: 100%; text-align: left; cursor: pointer;
-      font-family: var(--font);
-      transition: background .15s;
-    }
-    .qa-btn:last-child { border-bottom: none; }
-    [data-theme=dark] .qa-btn { border-color: var(--gray-700); }
-    .qa-btn:hover { background: rgba(13,148,136,.04); }
-
-    .qa-icon { font-size: 1.2rem; flex-shrink: 0; }
-    .qa-text { font-size: .88rem; font-weight: 600; color: var(--gray-600); }
-    .qa-arr  { margin-left: auto; color: var(--gray-300); font-size: .85rem; }
-    .qa-btn:hover .qa-arr { color: var(--teal); }
-
-    /* Earnings summary card */
-    .earnings-card {
-      background: linear-gradient(135deg, #0b2240 0%, var(--primary) 60%, #0d4f47 100%);
-      border-radius: var(--radius);
-      padding: 22px;
-      margin-bottom: 20px;
-      color: #fff; position: relative; overflow: hidden;
-    }
-    .earnings-card::before {
-      content: "";
-      position: absolute; inset: 0;
-      background-image:
-        linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
-      background-size: 36px 36px; pointer-events: none;
-    }
-    .ec-inner { position: relative; z-index: 1; }
-    .ec-label { font-size: .74rem; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: rgba(255,255,255,.6); margin-bottom: 4px; }
-    .ec-amount {
-      font-size: 2rem; font-weight: 900; color: #fff; line-height: 1;
-      margin-bottom: 2px;
-    }
-    .ec-amount span { font-size: 1rem; font-weight: 600; }
-    .ec-net   { font-size: .78rem; color: rgba(255,255,255,.65); margin-bottom: 16px; }
-
-    .ec-row {
-      display: flex; justify-content: space-between;
-      font-size: .82rem; color: rgba(255,255,255,.75);
-      padding: 5px 0;
-      border-bottom: 1px solid rgba(255,255,255,.1);
-    }
-    .ec-row:last-child { border-bottom: none; }
-    .ec-row strong { color: #fff; }
-
-    .btn-withdraw {
-      display: flex; align-items: center; justify-content: center; gap: 7px;
-      width: 100%; padding: 11px;
-      background: rgba(255,255,255,.15);
-      border: 1.5px solid rgba(255,255,255,.3);
-      border-radius: var(--radius-sm);
-      color: #fff; font-weight: 800; font-size: .88rem;
-      cursor: pointer; font-family: var(--font);
-      transition: background .2s;
-      margin-top: 16px;
-    }
-    .btn-withdraw:hover { background: rgba(255,255,255,.25); }
-
-    /* Dispute button */
-    .btn-raise-dispute {
-      display: flex; align-items: center; justify-content: center; gap: 8px;
-      width: 100%; padding: 11px;
-      background: transparent;
-      border: 1.5px solid rgba(239,68,68,.3);
-      border-radius: var(--radius-sm);
-      color: var(--pg-red); font-weight: 700; font-size: .86rem;
-      cursor: pointer; font-family: var(--font);
-      transition: all .2s;
-    }
-    .btn-raise-dispute:hover { background: rgba(239,68,68,.06); border-color: var(--pg-red); }
-
-    /* ══════════════════════════════════
-       DISPUTE FLOW MODAL
-    ══════════════════════════════════ */
-    .modal-overlay {
-      position: fixed; inset: 0; z-index: 200;
-      background: rgba(0,0,0,.5);
-      backdrop-filter: blur(4px);
-      display: none; align-items: center; justify-content: center;
-      padding: 20px;
-    }
-    .modal-overlay.show { display: flex; }
-
-    .modal-box {
-      background: var(--surface);
-      border: 1.5px solid var(--gray-200);
-      border-radius: var(--radius);
-      max-width: 520px; width: 100%;
-      box-shadow: var(--shadow-xl);
-      overflow: hidden;
-      animation: modalSlide .25s ease;
-    }
-    @keyframes modalSlide {
-      from { transform: translateY(24px); opacity: 0; }
-      to   { transform: none; opacity: 1; }
-    }
-    [data-theme=dark] .modal-box { border-color: var(--gray-700); }
-
-    .modal-header {
-      padding: 18px 22px;
-      border-bottom: 1.5px solid var(--gray-200);
-      display: flex; align-items: center; justify-content: space-between;
-    }
-    [data-theme=dark] .modal-header { border-color: var(--gray-700); }
-    .modal-title { font-size: 1rem; font-weight: 800; color: var(--primary); }
-    .modal-close {
-      background: none; border: none; cursor: pointer;
-      font-size: 1.2rem; color: var(--gray-400);
-      padding: 2px; transition: color .15s;
-    }
-    .modal-close:hover { color: var(--danger); }
-
-    .modal-body { padding: 22px; }
-
-    .dispute-type-grid {
-      display: grid; grid-template-columns: 1fr 1fr;
-      gap: 10px; margin-bottom: 18px;
-    }
-    @media(max-width:400px) { .dispute-type-grid { grid-template-columns: 1fr; } }
-
-    .dispute-type-btn {
-      padding: 14px 12px;
-      border: 2px solid var(--gray-200);
-      border-radius: var(--radius-sm);
-      background: none; cursor: pointer;
-      text-align: center; font-family: var(--font);
-      transition: all .18s;
-    }
-    .dispute-type-btn:hover { border-color: rgba(239,68,68,.4); }
-    .dispute-type-btn.selected { border-color: var(--pg-red); background: rgba(239,68,68,.05); }
-    [data-theme=dark] .dispute-type-btn { border-color: var(--gray-600); }
-
-    .dtb-icon  { font-size: 1.5rem; margin-bottom: 6px; line-height: 1; }
-    .dtb-label { font-size: .82rem; font-weight: 700; color: var(--text); margin-bottom: 2px; }
-    .dtb-desc  { font-size: .72rem; color: var(--gray-400); line-height: 1.4; }
-
-    .dispute-desc-field {
-      width: 100%;
-      padding: 11px 13px;
+    .ff-input,
+    .ff-select,
+    .ff-textarea {
+      width: 100%; padding: 10px 13px;
       border: 1.5px solid var(--gray-200);
       border-radius: var(--radius-sm);
       background: var(--surface); color: var(--text);
-      font-family: var(--font); font-size: .88rem;
-      line-height: 1.6; resize: vertical; min-height: 80px;
-      box-sizing: border-box; transition: border .2s;
+      font-family: var(--font); font-size: .9rem;
+      transition: border .2s, box-shadow .2s;
+      box-sizing: border-box;
     }
-    .dispute-desc-field:focus { outline: none; border-color: var(--pg-red); }
-    [data-theme=dark] .dispute-desc-field { border-color: var(--gray-600); background: var(--gray-800); }
+    .ff-input:focus,
+    .ff-select:focus,
+    .ff-textarea:focus {
+      outline: none;
+      border-color: var(--teal);
+      box-shadow: 0 0 0 3px rgba(13,148,136,.1);
+    }
+    .ff-input.error,
+    .ff-select.error,
+    .ff-textarea.error {
+      border-color: var(--danger);
+      box-shadow: 0 0 0 3px rgba(239,68,68,.08);
+    }
+    .ff-input.valid,
+    .ff-select.valid,
+    .ff-textarea.valid {
+      border-color: #059669;
+    }
+    [data-theme=dark] .ff-input,
+    [data-theme=dark] .ff-select,
+    [data-theme=dark] .ff-textarea {
+      border-color: var(--gray-600);
+      background: var(--gray-800);
+    }
+    .ff-textarea { resize: vertical; min-height: 96px; line-height: 1.65; }
 
-    .modal-footer {
-      padding: 14px 22px;
-      border-top: 1.5px solid var(--gray-200);
-      display: flex; gap: 10px; justify-content: flex-end;
+    .ff-error-msg {
+      font-size: .74rem; font-weight: 700;
+      color: var(--danger); margin-top: 5px;
+      display: none; align-items: center; gap: 4px;
     }
-    [data-theme=dark] .modal-footer { border-color: var(--gray-700); }
+    .ff-error-msg.visible { display: flex; }
 
-    .btn-modal-cancel {
-      padding: 10px 20px; border-radius: var(--radius-sm);
-      border: 1.5px solid var(--gray-200);
-      background: none; color: var(--gray-500);
-      font-weight: 700; font-size: .86rem; cursor: pointer;
-      font-family: var(--font); transition: all .15s;
+    /* Input with icon */
+    .ff-input-wrap { position: relative; }
+    .ff-input-icon {
+      position: absolute; left: 12px; top: 50%;
+      transform: translateY(-50%);
+      font-size: .9rem; pointer-events: none;
     }
-    .btn-modal-cancel:hover { border-color: var(--gray-400); color: var(--gray-700); }
-    [data-theme=dark] .btn-modal-cancel { border-color: var(--gray-600); }
+    .ff-input-wrap .ff-input { padding-left: 36px; }
+    .ff-input-suffix {
+      position: absolute; right: 12px; top: 50%;
+      transform: translateY(-50%);
+      font-size: .78rem; font-weight: 700; color: var(--gray-400);
+    }
 
-    .btn-modal-submit {
-      padding: 10px 22px; border-radius: var(--radius-sm);
-      background: var(--pg-red); color: #fff;
-      font-weight: 700; font-size: .86rem; cursor: pointer;
-      border: none; font-family: var(--font);
-      transition: opacity .2s;
+    /* Character count */
+    .ff-char-count {
+      text-align: right; font-size: .72rem;
+      font-weight: 600; color: var(--gray-400); margin-top: 4px;
     }
-    .btn-modal-submit:hover { opacity: .88; }
-    .btn-modal-submit:disabled { opacity: .5; cursor: not-allowed; }
+    .ff-char-count.warn { color: #d97706; }
+    .ff-char-count.over { color: var(--danger); }
 
     /* ══════════════════════════════════
-       NEXT STEPS / WHAT'S NEXT
+       CATEGORY PICKER
     ══════════════════════════════════ */
-    .next-steps-card {
-      background: var(--surface);
+    .category-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+    @media(max-width:580px) { .category-grid { grid-template-columns: repeat(3,1fr); } }
+    @media(max-width:380px) { .category-grid { grid-template-columns: repeat(2,1fr); } }
+
+    .cat-card {
       border: 1.5px solid var(--gray-200);
+      border-radius: 12px; padding: 12px 8px;
+      text-align: center; cursor: pointer;
+      transition: all .18s; background: var(--bg);
+      user-select: none;
+    }
+    .cat-card:hover {
+      border-color: rgba(13,148,136,.3);
+      background: rgba(13,148,136,.03);
+      transform: translateY(-1px);
+    }
+    .cat-card.selected {
+      border-color: rgba(13,148,136,.5);
+      background: rgba(13,148,136,.08);
+      box-shadow: 0 2px 10px rgba(13,148,136,.12);
+    }
+    [data-theme=dark] .cat-card {
+      background: var(--gray-800); border-color: var(--gray-600);
+    }
+    [data-theme=dark] .cat-card.selected {
+      background: rgba(13,148,136,.12); border-color: rgba(13,148,136,.4);
+    }
+    .cc-icon  { font-size: 1.5rem; margin-bottom: 5px; line-height: 1; display: block; }
+    .cc-label { font-size: .72rem; font-weight: 700; color: var(--text); line-height: 1.3; }
+    .cat-card.selected .cc-label { color: var(--teal); }
+
+    /* ══════════════════════════════════
+       PAY RATE TOGGLE
+    ══════════════════════════════════ */
+    .pay-type-tabs {
+      display: flex; gap: 0;
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+      overflow: hidden; margin-bottom: 14px;
+    }
+    [data-theme=dark] .pay-type-tabs { border-color: var(--gray-600); }
+    .pay-tab {
+      flex: 1; padding: 9px 12px;
+      text-align: center; cursor: pointer;
+      font-size: .8rem; font-weight: 700;
+      color: var(--gray-500);
+      background: none; border: none;
+      font-family: var(--font);
+      transition: all .15s;
+      border-right: 1px solid var(--gray-200);
+    }
+    .pay-tab:last-child { border-right: none; }
+    .pay-tab:hover { background: rgba(13,148,136,.04); color: var(--teal); }
+    .pay-tab.active {
+      background: rgba(13,148,136,.1);
+      color: var(--teal); font-weight: 900;
+    }
+    [data-theme=dark] .pay-tab { border-color: var(--gray-600); }
+
+    /* ══════════════════════════════════
+       SKILL TAGS
+    ══════════════════════════════════ */
+    .skill-tags-wrap {
+      display: flex; flex-wrap: wrap; gap: 8px;
+      margin-bottom: 10px;
+    }
+    .skill-tag {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 12px; border-radius: var(--radius-full);
+      border: 1.5px solid var(--gray-200);
+      background: none; color: var(--gray-500);
+      font-size: .76rem; font-weight: 700;
+      cursor: pointer; font-family: var(--font);
+      transition: all .15s;
+    }
+    .skill-tag:hover { border-color: var(--teal); color: var(--teal); }
+    .skill-tag.selected {
+      background: rgba(13,148,136,.08);
+      border-color: rgba(13,148,136,.35); color: var(--teal);
+    }
+    [data-theme=dark] .skill-tag { border-color: var(--gray-600); color: var(--gray-400); }
+    .skill-tag-remove { font-size: .7rem; opacity: .6; }
+
+    /* Custom skill add */
+    .skill-add-row {
+      display: flex; gap: 8px; margin-top: 8px;
+    }
+    .skill-add-row .ff-input { flex: 1; }
+    .btn-skill-add {
+      padding: 8px 14px; border-radius: var(--radius-sm);
+      background: rgba(13,148,136,.1);
+      border: 1.5px solid rgba(13,148,136,.25);
+      color: var(--teal); font-size: .8rem; font-weight: 800;
+      cursor: pointer; font-family: var(--font); white-space: nowrap;
+      transition: all .15s;
+    }
+    .btn-skill-add:hover { background: rgba(13,148,136,.18); }
+
+    /* ══════════════════════════════════
+       DATE / TIME PICKER ROWS
+    ══════════════════════════════════ */
+    .datetime-row {
+      display: grid; grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+    }
+    @media(max-width:560px) { .datetime-row { grid-template-columns: 1fr 1fr; } }
+
+    /* ══════════════════════════════════
+       WORKER COUNT STEPPER
+    ══════════════════════════════════ */
+    .stepper-wrap {
+      display: flex; align-items: center; gap: 0;
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+      overflow: hidden; width: fit-content;
+    }
+    [data-theme=dark] .stepper-wrap { border-color: var(--gray-600); }
+    .stepper-btn {
+      width: 40px; height: 42px;
+      border: none; background: var(--gray-100);
+      color: var(--text); font-size: 1.1rem;
+      cursor: pointer; font-family: var(--font);
+      transition: background .15s; font-weight: 900;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .stepper-btn:hover { background: rgba(13,148,136,.1); color: var(--teal); }
+    [data-theme=dark] .stepper-btn { background: var(--gray-700); }
+    .stepper-val {
+      width: 56px; text-align: center;
+      font-size: 1rem; font-weight: 900; color: var(--primary);
+      border: none; border-left: 1px solid var(--gray-200);
+      border-right: 1px solid var(--gray-200);
+      background: var(--surface); font-family: var(--font);
+      padding: 0; height: 42px;
+      -moz-appearance: textfield;
+    }
+    .stepper-val::-webkit-outer-spin-button,
+    .stepper-val::-webkit-inner-spin-button { -webkit-appearance: none; }
+    [data-theme=dark] .stepper-val { border-color: var(--gray-600); background: var(--gray-800); }
+
+    /* ══════════════════════════════════
+       PERKS CHECKLIST
+    ══════════════════════════════════ */
+    .perks-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    @media(max-width:440px) { .perks-grid { grid-template-columns: 1fr; } }
+    .perk-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 12px;
+      border: 1.5px solid var(--gray-200);
+      border-radius: 10px; cursor: pointer;
+      transition: all .15s; background: var(--bg);
+    }
+    .perk-item:hover { border-color: rgba(13,148,136,.3); }
+    .perk-item.checked {
+      border-color: rgba(13,148,136,.4);
+      background: rgba(13,148,136,.06);
+    }
+    [data-theme=dark] .perk-item { background: var(--gray-800); border-color: var(--gray-600); }
+    .perk-checkbox {
+      width: 18px; height: 18px;
+      border: 2px solid var(--gray-300);
+      border-radius: 4px;
+      background: none; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      transition: all .15s; font-size: .7rem; color: #fff;
+    }
+    .perk-item.checked .perk-checkbox {
+      background: var(--teal); border-color: var(--teal);
+    }
+    .perk-icon  { font-size: 1.1rem; flex-shrink: 0; }
+    .perk-label { font-size: .82rem; font-weight: 700; color: var(--text); }
+
+    /* ══════════════════════════════════
+       CONTACT / VISIBILITY TOGGLES
+    ══════════════════════════════════ */
+    .toggle-row {
+      display: flex; align-items: center;
+      justify-content: space-between; gap: 14px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--gray-100);
+    }
+    .toggle-row:last-child { border-bottom: none; padding-bottom: 0; }
+    [data-theme=dark] .toggle-row { border-color: var(--gray-700); }
+    .tr-info {}
+    .tr-label { font-size: .88rem; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+    .tr-sub   { font-size: .74rem; color: var(--gray-400); font-weight: 600; }
+
+    .tog-switch {
+      position: relative; width: 44px; height: 24px; flex-shrink: 0;
+    }
+    .tog-switch input { opacity: 0; width: 0; height: 0; }
+    .tog-slider {
+      position: absolute; inset: 0;
+      background: var(--gray-300); border-radius: 24px;
+      cursor: pointer; transition: background .2s;
+    }
+    .tog-slider::before {
+      content: "";
+      position: absolute;
+      width: 18px; height: 18px; border-radius: 50%;
+      background: #fff; left: 3px; top: 3px;
+      transition: transform .2s;
+      box-shadow: 0 1px 4px rgba(0,0,0,.15);
+    }
+    .tog-switch input:checked + .tog-slider { background: var(--teal); }
+    .tog-switch input:checked + .tog-slider::before { transform: translateX(20px); }
+    [data-theme=dark] .tog-slider { background: var(--gray-600); }
+
+    /* ══════════════════════════════════
+       URGENCY SELECTOR
+    ══════════════════════════════════ */
+    .urgency-row { display: flex; gap: 10px; flex-wrap: wrap; }
+    .urgency-btn {
+      flex: 1; min-width: 100px;
+      padding: 10px 12px; border-radius: 10px;
+      border: 1.5px solid var(--gray-200);
+      background: none; cursor: pointer;
+      font-family: var(--font); text-align: center;
+      transition: all .15s;
+    }
+    .urgency-btn:hover { border-color: var(--teal); }
+    .urgency-btn.selected { border-color: rgba(13,148,136,.4); background: rgba(13,148,136,.07); }
+    .urgency-btn.urgent.selected { border-color: rgba(239,68,68,.4); background: rgba(239,68,68,.06); }
+    .ub-icon  { font-size: 1.2rem; margin-bottom: 4px; display: block; }
+    .ub-label { font-size: .76rem; font-weight: 800; color: var(--text); }
+    .ub-sub   { font-size: .68rem; font-weight: 600; color: var(--gray-400); margin-top: 2px; }
+    [data-theme=dark] .urgency-btn { border-color: var(--gray-600); }
+
+    /* ══════════════════════════════════
+       PREVIEW CARD
+    ══════════════════════════════════ */
+    .pg-preview-card {
+      background: var(--surface);
+      border: 1.5px solid rgba(13,148,136,.2);
       border-radius: var(--radius);
       box-shadow: var(--shadow-sm);
       overflow: hidden;
-      margin-bottom: 20px;
+      position: sticky; top: 70px;
     }
-    [data-theme=dark] .next-steps-card { border-color: var(--gray-700); }
+    [data-theme=dark] .pg-preview-card { border-color: rgba(13,148,136,.25); }
+    .ppc-header {
+      padding: 14px 18px;
+      background: linear-gradient(135deg, rgba(13,148,136,.1), rgba(5,150,105,.06));
+      border-bottom: 1.5px solid rgba(13,148,136,.15);
+      font-size: .84rem; font-weight: 800; color: var(--teal);
+      display: flex; align-items: center; gap: 7px;
+    }
+    .ppc-body { padding: 16px; }
 
-    .nsc-header {
-      background: linear-gradient(135deg, rgba(26,60,94,.04), rgba(13,148,136,.06));
-      padding: 16px 20px;
-      border-bottom: 1.5px solid var(--gray-200);
+    .prev-gig-card {
+      background: var(--bg);
+      border: 1.5px solid var(--gray-200);
+      border-radius: 12px; padding: 14px;
+      margin-bottom: 14px;
     }
-    [data-theme=dark] .nsc-header { border-color: var(--gray-700); }
-    .nsc-title { font-size: .96rem; font-weight: 800; color: var(--primary); }
+    [data-theme=dark] .prev-gig-card { border-color: var(--gray-700); background: var(--gray-800); }
 
-    .next-step-item {
-      display: flex; align-items: flex-start; gap: 14px;
-      padding: 14px 20px;
-      border-bottom: 1px solid var(--gray-100);
+    .prev-title {
+      font-size: .92rem; font-weight: 900;
+      color: var(--primary); margin-bottom: 6px;
+      min-height: 18px;
     }
-    .next-step-item:last-child { border-bottom: none; }
-    [data-theme=dark] .next-step-item { border-color: var(--gray-700); }
+    .prev-category {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: rgba(13,148,136,.08);
+      border: 1px solid rgba(13,148,136,.15);
+      border-radius: 5px; padding: 2px 9px;
+      font-size: .68rem; font-weight: 800; color: var(--teal);
+      margin-bottom: 10px;
+    }
+    .prev-meta {
+      display: flex; flex-direction: column; gap: 5px;
+      margin-bottom: 10px;
+    }
+    .prev-meta-row {
+      display: flex; align-items: center; gap: 7px;
+      font-size: .78rem; color: var(--gray-500); font-weight: 600;
+    }
+    .prev-pay {
+      font-size: 1.1rem; font-weight: 900;
+      color: #059669; margin-bottom: 8px;
+    }
+    .prev-skills {
+      display: flex; flex-wrap: wrap; gap: 5px;
+    }
+    .prev-skill {
+      font-size: .66rem; font-weight: 700;
+      padding: 2px 8px; border-radius: 4px;
+      background: rgba(26,60,94,.06); color: var(--primary);
+      border: 1px solid rgba(26,60,94,.1);
+    }
+    [data-theme=dark] .prev-skill { background: rgba(255,255,255,.06); }
 
-    .nsi-num {
-      width: 28px; height: 28px; border-radius: 50%;
-      background: linear-gradient(135deg, var(--primary), var(--teal));
-      color: #fff; font-weight: 900; font-size: .76rem;
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0;
+    /* Posting fee summary */
+    .fee-summary {}
+    .fee-row {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      padding: 7px 0;
+      border-bottom: 1px dashed var(--gray-200);
+      font-size: .82rem;
     }
-    .nsi-title { font-size: .9rem; font-weight: 700; color: var(--text); margin-bottom: 3px; }
-    .nsi-desc  { font-size: .8rem; color: var(--gray-500); line-height: 1.55; }
+    .fee-row:last-child { border-bottom: none; }
+    [data-theme=dark] .fee-row { border-color: var(--gray-700); }
+    .fee-lbl { color: var(--gray-500); font-weight: 600; }
+    .fee-val { font-weight: 800; color: var(--text); }
+    .fee-val.free { color: #059669; }
+    .fee-val.total { color: var(--primary); font-size: .96rem; }
 
     /* ══════════════════════════════════
-       POST-COMPLETION CONFETTI (CSS only)
-    ══════════════════════════════════ */
-    .confetti-wrap {
-      position: fixed; inset: 0; pointer-events: none; z-index: 500;
-      display: none;
-    }
-    .confetti-wrap.show { display: block; }
-
-    @keyframes confettiFall {
-      0%   { transform: translateY(-10px) rotate(0deg); opacity: 1; }
-      100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
-    }
-    .confetti-piece {
-      position: absolute; top: -10px;
-      width: 10px; height: 10px;
-      animation: confettiFall linear forwards;
-    }
-
-    /* ══════════════════════════════════
-       STATE-SPECIFIC VIEWS
-    ══════════════════════════════════ */
-    .pg-view { display: none; }
-    .pg-view.active { display: block; }
-
-    /* ══════════════════════════════════
-       INFO BOX
+       INFO BOXES
     ══════════════════════════════════ */
     .pg-info-box {
       border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-      padding: 12px 15px; margin: 12px 0;
-      font-size: .86rem; line-height: 1.65;
+      padding: 11px 14px; margin-bottom: 20px;
+      font-size: .85rem; line-height: 1.65;
     }
-    .pg-info-box.teal   { background: rgba(13,148,136,.07);  border-left: 3px solid var(--teal); }
-    .pg-info-box.warn   { background: rgba(245,158,11,.07);  border-left: 3px solid #f59e0b; }
-    .pg-info-box.danger { background: rgba(239,68,68,.06);   border-left: 3px solid var(--danger); color: var(--text); }
-    .pg-info-box.green  { background: rgba(16,185,129,.06);  border-left: 3px solid #059669; }
+    .pg-info-box.teal  { background: rgba(13,148,136,.07); border-left: 3px solid var(--teal); }
+    .pg-info-box.green { background: rgba(16,185,129,.06); border-left: 3px solid #059669; }
+    .pg-info-box.amber { background: rgba(245,158,11,.07); border-left: 3px solid #f59e0b; }
 
     /* ══════════════════════════════════
-       SHARE CARD
+       SUBMIT ROW
     ══════════════════════════════════ */
-    .share-card {
+    .pg-submit-row {
       background: var(--surface);
       border: 1.5px solid var(--gray-200);
       border-radius: var(--radius);
-      padding: 18px;
-      margin-bottom: 20px;
-      box-shadow: var(--shadow-sm);
+      padding: 20px 22px;
+      display: flex; align-items: center;
+      gap: 14px; flex-wrap: wrap;
+      box-shadow: var(--shadow);
     }
-    [data-theme=dark] .share-card { border-color: var(--gray-700); }
+    [data-theme=dark] .pg-submit-row { border-color: var(--gray-700); }
 
-    .share-title { font-size: .86rem; font-weight: 800; color: var(--primary); margin-bottom: 4px; }
-    .share-sub   { font-size: .76rem; color: var(--gray-400); margin-bottom: 14px; line-height: 1.5; }
-
-    .share-btns { display: flex; gap: 8px; flex-wrap: wrap; }
-    .btn-share {
-      display: inline-flex; align-items: center; gap: 6px;
-      padding: 8px 14px; border-radius: var(--radius-sm);
-      font-weight: 700; font-size: .8rem; cursor: pointer;
-      font-family: var(--font); border: 1.5px solid var(--gray-200);
+    .btn-pg-submit {
+      display: inline-flex; align-items: center; gap: 9px;
+      padding: 13px 32px;
+      border-radius: var(--radius-sm);
+      background: linear-gradient(135deg, #059669, #0d9488);
+      border: none; color: #fff;
+      font-size: .96rem; font-weight: 900;
+      cursor: pointer; font-family: var(--font);
+      box-shadow: 0 4px 16px rgba(5,150,105,.3);
+      transition: all .2s;
+    }
+    .btn-pg-submit:hover {
+      box-shadow: 0 6px 22px rgba(5,150,105,.45);
+      transform: translateY(-1px);
+    }
+    .btn-pg-submit:disabled {
+      opacity: .55; cursor: not-allowed; transform: none;
+    }
+    .btn-pg-draft {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 13px 22px;
+      border-radius: var(--radius-sm);
+      border: 1.5px solid var(--gray-200);
       background: none; color: var(--gray-600);
+      font-size: .9rem; font-weight: 800;
+      cursor: pointer; font-family: var(--font);
       transition: all .15s;
     }
-    .btn-share:hover { border-color: var(--teal); color: var(--teal); }
-    [data-theme=dark] .btn-share { border-color: var(--gray-600); }
+    .btn-pg-draft:hover { border-color: var(--teal); color: var(--teal); }
+    [data-theme=dark] .btn-pg-draft { border-color: var(--gray-600); color: var(--gray-400); }
+
+    .pg-submit-note {
+      font-size: .76rem; color: var(--gray-400); font-weight: 600;
+      line-height: 1.6; flex: 1; min-width: 180px;
+    }
+
+    /* ══════════════════════════════════
+       SUCCESS MODAL
+    ══════════════════════════════════ */
+    .pg-modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.55);
+      backdrop-filter: blur(4px);
+      z-index: 100; display: none;
+      align-items: center; justify-content: center;
+      padding: 24px;
+    }
+    .pg-modal-overlay.open { display: flex; }
+
+    .pg-modal {
+      background: var(--surface);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-xl);
+      max-width: 480px; width: 100%;
+      padding: 36px 32px; text-align: center;
+      position: relative;
+      animation: modalIn .3s cubic-bezier(.34,1.56,.64,1);
+    }
+    @keyframes modalIn {
+      from { transform: scale(.88) translateY(20px); opacity: 0; }
+      to   { transform: scale(1) translateY(0); opacity: 1; }
+    }
+    [data-theme=dark] .pg-modal { border-color: var(--gray-700); }
+
+    .modal-confetti { font-size: 3.5rem; margin-bottom: 12px; animation: bounce 1s ease-in-out infinite alternate; }
+    @keyframes bounce { from { transform: scale(1); } to { transform: scale(1.12) rotate(5deg); } }
+    .modal-title { font-size: 1.4rem; font-weight: 900; color: var(--primary); margin-bottom: 8px; }
+    .modal-sub   { font-size: .88rem; color: var(--gray-500); line-height: 1.7; margin-bottom: 20px; }
+    .modal-gig-id {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(13,148,136,.08);
+      border: 1.5px solid rgba(13,148,136,.2);
+      border-radius: 8px; padding: 8px 16px;
+      font-size: .84rem; font-weight: 800; color: var(--teal);
+      margin-bottom: 24px;
+    }
+    .modal-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+    .btn-modal-primary {
+      padding: 11px 24px; border-radius: var(--radius-sm);
+      background: linear-gradient(135deg, var(--primary), var(--teal));
+      border: none; color: #fff;
+      font-size: .9rem; font-weight: 800;
+      cursor: pointer; font-family: var(--font);
+      transition: opacity .15s;
+    }
+    .btn-modal-primary:hover { opacity: .88; }
+    .btn-modal-outline {
+      padding: 11px 20px; border-radius: var(--radius-sm);
+      border: 1.5px solid var(--gray-200);
+      background: none; color: var(--gray-600);
+      font-size: .9rem; font-weight: 700;
+      cursor: pointer; font-family: var(--font);
+      transition: all .15s;
+    }
+    .btn-modal-outline:hover { border-color: var(--teal); color: var(--teal); }
+    [data-theme=dark] .btn-modal-outline { border-color: var(--gray-600); color: var(--gray-400); }
+
+    /* ══════════════════════════════════
+       TOAST
+    ══════════════════════════════════ */
+    .pg-toast {
+      position: fixed; bottom: 28px; left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--primary); color: #fff;
+      padding: 10px 22px; border-radius: var(--radius-full);
+      font-size: .84rem; font-weight: 700;
+      opacity: 0; transition: all .3s;
+      pointer-events: none; z-index: 200;
+      white-space: nowrap; box-shadow: var(--shadow-md);
+    }
+    .pg-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
   </style>
 </head>
 <body>
-  <!-- Confetti -->
-  <div class="confetti-wrap" id="confettiWrap"></div>
-
-  <!-- Dispute Modal -->
-  <div class="modal-overlay" id="disputeModal">
-    <div class="modal-box">
-      <div class="modal-header">
-        <div class="modal-title">🚨 Dispute Raise Karo</div>
-        <button class="modal-close" id="modalClose">✕</button>
-      </div>
-      <div class="modal-body">
-        <p style="font-size:.86rem;color:var(--gray-500);margin-bottom:16px;line-height:1.6">
-          Issue clearly describe karo. Team <strong>5 business days</strong> mein review karegi.
-          Evidence — chat screenshots — attach karo support ticket mein.
-        </p>
-        <div style="font-size:.8rem;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px">Issue Type</div>
-        <div class="dispute-type-grid">
-          <button class="dispute-type-btn" data-type="payment">
-            <div class="dtb-icon">💸</div>
-            <div class="dtb-label">Payment Issue</div>
-            <div class="dtb-desc">Payment nahi mili ya wrong amount</div>
-          </button>
-          <button class="dispute-type-btn" data-type="quality">
-            <div class="dtb-icon">⭐</div>
-            <div class="dtb-label">Work Quality</div>
-            <div class="dtb-desc">Kaam described se alag ya incomplete</div>
-          </button>
-          <button class="dispute-type-btn" data-type="noshow">
-            <div class="dtb-icon">🚶</div>
-            <div class="dtb-label">No Show</div>
-            <div class="dtb-desc">Worker/Poster show hi nahi hua</div>
-          </button>
-          <button class="dispute-type-btn" data-type="safety">
-            <div class="dtb-icon">🛡️</div>
-            <div class="dtb-label">Safety Issue</div>
-            <div class="dtb-desc">Harassment, scam ya unsafe behavior</div>
-          </button>
-        </div>
-        <div style="font-size:.82rem;font-weight:700;color:var(--gray-500);margin-bottom:7px">Kya hua? (detail mein)</div>
-        <textarea class="dispute-desc-field" id="disputeDesc" placeholder="Issue clearly explain karo — date, time, amounts, aur jo hua sab likho…" maxlength="800"></textarea>
-        <div style="font-size:.72rem;color:var(--gray-400);text-align:right;margin-top:4px">
-          <span id="disputeCharCount">0</span>/800
-        </div>
-        <div class="pg-info-box warn" style="margin-top:14px">
-          ⚠️ Dispute raise karne ke baad payment temporarily hold mein jaati hai review ke liye.
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn-modal-cancel" id="btnModalCancel">Cancel</button>
-        <button class="btn-modal-submit" id="btnDisputeSubmit" disabled>🚨 Submit Dispute</button>
-      </div>
-    </div>
-  </div>
 
   <div id="page-loader"></div>
   <div id="announce-bar"></div>
   <nav id="main-nav"></nav>
 
+  <div class="pg-toast"     id="pgToast"></div>
+
+  <!-- Success Modal -->
+  <div class="pg-modal-overlay" id="successModal">
+    <div class="pg-modal">
+      <div class="modal-confetti">🎉</div>
+      <div class="modal-title">Gig Live Ho Gaya!</div>
+      <div class="modal-sub">
+        Tumhara gig successfully post ho gaya hai. Workers abhi apply karna shuru kar denge — usually <strong>15–30 minutes</strong> mein pehla application aata hai!
+      </div>
+      <div class="modal-gig-id" id="modalGigId">📋 Gig ID: GL-2026-0001</div>
+      <div class="modal-actions">
+        <button class="btn-modal-primary" onclick="window.location.href='dashboard-client.html'">
+          📊 Dashboard Dekho
+        </button>
+        <button class="btn-modal-outline" onclick="window.location.href='browse.html'">
+          🔍 Browse Gigs
+        </button>
+        <button class="btn-modal-outline" onclick="postAnother()">
+          ➕ Ek Aur Post Karo
+        </button>
+      </div>
+    </div>
+  </div>
+
   <main class="pg-wrapper">
 
     <!-- ══════════════════════════════════
-         DYNAMIC HERO
+         HERO
     ══════════════════════════════════ -->
-    <div class="pg-hero state-pending" id="pgHero">
+    <section class="pg-hero">
       <div class="pg-hero-inner">
-        <div class="pg-status-icon" id="heroIcon">⏳</div>
-        <div class="pg-hero-badge" id="heroBadge">⏳ Awaiting Completion</div>
-        <h1 id="heroTitle">Kaam Complete Hua?</h1>
-        <p class="pg-hero-sub" id="heroSub">
-          Kaam ho gaya ho toh "Mark Complete" karo — payment release hogi aur
-          dono sides rating de sakenge.
-        </p>
-        <div class="pg-gig-id">
-          <span>GIG ID</span> #GL-2026-0314
+        <div>
+          <div class="pgh-tag">📋 Post a Gig</div>
+          <h1 class="pgh-title">Worker <span>Hire Karo</span></h1>
+          <p class="pgh-sub">
+            3 simple steps mein gig post karo — Gurugram ke verified workers
+            turant apply karne lagte hain. Payment safe, kaam fast. 💪
+          </p>
+        </div>
+        <div class="pgh-steps">
+          <div class="pgh-step active" id="heroStep1">
+            <div class="pgs-num">1</div>
+            <div class="pgs-info">
+              <div class="pgs-label">Gig Details</div>
+              <div class="pgs-sub">Title, category, description</div>
+            </div>
+          </div>
+          <div class="pgh-step" id="heroStep2">
+            <div class="pgs-num">2</div>
+            <div class="pgs-info">
+              <div class="pgs-label">Pay & Schedule</div>
+              <div class="pgs-sub">Rate, date, workers needed</div>
+            </div>
+          </div>
+          <div class="pgh-step" id="heroStep3">
+            <div class="pgs-num">3</div>
+            <div class="pgs-info">
+              <div class="pgs-label">Location & Review</div>
+              <div class="pgs-sub">Address, perks, publish</div>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
+    </section>
 
-    <!-- ══════════════════════════════════
-         STEP PROGRESS BAR
-    ══════════════════════════════════ -->
-    <div class="pg-steps-bar">
-      <div class="pg-steps-inner" id="stepsBar">
-        <div class="pg-step done" id="step1">
-          <div class="pg-step-circle">✓</div>
-          <div class="pg-step-label">Gig Posted</div>
+    <!-- Progress bar -->
+    <div class="pg-progress-bar">
+      <div class="pgpb-inner">
+        <div class="pgpb-label" id="pgpbLabel">Step 1 of 3</div>
+        <div class="pgpb-track">
+          <div class="pgpb-fill" id="pgpbFill" style="width:33%"></div>
         </div>
-        <div class="pg-step-line done" id="line1"></div>
-        <div class="pg-step done" id="step2">
-          <div class="pg-step-circle">✓</div>
-          <div class="pg-step-label">Worker Hired</div>
-        </div>
-        <div class="pg-step-line done" id="line2"></div>
-        <div class="pg-step active" id="step3">
-          <div class="pg-step-circle">3</div>
-          <div class="pg-step-label">Mark Complete</div>
-        </div>
-        <div class="pg-step-line" id="line3"></div>
-        <div class="pg-step" id="step4">
-          <div class="pg-step-circle">4</div>
-          <div class="pg-step-label">Rate & Review</div>
-        </div>
-        <div class="pg-step-line" id="line4"></div>
-        <div class="pg-step" id="step5">
-          <div class="pg-step-circle">5</div>
-          <div class="pg-step-label">Payment Released</div>
+        <div class="pgpb-pct"  id="pgpbPct">33%</div>
+        <div class="pgpb-steps">
+          <div class="pgpb-step-dot active" id="dot1"></div>
+          <div class="pgpb-step-dot"        id="dot2"></div>
+          <div class="pgpb-step-dot"        id="dot3"></div>
         </div>
       </div>
     </div>
@@ -942,879 +849,998 @@
     ══════════════════════════════════ -->
     <div class="pg-body">
 
-      <!-- ── LEFT COLUMN ── -->
-      <div class="pg-left">
+      <!-- ════ LEFT — FORM ════ -->
+      <div>
 
-        <!-- Breadcrumb -->
-        <div id="breadcrumb" style="margin-bottom:20px"></div>
+        <!-- ─────────────────────────────
+             SECTION 1: GIG DETAILS
+        ───────────────────────────────── -->
+        <div class="pg-info-box teal">
+          💡 <strong>Tip:</strong> Clear title aur detailed description wale gigs pe <strong>3x zyada applications</strong> aati hain. Jitna detail doge, utna better!
+        </div>
 
-        <!-- ════ VIEW A: POSTER — mark complete ════ -->
-        <div class="pg-view active" id="viewPoster">
-
-          <!-- Gig Summary -->
-          <div class="pg-card">
-            <div class="pg-card-header">
-              <div class="pg-card-title">📋 Gig Summary</div>
-              <span style="font-size:.74rem;font-weight:700;color:var(--teal);background:rgba(13,148,136,.1);padding:3px 9px;border-radius:6px">In Progress</span>
-            </div>
-            <div class="pg-card-body">
-              <div class="gig-summary-row">
-                <span class="gsr-label">Gig Title</span>
-                <span class="gsr-value">Weekend Warehouse Packing Helper</span>
-              </div>
-              <div class="gig-summary-row">
-                <span class="gsr-label">Location</span>
-                <span class="gsr-value">📍 Sector 14, Gurugram</span>
-              </div>
-              <div class="gig-summary-row">
-                <span class="gsr-label">Date</span>
-                <span class="gsr-value">📅 March 14, 2026 • 9:00 AM – 5:00 PM</span>
-              </div>
-              <div class="gig-summary-row">
-                <span class="gsr-label">Agreed Budget</span>
-                <span class="gsr-value green">💰 ₹1,200</span>
-              </div>
-              <div class="gig-summary-row">
-                <span class="gsr-label">Platform Fee (6%)</span>
-                <span class="gsr-value">₹72</span>
-              </div>
-              <div class="gig-summary-row">
-                <span class="gsr-label">Worker Receives</span>
-                <span class="gsr-value green">₹1,128</span>
-              </div>
-            </div>
+        <div class="pg-card" id="section1">
+          <div class="pg-card-header">
+            <div class="pgch-num">1</div>
+            <div class="pgch-title">📋 Gig ki Basic Details</div>
           </div>
+          <div class="pg-card-body">
 
-          <!-- Participants -->
-          <div class="pg-card">
-            <div class="pg-card-header">
-              <div class="pg-card-title">👥 Participants</div>
+            <!-- Gig Title -->
+            <div class="ff-group">
+              <label class="ff-label" for="gigTitle">
+                Gig ka Title <span class="ff-required">*</span>
+              </label>
+              <input
+                class="ff-input" type="text" id="gigTitle"
+                placeholder="e.g. Warehouse Packing Helper needed — Sector 37"
+                maxlength="80"
+                oninput="updatePreview(); updateCharCount('gigTitle','titleCount',80); validateField(this)"
+              />
+              <div class="ff-char-count"><span id="titleCount">0</span> / 80</div>
+              <div class="ff-error-msg" id="gigTitleErr">⚠️ Title zaroori hai — min 10 characters</div>
+              <div class="ff-hint">💡 Location aur task dono title mein daalo — workers dhundne mein easy hota hai</div>
             </div>
-            <div class="pg-card-body">
-              <div class="participant-row">
-                <div class="part-avatar">RK</div>
+
+            <!-- Category -->
+            <div class="ff-group">
+              <label class="ff-label">
+                Category <span class="ff-required">*</span>
+              </label>
+              <div class="category-grid" id="categoryGrid">
+                <div class="cat-card" data-cat="Delivery" onclick="selectCategory(this)">
+                  <span class="cc-icon">🛵</span>
+                  <span class="cc-label">Delivery</span>
+                </div>
+                <div class="cat-card" data-cat="Packing" onclick="selectCategory(this)">
+                  <span class="cc-icon">📦</span>
+                  <span class="cc-label">Packing</span>
+                </div>
+                <div class="cat-card" data-cat="Event Helper" onclick="selectCategory(this)">
+                  <span class="cc-icon">🎪</span>
+                  <span class="cc-label">Event Helper</span>
+                </div>
+                <div class="cat-card" data-cat="Home Shifting" onclick="selectCategory(this)">
+                  <span class="cc-icon">🚛</span>
+                  <span class="cc-label">Home Shifting</span>
+                </div>
+                <div class="cat-card" data-cat="Cleaning" onclick="selectCategory(this)">
+                  <span class="cc-icon">🧹</span>
+                  <span class="cc-label">Cleaning</span>
+                </div>
+                <div class="cat-card" data-cat="Repair" onclick="selectCategory(this)">
+                  <span class="cc-icon">🔧</span>
+                  <span class="cc-label">Repair</span>
+                </div>
+                <div class="cat-card" data-cat="Data Entry" onclick="selectCategory(this)">
+                  <span class="cc-icon">💻</span>
+                  <span class="cc-label">Data Entry</span>
+                </div>
+                <div class="cat-card" data-cat="Security" onclick="selectCategory(this)">
+                  <span class="cc-icon">🔒</span>
+                  <span class="cc-label">Security</span>
+                </div>
+                <div class="cat-card" data-cat="Cooking" onclick="selectCategory(this)">
+                  <span class="cc-icon">👨‍🍳</span>
+                  <span class="cc-label">Cooking</span>
+                </div>
+                <div class="cat-card" data-cat="Gardening" onclick="selectCategory(this)">
+                  <span class="cc-icon">🌿</span>
+                  <span class="cc-label">Gardening</span>
+                </div>
+                <div class="cat-card" data-cat="Tutoring" onclick="selectCategory(this)">
+                  <span class="cc-icon">📚</span>
+                  <span class="cc-label">Tutoring</span>
+                </div>
+                <div class="cat-card" data-cat="Other" onclick="selectCategory(this)">
+                  <span class="cc-icon">➕</span>
+                  <span class="cc-label">Other</span>
+                </div>
+              </div>
+              <div class="ff-error-msg" id="catErr">⚠️ Ek category select karna zaroori hai</div>
+            </div>
+
+            <!-- Description -->
+            <div class="ff-group">
+              <label class="ff-label" for="gigDesc">
+                Kaam ki Description <span class="ff-required">*</span>
+              </label>
+              <textarea
+                class="ff-textarea" id="gigDesc"
+                placeholder="Kya kaam karna hoga? Tools/equipment milenge ya khud laane honge? Dress code hai? Koi specific skill chahiye? Kitna physical kaam hai?&#10;&#10;Jitna detail doge utna better — workers ko sab pehle se pata hona chahiye."
+                maxlength="600"
+                oninput="updateCharCount('gigDesc','descCount',600); updatePreview()"
+                style="min-height:120px"
+              ></textarea>
+              <div class="ff-char-count"><span id="descCount">0</span> / 600 · Min 50 characters recommended</div>
+              <div class="ff-error-msg" id="gigDescErr">⚠️ Description zaroori hai</div>
+            </div>
+
+            <!-- Skills required -->
+            <div class="ff-group">
+              <label class="ff-label">Required Skills / Tags <span style="color:var(--gray-400);font-weight:600">(optional)</span></label>
+              <div class="skill-tags-wrap" id="skillTagsWrap">
+                <button class="skill-tag" onclick="toggleSkill(this)">💪 Physical Strength</button>
+                <button class="skill-tag" onclick="toggleSkill(this)">🛵 Own Vehicle</button>
+                <button class="skill-tag" onclick="toggleSkill(this)">📱 Smartphone</button>
+                <button class="skill-tag" onclick="toggleSkill(this)">🗺️ Area Knowledge</button>
+                <button class="skill-tag" onclick="toggleSkill(this)">🧮 Basic Counting</button>
+                <button class="skill-tag" onclick="toggleSkill(this)">📦 Packing Experience</button>
+                <button class="skill-tag" onclick="toggleSkill(this)">🤝 Team Player</button>
+                <button class="skill-tag" onclick="toggleSkill(this)">🔧 Tool Handling</button>
+                <button class="skill-tag" onclick="toggleSkill(this)">🚗 Driving License</button>
+                <button class="skill-tag" onclick="toggleSkill(this)">💬 Hindi Speaking</button>
+              </div>
+              <div class="skill-add-row">
+                <input class="ff-input" type="text" id="customSkillInput" placeholder="Custom skill add karo…" maxlength="30" onkeydown="if(event.key==='Enter'){event.preventDefault();addCustomSkill()}" />
+                <button class="btn-skill-add" onclick="addCustomSkill()">➕ Add</button>
+              </div>
+            </div>
+
+            <!-- Urgency -->
+            <div class="ff-group">
+              <label class="ff-label">Kitni Urgency Hai? <span class="ff-required">*</span></label>
+              <div class="urgency-row" id="urgencyRow">
+                <button class="urgency-btn" data-urgency="flexible" onclick="selectUrgency(this)">
+                  <span class="ub-icon">🟢</span>
+                  <div class="ub-label">Flexible</div>
+                  <div class="ub-sub">Koi rush nahi</div>
+                </button>
+                <button class="urgency-btn" data-urgency="normal" onclick="selectUrgency(this)">
+                  <span class="ub-icon">🟡</span>
+                  <div class="ub-label">Normal</div>
+                  <div class="ub-sub">1–2 din mein</div>
+                </button>
+                <button class="urgency-btn urgent" data-urgency="urgent" onclick="selectUrgency(this)">
+                  <span class="ub-icon">🔴</span>
+                  <div class="ub-label">Urgent!</div>
+                  <div class="ub-sub">Aaj ya kal chahiye</div>
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ─────────────────────────────
+             SECTION 2: PAY & SCHEDULE
+        ───────────────────────────────── -->
+        <div class="pg-card" id="section2">
+          <div class="pg-card-header">
+            <div class="pgch-num">2</div>
+            <div class="pgch-title">💰 Payment & Schedule</div>
+          </div>
+          <div class="pg-card-body">
+
+            <!-- Pay type tabs -->
+            <div class="ff-group">
+              <label class="ff-label">Payment Type <span class="ff-required">*</span></label>
+              <div class="pay-type-tabs" id="payTypeTabs">
+                <button class="pay-tab active" data-pay="hourly"  onclick="selectPayType(this)">⏰ Per Hour</button>
+                <button class="pay-tab"        data-pay="daily"   onclick="selectPayType(this)">📅 Per Day</button>
+                <button class="pay-tab"        data-pay="fixed"   onclick="selectPayType(this)">🎯 Fixed Price</button>
+                <button class="pay-tab"        data-pay="weekly"  onclick="selectPayType(this)">📆 Per Week</button>
+              </div>
+              <div class="ff-row">
                 <div>
-                  <div class="part-name">Rahul Kumar <span style="font-size:.72rem;color:var(--teal)">⭐ 4.8</span></div>
-                  <div class="part-role">Gurugram, Haryana</div>
+                  <label class="ff-label" for="payMin">
+                    Min Pay (₹) <span class="ff-required">*</span>
+                  </label>
+                  <div class="ff-input-wrap">
+                    <span class="ff-input-icon">₹</span>
+                    <input
+                      class="ff-input" type="number" id="payMin"
+                      placeholder="e.g. 500" min="1" max="99999"
+                      oninput="updatePreview(); validateField(this)"
+                    />
+                    <span class="ff-input-suffix" id="payTypeSuffix">/hr</span>
+                  </div>
+                  <div class="ff-error-msg" id="payMinErr">⚠️ Minimum pay daalna zaroori hai</div>
                 </div>
-                <span class="part-badge poster">Poster (You)</span>
-              </div>
-              <div class="participant-row">
-                <div class="part-avatar" style="background:linear-gradient(135deg,#059669,#0d9488)">AS</div>
                 <div>
-                  <div class="part-name">Arjun Singh <span style="font-size:.72rem;color:var(--teal)">⭐ 4.6</span></div>
-                  <div class="part-role">Gurugram, Haryana</div>
+                  <label class="ff-label" for="payMax">Max Pay (₹) <span style="color:var(--gray-400);font-weight:600">(optional)</span></label>
+                  <div class="ff-input-wrap">
+                    <span class="ff-input-icon">₹</span>
+                    <input
+                      class="ff-input" type="number" id="payMax"
+                      placeholder="e.g. 800" min="1" max="99999"
+                      oninput="updatePreview()"
+                    />
+                    <span class="ff-input-suffix" id="payTypeSuffix2">/hr</span>
+                  </div>
+                  <div class="ff-hint">💡 Range dene se zyada applications aati hain</div>
                 </div>
-                <span class="part-badge worker">Worker</span>
               </div>
             </div>
+
+            <!-- Workers needed -->
+            <div class="ff-group">
+              <label class="ff-label">Kitne Workers Chahiye? <span class="ff-required">*</span></label>
+              <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+                <div class="stepper-wrap">
+                  <button class="stepper-btn" onclick="stepWorkers(-1)">−</button>
+                  <input class="stepper-val" type="number" id="workersCount" value="1" min="1" max="50" oninput="updatePreview()" />
+                  <button class="stepper-btn" onclick="stepWorkers(1)">+</button>
+                </div>
+                <div style="font-size:.82rem;color:var(--gray-400);font-weight:600">workers required</div>
+              </div>
+            </div>
+
+            <!-- Date & Time -->
+            <div class="ff-group">
+              <label class="ff-label">Gig Start Date & Time <span class="ff-required">*</span></label>
+              <div class="datetime-row">
+                <div>
+                  <label class="ff-label" for="gigDate" style="font-size:.74rem">Start Date</label>
+                  <input class="ff-input" type="date" id="gigDate" oninput="updatePreview(); validateField(this)" />
+                  <div class="ff-error-msg" id="gigDateErr">⚠️ Date select karo</div>
+                </div>
+                <div>
+                  <label class="ff-label" for="gigTime" style="font-size:.74rem">Start Time</label>
+                  <input class="ff-input" type="time" id="gigTime" value="09:00" oninput="updatePreview()" />
+                </div>
+                <div>
+                  <label class="ff-label" for="gigDuration" style="font-size:.74rem">Duration</label>
+                  <select class="ff-select" id="gigDuration" oninput="updatePreview()">
+                    <option value="">Select…</option>
+                    <option value="2 hours">2 Hours</option>
+                    <option value="4 hours">4 Hours</option>
+                    <option value="Half day">Half Day (5 hrs)</option>
+                    <option value="Full day" selected>Full Day (8 hrs)</option>
+                    <option value="2 days">2 Days</option>
+                    <option value="3 days">3 Days</option>
+                    <option value="1 week">1 Week</option>
+                    <option value="Ongoing">Ongoing</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- End date (optional) -->
+            <div class="ff-group">
+              <label class="ff-label" for="gigEndDate">
+                End Date <span style="color:var(--gray-400);font-weight:600">(optional — recurring gig ke liye)</span>
+              </label>
+              <input class="ff-input" type="date" id="gigEndDate" style="max-width:220px" />
+            </div>
+
+            <!-- Working hours note -->
+            <div class="ff-group">
+              <label class="ff-label" for="hoursNote">Working Hours / Shifts Detail <span style="color:var(--gray-400);font-weight:600">(optional)</span></label>
+              <input
+                class="ff-input" type="text" id="hoursNote"
+                placeholder="e.g. 9 AM – 6 PM, 1 hr lunch break, No overtime"
+              />
+            </div>
+
           </div>
+        </div>
 
-          <!-- Mark Complete Card -->
-          <div class="mark-complete-card" id="markCompleteSection">
-            <div class="mc-icon">✅</div>
-            <div class="mc-title">Kaam Poora Hua — Confirm Karo</div>
-            <div class="mc-sub">
-              Neeche checklist complete karo aur "Mark Complete" dabao.
-              Payment worker ke wallet mein release ho jaayegi.
-            </div>
-
-            <div class="mc-checklist" id="mcChecklist">
-              <div class="mc-check-item" data-idx="0">
-                <div class="mcc-box"></div>
-                <div class="mcc-text">Kaam described scope ke according complete hua</div>
-              </div>
-              <div class="mc-check-item" data-idx="1">
-                <div class="mcc-box"></div>
-                <div class="mcc-text">Worker time pe aaya aur professionally behaved</div>
-              </div>
-              <div class="mc-check-item" data-idx="2">
-                <div class="mcc-box"></div>
-                <div class="mcc-text">Koi safety ya behavioral issue nahi tha</div>
-              </div>
-              <div class="mc-check-item" data-idx="3">
-                <div class="mcc-box"></div>
-                <div class="mcc-text">Agreed amount ₹1,200 release karne ke liye ready hoon</div>
-              </div>
-            </div>
-
-            <button class="btn-mark-complete" id="btnMarkComplete" disabled>
-              ✅ Mark as Complete & Release ₹1,128
-            </button>
+        <!-- ─────────────────────────────
+             SECTION 3: LOCATION & PERKS
+        ───────────────────────────────── -->
+        <div class="pg-card" id="section3">
+          <div class="pg-card-header">
+            <div class="pgch-num">3</div>
+            <div class="pgch-title">📍 Location & Additional Details</div>
           </div>
+          <div class="pg-card-body">
 
-          <!-- Already completed state (hidden by default) -->
-          <div id="alreadyCompleted" style="display:none">
-            <div class="pg-info-box green">
-              ✅ <strong>Gig marked complete!</strong> Payment worker ke wallet mein release ho gayi. Ab rating do neeche.
+            <!-- Location -->
+            <div class="ff-group">
+              <label class="ff-label" for="gigLocation">
+                Kaam ki Location (Address) <span class="ff-required">*</span>
+              </label>
+              <div class="ff-input-wrap">
+                <span class="ff-input-icon">📍</span>
+                <input
+                  class="ff-input" type="text" id="gigLocation"
+                  placeholder="e.g. Plot 15, Sector 37, Gurugram, Haryana — Near HUDA City Centre Metro"
+                  oninput="updatePreview(); validateField(this)"
+                />
+              </div>
+              <div class="ff-error-msg" id="gigLocationErr">⚠️ Location daalna zaroori hai</div>
+              <div class="ff-hint">💡 Landmark ya metro station bhi daalo — workers ko dhundne mein asaan hoga</div>
             </div>
-          </div>
 
-          <!-- Rating section (appears after complete) -->
-          <div class="rating-card" id="ratingSection" style="display:none">
-            <div class="rating-card-header">
-              <div class="rch-icon">⭐</div>
+            <!-- Area / Sector -->
+            <div class="ff-row">
               <div>
-                <div class="rch-title">Rate Arjun Singh</div>
-                <div class="rch-sub">Tumhara honest review community ke liye helpful hai</div>
+                <label class="ff-label" for="gigArea">Area / Sector <span class="ff-required">*</span></label>
+                <select class="ff-select" id="gigArea" oninput="updatePreview()">
+                  <option value="">Select Area…</option>
+                  <optgroup label="Gurugram">
+                    <option>Sector 14</option>
+                    <option>Sector 18</option>
+                    <option>Sector 29</option>
+                    <option>Sector 37</option>
+                    <option>Sector 44</option>
+                    <option>Sector 56</option>
+                    <option>DLF Cyber City</option>
+                    <option>DLF Phase 1–5</option>
+                    <option>Golf Course Road</option>
+                    <option>Sohna Road</option>
+                    <option>MG Road</option>
+                    <option>Manesar</option>
+                    <option>IMT Manesar</option>
+                    <option>Palam Vihar</option>
+                    <option>Udyog Vihar</option>
+                  </optgroup>
+                  <optgroup label="Delhi NCR">
+                    <option>South Delhi</option>
+                    <option>West Delhi</option>
+                    <option>Dwarka</option>
+                    <option>Noida Sec 62</option>
+                    <option>Noida Sec 18</option>
+                    <option>Greater Noida</option>
+                    <option>Faridabad</option>
+                    <option>Ghaziabad</option>
+                  </optgroup>
+                  <option value="other">Other (mention in address)</option>
+                </select>
               </div>
-            </div>
-            <div style="padding:18px 22px 22px">
-
-              <!-- Main star rating -->
-              <div class="star-rating-group">
-                <div class="srg-label">Overall Rating</div>
-                <div class="star-row" id="mainStarRow">
-                  <button class="star-btn" data-val="1">⭐</button>
-                  <button class="star-btn" data-val="2">⭐</button>
-                  <button class="star-btn" data-val="3">⭐</button>
-                  <button class="star-btn" data-val="4">⭐</button>
-                  <button class="star-btn" data-val="5">⭐</button>
-                  <span class="star-label-text" id="starLabelText"></span>
-                </div>
-              </div>
-
-              <!-- Sub-ratings -->
-              <div style="font-size:.8rem;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px">Specific Ratings</div>
-              <div class="sub-ratings">
-                <div class="sub-rating-row">
-                  <div class="srr-label">Punctuality</div>
-                  <div class="srr-stars" data-sub="punctuality">
-                    <span class="srr-star" data-val="1">⭐</span>
-                    <span class="srr-star" data-val="2">⭐</span>
-                    <span class="srr-star" data-val="3">⭐</span>
-                    <span class="srr-star" data-val="4">⭐</span>
-                    <span class="srr-star" data-val="5">⭐</span>
-                  </div>
-                </div>
-                <div class="sub-rating-row">
-                  <div class="srr-label">Work Quality</div>
-                  <div class="srr-stars" data-sub="quality">
-                    <span class="srr-star" data-val="1">⭐</span>
-                    <span class="srr-star" data-val="2">⭐</span>
-                    <span class="srr-star" data-val="3">⭐</span>
-                    <span class="srr-star" data-val="4">⭐</span>
-                    <span class="srr-star" data-val="5">⭐</span>
-                  </div>
-                </div>
-                <div class="sub-rating-row">
-                  <div class="srr-label">Communication</div>
-                  <div class="srr-stars" data-sub="communication">
-                    <span class="srr-star" data-val="1">⭐</span>
-                    <span class="srr-star" data-val="2">⭐</span>
-                    <span class="srr-star" data-val="3">⭐</span>
-                    <span class="srr-star" data-val="4">⭐</span>
-                    <span class="srr-star" data-val="5">⭐</span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Quick tags -->
-              <div style="font-size:.8rem;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px">Quick Tags (Optional)</div>
-              <div class="review-tags" id="reviewTagsPositive">
-                <button class="review-tag" data-tag="punctual">⏰ Punctual</button>
-                <button class="review-tag" data-tag="hardworking">💪 Hardworking</button>
-                <button class="review-tag" data-tag="professional">👔 Professional</button>
-                <button class="review-tag" data-tag="trustworthy">🤝 Trustworthy</button>
-                <button class="review-tag" data-tag="skilled">🎯 Skilled</button>
-                <button class="review-tag" data-tag="quick">⚡ Quick Worker</button>
-              </div>
-
-              <!-- Review text -->
-              <div style="margin-top:14px">
-                <div style="font-size:.82rem;font-weight:700;color:var(--gray-500);margin-bottom:7px">Review Likho (Optional)</div>
-                <textarea class="review-textarea" id="reviewText"
-                  placeholder="Experience kaisa tha? Kya achha tha, kya improve kar sakte hain…"
-                  maxlength="400"></textarea>
-                <div class="review-char-count"><span id="reviewCharCount">0</span>/400 characters</div>
-              </div>
-
-              <button class="btn-submit-rating" id="btnSubmitRating" disabled>
-                ⭐ Submit Rating
-              </button>
-
-              <!-- Submitted state -->
-              <div class="rating-submitted" id="ratingSubmitted">
-                <div class="rs-icon">🎉</div>
-                <div class="rs-title">Rating Submit Ho Gayi!</div>
-                <div class="rs-sub">Shukriya! Tumhara review GigLega community ke liye valuable hai.</div>
-              </div>
-            </div>
-          </div>
-
-        </div>
-        <!-- /viewPoster -->
-
-        <!-- ════ VIEW B: WORKER — awaiting payment ════ -->
-        <div class="pg-view" id="viewWorker">
-
-          <div class="pg-card">
-            <div class="pg-card-header">
-              <div class="pg-card-title">📋 Completed Gig</div>
-              <span style="font-size:.74rem;font-weight:700;color:var(--pg-amber);background:rgba(245,158,11,.1);padding:3px 9px;border-radius:6px">Awaiting Payment</span>
-            </div>
-            <div class="pg-card-body">
-              <div class="gig-summary-row">
-                <span class="gsr-label">Gig Title</span>
-                <span class="gsr-value">Weekend Warehouse Packing Helper</span>
-              </div>
-              <div class="gig-summary-row">
-                <span class="gsr-label">Poster</span>
-                <span class="gsr-value">Rahul Kumar ⭐ 4.8</span>
-              </div>
-              <div class="gig-summary-row">
-                <span class="gsr-label">Date Worked</span>
-                <span class="gsr-value">📅 March 14, 2026</span>
-              </div>
-              <div class="gig-summary-row">
-                <span class="gsr-label">Agreed Budget</span>
-                <span class="gsr-value">₹1,200</span>
-              </div>
-              <div class="gig-summary-row">
-                <span class="gsr-label">Platform Fee (6%)</span>
-                <span class="gsr-value">– ₹72</span>
-              </div>
-              <div class="gig-summary-row">
-                <span class="gsr-label">You Receive</span>
-                <span class="gsr-value green" style="font-size:1.1rem">₹1,128 🎉</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="pg-info-box teal">
-            💡 <strong>Auto-Release:</strong> Poster ne abhi tak mark complete nahi kiya.
-            Agar 72 ghante mein nahi kiya toh payment automatically tumhare wallet mein
-            release ho jaayegi.
-          </div>
-
-          <!-- Worker rating section -->
-          <div class="rating-card">
-            <div class="rating-card-header">
-              <div class="rch-icon">⭐</div>
               <div>
-                <div class="rch-title">Rate Rahul Kumar (Poster)</div>
-                <div class="rch-sub">Tumhara experience kaisa tha? Community ko batao.</div>
+                <label class="ff-label" for="gigPincode">Pincode</label>
+                <input
+                  class="ff-input" type="text" id="gigPincode"
+                  placeholder="e.g. 122001" maxlength="6"
+                  oninput="this.value=this.value.replace(/\D/g,'')"
+                />
               </div>
             </div>
-            <div style="padding:18px 22px 22px">
 
-              <div class="star-rating-group">
-                <div class="srg-label">Overall Experience</div>
-                <div class="star-row" id="workerMainStarRow">
-                  <button class="star-btn" data-val="1">⭐</button>
-                  <button class="star-btn" data-val="2">⭐</button>
-                  <button class="star-btn" data-val="3">⭐</button>
-                  <button class="star-btn" data-val="4">⭐</button>
-                  <button class="star-btn" data-val="5">⭐</button>
-                  <span class="star-label-text" id="workerStarLabel"></span>
+            <!-- Work type -->
+            <div class="ff-group" style="margin-top:18px">
+              <label class="ff-label">Kaam Kahan Hoga?</label>
+              <div class="urgency-row">
+                <button class="urgency-btn selected" data-wt="on-site" onclick="selectWorkType(this)">
+                  <span class="ub-icon">🏢</span>
+                  <div class="ub-label">On-Site</div>
+                  <div class="ub-sub">Worker aayega</div>
+                </button>
+                <button class="urgency-btn" data-wt="remote" onclick="selectWorkType(this)">
+                  <span class="ub-icon">💻</span>
+                  <div class="ub-label">Remote</div>
+                  <div class="ub-sub">Ghar se kaam</div>
+                </button>
+                <button class="urgency-btn" data-wt="hybrid" onclick="selectWorkType(this)">
+                  <span class="ub-icon">🔄</span>
+                  <div class="ub-label">Hybrid</div>
+                  <div class="ub-sub">Dono</div>
+                </button>
+              </div>
+            </div>
+
+            <!-- Perks -->
+            <div class="ff-group" style="margin-top:18px">
+              <label class="ff-label">Worker ko Kya Milega? <span style="color:var(--gray-400);font-weight:600">(Perks — optional)</span></label>
+              <div class="perks-grid" id="perksGrid">
+                <div class="perk-item" onclick="togglePerk(this)">
+                  <div class="perk-checkbox"></div>
+                  <span class="perk-icon">🍱</span>
+                  <span class="perk-label">Khana / Lunch</span>
+                </div>
+                <div class="perk-item" onclick="togglePerk(this)">
+                  <div class="perk-checkbox"></div>
+                  <span class="perk-icon">☕</span>
+                  <span class="perk-label">Chai / Nashta</span>
+                </div>
+                <div class="perk-item" onclick="togglePerk(this)">
+                  <div class="perk-checkbox"></div>
+                  <span class="perk-icon">🚗</span>
+                  <span class="perk-label">Transport / Drop</span>
+                </div>
+                <div class="perk-item" onclick="togglePerk(this)">
+                  <div class="perk-checkbox"></div>
+                  <span class="perk-icon">💊</span>
+                  <span class="perk-label">Medical Cover</span>
+                </div>
+                <div class="perk-item" onclick="togglePerk(this)">
+                  <div class="perk-checkbox"></div>
+                  <span class="perk-icon">🛠️</span>
+                  <span class="perk-label">Tools Provided</span>
+                </div>
+                <div class="perk-item" onclick="togglePerk(this)">
+                  <div class="perk-checkbox"></div>
+                  <span class="perk-icon">👕</span>
+                  <span class="perk-label">Uniform Diya</span>
+                </div>
+                <div class="perk-item" onclick="togglePerk(this)">
+                  <div class="perk-checkbox"></div>
+                  <span class="perk-icon">💰</span>
+                  <span class="perk-label">Bonus on Completion</span>
+                </div>
+                <div class="perk-item" onclick="togglePerk(this)">
+                  <div class="perk-checkbox"></div>
+                  <span class="perk-icon">🔄</span>
+                  <span class="perk-label">Repeat Work Available</span>
                 </div>
               </div>
+            </div>
 
-              <div class="sub-ratings">
-                <div class="sub-rating-row">
-                  <div class="srr-label">Clear Instructions</div>
-                  <div class="srr-stars" data-sub="clarity">
-                    <span class="srr-star" data-val="1">⭐</span>
-                    <span class="srr-star" data-val="2">⭐</span>
-                    <span class="srr-star" data-val="3">⭐</span>
-                    <span class="srr-star" data-val="4">⭐</span>
-                    <span class="srr-star" data-val="5">⭐</span>
+            <!-- Contact & visibility -->
+            <div class="ff-group" style="margin-top:20px">
+              <label class="ff-label">Contact & Visibility Settings</label>
+              <div>
+                <div class="toggle-row">
+                  <div class="tr-info">
+                    <div class="tr-label">📞 Phone Number Show Karo</div>
+                    <div class="tr-sub">Workers directly call kar sakenge</div>
+                  </div>
+                  <label class="tog-switch">
+                    <input type="checkbox" id="togglePhone" checked />
+                    <span class="tog-slider"></span>
+                  </label>
+                </div>
+                <div class="toggle-row" id="phoneRow">
+                  <div style="flex:1">
+                    <input class="ff-input" type="tel" id="contactPhone" placeholder="e.g. 98765 43210" maxlength="10" oninput="this.value=this.value.replace(/\D/g,'')" />
                   </div>
                 </div>
-                <div class="sub-rating-row">
-                  <div class="srr-label">Fair Payment</div>
-                  <div class="srr-stars" data-sub="fairpay">
-                    <span class="srr-star" data-val="1">⭐</span>
-                    <span class="srr-star" data-val="2">⭐</span>
-                    <span class="srr-star" data-val="3">⭐</span>
-                    <span class="srr-star" data-val="4">⭐</span>
-                    <span class="srr-star" data-val="5">⭐</span>
+                <div class="toggle-row">
+                  <div class="tr-info">
+                    <div class="tr-label">💬 WhatsApp se Contact Allow Karo</div>
+                    <div class="tr-sub">Workers WhatsApp pe message kar sakenge</div>
                   </div>
+                  <label class="tog-switch">
+                    <input type="checkbox" id="toggleWA" checked />
+                    <span class="tog-slider"></span>
+                  </label>
                 </div>
-                <div class="sub-rating-row">
-                  <div class="srr-label">Safe Environment</div>
-                  <div class="srr-stars" data-sub="safety">
-                    <span class="srr-star" data-val="1">⭐</span>
-                    <span class="srr-star" data-val="2">⭐</span>
-                    <span class="srr-star" data-val="3">⭐</span>
-                    <span class="srr-star" data-val="4">⭐</span>
-                    <span class="srr-star" data-val="5">⭐</span>
+                <div class="toggle-row">
+                  <div class="tr-info">
+                    <div class="tr-label">🔔 Instant Applications Notify Karo</div>
+                    <div class="tr-sub">Har naya application aane pe notification milegi</div>
                   </div>
+                  <label class="tog-switch">
+                    <input type="checkbox" id="toggleNotif" checked />
+                    <span class="tog-slider"></span>
+                  </label>
+                </div>
+                <div class="toggle-row">
+                  <div class="tr-info">
+                    <div class="tr-label">⭐ Sirf Verified Workers Ko Dikhao</div>
+                    <div class="tr-sub">GigLega verified badge wale workers only</div>
+                  </div>
+                  <label class="tog-switch">
+                    <input type="checkbox" id="toggleVerified" />
+                    <span class="tog-slider"></span>
+                  </label>
                 </div>
               </div>
+            </div>
 
-              <div class="review-tags" id="workerReviewTags">
-                <button class="review-tag" data-tag="fair">⚖️ Fair Poster</button>
-                <button class="review-tag" data-tag="clear">📋 Clear Description</button>
-                <button class="review-tag" data-tag="ontime">⏰ Paid On Time</button>
-                <button class="review-tag" data-tag="respectful">🤝 Respectful</button>
-                <button class="review-tag" data-tag="wouldwork">🔁 Would Work Again</button>
+            <!-- Additional notes -->
+            <div class="ff-group">
+              <label class="ff-label" for="additionalNotes">
+                Koi Aur Important Info? <span style="color:var(--gray-400);font-weight:600">(optional)</span>
+              </label>
+              <textarea
+                class="ff-textarea" id="additionalNotes"
+                placeholder="e.g. ID proof saath laana zaroori hai. Gate pe naam Rahul Kumar ko bata dena. Kaam ka mahaul accha hai — repeat hire possible."
+                maxlength="300"
+                oninput="updateCharCount('additionalNotes','notesCount',300)"
+                style="min-height:80px"
+              ></textarea>
+              <div class="ff-char-count"><span id="notesCount">0</span> / 300</div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ─────────────────────────────
+             SUBMIT ROW
+        ───────────────────────────────── -->
+        <div class="pg-submit-row">
+          <button class="btn-pg-submit" id="submitBtn" onclick="submitGig()">
+            🚀 Gig Post Karo — Free!
+          </button>
+          <button class="btn-pg-draft" onclick="saveDraft()">
+            💾 Draft Save Karo
+          </button>
+          <div class="pg-submit-note">
+            ✅ GigLega pe pehla gig post <strong>bilkul free</strong> hai. Payment sirf tab hoti hai jab gig complete ho. No hidden charges!
+          </div>
+        </div>
+
+      </div><!-- /left col -->
+
+      <!-- ════ RIGHT — SIDEBAR PREVIEW ════ -->
+      <div>
+        <div class="pg-preview-card">
+          <div class="ppc-header">👁️ Live Preview — Aise dikhega</div>
+          <div class="ppc-body">
+
+            <div class="prev-gig-card">
+              <div class="prev-title" id="prevTitle">Gig ka title yahan aayega…</div>
+              <div class="prev-category" id="prevCategory">📋 Category</div>
+              <div class="prev-pay" id="prevPay">₹ — Pay Rate</div>
+              <div class="prev-meta">
+                <div class="prev-meta-row" id="prevLocation">📍 Location</div>
+                <div class="prev-meta-row" id="prevDate">📅 Date</div>
+                <div class="prev-meta-row" id="prevWorkers">👥 Workers needed</div>
               </div>
+              <div class="prev-skills" id="prevSkills"></div>
+            </div>
 
-              <div style="margin-top:14px">
-                <textarea class="review-textarea" id="workerReviewText"
-                  placeholder="Poster ke baare mein likho — kya achha tha, kya improve ho sakta tha…"
-                  maxlength="400"></textarea>
-                <div class="review-char-count"><span id="workerCharCount">0</span>/400</div>
+            <!-- Fee breakdown -->
+            <div style="font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.4px;color:var(--gray-400);margin-bottom:8px">
+              💰 Posting Cost
+            </div>
+            <div class="fee-summary">
+              <div class="fee-row">
+                <span class="fee-lbl">Posting Fee</span>
+                <span class="fee-val free">FREE</span>
               </div>
-
-              <button class="btn-submit-rating" id="btnWorkerRating" disabled>
-                ⭐ Submit Rating
-              </button>
-              <div class="rating-submitted" id="workerRatingSubmitted">
-                <div class="rs-icon">🎉</div>
-                <div class="rs-title">Rating Submit Ho Gayi!</div>
-                <div class="rs-sub">Shukriya Arjun! Tumhara review valuable hai.</div>
+              <div class="fee-row">
+                <span class="fee-lbl">Platform Commission</span>
+                <span class="fee-val">6% (on completion)</span>
+              </div>
+              <div class="fee-row">
+                <span class="fee-lbl">Payment Protection</span>
+                <span class="fee-val free">Included ✅</span>
+              </div>
+              <div class="fee-row">
+                <span class="fee-lbl" style="font-weight:800;color:var(--text)">Total Due Now</span>
+                <span class="fee-val total free">₹0</span>
               </div>
             </div>
-          </div>
 
-        </div>
-        <!-- /viewWorker -->
+            <!-- Trust signals -->
+            <div style="margin-top:14px;display:flex;flex-direction:column;gap:6px">
+              <div style="font-size:.74rem;color:var(--gray-400);font-weight:600;display:flex;align-items:center;gap:6px">
+                ⚡ <span>Avg. <strong style="color:var(--text)">15 min</strong> mein pehla application</span>
+              </div>
+              <div style="font-size:.74rem;color:var(--gray-400);font-weight:600;display:flex;align-items:center;gap:6px">
+                👥 <span><strong style="color:var(--text)">120+</strong> verified workers Gurugram mein</span>
+              </div>
+              <div style="font-size:.74rem;color:var(--gray-400);font-weight:600;display:flex;align-items:center;gap:6px">
+                🔒 <span>Payment <strong style="color:var(--text)">escrow protected</strong></span>
+              </div>
+              <div style="font-size:.74rem;color:var(--gray-400);font-weight:600;display:flex;align-items:center;gap:6px">
+                ⭐ <span>Workers rated <strong style="color:var(--text)">4.8/5</strong> avg</span>
+              </div>
+            </div>
 
-      </div>
-      <!-- /pg-left -->
-
-      <!-- ── RIGHT SIDEBAR ── -->
-      <div class="pg-sidebar">
-
-        <!-- Auto-release timer -->
-        <div class="timer-card" id="timerCard">
-          <div class="tc-label">⏳ Auto-Release Timer</div>
-          <div class="tc-timer" id="countdownTimer">71:59:45</div>
-          <div class="tc-bar-wrap">
-            <div class="tc-bar" id="timerBar" style="width:99%"></div>
-          </div>
-          <div class="tc-sub">
-            Agar poster 72 ghante mein mark complete nahi karta,<br/>
-            payment automatically release hogi.
           </div>
         </div>
 
-        <!-- Earnings / payment card -->
-        <div class="earnings-card" id="earningsCard">
-          <div class="ec-inner">
-            <div class="ec-label">💰 Payment Summary</div>
-            <div class="ec-amount"><span>₹</span>1,200</div>
-            <div class="ec-net">Agreed budget</div>
-            <div class="ec-row">
-              <span>Platform Fee (6%)</span>
-              <strong>– ₹72</strong>
-            </div>
-            <div class="ec-row">
-              <span>Worker Receives</span>
-              <strong>₹1,128</strong>
-            </div>
-            <div class="ec-row">
-              <span>Status</span>
-              <strong id="paymentStatus">⏳ Pending</strong>
-            </div>
-            <button class="btn-withdraw" id="btnWithdraw" style="display:none">
-              🏦 Withdraw to Bank / UPI
-            </button>
-          </div>
+        <!-- Tips card -->
+        <div class="pg-info-box amber" style="border-radius:var(--radius);margin-top:0">
+          🎯 <strong>Pro Tips for More Applications:</strong>
+          <ul style="margin-top:8px;padding-left:16px;font-size:.82rem;line-height:1.9;color:var(--gray-600)">
+            <li>Pay range clearly likhna — vague pay pe kam apply hota hai</li>
+            <li>Exact location + landmark dena</li>
+            <li>Perks tick karna — food/chai wale gigs pe 2x applies</li>
+            <li>Urgent tag lagao agar aaj chahiye</li>
+          </ul>
         </div>
 
-        <!-- Quick Actions -->
-        <div class="quick-actions-card">
-          <div class="qa-title">Quick Actions</div>
-          <button class="qa-btn" id="btnOpenChat">
-            <span class="qa-icon">💬</span>
-            <span class="qa-text">Open Chat</span>
-            <span class="qa-arr">›</span>
-          </button>
-          <button class="qa-btn" onclick="window.location.href='dashboard.html'">
-            <span class="qa-icon">📊</span>
-            <span class="qa-text">Go to Dashboard</span>
-            <span class="qa-arr">›</span>
-          </button>
-          <button class="qa-btn" onclick="window.location.href='browse.html'">
-            <span class="qa-icon">🔍</span>
-            <span class="qa-text">Browse More Gigs</span>
-            <span class="qa-arr">›</span>
-          </button>
-          <button class="qa-btn" onclick="window.location.href='post-gig-form.html'">
-            <span class="qa-icon">➕</span>
-            <span class="qa-text">Post Another Gig</span>
-            <span class="qa-arr">›</span>
-          </button>
-          <button class="qa-btn" id="btnOpenDispute" style="color:var(--pg-red)">
-            <span class="qa-icon">🚨</span>
-            <span class="qa-text" style="color:var(--pg-red)">Raise a Dispute</span>
-            <span class="qa-arr" style="color:var(--pg-red)">›</span>
-          </button>
-        </div>
+      </div><!-- /sidebar -->
 
-        <!-- Next Steps -->
-        <div class="next-steps-card">
-          <div class="nsc-header">
-            <div class="nsc-title">🗺️ What's Next</div>
-          </div>
-          <div class="next-step-item">
-            <div class="nsi-num">1</div>
-            <div>
-              <div class="nsi-title">Mark Complete</div>
-              <div class="nsi-desc">Poster confirms kaam done — payment unlock hoti hai.</div>
-            </div>
-          </div>
-          <div class="next-step-item">
-            <div class="nsi-num">2</div>
-            <div>
-              <div class="nsi-title">Rate Each Other</div>
-              <div class="nsi-desc">Honest rating do — community build hoti hai.</div>
-            </div>
-          </div>
-          <div class="next-step-item">
-            <div class="nsi-num">3</div>
-            <div>
-              <div class="nsi-title">Withdraw Earnings</div>
-              <div class="nsi-desc">Wallet se bank ya UPI pe transfer karo.</div>
-            </div>
-          </div>
-          <div class="next-step-item">
-            <div class="nsi-num">4</div>
-            <div>
-              <div class="nsi-title">Next Gig!</div>
-              <div class="nsi-desc">Browse karo ya naya gig post karo.</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Share card -->
-        <div class="share-card">
-          <div class="share-title">📣 GigLega Share Karo</div>
-          <div class="share-sub">Friends ko GigLega ke baare mein batao — unhe bhi gig milein!</div>
-          <div class="share-btns">
-            <button class="btn-share" id="btnShareWA">
-              💬 WhatsApp
-            </button>
-            <button class="btn-share" id="btnCopyLink">
-              🔗 Copy Link
-            </button>
-          </div>
-        </div>
-
-      </div>
-      <!-- /pg-sidebar -->
-
-    </div>
+    </div><!-- /pg-body -->
   </main>
 
-  <footer id="main-footer"></footer>
-  <div id="toast-container"></div>
-
   <script>
-  document.addEventListener("DOMContentLoaded", function () {
 
     /* ══════════════════════════════════
-       DEMO MODE — switch "poster" / "worker"
-       In real app this comes from URL params or session
+       STATE
     ══════════════════════════════════ */
-    var params   = new URLSearchParams(window.location.search);
-    var userRole = params.get("role") || "poster"; // "poster" or "worker"
-    var gigState = params.get("state") || "pending"; // "pending","complete","disputed"
+    let selectedCategory = '';
+    let selectedPayType  = 'hourly';
+    let selectedUrgency  = '';
+    let selectedWorkType = 'on-site';
+    let selectedSkills   = [];
+    let selectedPerks    = [];
 
-    /* Show correct view */
-    document.getElementById("viewPoster").classList.toggle("active", userRole === "poster");
-    document.getElementById("viewWorker").classList.toggle("active", userRole === "worker");
+    const PAY_SUFFIXES = {
+      hourly: '/hr',
+      daily:  '/day',
+      fixed:  ' fixed',
+      weekly: '/week',
+    };
 
-    /* Adjust hero for worker */
-    if (userRole === "worker") {
-      document.getElementById("heroIcon").textContent   = "💼";
-      document.getElementById("heroBadge").textContent  = "💼 Gig Completed — Awaiting Payment";
-      document.getElementById("heroTitle").textContent  = "Badiya Kaam Kiya! 🎉";
-      document.getElementById("heroSub").textContent    = "Poster ke confirm karte hi tumhara ₹1,128 wallet mein aa jaayega. Rating do neeche.";
-      document.getElementById("pgHero").className       = "pg-hero state-pending";
-    }
-
-    /* ── Breadcrumb ── */
-    if (typeof buildBreadcrumb === "function") {
-      buildBreadcrumb("breadcrumb", [
-        { label: "Home",      href: "index.html" },
-        { label: "Dashboard", href: "dashboard.html" },
-        { label: "Post-Gig — #GL-2026-0314" }
-      ]);
+    /* ══════════════════════════════════
+       CATEGORY
+    ══════════════════════════════════ */
+    function selectCategory(el) {
+      document.querySelectorAll('.cat-card').forEach(c => c.classList.remove('selected'));
+      el.classList.add('selected');
+      selectedCategory = el.dataset.cat;
+      document.getElementById('catErr').classList.remove('visible');
+      updatePreview();
+      updateProgress();
     }
 
     /* ══════════════════════════════════
-       CHECKLIST — Mark Complete
+       PAY TYPE
     ══════════════════════════════════ */
-    var checks   = [false, false, false, false];
-    var checkEls = document.querySelectorAll(".mc-check-item");
-    var btnMC    = document.getElementById("btnMarkComplete");
-
-    checkEls.forEach(function (el) {
-      el.addEventListener("click", function () {
-        var idx  = parseInt(el.dataset.idx);
-        checks[idx] = !checks[idx];
-        el.classList.toggle("checked", checks[idx]);
-        el.querySelector(".mcc-box").textContent = checks[idx] ? "✓" : "";
-        btnMC.disabled = !checks.every(Boolean);
-      });
-    });
-
-    /* ══════════════════════════════════
-       MARK COMPLETE FLOW
-    ══════════════════════════════════ */
-    var gigCompleted = gigState === "complete";
-
-    if (gigCompleted) {
-      triggerComplete(false); // no confetti on load
+    function selectPayType(el) {
+      document.querySelectorAll('.pay-tab').forEach(t => t.classList.remove('active'));
+      el.classList.add('active');
+      selectedPayType = el.dataset.pay;
+      const suf = PAY_SUFFIXES[selectedPayType];
+      document.getElementById('payTypeSuffix').textContent  = suf;
+      document.getElementById('payTypeSuffix2').textContent = suf;
+      updatePreview();
     }
 
-    btnMC && btnMC.addEventListener("click", function () {
-      if (btnMC.disabled) return;
-      btnMC.disabled = true;
-      btnMC.innerHTML = "⏳ Processing…";
-      setTimeout(function () { triggerComplete(true); }, 1200);
-    });
+    /* ══════════════════════════════════
+       URGENCY
+    ══════════════════════════════════ */
+    function selectUrgency(el) {
+      document.querySelectorAll('#urgencyRow .urgency-btn').forEach(b => b.classList.remove('selected'));
+      el.classList.add('selected');
+      selectedUrgency = el.dataset.urgency;
+      updateProgress();
+    }
 
-    function triggerComplete(withConfetti) {
-      /* Hero */
-      var hero = document.getElementById("pgHero");
-      hero.className = "pg-hero state-complete";
-      document.getElementById("heroIcon").textContent  = "🎉";
-      document.getElementById("heroBadge").textContent = "✅ Gig Successfully Completed";
-      document.getElementById("heroTitle").textContent = "Payment Released! 🎉";
-      document.getElementById("heroSub").textContent   = "₹1,128 Arjun Singh ke wallet mein transfer ho gayi. Ab rating do.";
+    /* ══════════════════════════════════
+       WORK TYPE
+    ══════════════════════════════════ */
+    function selectWorkType(el) {
+      document.querySelectorAll('[data-wt]').forEach(b => b.classList.remove('selected'));
+      el.classList.add('selected');
+      selectedWorkType = el.dataset.wt;
+    }
 
-      /* Steps */
-      markStep(3, true);
-      markLine(3, true);
+    /* ══════════════════════════════════
+       SKILLS
+    ══════════════════════════════════ */
+    function toggleSkill(el) {
+      el.classList.toggle('selected');
+      const label = el.textContent.trim();
+      if (el.classList.contains('selected')) {
+        selectedSkills.push(label);
+      } else {
+        selectedSkills = selectedSkills.filter(s => s !== label);
+      }
+      updatePreview();
+    }
 
-      /* Mark complete section */
-      var mcs = document.getElementById("markCompleteSection");
-      if (mcs) mcs.style.display = "none";
-      var ac  = document.getElementById("alreadyCompleted");
-      if (ac) { ac.style.display = "block"; ac.style.animation = "fadeSlide .3s ease"; }
+    function addCustomSkill() {
+      const inp = document.getElementById('customSkillInput');
+      const val = inp.value.trim();
+      if (!val) return;
+      if (selectedSkills.length >= 10) { showToast('⚠️ Max 10 skills allowed'); return; }
 
-      /* Show rating section */
-      var rs = document.getElementById("ratingSection");
-      if (rs) { rs.style.display = "block"; rs.style.animation = "fadeSlide .35s ease"; }
+      const tag = document.createElement('button');
+      tag.className = 'skill-tag selected';
+      tag.innerHTML = `✅ ${val} <span class="skill-tag-remove">✕</span>`;
+      tag.onclick = () => {
+        selectedSkills = selectedSkills.filter(s => s !== `✅ ${val}`);
+        tag.remove();
+        updatePreview();
+      };
+      document.getElementById('skillTagsWrap').appendChild(tag);
+      selectedSkills.push(`✅ ${val}`);
+      inp.value = '';
+      updatePreview();
+    }
 
-      /* Payment card */
-      var ps = document.getElementById("paymentStatus");
-      if (ps) ps.innerHTML = "✅ Released";
-      var bw = document.getElementById("btnWithdraw");
-      if (bw) { bw.style.display = "flex"; }
-
-      /* Timer */
-      var tc = document.getElementById("timerCard");
-      if (tc) tc.style.display = "none";
-
-      /* Steps 4 → active */
-      markStep(4, false, true);
-
-      /* Confetti */
-      if (withConfetti) launchConfetti();
-
-      /* Toast */
-      if (typeof showToast === "function") {
-        showToast("✅ Gig complete! Payment released ₹1,128.", "success");
+    /* ══════════════════════════════════
+       PERKS
+    ══════════════════════════════════ */
+    function togglePerk(el) {
+      el.classList.toggle('checked');
+      const label = el.querySelector('.perk-label').textContent.trim();
+      if (el.classList.contains('checked')) {
+        selectedPerks.push(label);
+        el.querySelector('.perk-checkbox').textContent = '✓';
+      } else {
+        selectedPerks = selectedPerks.filter(p => p !== label);
+        el.querySelector('.perk-checkbox').textContent = '';
       }
     }
 
-    function markStep(num, done, active) {
-      var s = document.getElementById("step" + num);
-      if (!s) return;
-      s.classList.remove("done","active");
-      if (done)   { s.classList.add("done");   s.querySelector(".pg-step-circle").textContent = "✓"; }
-      if (active) { s.classList.add("active"); }
-    }
-    function markLine(num, done) {
-      var l = document.getElementById("line" + num);
-      if (l) l.classList.toggle("done", done);
+    /* ══════════════════════════════════
+       WORKER STEPPER
+    ══════════════════════════════════ */
+    function stepWorkers(delta) {
+      const inp = document.getElementById('workersCount');
+      let val = parseInt(inp.value) || 1;
+      val = Math.max(1, Math.min(50, val + delta));
+      inp.value = val;
+      updatePreview();
     }
 
     /* ══════════════════════════════════
-       CONFETTI
+       CHAR COUNT
     ══════════════════════════════════ */
-    function launchConfetti() {
-      var wrap   = document.getElementById("confettiWrap");
-      wrap.classList.add("show");
-      var colors = ["#0d9488","#1a3c5e","#6ee7b7","#fbbf24","#a78bfa","#f87171"];
-      for (var i = 0; i < 80; i++) {
-        (function () {
-          var el = document.createElement("div");
-          el.className = "confetti-piece";
-          var size = 8 + Math.random() * 8;
-          var color = colors[Math.floor(Math.random() * colors.length)];
-          var left  = Math.random() * 100;
-          var dur   = 2.5 + Math.random() * 2.5;
-          var delay = Math.random() * 1.5;
-          el.style.cssText =
-            "left:" + left + "vw;" +
-            "width:" + size + "px;" +
-            "height:" + size + "px;" +
-            "background:" + color + ";" +
-            "border-radius:" + (Math.random() > .5 ? "50%" : "2px") + ";" +
-            "animation:confettiFall " + dur + "s " + delay + "s ease-in forwards;";
-          wrap.appendChild(el);
-        })();
+    function updateCharCount(fieldId, countId, max) {
+      const val  = document.getElementById(fieldId).value.length;
+      const el   = document.getElementById(countId);
+      el.textContent = val;
+      const wrap = el.closest('.ff-char-count');
+      wrap.classList.toggle('warn', val > max * .85);
+      wrap.classList.toggle('over', val >= max);
+    }
+
+    /* ══════════════════════════════════
+       FIELD VALIDATION
+    ══════════════════════════════════ */
+    function validateField(input) {
+      const val = input.value.trim();
+      const isValid = val.length >= (input.id === 'gigTitle' ? 10 : 1);
+      input.classList.toggle('error', !isValid && val.length > 0);
+      input.classList.toggle('valid', isValid);
+    }
+
+    function validateAll() {
+      let ok = true;
+
+      const title = document.getElementById('gigTitle').value.trim();
+      if (title.length < 10) {
+        document.getElementById('gigTitleErr').classList.add('visible');
+        document.getElementById('gigTitle').classList.add('error');
+        ok = false;
+      } else {
+        document.getElementById('gigTitleErr').classList.remove('visible');
       }
-      setTimeout(function () {
-        wrap.classList.remove("show");
-        wrap.innerHTML = "";
-      }, 5000);
+
+      if (!selectedCategory) {
+        document.getElementById('catErr').classList.add('visible');
+        ok = false;
+      }
+
+      const desc = document.getElementById('gigDesc').value.trim();
+      if (desc.length < 20) {
+        document.getElementById('gigDescErr').classList.add('visible');
+        document.getElementById('gigDesc').classList.add('error');
+        ok = false;
+      } else {
+        document.getElementById('gigDescErr').classList.remove('visible');
+      }
+
+      const pay = document.getElementById('payMin').value.trim();
+      if (!pay || isNaN(pay) || Number(pay) < 1) {
+        document.getElementById('payMinErr').classList.add('visible');
+        document.getElementById('payMin').classList.add('error');
+        ok = false;
+      } else {
+        document.getElementById('payMinErr').classList.remove('visible');
+      }
+
+      const date = document.getElementById('gigDate').value;
+      if (!date) {
+        document.getElementById('gigDateErr').classList.add('visible');
+        document.getElementById('gigDate').classList.add('error');
+        ok = false;
+      } else {
+        document.getElementById('gigDateErr').classList.remove('visible');
+      }
+
+      const loc = document.getElementById('gigLocation').value.trim();
+      if (loc.length < 5) {
+        document.getElementById('gigLocationErr').classList.add('visible');
+        document.getElementById('gigLocation').classList.add('error');
+        ok = false;
+      } else {
+        document.getElementById('gigLocationErr').classList.remove('visible');
+      }
+
+      return ok;
     }
 
     /* ══════════════════════════════════
-       COUNTDOWN TIMER (72h auto-release)
+       LIVE PREVIEW
     ══════════════════════════════════ */
-    var totalSecs  = 72 * 3600;
-    var elapsed    = 15;          // demo: 15 seconds already passed
-    var remaining  = totalSecs - elapsed;
-    var timerEl    = document.getElementById("countdownTimer");
-    var timerBar   = document.getElementById("timerBar");
+    function updatePreview() {
+      const title    = document.getElementById('gigTitle').value.trim();
+      const payMin   = document.getElementById('payMin').value;
+      const payMax   = document.getElementById('payMax').value;
+      const location = document.getElementById('gigLocation').value.trim();
+      const date     = document.getElementById('gigDate').value;
+      const workers  = document.getElementById('workersCount').value;
+      const suf      = PAY_SUFFIXES[selectedPayType];
 
-    function fmtTime(s) {
-      var h = Math.floor(s / 3600);
-      var m = Math.floor((s % 3600) / 60);
-      var sec = s % 60;
-      return pad(h) + ":" + pad(m) + ":" + pad(sec);
+      document.getElementById('prevTitle').textContent =
+        title || 'Gig ka title yahan aayega…';
+
+      document.getElementById('prevCategory').textContent =
+        selectedCategory ? `📋 ${selectedCategory}` : '📋 Category';
+
+      let payStr = '₹ — Pay Rate';
+      if (payMin) {
+        payStr = `₹${Number(payMin).toLocaleString('en-IN')}`;
+        if (payMax) payStr += ` – ₹${Number(payMax).toLocaleString('en-IN')}`;
+        payStr += ` ${suf}`;
+      }
+      document.getElementById('prevPay').textContent = payStr;
+
+      document.getElementById('prevLocation').textContent =
+        location ? `📍 ${location.slice(0,45)}${location.length>45?'…':''}` : '📍 Location';
+
+      document.getElementById('prevDate').textContent =
+        date
+          ? `📅 ${new Date(date).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})}`
+          : '📅 Date';
+
+      document.getElementById('prevWorkers').textContent =
+        `👥 ${workers || 1} Worker${workers > 1 ? 's' : ''} needed`;
+
+      // Skills preview
+      const skillsEl = document.getElementById('prevSkills');
+      skillsEl.innerHTML = selectedSkills.slice(0,4).map(s =>
+        `<span class="prev-skill">${s}</span>`
+      ).join('');
+
+      updateProgress();
     }
-    function pad(n) { return n < 10 ? "0" + n : n; }
 
-    function tickTimer() {
-      if (remaining <= 0) {
-        if (timerEl) timerEl.textContent = "00:00:00";
+    /* ══════════════════════════════════
+       PROGRESS BAR
+    ══════════════════════════════════ */
+    function updateProgress() {
+      const filled = [
+        document.getElementById('gigTitle').value.trim().length >= 10,
+        !!selectedCategory,
+        document.getElementById('gigDesc').value.trim().length >= 20,
+        !!document.getElementById('payMin').value,
+        !!document.getElementById('gigDate').value,
+        document.getElementById('gigLocation').value.trim().length >= 5,
+        !!selectedUrgency,
+      ];
+      const count = filled.filter(Boolean).length;
+      const pct   = Math.round((count / filled.length) * 100);
+
+      document.getElementById('pgpbFill').style.width = pct + '%';
+      document.getElementById('pgpbPct').textContent  = pct + '%';
+
+      // Step dots
+      const s1 = filled.slice(0,3).filter(Boolean).length;
+      const s2 = filled.slice(3,5).filter(Boolean).length;
+      const s3 = filled.slice(5,7).filter(Boolean).length;
+
+      setDot('dot1', s1 >= 3 ? 'done' : s1 > 0 ? 'active' : '');
+      setDot('dot2', s2 >= 2 ? 'done' : s2 > 0 ? 'active' : '');
+      setDot('dot3', s3 >= 2 ? 'done' : s3 > 0 ? 'active' : '');
+
+      const step = s1 < 3 ? 1 : s2 < 2 ? 2 : 3;
+      document.getElementById('pgpbLabel').textContent = `Step ${step} of 3`;
+
+      // Hero steps
+      setHeroStep('heroStep1', s1 >= 3 ? 'done' : 'active');
+      setHeroStep('heroStep2', s2 >= 2 ? 'done' : s1 >= 3 ? 'active' : '');
+      setHeroStep('heroStep3', s3 >= 2 ? 'done' : s2 >= 2 ? 'active' : '');
+    }
+
+    function setDot(id, state) {
+      const el = document.getElementById(id);
+      el.className = 'pgpb-step-dot' + (state ? ' ' + state : '');
+    }
+    function setHeroStep(id, state) {
+      const el = document.getElementById(id);
+      el.className = 'pgh-step' + (state ? ' ' + state : '');
+    }
+
+    /* ══════════════════════════════════
+       PHONE TOGGLE
+    ══════════════════════════════════ */
+    document.getElementById('togglePhone').addEventListener('change', function() {
+      document.getElementById('phoneRow').style.display = this.checked ? '' : 'none';
+    });
+
+    /* ══════════════════════════════════
+       SUBMIT
+    ══════════════════════════════════ */
+    function submitGig() {
+      if (!validateAll()) {
+        showToast('⚠️ Sab zaroori fields fill karo pehle!');
+        // Scroll to first error
+        const firstErr = document.querySelector('.ff-input.error, .ff-select.error, .ff-textarea.error');
+        if (firstErr) firstErr.scrollIntoView({ behavior: 'smooth', block: 'center' });
         return;
       }
-      remaining--;
-      if (timerEl) {
-        timerEl.textContent = fmtTime(remaining);
-        timerEl.classList.toggle("urgent", remaining < 3600);
-      }
-      if (timerBar) {
-        var pct = (remaining / totalSecs) * 100;
-        timerBar.style.width = pct + "%";
-        timerBar.classList.toggle("urgent", remaining < 3600);
-      }
-    }
-    tickTimer();
-    var timerInterval = setInterval(tickTimer, 1000);
 
-    /* ══════════════════════════════════
-       STAR RATING — poster rating worker
-    ══════════════════════════════════ */
-    var STAR_LABELS = ["","Bahut Kharab 😞","Kharab 😕","Theek Hai 😐","Achha 😊","Bahut Achha 🤩"];
-    var mainRating  = 0;
-    var workerMainRating = 0;
+      const btn = document.getElementById('submitBtn');
+      btn.disabled = true;
+      btn.innerHTML = '⏳ Posting…';
 
-    function initStarRow(rowId, labelId, onSet) {
-      var row   = document.getElementById(rowId);
-      if (!row) return;
-      var stars = row.querySelectorAll(".star-btn");
-      var label = document.getElementById(labelId);
-      stars.forEach(function (btn) {
-        btn.addEventListener("mouseover", function () {
-          var v = parseInt(btn.dataset.val);
-          stars.forEach(function (s) {
-            s.classList.toggle("lit", parseInt(s.dataset.val) <= v);
-          });
-          if (label) { label.textContent = STAR_LABELS[v]; label.classList.add("show"); }
-        });
-        btn.addEventListener("mouseleave", function () {
-          stars.forEach(function (s) {
-            s.classList.toggle("lit", parseInt(s.dataset.val) <= (onSet() || 0));
-          });
-          if (label) {
-            label.textContent = STAR_LABELS[onSet() || 0];
-            label.classList.toggle("show", (onSet() || 0) > 0);
-          }
-        });
-        btn.addEventListener("click", function () {
-          var v = parseInt(btn.dataset.val);
-          stars.forEach(function (s) { s.classList.toggle("lit", parseInt(s.dataset.val) <= v); });
-          if (label) { label.textContent = STAR_LABELS[v]; label.classList.add("show"); }
-          updateRatingBtn(v, btn.closest(".rating-card") || btn.closest(".pg-view"));
-          if (rowId === "mainStarRow")       mainRating = v;
-          if (rowId === "workerMainStarRow") workerMainRating = v;
-        });
-      });
-    }
-
-    function updateRatingBtn(val, container) {
-      var btn = container && (container.querySelector("#btnSubmitRating") || container.querySelector("#btnWorkerRating"));
-      if (btn) btn.disabled = val < 1;
-    }
-
-    initStarRow("mainStarRow",       "starLabelText",    function () { return mainRating; });
-    initStarRow("workerMainStarRow", "workerStarLabel",  function () { return workerMainRating; });
-
-    /* Sub-ratings */
-    document.querySelectorAll(".srr-stars").forEach(function (group) {
-      var stars = group.querySelectorAll(".srr-star");
-      stars.forEach(function (star) {
-        star.addEventListener("click", function () {
-          var v = parseInt(star.dataset.val);
-          stars.forEach(function (s) { s.classList.toggle("lit", parseInt(s.dataset.val) <= v); });
-        });
-        star.addEventListener("mouseover", function () {
-          var v = parseInt(star.dataset.val);
-          stars.forEach(function (s) { s.classList.toggle("lit", parseInt(s.dataset.val) <= v); });
-        });
-        star.addEventListener("mouseleave", function () {
-          var lit = group.querySelectorAll(".srr-star.lit").length;
-          stars.forEach(function (s) { s.classList.toggle("lit", parseInt(s.dataset.val) <= lit); });
-        });
-      });
-    });
-
-    /* Review tags */
-    function initTags(containerId) {
-      var c = document.getElementById(containerId);
-      if (!c) return;
-      c.querySelectorAll(".review-tag").forEach(function (tag) {
-        tag.addEventListener("click", function () {
-          tag.classList.toggle("selected");
-        });
-      });
-    }
-    initTags("reviewTagsPositive");
-    initTags("workerReviewTags");
-
-    /* Char counter */
-    function initCharCount(textareaId, countId) {
-      var ta = document.getElementById(textareaId);
-      var ct = document.getElementById(countId);
-      if (!ta || !ct) return;
-      ta.addEventListener("input", function () {
-        ct.textContent = ta.value.length;
-      });
-    }
-    initCharCount("reviewText",       "reviewCharCount");
-    initCharCount("workerReviewText", "workerCharCount");
-
-    /* Submit rating */
-    function initRatingSubmit(btnId, submittedId) {
-      var btn = document.getElementById(btnId);
-      var sub = document.getElementById(submittedId);
-      if (!btn || !sub) return;
-      btn.addEventListener("click", function () {
-        btn.disabled = true;
-        btn.innerHTML = "⏳ Submitting…";
-        setTimeout(function () {
-          btn.style.display = "none";
-          sub.classList.add("show");
-          markStep(4, true);
-          markLine(4, true);
-          markStep(5, true);
-          if (typeof showToast === "function") {
-            showToast("⭐ Rating submit ho gayi! Shukriya.", "success");
-          }
-        }, 1000);
-      });
-    }
-    initRatingSubmit("btnSubmitRating", "ratingSubmitted");
-    initRatingSubmit("btnWorkerRating", "workerRatingSubmitted");
-
-    /* ══════════════════════════════════
-       DISPUTE MODAL
-    ══════════════════════════════════ */
-    var disputeModal = document.getElementById("disputeModal");
-    var selectedType = null;
-
-    function openDispute() { disputeModal.classList.add("show"); }
-    function closeDispute() { disputeModal.classList.remove("show"); }
-
-    document.getElementById("btnOpenDispute").addEventListener("click", openDispute);
-    document.getElementById("modalClose").addEventListener("click", closeDispute);
-    document.getElementById("btnModalCancel").addEventListener("click", closeDispute);
-    disputeModal.addEventListener("click", function (e) {
-      if (e.target === disputeModal) closeDispute();
-    });
-
-    document.querySelectorAll(".dispute-type-btn").forEach(function (btn) {
-      btn.addEventListener("click", function () {
-        document.querySelectorAll(".dispute-type-btn").forEach(function (b) { b.classList.remove("selected"); });
-        btn.classList.add("selected");
-        selectedType = btn.dataset.type;
-        checkDisputeSubmit();
-      });
-    });
-
-    var disputeDesc  = document.getElementById("disputeDesc");
-    var disputeCount = document.getElementById("disputeCharCount");
-    var btnDSubmit   = document.getElementById("btnDisputeSubmit");
-
-    disputeDesc.addEventListener("input", function () {
-      disputeCount.textContent = disputeDesc.value.length;
-      checkDisputeSubmit();
-    });
-
-    function checkDisputeSubmit() {
-      btnDSubmit.disabled = !(selectedType && disputeDesc.value.trim().length >= 20);
-    }
-
-    btnDSubmit.addEventListener("click", function () {
-      btnDSubmit.disabled = true;
-      btnDSubmit.textContent = "⏳ Submitting…";
-      setTimeout(function () {
-        closeDispute();
-        /* Update hero */
-        var hero = document.getElementById("pgHero");
-        hero.className = "pg-hero state-dispute";
-        document.getElementById("heroIcon").textContent  = "🚨";
-        document.getElementById("heroBadge").textContent = "🚨 Dispute Under Review";
-        document.getElementById("heroTitle").textContent = "Dispute Filed — Review Mein Hai";
-        document.getElementById("heroSub").textContent   = "Team 5 business days mein review karegi. Payment hold mein hai tab tak.";
-        if (typeof showToast === "function") {
-          showToast("🚨 Dispute submitted! Team review karegi.", "warning");
-        }
+      // Simulate API call
+      setTimeout(() => {
+        const gigId = 'GL-2026-' + String(Math.floor(Math.random() * 9000) + 1000);
+        document.getElementById('modalGigId').textContent = `📋 Gig ID: ${gigId}`;
+        document.getElementById('successModal').classList.add('open');
+        btn.disabled = false;
+        btn.innerHTML = '🚀 Gig Post Karo — Free!';
       }, 1200);
-    });
-
-    /* ══════════════════════════════════
-       WITHDRAW BUTTON
-    ══════════════════════════════════ */
-    var btnW = document.getElementById("btnWithdraw");
-    if (btnW) {
-      btnW.addEventListener("click", function () {
-        window.location.href = "dashboard.html#wallet";
-      });
     }
 
     /* ══════════════════════════════════
-       CHAT BUTTON
+       DRAFT
     ══════════════════════════════════ */
-    document.getElementById("btnOpenChat").addEventListener("click", function () {
-      window.location.href = "dashboard.html#chat";
-    });
-
-    /* ══════════════════════════════════
-       SHARE BUTTONS
-    ══════════════════════════════════ */
-    document.getElementById("btnShareWA").addEventListener("click", function () {
-      var text = encodeURIComponent("GigLega pe kaam mila — tum bhi try karo! 🚀 giglega.in");
-      window.open("https://wa.me/?text=" + text, "_blank");
-    });
-    document.getElementById("btnCopyLink").addEventListener("click", function () {
-      navigator.clipboard && navigator.clipboard.writeText("https://giglega.in").then(function () {
-        if (typeof showToast === "function") showToast("🔗 Link copied!", "success");
-      });
-    });
-
-    /* ══════════════════════════════════
-       URL HASH HANDLING
-    ══════════════════════════════════ */
-    var hash = window.location.hash;
-    if (hash === "#rate") {
-      setTimeout(function () {
-        var rs = document.getElementById("ratingSection");
-        if (rs) rs.scrollIntoView({ behavior: "smooth" });
-      }, 400);
-    }
-    if (hash === "#dispute") {
-      setTimeout(openDispute, 600);
+    function saveDraft() {
+      const draft = {
+        title:    document.getElementById('gigTitle').value,
+        category: selectedCategory,
+        desc:     document.getElementById('gigDesc').value,
+        payMin:   document.getElementById('payMin').value,
+        payMax:   document.getElementById('payMax').value,
+        payType:  selectedPayType,
+        workers:  document.getElementById('workersCount').value,
+        date:     document.getElementById('gigDate').value,
+        location: document.getElementById('gigLocation').value,
+        skills:   selectedSkills,
+        savedAt:  new Date().toISOString(),
+      };
+      localStorage.setItem('giglega_gig_draft', JSON.stringify(draft));
+      showToast('💾 Draft save ho gaya!');
     }
 
-    /* Clean up timer on unload */
-    window.addEventListener("beforeunload", function () {
-      clearInterval(timerInterval);
-    });
+    /* ══════════════════════════════════
+       LOAD DRAFT
+    ══════════════════════════════════ */
+    (function loadDraftIfExists() {
+      try {
+        const raw = localStorage.getItem('giglega_gig_draft');
+        if (!raw) return;
+        const d = JSON.parse(raw);
+        if (d.title)    document.getElementById('gigTitle').value    = d.title;
+        if (d.desc)     document.getElementById('gigDesc').value     = d.desc;
+        if (d.payMin)   document.getElementById('payMin').value      = d.payMin;
+        if (d.payMax)   document.getElementById('payMax').value      = d.payMax;
+        if (d.workers)  document.getElementById('workersCount').value = d.workers;
+        if (d.date)     document.getElementById('gigDate').value     = d.date;
+        if (d.location) document.getElementById('gigLocation').value = d.location;
 
-  });
+        if (d.category) {
+          const catEl = document.querySelector(`.cat-card[data-cat="${d.category}"]`);
+          if (catEl) selectCategory(catEl);
+        }
+
+        updatePreview();
+
+        const savedAt = d.savedAt ? new Date(d.savedAt).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}) : '';
+        showToast(`📂 Draft loaded${savedAt ? ' (saved at ' + savedAt + ')' : ''}`, 3500);
+      } catch {}
+    })();
+
+    /* ══════════════════════════════════
+       POST ANOTHER
+    ══════════════════════════════════ */
+    function postAnother() {
+      document.getElementById('successModal').classList.remove('open');
+      document.getElementById('gigTitle').value    = '';
+      document.getElementById('gigDesc').value     = '';
+      document.getElementById('payMin').value      = '';
+      document.getElementById('payMax').value      = '';
+      document.getElementById('gigDate').value     = '';
+      document.getElementById('gigLocation').value = '';
+      document.getElementById('workersCount').value = 1;
+      selectedCategory = ''; selectedSkills = []; selectedPerks = [];
+      document.querySelectorAll('.cat-card').forEach(c => c.classList.remove('selected'));
+      document.querySelectorAll('.skill-tag').forEach(s => s.classList.remove('selected'));
+      document.querySelectorAll('.perk-item').forEach(p => { p.classList.remove('checked'); p.querySelector('.perk-checkbox').textContent = ''; });
+      updatePreview();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* ══════════════════════════════════
+       SET MIN DATE TO TODAY
+    ══════════════════════════════════ */
+    (function setMinDate() {
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('gigDate').min    = today;
+      document.getElementById('gigEndDate').min = today;
+    })();
+
+    /* ══════════════════════════════════
+       TOAST
+    ══════════════════════════════════ */
+    let toastTimer;
+    function showToast(msg, duration = 2800) {
+      const t = document.getElementById('pgToast');
+      t.textContent = msg;
+      t.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => t.classList.remove('show'), duration);
+    }
+
+    /* Init */
+    updatePreview();
+
   </script>
+
 </body>
 </html>
