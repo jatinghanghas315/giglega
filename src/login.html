@@ -4,135 +4,141 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Login — GigLega</title>
-  <meta name="description" content="GigLega mein login karo ya naya account banao. Gig economy ka sabse smart platform." />
+  <meta name="description" content="GigLega mein login karo. Gig economy ka sabse smart platform." />
   <link rel="stylesheet" href="styles.css" />
-  <script defer src="shared.js"></script>
+  <script src="shared.js"></script>
   <style>
-    /* ── Page layout ── */
-    .auth-page{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px 16px;background:linear-gradient(135deg,rgba(26,60,94,.04) 0%,rgba(13,148,136,.06) 100%)}
+    .auth-page {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+      background: linear-gradient(135deg, rgba(26,60,94,.04) 0%, rgba(13,148,136,.06) 100%);
+    }
+    .auth-card {
+      background: var(--surface);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-lg);
+      width: 100%;
+      max-width: 460px;
+      overflow: hidden;
+    }
+    .auth-brand {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--teal) 100%);
+      padding: 28px 32px 24px;
+      text-align: center;
+      color: #fff;
+    }
+    .auth-logo { font-size: 1.9rem; font-weight: 900; letter-spacing: -1px; margin-bottom: 4px; }
+    .auth-logo span { opacity: .75; }
+    .auth-tagline { font-size: .82rem; opacity: .75; }
 
-    /* ── Card ── */
-    .auth-card{background:var(--surface);border:1.5px solid var(--gray-200);border-radius:var(--radius);box-shadow:0 8px 40px rgba(26,60,94,.12);width:100%;max-width:460px;overflow:hidden}
+    .auth-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border-bottom: 2px solid var(--gray-200);
+    }
+    .auth-tab {
+      padding: 14px;
+      border: none;
+      background: transparent;
+      font-weight: 700;
+      font-size: .9rem;
+      color: var(--gray-500);
+      cursor: pointer;
+      border-bottom: 2.5px solid transparent;
+      margin-bottom: -2px;
+      transition: var(--transition);
+      font-family: var(--font);
+    }
+    .auth-tab.active { color: var(--primary); border-bottom-color: var(--primary); background: rgba(26,60,94,.03); }
+    .auth-tab:hover:not(.active) { color: var(--gray-700); background: var(--gray-50); }
 
-    /* ── Brand header ── */
-    .auth-brand{background:linear-gradient(135deg,var(--primary) 0%,var(--teal) 100%);padding:28px 32px 24px;text-align:center;color:#fff}
-    .auth-logo{font-size:1.8rem;font-weight:900;letter-spacing:-1px;margin-bottom:4px}
-    .auth-logo span{opacity:.8}
-    .auth-tagline{font-size:.82rem;opacity:.75}
+    .auth-body { padding: 28px 32px 32px; }
+    @media(max-width:480px) { .auth-body { padding: 20px 20px 24px; } }
 
-    /* ── Tab switch ── */
-    .auth-tabs{display:grid;grid-template-columns:1fr 1fr;border-bottom:2px solid var(--gray-200)}
-    .auth-tab{padding:14px;border:none;background:transparent;font-weight:700;font-size:.9rem;color:var(--gray-500);cursor:pointer;border-bottom:2.5px solid transparent;margin-bottom:-2px;transition:all .2s}
-    .auth-tab.active{color:var(--primary);border-bottom-color:var(--primary);background:rgba(26,60,94,.03)}
-    .auth-tab:hover:not(.active){color:var(--gray-700);background:var(--gray-50)}
+    .auth-panel { display: none; }
+    .auth-panel.active { display: block; }
 
-    /* ── Form body ── */
-    .auth-body{padding:28px 32px 32px}
-    @media(max-width:480px){.auth-body{padding:20px 20px 24px}}
+    .field { margin-bottom: 18px; }
+    .field label { display: block; font-weight: 600; font-size: .86rem; color: var(--gray-700); margin-bottom: 6px; }
+    .field-input-wrap { position: relative; }
+    .field-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 1rem; pointer-events: none; }
+    .field input { width: 100%; padding: 11px 14px; border: 1.5px solid var(--gray-200); border-radius: var(--radius-sm); font-size: .93rem; background: var(--surface); color: var(--text); font-family: var(--font); transition: border .2s, box-shadow .2s; box-sizing: border-box; }
+    .field input.has-icon { padding-left: 38px; }
+    .field input.has-icon-right { padding-right: 42px; }
+    .field input:focus { outline: none; border-color: var(--teal); box-shadow: 0 0 0 3px rgba(13,148,136,.1); }
+    .field input.is-error { border-color: var(--danger); }
+    .field-error { font-size: .76rem; color: var(--danger); margin-top: 5px; font-weight: 600; display: none; }
+    .field-error.show { display: block; }
+    .btn-eye { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 1rem; color: var(--gray-400); padding: 4px; line-height: 1; }
+    .btn-eye:hover { color: var(--gray-700); }
 
-    /* ── Panel visibility ── */
-    .auth-panel{display:none}
-    .auth-panel.active{display:block}
+    .pw-strength { margin-top: 8px; display: none; }
+    .pw-strength.show { display: block; }
+    .pw-bars { display: flex; gap: 4px; margin-bottom: 4px; }
+    .pw-bar { flex: 1; height: 4px; border-radius: 2px; background: var(--gray-200); transition: background .3s; }
+    .pw-lbl { font-size: .74rem; font-weight: 600; color: var(--gray-400); }
 
-    /* ── Field ── */
-    .field{margin-bottom:18px;position:relative}
-    .field label{display:block;font-weight:600;font-size:.86rem;color:var(--gray-700);margin-bottom:6px}
-    .field-input-wrap{position:relative}
-    .field input{width:100%;padding:12px 14px;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);font-size:.93rem;background:var(--surface);color:var(--text);font-family:inherit;transition:border .2s,box-shadow .2s;box-sizing:border-box}
-    .field input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(13,148,136,.1)}
-    .field input.error{border-color:var(--danger)}
-    .field input.success{border-color:var(--success)}
-    .field-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:1rem;pointer-events:none}
-    .field input.has-icon{padding-left:38px}
-    .field-error{font-size:.76rem;color:var(--danger);margin-top:5px;display:none;font-weight:600}
-    .field-error.show{display:block}
+    .check-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 8px; }
+    .check-label { display: flex; align-items: center; gap: 8px; font-size: .83rem; color: var(--gray-600); cursor: pointer; user-select: none; }
+    .check-label input { width: 15px; height: 15px; accent-color: var(--teal); cursor: pointer; }
+    .btn-forgot { background: none; border: none; color: var(--teal); font-size: .83rem; font-weight: 600; cursor: pointer; padding: 0; font-family: var(--font); }
+    .btn-forgot:hover { text-decoration: underline; }
 
-    /* Password toggle */
-    .btn-eye{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1rem;color:var(--gray-400);padding:4px;line-height:1}
-    .btn-eye:hover{color:var(--gray-700)}
+    .btn-submit { width: 100%; padding: 13px; background: linear-gradient(135deg, var(--primary) 0%, var(--teal) 100%); color: #fff; border: none; border-radius: var(--radius-sm); font-weight: 800; font-size: .95rem; cursor: pointer; transition: transform .15s, box-shadow .15s, opacity .2s; box-shadow: 0 4px 14px rgba(13,148,136,.35); margin-bottom: 16px; font-family: var(--font); display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .btn-submit:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(13,148,136,.45); }
+    .btn-submit:disabled { opacity: .55; transform: none; cursor: not-allowed; box-shadow: none; }
+    .btn-submit .spinner { display: none; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,.35); border-top-color: #fff; border-radius: 50%; animation: spin .65s linear infinite; }
+    .btn-submit.loading .btn-text { display: none; }
+    .btn-submit.loading .spinner { display: inline-block; }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ── Password strength ── */
-    .pw-strength{margin-top:8px;display:none}
-    .pw-strength.show{display:block}
-    .pw-bars{display:flex;gap:4px;margin-bottom:4px}
-    .pw-bar{flex:1;height:4px;border-radius:2px;background:var(--gray-200);transition:background .3s}
-    .pw-label{font-size:.74rem;color:var(--gray-500);font-weight:600}
-    .pw-label.weak{color:var(--danger)}
-    .pw-label.fair{color:var(--accent)}
-    .pw-label.good{color:#16a34a}
-    .pw-label.strong{color:var(--teal)}
+    .btn-social { width: 100%; padding: 11px; border: 1.5px solid var(--gray-200); border-radius: var(--radius-sm); background: var(--surface); color: var(--gray-700); font-weight: 600; font-size: .88rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: var(--transition); margin-bottom: 10px; font-family: var(--font); }
+    .btn-social:hover { border-color: var(--teal); background: rgba(13,148,136,.04); }
 
-    /* ── Checkbox row ── */
-    .check-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:8px}
-    .check-label{display:flex;align-items:center;gap:8px;font-size:.83rem;color:var(--gray-600);cursor:pointer;user-select:none}
-    .check-label input[type=checkbox]{width:16px;height:16px;accent-color:var(--teal);cursor:pointer}
-    .btn-forgot{background:none;border:none;color:var(--teal);font-size:.83rem;font-weight:600;cursor:pointer;padding:0}
-    .btn-forgot:hover{text-decoration:underline}
+    .auth-switch { text-align: center; font-size: .83rem; color: var(--gray-500); }
+    .auth-switch button { background: none; border: none; color: var(--teal); font-weight: 700; cursor: pointer; font-size: .83rem; padding: 0; font-family: var(--font); }
+    .auth-switch button:hover { text-decoration: underline; }
 
-    /* ── Submit button ── */
-    .btn-submit{width:100%;padding:13px;background:linear-gradient(135deg,var(--primary) 0%,var(--teal) 100%);color:#fff;border:none;border-radius:var(--radius-sm);font-weight:800;font-size:.95rem;cursor:pointer;transition:transform .15s,box-shadow .15s,opacity .2s;box-shadow:0 4px 14px rgba(13,148,136,.35);margin-bottom:16px}
-    .btn-submit:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(13,148,136,.45)}
-    .btn-submit:disabled{opacity:.55;transform:none;cursor:not-allowed;box-shadow:none}
-    .btn-submit .spinner{display:none;width:16px;height:16px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;margin:0 auto}
-    .btn-submit.loading .btn-text{display:none}
-    .btn-submit.loading .spinner{display:inline-block}
-    @keyframes spin{to{transform:rotate(360deg)}}
+    .terms-note { font-size: .74rem; color: var(--gray-400); text-align: center; line-height: 1.6; margin-top: 12px; }
+    .terms-note a { color: var(--teal); }
+    .terms-note a:hover { text-decoration: underline; }
 
-    /* ── Divider ── */
-    .auth-divider{display:flex;align-items:center;gap:12px;margin-bottom:16px}
-    .auth-divider span{font-size:.78rem;color:var(--gray-400);white-space:nowrap}
-    .auth-divider::before,.auth-divider::after{content:"";flex:1;height:1px;background:var(--gray-200)}
+    /* Forgot password */
+    .forgot-panel { display: none; padding: 28px 32px 32px; }
+    .forgot-panel.active { display: block; }
+    @media(max-width:480px) { .forgot-panel { padding: 20px 20px 24px; } }
+    .forgot-back { background: none; border: none; color: var(--teal); font-weight: 700; font-size: .84rem; cursor: pointer; padding: 0; margin-bottom: 20px; display: flex; align-items: center; gap: 5px; font-family: var(--font); }
+    .forgot-back:hover { text-decoration: underline; }
+    .forgot-title { font-size: 1.1rem; font-weight: 800; color: var(--primary); margin-bottom: 6px; }
+    .forgot-sub { font-size: .84rem; color: var(--gray-500); margin-bottom: 22px; line-height: 1.5; }
 
-    /* ── Social login (demo) ── */
-    .btn-social{width:100%;padding:11px;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);background:var(--surface);color:var(--gray-700);font-weight:600;font-size:.88rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:border .2s,background .2s;margin-bottom:10px}
-    .btn-social:hover{border-color:var(--teal);background:rgba(13,148,136,.04)}
+    .otp-row { display: flex; gap: 10px; justify-content: center; margin-bottom: 18px; }
+    .otp-digit { width: 52px; height: 56px; border: 1.5px solid var(--gray-200); border-radius: var(--radius-sm); text-align: center; font-size: 1.3rem; font-weight: 700; color: var(--text); background: var(--surface); font-family: var(--font); transition: border .2s; }
+    .otp-digit:focus { outline: none; border-color: var(--teal); box-shadow: 0 0 0 3px rgba(13,148,136,.1); }
+    .otp-timer { text-align: center; font-size: .8rem; color: var(--gray-400); margin-bottom: 16px; }
+    .otp-timer strong { color: var(--primary); }
+    .btn-resend { background: none; border: none; color: var(--teal); font-weight: 700; font-size: .82rem; cursor: pointer; padding: 0; font-family: var(--font); }
+    .btn-resend:disabled { opacity: .45; cursor: not-allowed; }
 
-    /* ── Switch text ── */
-    .auth-switch{text-align:center;font-size:.83rem;color:var(--gray-500)}
-    .auth-switch button{background:none;border:none;color:var(--teal);font-weight:700;cursor:pointer;font-size:.83rem;padding:0}
-    .auth-switch button:hover{text-decoration:underline}
+    .auth-success { text-align: center; padding: 32px 24px; display: none; }
+    .auth-success.show { display: block; }
+    .auth-success .s-icon { font-size: 3rem; margin-bottom: 14px; }
+    .auth-success h3 { font-size: 1.1rem; font-weight: 800; color: var(--success); margin-bottom: 8px; }
+    .auth-success p { font-size: .85rem; color: var(--gray-500); line-height: 1.6; }
 
-    /* ── Terms note ── */
-    .terms-note{font-size:.74rem;color:var(--gray-400);text-align:center;line-height:1.6;margin-top:12px}
-    .terms-note a{color:var(--teal);text-decoration:none}
-    .terms-note a:hover{text-decoration:underline}
-
-    /* ── OTP / Forgot password panel ── */
-    .forgot-panel{display:none;padding:28px 32px 32px}
-    .forgot-panel.active{display:block}
-    @media(max-width:480px){.forgot-panel{padding:20px 20px 24px}}
-    .forgot-back{background:none;border:none;color:var(--teal);font-weight:700;font-size:.84rem;cursor:pointer;padding:0;margin-bottom:18px;display:flex;align-items:center;gap:5px}
-    .forgot-back:hover{text-decoration:underline}
-    .forgot-title{font-size:1.1rem;font-weight:800;color:var(--primary);margin-bottom:6px}
-    .forgot-sub{font-size:.84rem;color:var(--gray-500);margin-bottom:22px;line-height:1.5}
-    .otp-input-row{display:flex;gap:10px;justify-content:center;margin-bottom:18px}
-    .otp-digit{width:52px;height:56px;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);text-align:center;font-size:1.3rem;font-weight:700;color:var(--text);background:var(--surface);font-family:inherit;transition:border .2s}
-    .otp-digit:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(13,148,136,.1)}
-    .otp-timer{text-align:center;font-size:.8rem;color:var(--gray-400);margin-bottom:16px}
-    .otp-timer strong{color:var(--primary)}
-    .btn-resend{background:none;border:none;color:var(--teal);font-weight:700;font-size:.82rem;cursor:pointer;padding:0}
-    .btn-resend:disabled{opacity:.5;cursor:not-allowed}
-
-    /* Success state */
-    .auth-success{text-align:center;padding:32px 20px;display:none}
-    .auth-success.show{display:block}
-    .auth-success .success-icon{font-size:3rem;margin-bottom:14px}
-    .auth-success h3{font-size:1.1rem;font-weight:800;color:var(--success);margin-bottom:8px}
-    .auth-success p{font-size:.85rem;color:var(--gray-500);line-height:1.6}
-
-    /* Dark mode */
-    [data-theme=dark] .auth-card{border-color:var(--gray-700);background:var(--gray-900)}
-    [data-theme=dark] .auth-tabs{border-color:var(--gray-700)}
-    [data-theme=dark] .auth-tab.active{background:rgba(13,148,136,.08)}
-    [data-theme=dark] .auth-tab:hover:not(.active){background:var(--gray-800)}
-    [data-theme=dark] .field input{border-color:var(--gray-600);background:var(--gray-800)}
-    [data-theme=dark] .field label{color:var(--gray-300)}
-    [data-theme=dark] .btn-social{border-color:var(--gray-600);color:var(--gray-300);background:var(--gray-800)}
-    [data-theme=dark] .btn-social:hover{border-color:var(--teal)}
-    [data-theme=dark] .otp-digit{border-color:var(--gray-600);background:var(--gray-800)}
-    [data-theme=dark] .auth-divider::before,[data-theme=dark] .auth-divider::after{background:var(--gray-700)}
-    [data-theme=dark] .pw-bar{background:var(--gray-700)}
-    [data-theme=dark] .check-label{color:var(--gray-400)}
+    /* Dark */
+    [data-theme=dark] .auth-card { border-color: var(--gray-700); }
+    [data-theme=dark] .auth-tabs { border-color: var(--gray-700); }
+    [data-theme=dark] .field input { border-color: var(--gray-600); background: var(--gray-800); }
+    [data-theme=dark] .field label { color: var(--gray-300); }
+    [data-theme=dark] .btn-social { border-color: var(--gray-600); color: var(--gray-300); background: var(--gray-800); }
+    [data-theme=dark] .otp-digit { border-color: var(--gray-600); background: var(--gray-800); }
+    [data-theme=dark] .check-label { color: var(--gray-400); }
+    [data-theme=dark] .pw-bar { background: var(--gray-700); }
   </style>
 </head>
 <body>
@@ -143,7 +149,6 @@
     <div class="auth-page">
       <div class="auth-card">
 
-        <!-- Brand -->
         <div class="auth-brand">
           <div class="auth-logo">Gig<span>Lega</span></div>
           <div class="auth-tagline">Gurugram ka #1 Gig Platform — Karo Kaam, Kamao Daam</div>
@@ -155,17 +160,14 @@
           <button class="auth-tab" data-tab="register">✨ Register</button>
         </div>
 
-        <!-- ════════════════════════
-             LOGIN PANEL
-        ════════════════════════ -->
+        <!-- LOGIN PANEL -->
         <div class="auth-panel active" id="panelLogin">
           <div class="auth-body">
-
             <div class="field">
               <label for="loginId">Email or Phone Number</label>
               <div class="field-input-wrap">
                 <span class="field-icon">📧</span>
-                <input type="text" id="loginId" class="has-icon" placeholder="you@email.com or 98765 43210" autocomplete="username" />
+                <input type="text" id="loginId" class="has-icon" placeholder="you@email.com or 9876543210" autocomplete="username" />
               </div>
               <div class="field-error" id="loginIdErr">Please enter your email or phone number.</div>
             </div>
@@ -174,7 +176,7 @@
               <label for="loginPw">Password</label>
               <div class="field-input-wrap">
                 <span class="field-icon">🔒</span>
-                <input type="password" id="loginPw" class="has-icon" placeholder="Your password" autocomplete="current-password" style="padding-right:42px" />
+                <input type="password" id="loginPw" class="has-icon has-icon-right" placeholder="Your password" autocomplete="current-password" />
                 <button class="btn-eye" id="eyeLogin" type="button" aria-label="Toggle password">👁️</button>
               </div>
               <div class="field-error" id="loginPwErr">Please enter your password.</div>
@@ -192,40 +194,39 @@
               <span class="spinner"></span>
             </button>
 
-            <div class="auth-divider"><span>or continue with</span></div>
+            <div class="divider">or continue with</div>
 
             <button class="btn-social" id="btnGoogleLogin" type="button">
-              <span>🔴</span> Continue with Google <span style="font-size:.75rem;color:var(--gray-400)">(coming soon)</span>
+              🔴 Continue with Google
+              <span style="font-size:.74rem;color:var(--gray-400)">(coming soon)</span>
             </button>
 
             <div class="auth-switch">
-              Don't have an account? <button id="switchToRegister" type="button">Register free →</button>
+              Don't have an account?
+              <button id="switchToRegister" type="button">Register free →</button>
             </div>
           </div>
         </div>
 
-        <!-- ════════════════════════
-             REGISTER PANEL
-        ════════════════════════ -->
+        <!-- REGISTER PANEL -->
         <div class="auth-panel" id="panelRegister">
           <div class="auth-body">
-
             <div class="field">
               <label for="regName">Full Name</label>
               <div class="field-input-wrap">
                 <span class="field-icon">👤</span>
                 <input type="text" id="regName" class="has-icon" placeholder="Your full name" autocomplete="name" />
               </div>
-              <div class="field-error" id="regNameErr">Please enter your full name (min 2 characters).</div>
+              <div class="field-error" id="regNameErr">Please enter your full name (min 2 chars).</div>
             </div>
 
             <div class="field">
               <label for="regId">Email or Phone Number</label>
               <div class="field-input-wrap">
                 <span class="field-icon">📧</span>
-                <input type="text" id="regId" class="has-icon" placeholder="you@email.com or 98765 43210" autocomplete="username" />
+                <input type="text" id="regId" class="has-icon" placeholder="you@email.com or 9876543210" autocomplete="username" />
               </div>
-              <div class="field-error" id="regIdErr">Please enter a valid email or 10-digit phone number.</div>
+              <div class="field-error" id="regIdErr">Enter a valid email or 10-digit phone number.</div>
             </div>
 
             <div class="field">
@@ -241,17 +242,17 @@
               <label for="regPw">Password</label>
               <div class="field-input-wrap">
                 <span class="field-icon">🔒</span>
-                <input type="password" id="regPw" class="has-icon" placeholder="Create a strong password" autocomplete="new-password" style="padding-right:42px" />
+                <input type="password" id="regPw" class="has-icon has-icon-right" placeholder="Create a strong password" autocomplete="new-password" />
                 <button class="btn-eye" id="eyeReg" type="button" aria-label="Toggle password">👁️</button>
               </div>
               <div class="pw-strength" id="pwStrength">
                 <div class="pw-bars">
-                  <div class="pw-bar" id="pwBar1"></div>
-                  <div class="pw-bar" id="pwBar2"></div>
-                  <div class="pw-bar" id="pwBar3"></div>
-                  <div class="pw-bar" id="pwBar4"></div>
+                  <div class="pw-bar" id="pb1"></div>
+                  <div class="pw-bar" id="pb2"></div>
+                  <div class="pw-bar" id="pb3"></div>
+                  <div class="pw-bar" id="pb4"></div>
                 </div>
-                <div class="pw-label" id="pwLabel">Enter a password</div>
+                <div class="pw-lbl" id="pwLbl">Enter a password</div>
               </div>
               <div class="field-error" id="regPwErr">Password must be at least 6 characters.</div>
             </div>
@@ -260,7 +261,7 @@
               <label for="regPwConf">Confirm Password</label>
               <div class="field-input-wrap">
                 <span class="field-icon">🔒</span>
-                <input type="password" id="regPwConf" class="has-icon" placeholder="Repeat your password" autocomplete="new-password" style="padding-right:42px" />
+                <input type="password" id="regPwConf" class="has-icon has-icon-right" placeholder="Repeat your password" autocomplete="new-password" />
                 <button class="btn-eye" id="eyeRegConf" type="button" aria-label="Toggle password">👁️</button>
               </div>
               <div class="field-error" id="regPwConfErr">Passwords do not match.</div>
@@ -278,27 +279,25 @@
             </div>
 
             <div class="auth-switch" style="margin-top:14px">
-              Already have an account? <button id="switchToLogin" type="button">Login →</button>
+              Already have an account?
+              <button id="switchToLogin" type="button">Login →</button>
             </div>
-
           </div>
         </div>
 
-        <!-- ════════════════════════
-             FORGOT PASSWORD PANEL
-        ════════════════════════ -->
+        <!-- FORGOT PASSWORD PANEL -->
         <div class="forgot-panel" id="panelForgot">
 
-          <!-- Step 1: Enter email/phone -->
-          <div id="forgotStep1">
+          <!-- Step 1: Enter identifier -->
+          <div id="fStep1">
             <button class="forgot-back" id="forgotBack1" type="button">← Back to Login</button>
             <div class="forgot-title">🔑 Reset Password</div>
-            <div class="forgot-sub">Enter your registered email or phone number and we'll send you a verification code.</div>
+            <div class="forgot-sub">Enter your registered email or phone and we'll send a verification code.</div>
             <div class="field">
               <label for="forgotId">Email or Phone Number</label>
               <div class="field-input-wrap">
                 <span class="field-icon">📧</span>
-                <input type="text" id="forgotId" class="has-icon" placeholder="you@email.com or 98765 43210" />
+                <input type="text" id="forgotId" class="has-icon" placeholder="you@email.com or 9876543210" />
               </div>
               <div class="field-error" id="forgotIdErr">Account not found. Please check and try again.</div>
             </div>
@@ -308,20 +307,21 @@
             </button>
           </div>
 
-          <!-- Step 2: Enter OTP -->
-          <div id="forgotStep2" style="display:none">
+          <!-- Step 2: OTP -->
+          <div id="fStep2" style="display:none">
             <button class="forgot-back" id="forgotBack2" type="button">← Change number</button>
             <div class="forgot-title">📱 Enter OTP</div>
-            <div class="forgot-sub" id="otpSubText">OTP sent to your email/phone. (Demo: use <strong>1234</strong>)</div>
-            <div class="otp-input-row">
-              <input class="otp-digit" id="otp1" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]" />
-              <input class="otp-digit" id="otp2" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]" />
-              <input class="otp-digit" id="otp3" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]" />
-              <input class="otp-digit" id="otp4" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]" />
+            <div class="forgot-sub" id="otpSubText">OTP sent. (Demo: use <strong>1234</strong>)</div>
+            <div class="otp-row">
+              <input class="otp-digit" id="od1" maxlength="1" type="text" inputmode="numeric" />
+              <input class="otp-digit" id="od2" maxlength="1" type="text" inputmode="numeric" />
+              <input class="otp-digit" id="od3" maxlength="1" type="text" inputmode="numeric" />
+              <input class="otp-digit" id="od4" maxlength="1" type="text" inputmode="numeric" />
             </div>
-            <div class="field-error" id="otpErr" style="text-align:center">Incorrect OTP. Try again. (Hint: 1234)</div>
-            <div class="otp-timer">Resend in <strong id="otpCountdown">30s</strong> &nbsp;
-              <button class="btn-resend" id="btnResend" type="button" disabled>Resend OTP</button>
+            <div class="field-error" id="otpErr" style="text-align:center;margin-bottom:10px">Incorrect OTP. (Hint: 1234)</div>
+            <div class="otp-timer">
+              Resend in <strong id="otpCountdown">30s</strong> &nbsp;
+              <button class="btn-resend" id="btnResend" disabled type="button">Resend OTP</button>
             </div>
             <button class="btn-submit" id="btnVerifyOtp" type="button">
               <span class="btn-text">Verify OTP →</span>
@@ -330,14 +330,14 @@
           </div>
 
           <!-- Step 3: New password -->
-          <div id="forgotStep3" style="display:none">
+          <div id="fStep3" style="display:none">
             <div class="forgot-title">🔒 Set New Password</div>
             <div class="forgot-sub">Enter and confirm your new password below.</div>
             <div class="field">
               <label for="newPw">New Password</label>
               <div class="field-input-wrap">
                 <span class="field-icon">🔒</span>
-                <input type="password" id="newPw" class="has-icon" placeholder="New password" style="padding-right:42px" />
+                <input type="password" id="newPw" class="has-icon has-icon-right" placeholder="New password" />
                 <button class="btn-eye" id="eyeNew" type="button">👁️</button>
               </div>
               <div class="field-error" id="newPwErr">Password must be at least 6 characters.</div>
@@ -346,7 +346,7 @@
               <label for="newPwConf">Confirm New Password</label>
               <div class="field-input-wrap">
                 <span class="field-icon">🔒</span>
-                <input type="password" id="newPwConf" class="has-icon" placeholder="Repeat new password" style="padding-right:42px" />
+                <input type="password" id="newPwConf" class="has-icon has-icon-right" placeholder="Repeat new password" />
                 <button class="btn-eye" id="eyeNewConf" type="button">👁️</button>
               </div>
               <div class="field-error" id="newPwConfErr">Passwords do not match.</div>
@@ -359,16 +359,16 @@
 
           <!-- Step 4: Success -->
           <div class="auth-success" id="forgotSuccess">
-            <div class="success-icon">🎉</div>
+            <div class="s-icon">🎉</div>
             <h3>Password Reset!</h3>
-            <p>Your password has been updated successfully.<br>Logging you in now...</p>
+            <p>Your password has been updated.<br>Logging you in now...</p>
           </div>
 
         </div>
 
         <!-- Register success -->
         <div class="auth-success" id="registerSuccess" style="padding:32px">
-          <div class="success-icon">🎉</div>
+          <div class="s-icon">🎉</div>
           <h3>Account Created!</h3>
           <p>Welcome to GigLega! Redirecting you now...</p>
         </div>
@@ -380,39 +380,68 @@
   <div id="toast-container"></div>
 
   <script>
-  (function () {
+  document.addEventListener("DOMContentLoaded", function () {
 
-    var GIG_KEY   = (typeof GL !== "undefined" && GL.STORAGE_KEY_GIGS)  ? GL.STORAGE_KEY_GIGS  : "gl_gigs";
-    var USER_KEY  = (typeof GL !== "undefined" && GL.STORAGE_KEY_USER)  ? GL.STORAGE_KEY_USER  : "gl_user";
-    var USERS_KEY = (typeof GL !== "undefined" && GL.STORAGE_KEY_USERS) ? GL.STORAGE_KEY_USERS : "gl_users";
+    /* ── Keys (use GL if available) ── */
+    var USER_KEY  = (typeof GL !== "undefined") ? GL.STORAGE_KEY_USER  : "gl_user";
+    var USERS_KEY = (typeof GL !== "undefined") ? GL.STORAGE_KEY_USERS : "gl_users";
 
-    /* ── Redirect param ── */
-    function getParam(n) { return new URLSearchParams(window.location.search).get(n); }
+    /* ── Redirect destination ── */
     var redirectTo = getParam("redirect") || "index.html";
-    if (redirectTo.indexOf("login") !== -1) redirectTo = "index.html";
+    /* Safety: never redirect back to login or signup */
+    if (!redirectTo || /login|signup/i.test(redirectTo)) redirectTo = "index.html";
 
-    /* ── If already logged in, redirect ── */
-    var existing = localStorage.getItem(USER_KEY);
-    if (existing) {
-      try {
-        var u = JSON.parse(existing);
-        if (u && u.id) { window.location.href = redirectTo; return; }
-      } catch(e) {}
+    /* ✅ Already logged in — go to destination immediately */
+    var alreadyIn = getCurrentUser ? getCurrentUser() : safeParseUser();
+    if (alreadyIn) { window.location.replace(redirectTo); return; }
+
+    var DEMO_OTP    = "1234";
+    var resetTarget = null;
+    var otpTimer    = null;
+
+    /* ── Helpers ── */
+    function getParam(n) { return new URLSearchParams(window.location.search).get(n); }
+    function safeParseUser() {
+      try { var u = JSON.parse(localStorage.getItem(USER_KEY)||"null"); return (u&&u.id)?u:null; } catch(e){return null;}
+    }
+    function getUsers()      { try { return JSON.parse(localStorage.getItem(USERS_KEY)||"[]"); } catch(e){ return []; } }
+    function saveUsers(arr)  { localStorage.setItem(USERS_KEY, JSON.stringify(arr)); }
+    function saveUser(u)     { localStorage.setItem(USER_KEY, JSON.stringify(u)); }
+    function isEmail(v)      { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim()); }
+    function isPhone(v)      { return /^[6-9]\d{9}$/.test(v.replace(/\s+/g,"")); }
+    function validId(v)      { return isEmail(v) || isPhone(v); }
+    function hashPw(pw) {
+      var h = 0;
+      for (var i = 0; i < pw.length; i++) { h = ((h << 5) - h) + pw.charCodeAt(i); h |= 0; }
+      return "h" + Math.abs(h).toString(16);
+    }
+    function findUser(id) {
+      var clean = id.trim().replace(/\s+/g,"");
+      return getUsers().find(function(u){ return u.email===clean||u.phone===clean; }) || null;
+    }
+    function showErr(id, msg) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      if (msg) el.textContent = msg;
+      el.classList.add("show");
+    }
+    function hideErr(id) { var el=document.getElementById(id); if(el) el.classList.remove("show"); }
+    function clearErrs()  { document.querySelectorAll(".field-error").forEach(function(e){ e.classList.remove("show"); }); }
+    function setLoading(id, on) {
+      var btn = document.getElementById(id);
+      if (!btn) return;
+      btn.disabled = on;
+      btn.classList.toggle("loading", on);
     }
 
-    /* ── Simulated OTP ── */
-    var DEMO_OTP      = "1234";
-    var resetTarget   = null; // user object being reset
-    var otpTimer      = null;
-
-    /* ═══════════════════════════════════════
-       TAB SWITCHING
-    ═══════════════════════════════════════ */
+    /* ── Tab switching ── */
     function showPanel(name) {
-      document.querySelectorAll(".auth-panel").forEach(function (p) { p.classList.remove("active"); });
-      document.querySelectorAll(".auth-tab").forEach(function (t) { t.classList.remove("active"); });
-      document.getElementById("panelForgot").classList.remove("active");
-      document.getElementById("authTabs").style.display = "grid";
+      document.querySelectorAll(".auth-panel").forEach(function(p){ p.classList.remove("active"); });
+      document.querySelectorAll(".auth-tab").forEach(function(t){ t.classList.remove("active"); });
+      var forgot = document.getElementById("panelForgot");
+      var tabs   = document.getElementById("authTabs");
+      forgot.classList.remove("active");
+      tabs.style.display = "grid";
 
       if (name === "login") {
         document.getElementById("panelLogin").classList.add("active");
@@ -422,27 +451,26 @@
         document.querySelector('[data-tab="register"]').classList.add("active");
       } else if (name === "forgot") {
         document.getElementById("panelLogin").classList.remove("active");
-        document.getElementById("panelRegister").classList.remove("active");
-        document.getElementById("panelForgot").classList.add("active");
-        document.getElementById("authTabs").style.display = "none";
+        forgot.classList.add("active");
+        tabs.style.display = "none";
       }
     }
 
-    document.querySelectorAll(".auth-tab").forEach(function (tab) {
-      tab.addEventListener("click", function () { showPanel(tab.dataset.tab); });
+    document.querySelectorAll(".auth-tab").forEach(function(t){
+      t.addEventListener("click", function(){ showPanel(t.dataset.tab); });
     });
-    document.getElementById("switchToRegister").addEventListener("click", function () { showPanel("register"); });
-    document.getElementById("switchToLogin").addEventListener("click", function () { showPanel("login"); });
+    document.getElementById("switchToRegister").addEventListener("click", function(){ showPanel("register"); });
+    document.getElementById("switchToLogin").addEventListener("click", function(){ showPanel("login"); });
 
-    /* ═══════════════════════════════════════
-       PASSWORD TOGGLE
-    ═══════════════════════════════════════ */
+    /* ── Eye toggles ── */
     function bindEye(btnId, inputId) {
-      document.getElementById(btnId).addEventListener("click", function () {
-        var inp = document.getElementById(inputId);
+      var btn = document.getElementById(btnId);
+      var inp = document.getElementById(inputId);
+      if (!btn || !inp) return;
+      btn.addEventListener("click", function(){
         var isText = inp.type === "text";
         inp.type = isText ? "password" : "text";
-        this.textContent = isText ? "👁️" : "🙈";
+        btn.textContent = isText ? "👁️" : "🙈";
       });
     }
     bindEye("eyeLogin",   "loginPw");
@@ -451,169 +479,105 @@
     bindEye("eyeNew",     "newPw");
     bindEye("eyeNewConf", "newPwConf");
 
-    /* ═══════════════════════════════════════
-       PASSWORD STRENGTH
-    ═══════════════════════════════════════ */
-    document.getElementById("regPw").addEventListener("input", function () {
+    /* ── Password strength ── */
+    document.getElementById("regPw").addEventListener("input", function(){
       var val = this.value;
       var wrap = document.getElementById("pwStrength");
       if (!val) { wrap.classList.remove("show"); return; }
       wrap.classList.add("show");
-
       var score = 0;
       if (val.length >= 6)  score++;
       if (val.length >= 10) score++;
       if (/[A-Z]/.test(val) && /[a-z]/.test(val)) score++;
       if (/[0-9]/.test(val) && /[^a-zA-Z0-9]/.test(val)) score++;
-
       var colors  = ["#ef4444","#f59e0b","#22c55e","#0d9488"];
       var labels  = ["Weak","Fair","Good","Strong!"];
-      var classes = ["weak","fair","good","strong"];
-      var bars    = [document.getElementById("pwBar1"),document.getElementById("pwBar2"),document.getElementById("pwBar3"),document.getElementById("pwBar4")];
-      var label   = document.getElementById("pwLabel");
-
-      bars.forEach(function (b, i) {
-        b.style.background = i < score ? colors[score - 1] : "var(--gray-200)";
-      });
-      label.textContent  = score > 0 ? labels[score - 1] : "Too short";
-      label.className    = "pw-label " + (score > 0 ? classes[score - 1] : "weak");
+      for (var i = 1; i <= 4; i++) {
+        var bar = document.getElementById("pb"+i);
+        if (bar) bar.style.background = i <= score ? colors[score-1] : "var(--gray-200)";
+      }
+      var lbl = document.getElementById("pwLbl");
+      if (lbl) { lbl.textContent = score > 0 ? labels[score-1] : "Too short"; }
     });
 
-    /* ═══════════════════════════════════════
-       VALIDATION HELPERS
-    ═══════════════════════════════════════ */
-    function showErr(id, msg) {
-      var el = document.getElementById(id);
-      if (msg) el.textContent = msg;
-      el.classList.add("show");
-      var input = el.previousElementSibling && el.previousElementSibling.querySelector("input");
-      if (!input) input = document.getElementById(id.replace("Err","").replace("Id","Id").replace("Pw","Pw"));
-    }
-    function hideErr(id) { document.getElementById(id).classList.remove("show"); }
-    function clearErrs() {
-      document.querySelectorAll(".field-error").forEach(function (e) { e.classList.remove("show"); });
-    }
-
-    function isEmail(v)  { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
-    function isPhone(v)  { return /^[6-9]\d{9}$/.test(v.replace(/\s+/g,"")); }
-    function validId(v)  { return isEmail(v) || isPhone(v.replace(/\s+/g,"")); }
-
-    /* ═══════════════════════════════════════
-       USERS STORAGE
-    ═══════════════════════════════════════ */
-    function getUsers()     { return JSON.parse(localStorage.getItem(USERS_KEY) || "[]"); }
-    function saveUsers(arr) { localStorage.setItem(USERS_KEY, JSON.stringify(arr)); }
-
-    function hashPw(pw) {
-      /* Simple deterministic hash — NOT cryptographic, for demo only */
-      var h = 0;
-      for (var i = 0; i < pw.length; i++) {
-        h = ((h << 5) - h) + pw.charCodeAt(i);
-        h |= 0;
-      }
-      return "h" + Math.abs(h).toString(16);
-    }
-
-    function findUser(identifier) {
-      var id = identifier.trim().replace(/\s+/g,"");
-      return getUsers().find(function (u) {
-        return u.email === id || u.phone === id || u.email === identifier.trim() || u.phone === identifier.trim();
-      }) || null;
-    }
-
-    function loginUser(user, remember) {
-      if (remember) {
-        localStorage.setItem(USER_KEY, JSON.stringify(user));
-      } else {
-        sessionStorage.setItem(USER_KEY, JSON.stringify(user));
-        localStorage.setItem(USER_KEY, JSON.stringify(user)); // fallback
-      }
-    }
-
-    function setLoading(btnId, on) {
-      var btn = document.getElementById(btnId);
-      btn.disabled = on;
-      btn.classList.toggle("loading", on);
-    }
-
-    /* ═══════════════════════════════════════
+    /* ══════════════════
        LOGIN
-    ═══════════════════════════════════════ */
-    document.getElementById("btnLogin").addEventListener("click", function () {
+    ══════════════════ */
+    document.getElementById("btnLogin").addEventListener("click", doLogin);
+    ["loginId","loginPw"].forEach(function(id){
+      document.getElementById(id).addEventListener("keydown", function(e){
+        if (e.key === "Enter") doLogin();
+      });
+    });
+
+    function doLogin() {
       clearErrs();
       var id  = document.getElementById("loginId").value.trim();
       var pw  = document.getElementById("loginPw").value;
       var rem = document.getElementById("rememberMe").checked;
       var ok  = true;
 
-      if (!id) { showErr("loginIdErr", "Please enter your email or phone number."); ok = false; }
-      else if (!validId(id)) { showErr("loginIdErr", "Enter a valid email or 10-digit phone number."); ok = false; }
-      if (!pw) { showErr("loginPwErr", "Please enter your password."); ok = false; }
+      if (!id)          { showErr("loginIdErr","Please enter your email or phone number."); ok=false; }
+      else if (!validId(id)) { showErr("loginIdErr","Enter a valid email or 10-digit phone number."); ok=false; }
+      if (!pw)          { showErr("loginPwErr","Please enter your password."); ok=false; }
       if (!ok) return;
 
       setLoading("btnLogin", true);
-
-      setTimeout(function () {
+      setTimeout(function(){
         setLoading("btnLogin", false);
         var user = findUser(id);
         if (!user) {
-          showErr("loginIdErr", "No account found with this email/phone. Please register first.");
+          showErr("loginIdErr","No account found. Please register first.");
           return;
         }
         if (user.password !== hashPw(pw)) {
-          showErr("loginPwErr", "Incorrect password. Please try again.");
+          showErr("loginPwErr","Incorrect password. Please try again.");
           return;
         }
-        loginUser(user, rem);
-        if (typeof showToast === "function") showToast("✅ Welcome back, " + (user.name || "User") + "!", "success");
-        setTimeout(function () { window.location.href = redirectTo; }, 900);
-      }, 900);
-    });
+        saveUser(user);
+        showToast("✅ Welcome back, " + (user.name||"User") + "!", "success");
+        setTimeout(function(){ window.location.replace(redirectTo); }, 900);
+      }, 800);
+    }
 
-    /* Enter key on login fields */
-    ["loginId","loginPw"].forEach(function (id) {
-      document.getElementById(id).addEventListener("keydown", function (e) {
-        if (e.key === "Enter") document.getElementById("btnLogin").click();
-      });
-    });
-
-    /* ═══════════════════════════════════════
+    /* ══════════════════
        REGISTER
-    ═══════════════════════════════════════ */
-    document.getElementById("btnRegister").addEventListener("click", function () {
-      clearErrs();
-      var name    = document.getElementById("regName").value.trim();
-      var id      = document.getElementById("regId").value.trim();
-      var city    = document.getElementById("regCity").value.trim();
-      var pw      = document.getElementById("regPw").value;
-      var pwConf  = document.getElementById("regPwConf").value;
-      var ok      = true;
+    ══════════════════ */
+    document.getElementById("btnRegister").addEventListener("click", doRegister);
+    document.getElementById("regPwConf").addEventListener("keydown", function(e){
+      if (e.key === "Enter") doRegister();
+    });
 
-      if (!name || name.length < 2) { showErr("regNameErr","Please enter your full name (min 2 characters)."); ok = false; }
-      if (!id || !validId(id))      { showErr("regIdErr","Please enter a valid email or 10-digit phone number."); ok = false; }
-      if (!city)                    { showErr("regCityErr","Please enter your city or area."); ok = false; }
-      if (!pw || pw.length < 6)     { showErr("regPwErr","Password must be at least 6 characters."); ok = false; }
-      if (pw !== pwConf)            { showErr("regPwConfErr","Passwords do not match."); ok = false; }
+    function doRegister() {
+      clearErrs();
+      var name   = document.getElementById("regName").value.trim();
+      var id     = document.getElementById("regId").value.trim();
+      var city   = document.getElementById("regCity").value.trim();
+      var pw     = document.getElementById("regPw").value;
+      var pwConf = document.getElementById("regPwConf").value;
+      var ok     = true;
+
+      if (!name||name.length<2)   { showErr("regNameErr"); ok=false; }
+      if (!id||!validId(id))      { showErr("regIdErr");   ok=false; }
+      if (!city)                  { showErr("regCityErr"); ok=false; }
+      if (!pw||pw.length<6)       { showErr("regPwErr");   ok=false; }
+      if (pw !== pwConf)          { showErr("regPwConfErr"); ok=false; }
       if (!ok) return;
 
-      /* Duplicate check */
-      var cleanId = id.replace(/\s+/g,"");
-      var dup = getUsers().find(function (u) { return u.email === cleanId || u.phone === cleanId; });
-      if (dup) {
-        showErr("regIdErr", "An account with this email/phone already exists. Please login instead.");
+      var clean = id.replace(/\s+/g,"");
+      if (findUser(clean)) {
+        showErr("regIdErr","Account already exists with this email/phone. Please login.");
         return;
       }
 
       setLoading("btnRegister", true);
-
-      setTimeout(function () {
+      setTimeout(function(){
         setLoading("btnRegister", false);
-
         var newUser = {
           id:        "usr_" + Date.now(),
           name:      name,
-          email:     isEmail(cleanId) ? cleanId : null,
-          phone:     isPhone(cleanId) ? cleanId : null,
+          email:     isEmail(clean) ? clean : null,
+          phone:     isPhone(clean) ? clean : null,
           city:      city,
           password:  hashPw(pw),
           createdAt: new Date().toISOString(),
@@ -622,178 +586,122 @@
           bio:       "",
           workType:  ""
         };
-
         var users = getUsers();
         users.push(newUser);
         saveUsers(users);
-        loginUser(newUser, true);
+        saveUser(newUser);
 
-        /* Show success */
-        document.getElementById("panelRegister").style.display = "none";
-        document.getElementById("authTabs").style.display = "none";
+        document.getElementById("panelRegister").style.display   = "none";
+        document.getElementById("authTabs").style.display         = "none";
         document.getElementById("registerSuccess").classList.add("show");
-
-        if (typeof showToast === "function") showToast("🎉 Welcome to GigLega, " + name + "!", "success");
-        setTimeout(function () { window.location.href = redirectTo; }, 1800);
+        showToast("🎉 Welcome to GigLega, " + name + "!", "success");
+        setTimeout(function(){ window.location.replace(redirectTo); }, 1800);
       }, 1000);
-    });
+    }
 
-    /* Enter key on register last field */
-    document.getElementById("regPwConf").addEventListener("keydown", function (e) {
-      if (e.key === "Enter") document.getElementById("btnRegister").click();
+    /* ══════════════════
+       FORGOT PASSWORD
+    ══════════════════ */
+    document.getElementById("btnForgot").addEventListener("click", function(){
+      clearErrs(); showPanel("forgot"); showFStep(1);
     });
+    document.getElementById("forgotBack1").addEventListener("click", function(){ showPanel("login"); });
+    document.getElementById("forgotBack2").addEventListener("click", function(){ showFStep(1); });
 
-    /* ═══════════════════════════════════════
-       FORGOT PASSWORD FLOW
-    ═══════════════════════════════════════ */
-    document.getElementById("btnForgot").addEventListener("click", function () {
-      clearErrs();
-      showPanel("forgot");
-      showForgotStep(1);
-    });
-
-    document.getElementById("forgotBack1").addEventListener("click", function () {
-      showPanel("login");
-    });
-
-    document.getElementById("forgotBack2").addEventListener("click", function () {
-      showForgotStep(1);
-    });
-
-    function showForgotStep(step) {
-      [1,2,3].forEach(function (i) {
-        document.getElementById("forgotStep" + i).style.display = i === step ? "block" : "none";
+    function showFStep(n) {
+      [1,2,3].forEach(function(i){
+        document.getElementById("fStep"+i).style.display = i===n ? "block" : "none";
       });
       document.getElementById("forgotSuccess").classList.remove("show");
     }
 
-    /* Step 1: Send OTP */
-    document.getElementById("btnSendOtp").addEventListener("click", function () {
+    document.getElementById("btnSendOtp").addEventListener("click", function(){
       clearErrs();
       var id = document.getElementById("forgotId").value.trim();
-      if (!id || !validId(id)) {
-        showErr("forgotIdErr","Please enter a valid email or 10-digit phone number.");
-        return;
-      }
+      if (!id||!validId(id)) { showErr("forgotIdErr","Enter a valid email or 10-digit phone number."); return; }
       var user = findUser(id);
-      if (!user) {
-        showErr("forgotIdErr","No account found with this email/phone.");
-        return;
-      }
+      if (!user) { showErr("forgotIdErr","No account found with this email/phone."); return; }
       resetTarget = user;
       setLoading("btnSendOtp", true);
-      setTimeout(function () {
+      setTimeout(function(){
         setLoading("btnSendOtp", false);
-        var masked = isEmail(id)
-          ? id.replace(/(.{2}).*(@.*)/, "$1***$2")
-          : id.replace(/(\d{2})\d{6}(\d{2})/, "$1******$2");
         document.getElementById("otpSubText").innerHTML =
-          "OTP sent to <strong>" + masked + "</strong>. &nbsp;(Demo: use <strong>1234</strong>)";
-        showForgotStep(2);
+          "OTP sent! &nbsp;(Demo: use <strong>1234</strong>)";
+        showFStep(2);
         startOtpTimer();
-      }, 1000);
+      }, 900);
     });
 
-    /* OTP digits auto-advance */
-    ["otp1","otp2","otp3","otp4"].forEach(function (id, i, arr) {
+    /* OTP digit auto-advance */
+    ["od1","od2","od3","od4"].forEach(function(id, i, arr){
       var inp = document.getElementById(id);
-      inp.addEventListener("input", function () {
+      inp.addEventListener("input", function(){
         this.value = this.value.replace(/\D/g,"").slice(0,1);
-        if (this.value && i < arr.length - 1) {
-          document.getElementById(arr[i+1]).focus();
-        }
+        if (this.value && i < arr.length-1) document.getElementById(arr[i+1]).focus();
       });
-      inp.addEventListener("keydown", function (e) {
-        if (e.key === "Backspace" && !this.value && i > 0) {
-          document.getElementById(arr[i-1]).focus();
-        }
+      inp.addEventListener("keydown", function(e){
+        if (e.key==="Backspace" && !this.value && i>0) document.getElementById(arr[i-1]).focus();
       });
     });
 
-    /* OTP timer */
     function startOtpTimer() {
       var sec  = 30;
       var btn  = document.getElementById("btnResend");
       var disp = document.getElementById("otpCountdown");
       btn.disabled = true;
       clearInterval(otpTimer);
-      otpTimer = setInterval(function () {
+      otpTimer = setInterval(function(){
         sec--;
         disp.textContent = sec + "s";
-        if (sec <= 0) {
-          clearInterval(otpTimer);
-          disp.textContent = "";
-          btn.disabled = false;
-        }
+        if (sec <= 0) { clearInterval(otpTimer); disp.textContent = ""; btn.disabled = false; }
       }, 1000);
     }
 
-    document.getElementById("btnResend").addEventListener("click", function () {
-      if (typeof showToast === "function") showToast("OTP resent! (Demo: use 1234)", "success");
+    document.getElementById("btnResend").addEventListener("click", function(){
+      showToast("OTP resent! (Demo: use 1234)", "success");
       startOtpTimer();
     });
 
-    /* Step 2: Verify OTP */
-    document.getElementById("btnVerifyOtp").addEventListener("click", function () {
+    document.getElementById("btnVerifyOtp").addEventListener("click", function(){
       hideErr("otpErr");
-      var otp = ["otp1","otp2","otp3","otp4"].map(function (id) {
-        return document.getElementById(id).value;
-      }).join("");
-      if (otp.length < 4) {
-        showErr("otpErr","Please enter the 4-digit OTP.");
-        return;
-      }
+      var otp = ["od1","od2","od3","od4"].map(function(id){ return document.getElementById(id).value; }).join("");
+      if (otp.length < 4) { showErr("otpErr","Please enter the 4-digit OTP."); return; }
       setLoading("btnVerifyOtp", true);
-      setTimeout(function () {
+      setTimeout(function(){
         setLoading("btnVerifyOtp", false);
-        if (otp !== DEMO_OTP) {
-          showErr("otpErr","Incorrect OTP. Try again. (Hint: 1234)");
-          return;
-        }
-        showForgotStep(3);
-      }, 800);
+        if (otp !== DEMO_OTP) { showErr("otpErr","Incorrect OTP. Try again. (Hint: 1234)"); return; }
+        showFStep(3);
+      }, 700);
     });
 
-    /* Step 3: Set new password */
-    document.getElementById("btnSetPw").addEventListener("click", function () {
+    document.getElementById("btnSetPw").addEventListener("click", function(){
       hideErr("newPwErr"); hideErr("newPwConfErr");
       var pw     = document.getElementById("newPw").value;
       var pwConf = document.getElementById("newPwConf").value;
-      var ok     = true;
-      if (!pw || pw.length < 6) { showErr("newPwErr","Password must be at least 6 characters."); ok = false; }
-      if (pw !== pwConf)        { showErr("newPwConfErr","Passwords do not match."); ok = false; }
-      if (!ok) return;
-
+      if (!pw||pw.length<6) { showErr("newPwErr"); return; }
+      if (pw!==pwConf)      { showErr("newPwConfErr"); return; }
       setLoading("btnSetPw", true);
-      setTimeout(function () {
+      setTimeout(function(){
         setLoading("btnSetPw", false);
-        /* Update user password */
         var users = getUsers();
-        var idx   = users.findIndex(function (u) { return u.id === resetTarget.id; });
-        if (idx > -1) {
-          users[idx].password = hashPw(pw);
-          saveUsers(users);
-          resetTarget.password = hashPw(pw);
-        }
-        loginUser(resetTarget, true);
+        var idx   = users.findIndex(function(u){ return u.id===resetTarget.id; });
+        if (idx > -1) { users[idx].password = hashPw(pw); saveUsers(users); }
+        resetTarget.password = hashPw(pw);
+        saveUser(resetTarget);
         clearInterval(otpTimer);
-
-        [1,2,3].forEach(function (i) {
-          document.getElementById("forgotStep" + i).style.display = "none";
-        });
+        [1,2,3].forEach(function(i){ document.getElementById("fStep"+i).style.display="none"; });
         document.getElementById("forgotSuccess").classList.add("show");
-        if (typeof showToast === "function") showToast("✅ Password reset successful!", "success");
-        setTimeout(function () { window.location.href = redirectTo; }, 1800);
+        showToast("✅ Password reset successful!", "success");
+        setTimeout(function(){ window.location.replace(redirectTo); }, 1800);
       }, 900);
     });
 
     /* Google (demo) */
-    document.getElementById("btnGoogleLogin").addEventListener("click", function () {
-      if (typeof showToast === "function") showToast("Google login coming soon! Use email/phone for now.", "error");
+    document.getElementById("btnGoogleLogin").addEventListener("click", function(){
+      showToast("Google login coming soon! Use email/phone for now.", "warning");
     });
 
-  })();
+  });
   </script>
 </body>
 </html>
-
