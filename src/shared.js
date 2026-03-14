@@ -109,7 +109,7 @@
             '→ Login to Continue' +
           '</a>' +
           '<p style="margin-top:14px;font-size:.82rem;color:var(--gray-400)">' +
-            "Don't have an account? <a href=\"signup.html\" style="color:var(--teal);font-weight:600">Register free</a>' +
+            "Don't have an account? <a href='signup.html' style='color:var(--teal);font-weight:600'>Register free</a>" +
           '</p>';
         // Replace main content with wall
         if (main.firstChild) {
