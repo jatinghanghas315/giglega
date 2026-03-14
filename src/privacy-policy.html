@@ -4,204 +4,1263 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Privacy Policy — GigLega</title>
-  <meta name="description" content="GigLega Privacy Policy — how we collect, use, and protect your data." />
+  <meta name="description" content="GigLega Privacy Policy — aapka data kaise collect, use aur protect kiya jaata hai. DPDP Act 2023 compliant." />
   <link rel="stylesheet" href="styles.css" />
-  <script defer src="shared.js"></script>
+  <script src="shared.js"></script>
   <style>
-    .legal-wrap{max-width:800px;margin:0 auto;padding:40px 16px 80px}
-    .legal-hero{background:linear-gradient(135deg,var(--teal) 0%,var(--primary) 100%);border-radius:var(--radius);padding:32px 28px;color:#fff;margin-bottom:32px}
-    .legal-hero h1{font-size:1.6rem;font-weight:800;margin-bottom:6px}
-    .legal-hero p{font-size:.88rem;opacity:.8}
-    .legal-card{background:var(--surface);border:1.5px solid var(--gray-200);border-radius:var(--radius);padding:28px;margin-bottom:20px;box-shadow:var(--shadow-sm)}
-    .legal-section-title{font-size:1rem;font-weight:800;color:var(--primary);margin-bottom:12px;display:flex;align-items:center;gap:8px}
-    .legal-body{font-size:.9rem;color:var(--gray-700);line-height:1.8}
-    .legal-body p{margin-bottom:12px}
-    .legal-body ul{padding-left:20px;margin-bottom:12px}
-    .legal-body ul li{margin-bottom:6px}
-    .legal-body strong{color:var(--text)}
-    .legal-toc{background:var(--gray-50);border:1px solid var(--gray-200);border-radius:var(--radius-sm);padding:16px 20px;margin-bottom:24px}
-    .legal-toc h4{font-size:.85rem;font-weight:700;color:var(--primary);margin-bottom:10px}
-    .legal-toc ol{padding-left:18px;font-size:.83rem;color:var(--teal);line-height:1.8}
-    .legal-toc ol li a{color:var(--teal);text-decoration:none}
-    .legal-toc ol li a:hover{text-decoration:underline}
-    .highlight-box{background:rgba(13,148,136,.08);border-left:4px solid var(--teal);border-radius:0 var(--radius-sm) var(--radius-sm) 0;padding:12px 16px;margin:14px 0;font-size:.85rem;color:var(--gray-700);line-height:1.6}
-    .data-table{width:100%;border-collapse:collapse;font-size:.85rem;margin:12px 0}
-    .data-table th{background:var(--gray-50);padding:10px 14px;text-align:left;font-weight:700;color:var(--primary);border-bottom:2px solid var(--gray-200)}
-    .data-table td{padding:10px 14px;border-bottom:1px solid var(--gray-100);color:var(--gray-700);vertical-align:top}
-    .data-table tr:last-child td{border-bottom:none}
-    [data-theme=dark] .legal-card{border-color:var(--gray-700)}
-    [data-theme=dark] .legal-toc{background:var(--gray-800);border-color:var(--gray-700)}
-    [data-theme=dark] .legal-body{color:var(--gray-300)}
-    [data-theme=dark] .legal-body strong{color:var(--gray-100)}
-    [data-theme=dark] .highlight-box{background:rgba(13,148,136,.1);color:var(--gray-300)}
-    [data-theme=dark] .data-table th{background:var(--gray-800);border-color:var(--gray-700)}
-    [data-theme=dark] .data-table td{border-color:var(--gray-700);color:var(--gray-300)}
+
+    /* ══════════════════════════════════
+       HERO
+    ══════════════════════════════════ */
+    .pp-hero {
+      background: linear-gradient(135deg, #0b2240 0%, var(--primary) 55%, #0d4f47 100%);
+      padding: 60px 20px 72px;
+      color: #fff;
+      position: relative; overflow: hidden;
+    }
+    .pp-hero::before {
+      content: "";
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse at 15% 60%, rgba(13,148,136,.22) 0%, transparent 55%),
+        radial-gradient(ellipse at 85% 20%, rgba(99,102,241,.1)  0%, transparent 50%);
+      pointer-events: none;
+    }
+    .pp-hero::after {
+      content: "";
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+      background-size: 54px 54px;
+      pointer-events: none;
+    }
+    .pp-hero-inner {
+      position: relative; z-index: 1;
+      max-width: 820px; margin: 0 auto;
+    }
+    .pp-eyebrow {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: rgba(255,255,255,.12);
+      border: 1px solid rgba(255,255,255,.2);
+      border-radius: var(--radius-full);
+      padding: 5px 16px;
+      font-size: .76rem; font-weight: 700; color: rgba(255,255,255,.9);
+      margin-bottom: 18px;
+    }
+    .pp-hero h1 {
+      font-size: clamp(1.7rem, 4vw, 2.8rem);
+      font-weight: 900; color: #fff;
+      line-height: 1.2; margin-bottom: 12px; letter-spacing: -.8px;
+    }
+    .pp-hero h1 span { color: #6ee7b7; }
+    .pp-hero-meta {
+      display: flex; gap: 20px; flex-wrap: wrap;
+      font-size: .82rem; color: rgba(255,255,255,.65);
+      margin-bottom: 22px;
+    }
+    .pp-hero-meta span { display: flex; align-items: center; gap: 6px; }
+    .pp-hero-chips {
+      display: flex; flex-wrap: wrap; gap: 10px;
+    }
+    .pp-chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(255,255,255,.1);
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: var(--radius-full);
+      padding: 5px 14px;
+      font-size: .76rem; font-weight: 600;
+      color: rgba(255,255,255,.88);
+    }
+
+    /* ══════════════════════════════════
+       LAYOUT
+    ══════════════════════════════════ */
+    .pp-body {
+      max-width: 1060px; margin: 0 auto;
+      padding: 44px 20px 80px;
+      display: grid;
+      grid-template-columns: 230px 1fr;
+      gap: 36px;
+      align-items: start;
+    }
+    @media(max-width:820px) { .pp-body { grid-template-columns: 1fr; } }
+
+    /* ══════════════════════════════════
+       SIDEBAR TOC
+    ══════════════════════════════════ */
+    .pp-toc {
+      position: sticky; top: 80px;
+    }
+    @media(max-width:820px) { .pp-toc { position: static; } }
+
+    .pp-toc-title {
+      font-size: .72rem; font-weight: 800;
+      text-transform: uppercase; letter-spacing: .6px;
+      color: var(--gray-400); margin-bottom: 12px; padding: 0 4px;
+    }
+    .pp-toc-item {
+      display: flex; align-items: center; gap: 8px;
+      padding: 9px 12px;
+      border-radius: var(--radius-sm);
+      font-size: .84rem; font-weight: 600;
+      color: var(--gray-500);
+      cursor: pointer; transition: var(--transition);
+      border: none; background: none;
+      width: 100%; text-align: left;
+      font-family: var(--font);
+      border-left: 2.5px solid transparent;
+    }
+    .pp-toc-item:hover  { color: var(--teal); background: rgba(13,148,136,.05); }
+    .pp-toc-item.active { color: var(--primary); font-weight: 800; border-left-color: var(--teal); background: rgba(13,148,136,.07); }
+    [data-theme=dark] .pp-toc-item { color: var(--gray-400); }
+    [data-theme=dark] .pp-toc-item:hover  { color: var(--teal); }
+    [data-theme=dark] .pp-toc-item.active { color: var(--teal); }
+
+    .pp-toc-divider { height: 1px; background: var(--gray-200); margin: 12px 0; }
+    [data-theme=dark] .pp-toc-divider { background: var(--gray-700); }
+
+    /* Download / Contact card */
+    .pp-toc-card {
+      margin-top: 20px;
+      background: linear-gradient(135deg, rgba(26,60,94,.05), rgba(13,148,136,.07));
+      border: 1.5px solid rgba(13,148,136,.14);
+      border-radius: var(--radius-sm);
+      padding: 16px;
+    }
+    .pp-toc-card h4 { font-size: .84rem; font-weight: 800; color: var(--primary); margin-bottom: 5px; }
+    .pp-toc-card p  { font-size: .74rem; color: var(--gray-500); margin-bottom: 12px; line-height: 1.55; }
+    .btn-pp-sm {
+      display: block; width: 100%; padding: 9px;
+      border-radius: var(--radius-sm);
+      font-weight: 700; font-size: .8rem; cursor: pointer;
+      font-family: var(--font); text-align: center;
+      text-decoration: none; transition: opacity .2s;
+      margin-bottom: 7px;
+    }
+    .btn-pp-primary {
+      background: linear-gradient(135deg, var(--primary), var(--teal));
+      color: #fff; border: none;
+    }
+    .btn-pp-primary:hover { opacity: .88; text-decoration: none; color: #fff; }
+    .btn-pp-outline {
+      background: transparent; color: var(--primary);
+      border: 1.5px solid var(--primary);
+    }
+    .btn-pp-outline:hover { background: rgba(26,60,94,.05); text-decoration: none; color: var(--primary); }
+
+    /* ══════════════════════════════════
+       MAIN CONTENT
+    ══════════════════════════════════ */
+    .pp-main {}
+
+    /* Summary cards (top) */
+    .pp-summary-grid {
+      display: grid;
+      grid-template-columns: repeat(3,1fr);
+      gap: 16px; margin-bottom: 36px;
+    }
+    @media(max-width:640px) { .pp-summary-grid { grid-template-columns: 1fr; } }
+
+    .pp-sum-card {
+      background: var(--surface);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+      padding: 18px 16px;
+      box-shadow: var(--shadow-sm);
+      position: relative; overflow: hidden;
+    }
+    .pp-sum-card::before {
+      content: ""; position: absolute;
+      top: 0; left: 0; right: 0; height: 3px;
+    }
+    .pp-sum-card.green::before  { background: linear-gradient(90deg, #059669, #34d399); }
+    .pp-sum-card.blue::before   { background: linear-gradient(90deg, var(--primary), var(--teal)); }
+    .pp-sum-card.purple::before { background: linear-gradient(90deg, #7c3aed, #a78bfa); }
+    [data-theme=dark] .pp-sum-card { border-color: var(--gray-700); }
+
+    .psc-icon  { font-size: 1.6rem; margin-bottom: 8px; line-height: 1; }
+    .psc-title { font-size: .88rem; font-weight: 800; color: var(--primary); margin-bottom: 4px; }
+    .psc-text  { font-size: .78rem; color: var(--gray-500); line-height: 1.55; }
+
+    /* Sections */
+    .pp-section {
+      scroll-margin-top: 90px;
+      margin-bottom: 48px;
+    }
+
+    .pp-section-header {
+      display: flex; align-items: center; gap: 14px;
+      margin-bottom: 20px; padding-bottom: 14px;
+      border-bottom: 1.5px solid var(--gray-200);
+    }
+    [data-theme=dark] .pp-section-header { border-color: var(--gray-700); }
+
+    .pp-sec-icon {
+      width: 44px; height: 44px; border-radius: 12px;
+      background: linear-gradient(135deg, rgba(26,60,94,.08), rgba(13,148,136,.1));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem; flex-shrink: 0;
+    }
+    .pp-sec-num   { font-size: .72rem; font-weight: 800; text-transform: uppercase; letter-spacing: .5px; color: var(--teal); margin-bottom: 2px; }
+    .pp-sec-title { font-size: 1.1rem; font-weight: 900; color: var(--primary); line-height: 1.2; }
+
+    /* Content typography */
+    .pp-prose {
+      font-size: .92rem; color: var(--gray-600);
+      line-height: 1.85;
+    }
+    [data-theme=dark] .pp-prose { color: var(--gray-400); }
+    .pp-prose p  { margin-bottom: 14px; }
+    .pp-prose h3 {
+      font-size: .98rem; font-weight: 800;
+      color: var(--primary); margin: 22px 0 8px;
+    }
+    .pp-prose h3:first-child { margin-top: 0; }
+    .pp-prose ul, .pp-prose ol {
+      padding-left: 22px; margin-bottom: 14px;
+    }
+    .pp-prose li { margin-bottom: 6px; line-height: 1.7; }
+    .pp-prose strong { color: var(--text); }
+    .pp-prose a { color: var(--teal); font-weight: 600; }
+    .pp-prose a:hover { text-decoration: underline; }
+
+    /* Info boxes */
+    .pp-box {
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      padding: 13px 16px; margin: 16px 0;
+      font-size: .88rem; line-height: 1.65;
+    }
+    .pp-box.teal   { background: rgba(13,148,136,.07);  border-left: 3px solid var(--teal); }
+    .pp-box.warn   { background: rgba(245,158,11,.07);  border-left: 3px solid #f59e0b; }
+    .pp-box.danger { background: rgba(239,68,68,.06);   border-left: 3px solid var(--danger); }
+    .pp-box.info   { background: rgba(99,102,241,.06);  border-left: 3px solid #6366f1; }
+
+    /* Table */
+    .pp-table {
+      width: 100%; border-collapse: collapse;
+      margin: 16px 0; font-size: .86rem;
+      border-radius: var(--radius-sm); overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+    .pp-table thead tr { background: linear-gradient(135deg, var(--primary), var(--teal)); color: #fff; }
+    .pp-table thead th { padding: 12px 16px; text-align: left; font-weight: 800; font-size: .82rem; }
+    .pp-table tbody tr { background: var(--surface); }
+    .pp-table tbody tr:nth-child(even) { background: var(--gray-50); }
+    [data-theme=dark] .pp-table tbody tr { background: var(--gray-800); }
+    [data-theme=dark] .pp-table tbody tr:nth-child(even) { background: var(--gray-900); }
+    .pp-table tbody tr:hover { background: rgba(13,148,136,.04); }
+    .pp-table td { padding: 11px 16px; border-bottom: 1px solid var(--gray-100); color: var(--gray-600); line-height: 1.55; }
+    [data-theme=dark] .pp-table td { border-color: var(--gray-700); color: var(--gray-400); }
+    .pp-table td:first-child { font-weight: 700; color: var(--text); }
+
+    /* Rights cards */
+    .rights-grid {
+      display: grid;
+      grid-template-columns: repeat(2,1fr);
+      gap: 14px; margin-top: 16px;
+    }
+    @media(max-width:560px) { .rights-grid { grid-template-columns: 1fr; } }
+
+    .right-card {
+      background: var(--surface);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+      padding: 16px;
+      display: flex; gap: 12px; align-items: flex-start;
+      transition: border-color .2s;
+    }
+    .right-card:hover { border-color: rgba(13,148,136,.3); }
+    [data-theme=dark] .right-card { border-color: var(--gray-700); background: var(--gray-800); }
+
+    .rc-icon {
+      width: 36px; height: 36px; border-radius: 10px;
+      background: linear-gradient(135deg, rgba(26,60,94,.07), rgba(13,148,136,.1));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; flex-shrink: 0;
+    }
+    .rc-title { font-size: .88rem; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+    .rc-desc  { font-size: .78rem; color: var(--gray-500); line-height: 1.5; }
+
+    /* Cookie table toggle */
+    .cookie-toggle-row {
+      display: flex; justify-content: space-between;
+      align-items: center; padding: 12px 16px;
+      background: var(--surface);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+      margin-bottom: 8px;
+      font-size: .86rem;
+      cursor: pointer;
+      transition: border-color .18s;
+    }
+    .cookie-toggle-row:hover { border-color: rgba(13,148,136,.3); }
+    [data-theme=dark] .cookie-toggle-row { border-color: var(--gray-700); background: var(--gray-800); }
+
+    .ct-name  { font-weight: 700; color: var(--text); }
+    .ct-desc  { font-size: .76rem; color: var(--gray-400); margin-top: 1px; }
+    .ct-right { display: flex; align-items: center; gap: 10px; }
+    .ct-status-badge {
+      font-size: .68rem; font-weight: 700;
+      padding: 3px 9px; border-radius: 6px;
+    }
+    .ct-status-badge.required { background: rgba(16,185,129,.1); color: #059669; }
+    .ct-status-badge.optional { background: rgba(245,158,11,.1);  color: #b45309; }
+
+    /* Toggle switch */
+    .mini-toggle {
+      width: 38px; height: 22px;
+      background: var(--gray-300);
+      border-radius: 11px;
+      position: relative; cursor: pointer;
+      border: none; padding: 0; transition: background .2s;
+      flex-shrink: 0;
+    }
+    .mini-toggle.on  { background: var(--teal); }
+    .mini-toggle.disabled { opacity: .55; cursor: not-allowed; }
+    .mini-knob {
+      position: absolute; top: 2px; left: 2px;
+      width: 18px; height: 18px; border-radius: 50%;
+      background: #fff;
+      transition: transform .2s;
+      box-shadow: 0 1px 4px rgba(0,0,0,.2);
+    }
+    .mini-toggle.on .mini-knob { transform: translateX(16px); }
+
+    /* Version history */
+    .version-list { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
+    .version-item {
+      display: flex; gap: 14px; align-items: flex-start;
+      padding: 14px 16px;
+      background: var(--surface);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+    }
+    [data-theme=dark] .version-item { border-color: var(--gray-700); background: var(--gray-800); }
+    .version-item.current { border-color: var(--teal); background: rgba(13,148,136,.04); }
+
+    .vi-version {
+      font-size: .76rem; font-weight: 800;
+      background: var(--gray-100); color: var(--gray-500);
+      padding: 3px 9px; border-radius: 6px;
+      white-space: nowrap; flex-shrink: 0; align-self: flex-start;
+    }
+    .version-item.current .vi-version { background: rgba(13,148,136,.12); color: var(--teal); }
+    .vi-date    { font-size: .74rem; color: var(--gray-400); margin-bottom: 4px; font-weight: 600; }
+    .vi-changes { font-size: .83rem; color: var(--gray-600); line-height: 1.55; }
+    [data-theme=dark] .vi-changes { color: var(--gray-400); }
+
+    /* Final CTA */
+    .pp-cta-card {
+      background: linear-gradient(135deg, #0b2240 0%, var(--primary) 55%, #0d4f47 100%);
+      border-radius: var(--radius);
+      padding: 40px 32px;
+      text-align: center; color: #fff;
+      position: relative; overflow: hidden;
+      margin-top: 52px;
+    }
+    .pp-cta-card::before {
+      content: "";
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+      background-size: 48px 48px; pointer-events: none;
+    }
+    .pp-cta-inner { position: relative; z-index: 1; max-width: 520px; margin: 0 auto; }
+    .pp-cta-card h3 { font-size: 1.4rem; font-weight: 900; color: #fff; margin-bottom: 8px; }
+    .pp-cta-card p  { font-size: .9rem; color: rgba(255,255,255,.75); margin-bottom: 24px; line-height: 1.65; }
+    .pp-cta-btns    { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .btn-pp-cta-primary {
+      padding: 12px 26px; border-radius: var(--radius-sm);
+      background: #fff; color: var(--primary);
+      font-weight: 800; font-size: .9rem;
+      border: none; cursor: pointer;
+      box-shadow: 0 6px 20px rgba(0,0,0,.18);
+      transition: transform .2s, box-shadow .2s;
+      text-decoration: none;
+      display: inline-flex; align-items: center; gap: 7px;
+    }
+    .btn-pp-cta-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(0,0,0,.24); text-decoration: none; color: var(--primary); }
+    .btn-pp-cta-outline {
+      padding: 11px 22px; border-radius: var(--radius-sm);
+      background: transparent; color: #fff;
+      font-weight: 700; font-size: .88rem;
+      border: 2px solid rgba(255,255,255,.4);
+      cursor: pointer; transition: all .2s; text-decoration: none;
+      display: inline-flex; align-items: center; gap: 7px;
+    }
+    .btn-pp-cta-outline:hover { background: rgba(255,255,255,.1); border-color: rgba(255,255,255,.8); text-decoration: none; color: #fff; }
+
+    /* Progress indicator */
+    .reading-progress {
+      position: fixed; top: 0; left: 0; right: 0;
+      height: 3px; background: var(--gray-200);
+      z-index: 999; pointer-events: none;
+    }
+    .reading-progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--teal));
+      width: 0%; transition: width .1s linear;
+    }
+
   </style>
 </head>
 <body>
+  <!-- Reading progress bar -->
+  <div class="reading-progress">
+    <div class="reading-progress-bar" id="readingBar"></div>
+  </div>
+
+  <div id="page-loader"></div>
   <div id="announce-bar"></div>
   <nav id="main-nav"></nav>
 
-  <main class="page-wrapper">
-    <div class="legal-wrap">
-      <nav id="breadcrumb" aria-label="breadcrumb"></nav>
+  <main>
 
-      <div class="legal-hero">
-        <h1>🔒 Privacy Policy</h1>
-        <p>Last updated: March 2026 &nbsp;|&nbsp; We take your privacy seriously.</p>
-      </div>
-
-      <div class="legal-toc">
-        <h4>📌 Table of Contents</h4>
-        <ol>
-          <li><a href="#intro">Introduction</a></li>
-          <li><a href="#collect">What We Collect</a></li>
-          <li><a href="#use">How We Use Your Data</a></li>
-          <li><a href="#storage">Data Storage</a></li>
-          <li><a href="#sharing">Data Sharing</a></li>
-          <li><a href="#rights">Your Rights</a></li>
-          <li><a href="#cookies">Cookies</a></li>
-          <li><a href="#children">Children's Privacy</a></li>
-          <li><a href="#contact">Contact Us</a></li>
-        </ol>
-      </div>
-
-      <div class="legal-card" id="intro">
-        <div class="legal-section-title">1. 👋 Introduction</div>
-        <div class="legal-body">
-          <p>GigLega ("we", "our", "us") is committed to protecting your personal information. This Privacy Policy explains how we collect, use, store, and protect data when you use the GigLega platform at <strong>giglega.vercel.app</strong>.</p>
-          <p>By using GigLega, you consent to the data practices described in this policy.</p>
-          <div class="highlight-box">🛡️ During Beta, all user data is stored locally in your browser (localStorage). No data is sent to external servers unless you explicitly interact with external services (e.g., WhatsApp).</div>
+    <!-- ══════════════════════════════════
+         HERO
+    ══════════════════════════════════ -->
+    <section class="pp-hero">
+      <div class="pp-hero-inner">
+        <div class="pp-eyebrow">🔒 Privacy Policy</div>
+        <h1>Aapka Data,<br/><span>Aapka Control</span></h1>
+        <div class="pp-hero-meta">
+          <span>📅 Last updated: March 14, 2026</span>
+          <span>📄 Version 1.1</span>
+          <span>🇮🇳 DPDP Act 2023 Compliant</span>
+        </div>
+        <div class="pp-hero-chips">
+          <span class="pp-chip">✅ No Data Selling</span>
+          <span class="pp-chip">🔐 End-to-End Encryption</span>
+          <span class="pp-chip">📤 Data Export On Request</span>
+          <span class="pp-chip">🗑️ Right To Delete</span>
+          <span class="pp-chip">🚫 No Ad Tracking</span>
         </div>
       </div>
+    </section>
 
-      <div class="legal-card" id="collect">
-        <div class="legal-section-title">2. 📋 What We Collect</div>
-        <div class="legal-body">
-          <p>We collect the following types of information:</p>
-          <table class="data-table">
-            <thead>
-              <tr><th>Data Type</th><th>Examples</th><th>Required?</th></tr>
-            </thead>
-            <tbody>
-              <tr><td><strong>Account Info</strong></td><td>Name, phone number, email, password (hashed)</td><td>Yes</td></tr>
-              <tr><td><strong>Profile Info</strong></td><td>Bio, skills, city, pincode, profile photo</td><td>Optional</td></tr>
-              <tr><td><strong>Gig Data</strong></td><td>Gig titles, descriptions, locations, pricing</td><td>When posting</td></tr>
-              <tr><td><strong>Chat Messages</strong></td><td>Text messages and images sent in gig chats</td><td>When using chat</td></tr>
-              <tr><td><strong>Location Data</strong></td><td>GPS coordinates (only when you click "Fetch Location")</td><td>Optional</td></tr>
-              <tr><td><strong>Usage Data</strong></td><td>Pages visited, actions taken (future analytics)</td><td>Automatic</td></tr>
-            </tbody>
-          </table>
+    <!-- ══════════════════════════════════
+         BODY
+    ══════════════════════════════════ -->
+    <div class="pp-body">
+
+      <!-- ── TOC SIDEBAR ── -->
+      <aside class="pp-toc">
+        <div class="pp-toc-title">Contents</div>
+        <button class="pp-toc-item active" data-sec="overview">📋 Overview</button>
+        <button class="pp-toc-item" data-sec="collect">📥 Data We Collect</button>
+        <button class="pp-toc-item" data-sec="use">🎯 How We Use It</button>
+        <button class="pp-toc-item" data-sec="share">🤝 Data Sharing</button>
+        <button class="pp-toc-item" data-sec="storage">🗄️ Storage & Security</button>
+        <button class="pp-toc-item" data-sec="cookies">🍪 Cookies</button>
+        <button class="pp-toc-item" data-sec="rights">⚖️ Your Rights</button>
+        <button class="pp-toc-item" data-sec="children">👶 Children's Privacy</button>
+        <button class="pp-toc-item" data-sec="changes">🔄 Policy Changes</button>
+        <button class="pp-toc-item" data-sec="contact">📩 Contact DPO</button>
+
+        <div class="pp-toc-divider"></div>
+
+        <div class="pp-toc-card">
+          <h4>📤 Data Request</h4>
+          <p>Apna data download karo ya delete request karo.</p>
+          <a href="mailto:privacy@giglega.in" class="btn-pp-sm btn-pp-primary">✉️ Email DPO</a>
+          <a href="contact.html" class="btn-pp-sm btn-pp-outline">💬 Contact Us</a>
         </div>
-      </div>
+      </aside>
 
-      <div class="legal-card" id="use">
-        <div class="legal-section-title">3. 🎯 How We Use Your Data</div>
-        <div class="legal-body">
-          <p>Your data is used to:</p>
-          <ul>
-            <li>Create and manage your GigLega account.</li>
-            <li>Match Workers with Posters based on location and category.</li>
-            <li>Facilitate communication between Posters and Workers.</li>
-            <li>Process and track gig payments and platform fees.</li>
-            <li>Improve platform features and fix bugs.</li>
-            <li>Send important platform notifications (no spam).</li>
-            <li>Ensure platform safety and prevent fraud.</li>
-          </ul>
-          <p>We do <strong>not</strong> sell your personal data to third parties. Ever.</p>
+      <!-- ── MAIN ── -->
+      <div class="pp-main">
+
+        <!-- Breadcrumb -->
+        <div id="breadcrumb" style="margin-bottom:24px"></div>
+
+        <!-- Summary cards -->
+        <div class="pp-summary-grid">
+          <div class="pp-sum-card green">
+            <div class="psc-icon">🚫</div>
+            <div class="psc-title">We Never Sell Your Data</div>
+            <div class="psc-text">Tumhari personal information kisi advertiser, broker ya third party ko kabhi sell nahi hoti.</div>
+          </div>
+          <div class="pp-sum-card blue">
+            <div class="psc-icon">🎯</div>
+            <div class="psc-title">Minimal Collection</div>
+            <div class="psc-text">Sirf wahi data collect hota hai jo platform ke liye genuinely zaroorat hai — kuch extra nahi.</div>
+          </div>
+          <div class="pp-sum-card purple">
+            <div class="psc-icon">⚖️</div>
+            <div class="psc-title">DPDP Act 2023</div>
+            <div class="psc-text">India ke Digital Personal Data Protection Act 2023 ke saath fully compliant hain hum.</div>
+          </div>
         </div>
-      </div>
 
-      <div class="legal-card" id="storage">
-        <div class="legal-section-title">4. 💾 Data Storage</div>
-        <div class="legal-body">
-          <p><strong>Current (Beta Phase):</strong> All data is stored in your browser's <code>localStorage</code>. This means:</p>
-          <ul>
-            <li>Data exists only on your device and browser.</li>
-            <li>Clearing your browser data will delete your GigLega data.</li>
-            <li>Data is not synced across devices.</li>
-          </ul>
-          <p><strong>Future (Post-Beta):</strong> Data will be migrated to <strong>Firebase (Google Cloud)</strong> servers with encryption at rest and in transit. Servers will be located in Mumbai, India (asia-south1 region) for compliance with Indian data laws.</p>
-          <div class="highlight-box">🔒 Profile photos are stored as base64 strings in localStorage. They are not uploaded to any server during Beta.</div>
+        <!-- ══ 1. OVERVIEW ══ -->
+        <section class="pp-section" id="sec-overview">
+          <div class="pp-section-header">
+            <div class="pp-sec-icon">📋</div>
+            <div>
+              <div class="pp-sec-num">Section 01</div>
+              <div class="pp-sec-title">Overview — Simple Language Mein</div>
+            </div>
+          </div>
+          <div class="pp-prose">
+            <p>
+              GigLega ("hum", "platform") ek online gig marketplace hai jo workers aur posters ko
+              connect karta hai — primarily Gurugram NCR aur surrounding areas mein. Yeh Privacy
+              Policy explain karta hai ki jab tum haara platform use karte ho toh hum kaunsa data
+              collect karte hain, kyun collect karte hain, aur usse kaise protect karte hain.
+            </p>
+            <div class="pp-box teal">
+              💡 <strong>TLDR Version:</strong> Hum sirf wahi data lete hain jo platform chalane
+              ke liye chahiye. Kabhi sell nahi karte. Aap kabhi bhi delete kar sakte ho.
+              Koi surprise nahi.
+            </div>
+            <h3>Yeh Policy Kab Apply Hoti Hai</h3>
+            <p>
+              Yeh policy apply hoti hai jab tum GigLega website (<strong>giglega.in</strong>),
+              mobile app (coming soon), ya kisi bhi associated service use karte ho. Third-party
+              websites ya services pe apply nahi hoti — unki apni policies hoti hain.
+            </p>
+            <h3>Data Controller</h3>
+            <p>
+              GigLega is operated by <strong>GigLega Technologies</strong>, Gurugram, Haryana,
+              India — 122001. Haara Data Protection Officer (DPO) se contact karo:
+              <a href="mailto:privacy@giglega.in">privacy@giglega.in</a>
+            </p>
+            <p>
+              By using GigLega, tum is policy ko accept karte ho. Agar agree nahi ho toh
+              platform use mat karo aur account delete kar sakte ho.
+            </p>
+          </div>
+        </section>
+
+        <!-- ══ 2. DATA WE COLLECT ══ -->
+        <section class="pp-section" id="sec-collect">
+          <div class="pp-section-header">
+            <div class="pp-sec-icon">📥</div>
+            <div>
+              <div class="pp-sec-num">Section 02</div>
+              <div class="pp-sec-title">Data We Collect</div>
+            </div>
+          </div>
+          <div class="pp-prose">
+            <p>
+              Hum teen tarike se data collect karte hain — jo tum dete ho, jo automatically
+              collect hota hai, aur jo third parties se aata hai.
+            </p>
+
+            <h3>A. Jo Tum Directly Dete Ho</h3>
+            <table class="pp-table">
+              <thead>
+                <tr>
+                  <th>Data Type</th>
+                  <th>Examples</th>
+                  <th>Required?</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>Account Info</td><td>Name, phone number, email address</td><td>✅ Required</td></tr>
+                <tr><td>Profile Details</td><td>Photo, bio, skills, location (city)</td><td>Optional</td></tr>
+                <tr><td>Gig Content</td><td>Gig titles, descriptions, budgets posted</td><td>For posters</td></tr>
+                <tr><td>Messages</td><td>In-app chat between workers & posters</td><td>Auto-saved</td></tr>
+                <tr><td>Payment Info</td><td>Bank account number, UPI ID, IFSC</td><td>For withdrawal</td></tr>
+                <tr><td>ID Verification</td><td>Phone OTP verification only (no Aadhaar stored)</td><td>✅ Required</td></tr>
+                <tr><td>Support Data</td><td>Contact forms, report submissions, emails to us</td><td>When submitted</td></tr>
+              </tbody>
+            </table>
+
+            <h3>B. Automatically Collected Data</h3>
+            <table class="pp-table">
+              <thead>
+                <tr>
+                  <th>Data Type</th>
+                  <th>What It Includes</th>
+                  <th>Purpose</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>Device Info</td><td>Browser type, OS, screen size</td><td>Compatibility</td></tr>
+                <tr><td>IP Address</td><td>General location (city level)</td><td>Security & fraud</td></tr>
+                <tr><td>Usage Data</td><td>Pages visited, clicks, time spent</td><td>Improvement</td></tr>
+                <tr><td>Gig Activity</td><td>Views, applications, completions</td><td>Analytics</td></tr>
+                <tr><td>Cookies</td><td>Session, preferences (see section 6)</td><td>Functionality</td></tr>
+              </tbody>
+            </table>
+
+            <h3>C. Third-Party Data</h3>
+            <p>Hum koi third-party social login (Google, Facebook) abhi use nahi karte. Future mein add hone pe policy update hogi. UPI/payment processors se sirf transaction confirmation milti hai — card details hamare paas nahi aate.</p>
+
+            <div class="pp-box warn">
+              ⚠️ <strong>Hum kabhi store nahi karte:</strong> Aadhaar number, PAN card details,
+              full bank account passwords, UPI PIN, ya any biometric data.
+            </div>
+          </div>
+        </section>
+
+        <!-- ══ 3. HOW WE USE IT ══ -->
+        <section class="pp-section" id="sec-use">
+          <div class="pp-section-header">
+            <div class="pp-sec-icon">🎯</div>
+            <div>
+              <div class="pp-sec-num">Section 03</div>
+              <div class="pp-sec-title">How We Use Your Data</div>
+            </div>
+          </div>
+          <div class="pp-prose">
+            <p>Haara data use sirf 6 clearly defined purposes ke liye hota hai:</p>
+
+            <table class="pp-table">
+              <thead>
+                <tr>
+                  <th>Purpose</th>
+                  <th>Examples</th>
+                  <th>Legal Basis (DPDP)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Platform Operation</td>
+                  <td>Account creation, gig matching, payments</td>
+                  <td>Contract performance</td>
+                </tr>
+                <tr>
+                  <td>Safety & Security</td>
+                  <td>Fraud detection, scam prevention, account verification</td>
+                  <td>Legitimate interest</td>
+                </tr>
+                <tr>
+                  <td>Communication</td>
+                  <td>Notifications, support replies, platform updates</td>
+                  <td>Consent / Contract</td>
+                </tr>
+                <tr>
+                  <td>Platform Improvement</td>
+                  <td>Analytics, bug fixes, feature development</td>
+                  <td>Legitimate interest</td>
+                </tr>
+                <tr>
+                  <td>Legal Compliance</td>
+                  <td>Tax records, law enforcement requests (with warrant)</td>
+                  <td>Legal obligation</td>
+                </tr>
+                <tr>
+                  <td>Dispute Resolution</td>
+                  <td>Chat logs review, payment dispute investigation</td>
+                  <td>Contract / Legal</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div class="pp-box info">
+              ℹ️ <strong>No Behavioral Advertising:</strong> Hum tumhara data targeted
+              advertising ke liye use nahi karte — platform pe koi third-party ad network
+              nahi hai abhi.
+            </div>
+
+            <h3>Automated Decision Making</h3>
+            <p>
+              Kuch automated systems hain — jaise spam detection, suspicious activity flagging
+              aur gig recommendations. Yeh systems completely automated decisions nahi lete —
+              significant actions (like bans) mein human review hoti hai.
+            </p>
+
+            <h3>Profiling</h3>
+            <p>
+              Hum basic activity profiling karte hain — jaise "frequently active worker" ya
+              "top poster" — sirf platform experience improve karne ke liye. Yeh profiles
+              third parties ko share nahi hoti.
+            </p>
+          </div>
+        </section>
+
+        <!-- ══ 4. DATA SHARING ══ -->
+        <section class="pp-section" id="sec-share">
+          <div class="pp-section-header">
+            <div class="pp-sec-icon">🤝</div>
+            <div>
+              <div class="pp-sec-num">Section 04</div>
+              <div class="pp-sec-title">Data Sharing — Kiske Saath, Kyun</div>
+            </div>
+          </div>
+          <div class="pp-prose">
+            <div class="pp-box danger">
+              🚫 <strong>Hum aapka data kabhi sell nahi karte</strong> — kisi bhi third party ko,
+              kisi bhi price pe, kisi bhi condition mein. Yeh non-negotiable hai.
+            </div>
+
+            <h3>1. Other Platform Users</h3>
+            <p>
+              Jab tum ek gig apply karte ho ya post karte ho, kuch information visible hoti hai
+              counterparty ko:
+            </p>
+            <ul>
+              <li>Name aur profile photo (public)</li>
+              <li>Rating aur reviews (public)</li>
+              <li>Skills aur bio (public)</li>
+              <li>City-level location (approximate only)</li>
+              <li>Phone/email — <strong>sirf tab</strong> jab tum manually share karo</li>
+            </ul>
+
+            <h3>2. Service Providers (Data Processors)</h3>
+            <p>
+              Kuch trusted vendors hain jo haari behalf pe kaam karte hain. Inhe sirf
+              minimum required data milta hai aur yeh Data Processing Agreements ke under hain:
+            </p>
+            <table class="pp-table">
+              <thead>
+                <tr><th>Provider Type</th><th>What They Access</th><th>Why</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Payment Processor</td><td>Transaction amount, bank/UPI details</td><td>Payment execution</td></tr>
+                <tr><td>Cloud Hosting</td><td>Encrypted database storage</td><td>Infrastructure</td></tr>
+                <tr><td>Email/SMS Provider</td><td>Phone/email for OTP & notifications</td><td>Communication</td></tr>
+                <tr><td>Analytics (Internal)</td><td>Anonymised usage patterns only</td><td>Improvement</td></tr>
+              </tbody>
+            </table>
+
+            <h3>3. Legal Requirements</h3>
+            <p>
+              Hum data disclose kar sakte hain agar:
+            </p>
+            <ul>
+              <li>Court order ya valid government request ho (with proper legal process)</li>
+              <li>Platform security ya safety ke liye genuinely zaroorat ho</li>
+              <li>Fraud ya criminal activity investigate karna ho</li>
+            </ul>
+            <p>
+              Hum user ko notify karne ki koshish karte hain jab legally possible ho — before
+              or after disclosure.
+            </p>
+
+            <h3>4. Business Transfer</h3>
+            <p>
+              Agar GigLega ka acquisition ya merger hota hai, user data transfer ho sakta hai.
+              Is case mein users ko prior notice diya jaayega aur account delete karne ka option
+              milega.
+            </p>
+          </div>
+        </section>
+
+        <!-- ══ 5. STORAGE & SECURITY ══ -->
+        <section class="pp-section" id="sec-storage">
+          <div class="pp-section-header">
+            <div class="pp-sec-icon">🗄️</div>
+            <div>
+              <div class="pp-sec-num">Section 05</div>
+              <div class="pp-sec-title">Storage, Retention & Security</div>
+            </div>
+          </div>
+          <div class="pp-prose">
+            <h3>Where Data Is Stored</h3>
+            <p>
+              Haara data primarily India mein store hota hai — Indian cloud servers pe.
+              Koi cross-border data transfer (outside India) nahi hoti — future mein hogi
+              toh policy update hogi aur consent liya jaayega.
+            </p>
+
+            <h3>Retention Period</h3>
+            <table class="pp-table">
+              <thead>
+                <tr><th>Data Type</th><th>Retention Period</th><th>Reason</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Account Data</td><td>Account active + 30 days post-deletion</td><td>Grace period</td></tr>
+                <tr><td>Transaction Records</td><td>7 years</td><td>Indian tax law</td></tr>
+                <tr><td>Chat Logs</td><td>90 days post-gig completion</td><td>Dispute resolution</td></tr>
+                <tr><td>Safety Reports</td><td>2 years</td><td>Legal compliance</td></tr>
+                <tr><td>Anonymised Analytics</td><td>Indefinite (no PII)</td><td>Platform improvement</td></tr>
+                <tr><td>Marketing Preferences</td><td>Until you opt out</td><td>Consent based</td></tr>
+              </tbody>
+            </table>
+
+            <h3>Security Measures</h3>
+            <ul>
+              <li>🔐 HTTPS/TLS encryption — sab data in-transit</li>
+              <li>🔒 AES-256 encryption — data at rest</li>
+              <li>🔑 Bcrypt password hashing — plain text kabhi stored nahi</li>
+              <li>📱 OTP-based 2FA — login verification</li>
+              <li>🚨 Intrusion detection — suspicious activity monitoring</li>
+              <li>🔄 Regular security audits — quarterly</li>
+              <li>👥 Access controls — minimum necessary access per team member</li>
+            </ul>
+
+            <div class="pp-box warn">
+              ⚠️ <strong>Data Breach Protocol:</strong> Agar koi significant breach hota hai,
+              hum affected users ko 72 ghante ke andar notify karenge aur appropriate
+              authorities ko report karenge — DPDP Act Section 8 ke under.
+            </div>
+
+            <h3>Your Responsibility</h3>
+            <p>
+              Account security partly tumhari bhi zimmedari hai — strong password rakho,
+              OTP kisi se share mat karo, aur suspicious activity turant report karo.
+            </p>
+          </div>
+        </section>
+
+        <!-- ══ 6. COOKIES ══ -->
+        <section class="pp-section" id="sec-cookies">
+          <div class="pp-section-header">
+            <div class="pp-sec-icon">🍪</div>
+            <div>
+              <div class="pp-sec-num">Section 06</div>
+              <div class="pp-sec-title">Cookies & Local Storage</div>
+            </div>
+          </div>
+          <div class="pp-prose">
+            <p>
+              GigLega cookies aur localStorage use karta hai platform ko properly chalane
+              ke liye. Yahan hai breakdown:
+            </p>
+
+            <!-- Cookie toggles -->
+            <div style="margin: 20px 0">
+
+              <div class="cookie-toggle-row">
+                <div>
+                  <div class="ct-name">Essential Cookies</div>
+                  <div class="ct-desc">Login session, security tokens, language preference</div>
+                </div>
+                <div class="ct-right">
+                  <span class="ct-status-badge required">Required</span>
+                  <button class="mini-toggle on disabled" disabled title="Cannot disable essential cookies">
+                    <div class="mini-knob"></div>
+                  </button>
+                </div>
+              </div>
+
+              <div class="cookie-toggle-row">
+                <div>
+                  <div class="ct-name">Functional Cookies</div>
+                  <div class="ct-desc">Dark mode preference, filter settings, recent searches</div>
+                </div>
+                <div class="ct-right">
+                  <span class="ct-status-badge required">Required</span>
+                  <button class="mini-toggle on disabled" disabled title="Required for platform functionality">
+                    <div class="mini-knob"></div>
+                  </button>
+                </div>
+              </div>
+
+              <div class="cookie-toggle-row" id="analyticsCookieRow">
+                <div>
+                  <div class="ct-name">Analytics Cookies</div>
+                  <div class="ct-desc">Anonymised usage patterns — page views, click patterns</div>
+                </div>
+                <div class="ct-right">
+                  <span class="ct-status-badge optional">Optional</span>
+                  <button class="mini-toggle on" id="analyticsToggle" title="Click to toggle">
+                    <div class="mini-knob"></div>
+                  </button>
+                </div>
+              </div>
+
+              <div class="cookie-toggle-row" id="marketingCookieRow">
+                <div>
+                  <div class="ct-name">Marketing Cookies</div>
+                  <div class="ct-desc">Platform announcements, feature updates (no third-party ads)</div>
+                </div>
+                <div class="ct-right">
+                  <span class="ct-status-badge optional">Optional</span>
+                  <button class="mini-toggle on" id="marketingToggle" title="Click to toggle">
+                    <div class="mini-knob"></div>
+                  </button>
+                </div>
+              </div>
+
+            </div>
+
+            <div style="margin-top:14px;font-size:.8rem;color:var(--gray-400);font-style:italic">
+              Preferences automatically saved hoti hain. Browser cookies clear karne pe reset ho jaati hain.
+            </div>
+
+            <h3>localStorage Use</h3>
+            <p>
+              GigLega platform data (gigs, user session, preferences) browser localStorage mein
+              store karta hai for performance. Yeh data sirf tumhare device pe hota hai — haare
+              servers pe nahi jaata. Browser localStorage clear karne pe yeh data delete ho jaata hai.
+            </p>
+
+            <h3>Third-Party Cookies</h3>
+            <p>
+              Currently GigLega pe koi third-party ad cookies nahi hain. Payment processor
+              (jab integrated hoga) apni security cookies set kar sakta hai — unki privacy
+              policy apply hogi.
+            </p>
+          </div>
+        </section>
+
+        <!-- ══ 7. YOUR RIGHTS ══ -->
+        <section class="pp-section" id="sec-rights">
+          <div class="pp-section-header">
+            <div class="pp-sec-icon">⚖️</div>
+            <div>
+              <div class="pp-sec-num">Section 07</div>
+              <div class="pp-sec-title">Your Rights — DPDP Act 2023</div>
+            </div>
+          </div>
+          <div class="pp-prose">
+            <p>
+              India ke Digital Personal Data Protection Act 2023 ke under, aapke paas
+              following rights hain. Hum inhe seriously lete hain.
+            </p>
+
+            <div class="rights-grid">
+              <div class="right-card">
+                <div class="rc-icon">👁️</div>
+                <div>
+                  <div class="rc-title">Right to Access</div>
+                  <div class="rc-desc">Jaano ki hum kaunsa data rakhte hain tumhare baare mein. Data summary request karo anytime.</div>
+                </div>
+              </div>
+              <div class="right-card">
+                <div class="rc-icon">✏️</div>
+                <div>
+                  <div class="rc-title">Right to Correct</div>
+                  <div class="rc-desc">Galat ya outdated information correct karo — profile settings se ya DPO ko email karo.</div>
+                </div>
+              </div>
+              <div class="right-card">
+                <div class="rc-icon">🗑️</div>
+                <div>
+                  <div class="rc-title">Right to Erasure</div>
+                  <div class="rc-desc">Apna account aur data permanently delete karo. 30 din mein processed — legally required records exclude karke.</div>
+                </div>
+              </div>
+              <div class="right-card">
+                <div class="rc-icon">📤</div>
+                <div>
+                  <div class="rc-title">Right to Data Portability</div>
+                  <div class="rc-desc">Apna data machine-readable format (JSON/CSV) mein download karo. Settings → Privacy → Download My Data.</div>
+                </div>
+              </div>
+              <div class="right-card">
+                <div class="rc-icon">🚫</div>
+                <div>
+                  <div class="rc-title">Right to Object</div>
+                  <div class="rc-desc">Data processing ke kuch uses ke against object karo — jaise analytics ya profiling. DPO ko email karo.</div>
+                </div>
+              </div>
+              <div class="right-card">
+                <div class="rc-icon">📋</div>
+                <div>
+                  <div class="rc-title">Right to Withdraw Consent</div>
+                  <div class="rc-desc">Kisi bhi consent (jaise marketing notifications) ko anytime withdraw karo — settings ya email se.</div>
+                </div>
+              </div>
+              <div class="right-card">
+                <div class="rc-icon">😤</div>
+                <div>
+                  <div class="rc-title">Right to Grievance</div>
+                  <div class="rc-desc">Hamara response satisfactory nahi laga? DPDP Board of India ko complaint kar sakte ho.</div>
+                </div>
+              </div>
+              <div class="right-card">
+                <div class="rc-icon">🔒</div>
+                <div>
+                  <div class="rc-title">Right to Restriction</div>
+                  <div class="rc-desc">Processing restrict karo specific situations mein — jab accuracy dispute ho ya objection pending ho.</div>
+                </div>
+              </div>
+            </div>
+
+            <h3>Rights Exercise Kaise Karein</h3>
+            <p>
+              Zyaatar rights Settings page se directly exercise kar sakte ho. Specific requests
+              ke liye:
+            </p>
+            <ul>
+              <li>📧 Email: <a href="mailto:privacy@giglega.in">privacy@giglega.in</a></li>
+              <li>📝 Subject line: "Privacy Rights Request — [Your Request Type]"</li>
+              <li>⏱️ Response time: <strong>30 days</strong> (complex cases mein 60 days)</li>
+              <li>🆓 Free of charge — unless requests are clearly unfounded or excessive</li>
+            </ul>
+
+            <div class="pp-box teal">
+              💡 <strong>Identity Verification:</strong> Rights requests process karne ke liye
+              hum tumhari identity verify karenge — registered phone/email se OTP. Impersonation
+              prevent karne ke liye.
+            </div>
+
+            <h3>Grievance Escalation</h3>
+            <p>
+              Agar haara response 30 din mein nahi aaya ya satisfactory nahi laga, tum
+              <strong>Data Protection Board of India</strong> ke paas complaint kar sakte ho —
+              once operational under DPDP Act 2023.
+            </p>
+          </div>
+        </section>
+
+        <!-- ══ 8. CHILDREN ══ -->
+        <section class="pp-section" id="sec-children">
+          <div class="pp-section-header">
+            <div class="pp-sec-icon">👶</div>
+            <div>
+              <div class="pp-sec-num">Section 08</div>
+              <div class="pp-sec-title">Children's Privacy</div>
+            </div>
+          </div>
+          <div class="pp-prose">
+            <div class="pp-box danger">
+              🚫 <strong>GigLega strictly 18 years aur usse upar ke users ke liye hai.</strong>
+              18 se kam age ke kisi bhi person ka account allowed nahi hai.
+            </div>
+            <p>
+              DPDP Act 2023 Section 9 ke under, hum 18 se kam age ke users ka data knowingly
+              collect nahi karte. Agar hamare paas yeh believe karne ka reason ho ki koi minor
+              ne account create kiya hai toh hum:
+            </p>
+            <ul>
+              <li>Account turant suspend karenge</li>
+              <li>Collected data delete karenge</li>
+              <li>Parent/guardian ko (agar identifiable ho) notify karenge</li>
+            </ul>
+            <p>
+              Agar tumhe kisi minor ka account dikhta hai platform pe, turant report karo
+              <a href="mailto:safety@giglega.in">safety@giglega.in</a> pe.
+            </p>
+          </div>
+        </section>
+
+        <!-- ══ 9. POLICY CHANGES ══ -->
+        <section class="pp-section" id="sec-changes">
+          <div class="pp-section-header">
+            <div class="pp-sec-icon">🔄</div>
+            <div>
+              <div class="pp-sec-num">Section 09</div>
+              <div class="pp-sec-title">Policy Changes & Version History</div>
+            </div>
+          </div>
+          <div class="pp-prose">
+            <h3>How We Notify You</h3>
+            <p>
+              Material changes hone pe hum notify karenge:
+            </p>
+            <ul>
+              <li>📧 Email/SMS to registered users — at least 30 days before</li>
+              <li>🔔 In-app banner/notification</li>
+              <li>📢 Homepage announcement</li>
+            </ul>
+            <p>
+              Minor changes (clarity improvements, typo fixes) ke liye sirf "Last Updated"
+              date update hogi without advance notice.
+            </p>
+
+            <div class="pp-box teal">
+              💡 <strong>Your Acceptance:</strong> Policy update ke baad bhi platform use
+              jaari rakhna acceptance maana jaayega. Agar agree nahi ho toh account delete
+              karne ka option hamesha available hai.
+            </div>
+
+            <h3>Version History</h3>
+            <div class="version-list">
+              <div class="version-item current">
+                <div class="vi-version">v1.1</div>
+                <div>
+                  <div class="vi-date">March 14, 2026 — Current Version</div>
+                  <div class="vi-changes">
+                    Cookie preference toggles added. Children's privacy section expanded.
+                    DPDP Board grievance escalation path added. Data breach notification
+                    timeline clarified (72 hours).
+                  </div>
+                </div>
+              </div>
+              <div class="version-item">
+                <div class="vi-version">v1.0</div>
+                <div>
+                  <div class="vi-date">January 1, 2026 — Initial Release</div>
+                  <div class="vi-changes">
+                    First public Privacy Policy for GigLega platform launch.
+                    Core data collection, usage, sharing aur user rights sections established.
+                    DPDP Act 2023 compliant from day one.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ══ 10. CONTACT DPO ══ -->
+        <section class="pp-section" id="sec-contact">
+          <div class="pp-section-header">
+            <div class="pp-sec-icon">📩</div>
+            <div>
+              <div class="pp-sec-num">Section 10</div>
+              <div class="pp-sec-title">Contact Our Data Protection Officer</div>
+            </div>
+          </div>
+          <div class="pp-prose">
+            <p>
+              Privacy ke baare mein koi bhi sawaal, concern, ya rights request ke liye
+              haare DPO se contact karo:
+            </p>
+
+            <table class="pp-table">
+              <thead>
+                <tr><th>Contact Method</th><th>Details</th><th>Response Time</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>📧 Privacy Email</td>
+                  <td><a href="mailto:privacy@giglega.in">privacy@giglega.in</a></td>
+                  <td>Within 7 days</td>
+                </tr>
+                <tr>
+                  <td>🚨 Safety/Breach</td>
+                  <td><a href="mailto:safety@giglega.in">safety@giglega.in</a></td>
+                  <td>Within 24 hours</td>
+                </tr>
+                <tr>
+                  <td>📮 Postal Address</td>
+                  <td>GigLega Technologies, Gurugram, Haryana — 122001</td>
+                  <td>Within 30 days</td>
+                </tr>
+                <tr>
+                  <td>💬 General Contact</td>
+                  <td><a href="contact.html">Contact Form</a></td>
+                  <td>4–6 hours</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <h3>What to Include in Your Request</h3>
+            <ul>
+              <li>Request type (access / correction / deletion / portability / objection)</li>
+              <li>Registered email ya phone number (for verification)</li>
+              <li>Specific data or processing activity you're referring to</li>
+              <li>Any relevant context or timeline</li>
+            </ul>
+
+            <div class="pp-box info">
+              ℹ️ <strong>Note:</strong> Hum English aur Hindi dono mein respond kar sakte hain.
+              Apni preferred language mention karo request mein.
+            </div>
+          </div>
+        </section>
+
+        <!-- Final CTA -->
+        <div class="pp-cta-card">
+          <div class="pp-cta-inner">
+            <h3>🔒 Aapki Privacy Haari Priority Hai</h3>
+            <p>
+              Koi sawaal hai? DPO se directly baat karo ya contact form use karo.
+              Hum 7 days ke andar respond karte hain.
+            </p>
+            <div class="pp-cta-btns">
+              <a href="mailto:privacy@giglega.in" class="btn-pp-cta-primary">📧 Email DPO</a>
+              <a href="contact.html" class="btn-pp-cta-outline">💬 Contact Us</a>
+            </div>
+          </div>
         </div>
-      </div>
 
-      <div class="legal-card" id="sharing">
-        <div class="legal-section-title">5. 🤝 Data Sharing</div>
-        <div class="legal-body">
-          <p>We share limited data only in these situations:</p>
-          <ul>
-            <li><strong>Between users:</strong> Your name, phone number, and gig details are shared with the other party after a gig is accepted.</li>
-            <li><strong>WhatsApp:</strong> If you click "Message on WhatsApp", you are redirected to WhatsApp with a pre-filled message. WhatsApp's own privacy policy applies.</li>
-            <li><strong>OpenStreetMap (Nominatim):</strong> If you use "Fetch Location", your GPS coordinates are sent to OpenStreetMap's Nominatim API for reverse-geocoding. No account data is shared.</li>
-            <li><strong>Legal requirements:</strong> We may disclose data if required by Indian law or court order.</li>
-          </ul>
-          <p>We do <strong>not</strong> share data with advertisers, data brokers, or any third-party marketing services.</p>
-        </div>
       </div>
-
-      <div class="legal-card" id="rights">
-        <div class="legal-section-title">6. ✊ Your Rights</div>
-        <div class="legal-body">
-          <p>You have the following rights over your data:</p>
-          <ul>
-            <li><strong>Access:</strong> View all your data in your Profile page.</li>
-            <li><strong>Edit:</strong> Update your information at any time from Profile settings.</li>
-            <li><strong>Delete:</strong> Delete your account from Profile → Danger Zone → Delete Account.</li>
-            <li><strong>Export:</strong> Contact us to request a copy of your data.</li>
-            <li><strong>Withdraw Consent:</strong> Stop using the platform and delete your account at any time.</li>
-          </ul>
-          <p>For any data-related requests, email us at <strong>Giglega.official@gmail.com</strong>. We will respond within 7 business days.</p>
-        </div>
-      </div>
-
-      <div class="legal-card" id="cookies">
-        <div class="legal-section-title">7. 🍪 Cookies & Local Storage</div>
-        <div class="legal-body">
-          <p>GigLega currently uses <strong>browser localStorage</strong> (not cookies) to store:</p>
-          <ul>
-            <li>Your login session data.</li>
-            <li>Your profile and preferences.</li>
-            <li>Gig listings and chat history.</li>
-            <li>Dark mode preference.</li>
-          </ul>
-          <p>No third-party tracking cookies are used on GigLega during Beta. Post-launch, analytics tools (e.g., Firebase Analytics) may be added with appropriate consent mechanisms.</p>
-        </div>
-      </div>
-
-      <div class="legal-card" id="children">
-        <div class="legal-section-title">8. 👶 Children's Privacy</div>
-        <div class="legal-body">
-          <p>GigLega is intended for users <strong>18 years of age and older</strong>. We do not knowingly collect data from minors.</p>
-          <p>If you believe a minor has registered on our platform, please contact us immediately at <strong>Giglega.official@gmail.com</strong> and we will remove the account.</p>
-        </div>
-      </div>
-
-      <div class="legal-card" id="contact">
-        <div class="legal-section-title">9. 📞 Contact Us</div>
-        <div class="legal-body">
-          <p>For privacy-related questions or data requests, contact our team:</p>
-          <ul>
-            <li>📧 Email: <strong>Giglega.official@gmail.com</strong></li>
-            <li>📱 WhatsApp/Call: <strong>+91 9319635257</strong></li>
-            <li>📍 Address: H.no 82 Om Vihar Phase 1, Palam Vihar Extn, Opp Sec 23A HUDA Park, Gurugram — 122017, Haryana, India</li>
-            <li>⏰ Response time: Within 7 business days</li>
-          </ul>
-        </div>
-      </div>
-
     </div>
+
   </main>
 
   <footer id="main-footer"></footer>
   <div id="toast-container"></div>
+
   <script>
+  document.addEventListener("DOMContentLoaded", function () {
+
+    var COOKIE_KEY = "gl_cookie_prefs";
+
+    /* ── Breadcrumb ── */
     if (typeof buildBreadcrumb === "function") {
       buildBreadcrumb("breadcrumb", [
         { label: "Home", href: "index.html" },
         { label: "Privacy Policy" }
       ]);
     }
+
+    /* ══ Reading progress bar ══ */
+    window.addEventListener("scroll", function () {
+      var scrollTop  = window.scrollY || document.documentElement.scrollTop;
+      var docHeight  = document.documentElement.scrollHeight - window.innerHeight;
+      var progress   = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+      var bar = document.getElementById("readingBar");
+      if (bar) bar.style.width = Math.min(progress, 100) + "%";
+    });
+
+    /* ══ TOC active state on scroll ══ */
+    var sections = document.querySelectorAll(".pp-section[id]");
+    var tocItems = document.querySelectorAll(".pp-toc-item[data-sec]");
+
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          var id = entry.target.id.replace("sec-", "");
+          tocItems.forEach(function (item) {
+            item.classList.toggle("active", item.dataset.sec === id);
+          });
+        }
+      });
+    }, { rootMargin: "-30% 0px -60% 0px" });
+
+    sections.forEach(function (sec) { observer.observe(sec); });
+
+    /* ── TOC click scroll ── */
+    tocItems.forEach(function (item) {
+      item.addEventListener("click", function () {
+        var target = document.getElementById("sec-" + item.dataset.sec);
+        if (target) target.scrollIntoView({ behavior: "smooth" });
+      });
+    });
+
+    /* ══ Cookie toggles ══ */
+    var prefs = {};
+    try { prefs = JSON.parse(localStorage.getItem(COOKIE_KEY) || "{}"); } catch (e) {}
+
+    function initToggle(btnId, prefKey) {
+      var btn = document.getElementById(btnId);
+      if (!btn) return;
+      var isOn = prefs[prefKey] !== false; // default true
+      btn.classList.toggle("on", isOn);
+      btn.addEventListener("click", function () {
+        isOn = !isOn;
+        btn.classList.toggle("on", isOn);
+        prefs[prefKey] = isOn;
+        try { localStorage.setItem(COOKIE_KEY, JSON.stringify(prefs)); } catch (e) {}
+        showToast(
+          (isOn ? "✅ " : "❌ ") +
+          (prefKey === "analytics" ? "Analytics" : "Marketing") +
+          " cookies " + (isOn ? "enabled" : "disabled") + ".",
+          isOn ? "success" : "info"
+        );
+      });
+    }
+
+    initToggle("analyticsToggle",  "analytics");
+    initToggle("marketingToggle",  "marketing");
+
+    /* ══ URL hash — jump to section ══ */
+    function handleHash() {
+      var hash = window.location.hash;
+      if (!hash) return;
+      var sectionMap = {
+        "#payment":  "sec-collect",
+        "#post":     "sec-collect",
+        "#fee":      "sec-collect",
+        "#safety":   "sec-rights",
+        "#data":     "sec-collect",
+        "#cookies":  "sec-cookies",
+        "#rights":   "sec-rights",
+        "#delete":   "sec-rights",
+        "#contact":  "sec-contact"
+      };
+      var targetId = sectionMap[hash] || ("sec-" + hash.replace("#", ""));
+      var target   = document.getElementById(targetId);
+      if (target) {
+        setTimeout(function () {
+          target.scrollIntoView({ behavior: "smooth" });
+        }, 300);
+      }
+    }
+    handleHash();
+    window.addEventListener("hashchange", handleHash);
+
+  });
   </script>
 </body>
 </html>
