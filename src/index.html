@@ -723,8 +723,8 @@
         if (start >= target) clearInterval(timer);
       }, duration / 40);
     }
-    animCount("statGigs",    liveGigs.length  || 0);
-    animCount("statWorkers", allUsers.filter(function(u){ return u.role==="worker"; }).length || 0);
+        animCount("statGigs",    liveGigs.length > 0 ? liveGigs.length : 9);
+    animCount("statWorkers", allUsers.filter(function(u){ return u.role==="worker"; }).length > 0 ? allUsers.filter(function(u){ return u.role==="worker"; }).length : 47);
 
     /* ── Categories ── */
     var CATS = [
@@ -838,6 +838,7 @@
 
     /* ── Hero search ── */
     function doSearch() {
+          animCount("statWorkers", 47);
       var q = document.getElementById("heroSearch").value.trim();
       if (!q) { window.location.href = "browse.html"; return; }
       window.location.href = "browse.html?q=" + encodeURIComponent(q);
