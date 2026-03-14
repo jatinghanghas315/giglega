@@ -585,6 +585,7 @@
           avatar:    null,
           bio:       "",
           workType:  ""
+                  role:        "worker",
         };
         var users = getUsers();
         users.push(newUser);
@@ -595,7 +596,7 @@
         document.getElementById("authTabs").style.display         = "none";
         document.getElementById("registerSuccess").classList.add("show");
         showToast("🎉 Welcome to GigLega, " + name + "!", "success");
-        setTimeout(function(){ window.location.replace(redirectTo); }, 1800);
+                setTimeout(function(){ window.location.replace("dashboard-worker.html"); }, 1800);
       }, 1000);
     }
 
