@@ -429,7 +429,7 @@ if (!user) {
 
     /* ── Storage sync ── */
     window.addEventListener("storage", function (e) {
-      if (e.key === GIG_KEY) render();
+      if (e.key === GIG_KEY) render(); if (e.key === USER_KEY && e.newValue) { try { user = JSON.parse(e.newValue); } catch(ex){} if(user&&user.id){var h=new Date().getHours();var g2=h<12?'Good morning':h<17?'Good afternoon':'Good evening';var el=document.getElementById('greetingText');if(el)el.textContent=g2+', '+(user.name||'Worker')+'! 👋';render();} }
     });
 
     render();
