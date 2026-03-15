@@ -7,7 +7,7 @@
     "build": "parcel build src/*.html",
     "lint": "eslint src --ext .js,.mjs"
   },
-  "devDependencies": {
+  "dependencies": {
     "parcel": "^2.8.3"
   }
 }
