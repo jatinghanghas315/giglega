@@ -1,3 +1,24 @@
+/* CACHE BUSTER v1.5.0 — auto-clears old SW on first load */
+(function(){
+  var APP_BUILD = '1.5.0';
+  var stored = localStorage.getItem('gl_app_build');
+  if (stored !== APP_BUILD) {
+    localStorage.setItem('gl_app_build', APP_BUILD);
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(function(regs) {
+        if (regs.length) {
+          Promise.all(regs.map(function(r){return r.unregister();})).then(function(){
+            caches.keys().then(function(keys){
+              Promise.all(keys.map(function(k){return caches.delete(k);})).then(function(){
+                window.location.reload();
+              });
+            });
+          });
+        }
+      });
+    }
+  }
+})();
 /* ============================================================
    GigLega v1.1 — shared.js
    Foundation: config, auth, navbar, footer, toast, breadcrumb
