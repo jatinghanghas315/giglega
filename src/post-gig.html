@@ -1737,14 +1737,41 @@
       btn.disabled = true;
       btn.innerHTML = '⏳ Posting…';
 
-      // Simulate API call
-      setTimeout(() => {
-        const gigId = 'GL-2026-' + String(Math.floor(Math.random() * 9000) + 1000);
-        document.getElementById('modalGigId').textContent = `📋 Gig ID: ${gigId}`;
-        document.getElementById('successModal').classList.add('open');
-        btn.disabled = false;
-        btn.innerHTML = '🚀 Gig Post Karo — Free!';
-      }, 1200);
+      // ── Save gig to localStorage ──
+    const GIG_KEY = (typeof GL !== 'undefined' && GL.STORAGE_KEY_GIGS) ? GL.STORAGE_KEY_GIGS : 'gl_gigs';
+    let user = null;
+    try { user = JSON.parse(localStorage.getItem('gl_user') || 'null'); } catch(e){}
+    const gigId = 'GL-2026-' + String(Math.floor(Math.random() * 9000) + 1000);
+    const newGig = {
+      id: gigId,
+      posterId: user ? user.id : 'unknown',
+      title: document.getElementById('gigTitle').value.trim(),
+      category: selectedCategory,
+      description: document.getElementById('gigDesc').value.trim(),
+      location: document.getElementById('gigLocation').value.trim(),
+      area: document.getElementById('gigArea').value,
+      pincode: document.getElementById('gigPincode').value,
+      payType: selectedPayType,
+      pricePerHr: Number(document.getElementById('payMin').value) || 0,
+      payMax: Number(document.getElementById('payMax').value) || 0,
+      workers: Number(document.getElementById('workersCount').value) || 1,
+      date: document.getElementById('gigDate').value,
+      time: document.getElementById('gigTime').value,
+      duration: document.getElementById('gigDuration').value,
+      urgency: selectedUrgency,
+      workType: selectedWorkType,
+      skills: selectedSkills,
+      perks: selectedPerks,
+      status: 'open',
+      postedAt: new Date().toISOString(),
+    };
+    const allGigs = JSON.parse(localStorage.getItem(GIG_KEY) || '[]');
+    allGigs.unshift(newGig);
+    localStorage.setItem(GIG_KEY, JSON.stringify(allGigs));
+    document.getElementById('modalGigId').textContent = '📋 Gig ID: ' + gigId;
+    document.getElementById('successModal').classList.add('open');
+    btn.disabled = false;
+    btn.innerHTML = '🚀 Gig Post Karo — Free!';
     }
 
     /* ══════════════════════════════════
