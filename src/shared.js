@@ -1,6 +1,6 @@
 /* CACHE BUSTER v1.5.0 — auto-clears old SW on first load */
 (function(){
-  var APP_BUILD = '1.5.0';
+  var APP_BUILD = '1.6.0';
   var stored = localStorage.getItem('gl_app_build');
   if (stored !== APP_BUILD) {
     localStorage.setItem('gl_app_build', APP_BUILD);
@@ -33,7 +33,7 @@
   var GL = {
     VERSION:          "1.1",
     APP_NAME:         "GigLega",
-    TAGLINE:          "Gurugram ka #1 Gig Platform",
+    TAGLINE:          "Gurugram's Trusted Gig Marketplace",
     FEE_RATE:         0.06,
 
     // Storage keys — single source of truth
@@ -235,7 +235,7 @@
     var el = document.getElementById("announce-bar");
     if (!el) return;
 
-    var msg = "🚀 GigLega v1.1 is live! Gurugram ke best gigs abhi browse karo.";
+    var msg = "🚀 GigLega v1.2 is live! Gurugram ke best gigs abhi browse karo.";
     var dismissed = sessionStorage.getItem("gl_announce_dismissed");
     if (dismissed) { el.style.display = "none"; return; }
 
@@ -504,7 +504,7 @@
 
       '<div class="footer-bottom">' +
         '<span>© ' + new Date().getFullYear() + ' GigLega. All rights reserved.</span>' +
-        '<span>Made with ❤️ in Gurugram</span>' +
+        '<span>Made with ❤️ in Gurugram &nbsp;|  <a href="https://wa.me/919876543210" target="_blank" rel="noopener noreferrer" style="color:inherit;text-decoration:underline">💬 WhatsApp Support</a></span>' +
       '</div>';
   }
 
