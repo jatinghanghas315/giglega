@@ -1194,3 +1194,312 @@ tbody tr:hover td { background: rgba(13,148,136,.03); }
   .modal    { max-width: 100%; border-radius: var(--radius) var(--radius) 0 0; }
   .modal-overlay { align-items: flex-end; padding: 0; }
 }
+
+/* ============================================================
+   V1.2 — GigLega Design System & Mobile Polish
+   Phase 2: Typography, Spacing, Cards, Sticky CTAs
+   Phase 3: Accessibility, Performance
+============================================================ */
+
+/* ── Typography Scale ── */
+.hero h1 {
+  font-size: clamp(2rem, 5.5vw, 3.4rem);
+  font-weight: 900;
+  letter-spacing: -1.5px;
+  margin-bottom: 20px;
+}
+
+.section-head h2,
+.gigs-header h2,
+.testi-section .section-head h2,
+.faq-section .section-head h2,
+.features-section .section-head h2 {
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: 900;
+  margin-bottom: 10px;
+  line-height: 1.25;
+}
+
+.section-head p {
+  font-size: clamp(.9rem, 2vw, 1rem);
+  color: var(--gray-500);
+  margin-top: 8px;
+}
+
+/* ── Vertical section spacing ── */
+.hiw-section,
+.gigs-section,
+.features-section,
+.testi-section,
+.faq-section,
+.final-cta {
+  padding-top: 80px;
+  padding-bottom: 80px;
+}
+
+.section-head {
+  margin-bottom: 52px;
+}
+
+/* ── Button full-width on mobile ── */
+@media (max-width: 600px) {
+  .btn-hero-primary,
+  .btn-hero-secondary,
+  .btn-trust-primary,
+  .btn-trust-secondary {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .hero-cta {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .trust-ctas {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .final-cta-btns {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  /* Full-width primary CTAs on all forms */
+  .btn-primary,
+  .btn {
+    width: 100%;
+    text-align: center;
+    justify-content: center;
+  }
+}
+
+/* ── Gig card improvements ── */
+.gig-card {
+  border: 1.5px solid var(--gray-200);
+  border-radius: var(--radius);
+  padding: 22px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: 0 2px 10px rgba(0,0,0,.06);
+  transition: transform .2s, box-shadow .2s;
+  background: var(--surface);
+  position: relative;
+}
+
+.gig-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0,0,0,.1);
+}
+
+/* Trust note on gig cards */
+.gig-trust-note {
+  font-size: .72rem;
+  color: var(--teal);
+  font-weight: 600;
+  margin-top: -8px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ── Form improvements ── */
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 700;
+  font-size: .88rem;
+  margin-bottom: 6px;
+  color: var(--text);
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+  padding: 13px 14px;
+  font-size: .95rem;
+  border: 1.5px solid var(--gray-300);
+  border-radius: var(--radius-sm);
+  width: 100%;
+  font-family: var(--font);
+  background: var(--surface);
+  color: var(--text);
+  transition: border-color .2s, box-shadow .2s;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: var(--teal);
+  box-shadow: 0 0 0 3px rgba(13,148,136,.12);
+}
+
+/* ── Sticky CTA bar on mobile (post-gig & worker signup) ── */
+.sticky-cta-bar {
+  position: sticky;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--surface);
+  border-top: 1.5px solid var(--gray-200);
+  padding: 12px 20px;
+  z-index: 100;
+  display: none;
+  box-shadow: 0 -4px 16px rgba(0,0,0,.08);
+}
+
+@media (max-width: 768px) {
+  .sticky-cta-bar {
+    display: block;
+  }
+
+  .sticky-cta-bar .btn {
+    width: 100%;
+    padding: 15px;
+    font-size: 1rem;
+    font-weight: 800;
+  }
+
+  /* Prevent sticky CTA from covering focused inputs */
+  body {
+    scroll-padding-bottom: 80px;
+  }
+}
+
+/* ── Testimonial cards polish ── */
+.testi-card {
+  padding: 28px;
+  box-shadow: 0 2px 12px rgba(0,0,0,.06);
+}
+
+.testi-body {
+  font-size: .9rem;
+  line-height: 1.7;
+}
+
+.testi-name {
+  font-size: .9rem;
+  font-weight: 800;
+}
+
+/* ── FAQ improvements ── */
+.faq-q {
+  font-size: .95rem;
+  padding: 18px 22px;
+}
+
+.faq-a {
+  font-size: .88rem;
+  line-height: 1.75;
+  padding: 0 22px;
+}
+
+.faq-item.open .faq-a {
+  padding: 0 22px 18px;
+}
+
+/* ── Trust note blocks ── */
+.trust-note-block {
+  background: rgba(13,148,136,.06);
+  border: 1px solid rgba(13,148,136,.18);
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  font-size: .82rem;
+  color: var(--teal);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+/* ── Navigation improvements ── */
+.nav-link {
+  font-size: .88rem;
+  font-weight: 600;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  transition: color .2s, background .2s;
+}
+
+.nav-link:hover {
+  color: var(--teal);
+  background: rgba(13,148,136,.06);
+}
+
+/* Primary nav CTA (Post a Gig) */
+.btn-nav-primary {
+  background: var(--teal);
+  color: #fff !important;
+  padding: 9px 18px;
+  border-radius: var(--radius-sm);
+  font-weight: 800;
+  font-size: .88rem;
+  transition: background .2s, transform .15s;
+}
+
+.btn-nav-primary:hover {
+  background: var(--primary);
+  transform: translateY(-1px);
+  text-decoration: none;
+}
+
+/* ── Footer trust copy ── */
+.footer-tagline {
+  font-size: .82rem;
+  color: var(--gray-400);
+  margin-top: 8px;
+  line-height: 1.5;
+}
+
+/* ── Color contrast fixes ── */
+/* Ensure orange/amber text has sufficient contrast on white */
+.badge-worker,
+.badge-poster {
+  font-weight: 800;
+  letter-spacing: .2px;
+}
+
+/* ── Performance: reduce layout shift from sticky elements ── */
+@media (max-width: 768px) {
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 200;
+    backdrop-filter: blur(10px);
+  }
+}
+
+/* ── Accessibility: focus visible for keyboard nav ── */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid var(--teal);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ── Mobile: form input spacing ── */
+@media (max-width: 600px) {
+  input, textarea, select {
+    font-size: 16px; /* Prevents iOS zoom */
+    margin-bottom: 14px;
+  }
+
+  .gig-card {
+    padding: 18px 16px;
+    margin-bottom: 4px;
+  }
+
+  .gigs-grid {
+    gap: 14px;
+  }
+}
