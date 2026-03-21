@@ -162,6 +162,12 @@
 
   function applyTheme(theme) {
     document.documentElement.setAttribute("data-theme", theme);
+      // Also add .dark class for compatibility with new styles
+  if (theme === "dark") {
+    document.documentElement.classList.add("dark");
+  } else {
+    document.documentElement.classList.remove("dark");
+  }
     localStorage.setItem(GL.STORAGE_KEY_THEME, theme);
     // Update toggle button if it exists
     var btn = document.getElementById("themeToggle");
