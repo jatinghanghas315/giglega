@@ -1266,7 +1266,7 @@ tbody tr:hover td { background: rgba(13,148,136,.03); }
     gap: 10px;
   }
 
-  /* Full-width primary CTAs on all forms */
+  /* Full-width primary CTAs on hero/landing sections only */
   .btn-primary,
   .btn {
     width: 100%;
