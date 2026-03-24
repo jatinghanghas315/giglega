@@ -1283,7 +1283,7 @@ tbody tr:hover td { background: rgba(13,148,136,.03); }
   display: flex;
   flex-direction: column;
   gap: 14px;
-  box-shadow: 0 2px 10px rgba(0,0,0,.06);
+  box-shadow: var(--shadow-sm);
   transition: transform .2s, box-shadow .2s;
   background: var(--surface);
   position: relative;
@@ -1291,7 +1291,7 @@ tbody tr:hover td { background: rgba(13,148,136,.03); }
 
 .gig-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 24px rgba(0,0,0,.1);
+  box-shadow: var(--shadow-md);
 }
 
 /* Trust note on gig cards */
@@ -1375,7 +1375,7 @@ tbody tr:hover td { background: rgba(13,148,136,.03); }
 /* ── Testimonial cards polish ── */
 .testi-card {
   padding: 28px;
-  box-shadow: 0 2px 12px rgba(0,0,0,.06);
+  box-shadow: var(--shadow-sm);
 }
 
 .testi-body {
@@ -1673,4 +1673,22 @@ textarea:focus-visible {
 [data-theme=dark] .story-visual {
   background: rgba(13,148,136,.06) !important;
   border-color: rgba(13,148,136,.2) !important;
+}
+
+/* --- Sticky CTA bar dark mode --- */
+[data-theme=dark] .sticky-cta-bar {
+  background: var(--surface);
+  border-color: var(--gray-700);
+}
+
+/* --- V1.2 form-group inputs dark mode --- */
+[data-theme=dark] .form-group input,
+[data-theme=dark] .form-group textarea,
+[data-theme=dark] .form-group select {
+  background: var(--gray-800) !important;
+  color: var(--text) !important;
+  border-color: var(--gray-600) !important;
+}
+[data-theme=dark] .form-group label {
+  color: var(--gray-300);
 }
