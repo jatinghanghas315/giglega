@@ -510,7 +510,7 @@
 
       '<div class="footer-bottom">' +
         '<span>© ' + new Date().getFullYear() + ' GigLega. All rights reserved.</span>' +
-        '<span>Made with ❤️ in Gurugram &nbsp;|  <a href="https://wa.me/919876543210" target="_blank" rel="noopener noreferrer" style="color:inherit;text-decoration:underline">💬 WhatsApp Support</a></span>' +
+        '<span>Made with ❤️ in Gurugram &nbsp;|  <a href="https://wa.me/919319635257" target="_blank" rel="noopener noreferrer" style="color:inherit;text-decoration:underline">💬 WhatsApp Support</a></span>' +
       '</div>';
   }
 
