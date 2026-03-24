@@ -93,3 +93,171 @@ body {
   backdrop-filter: blur(14px);
   border-bottom: 1px solid rgba(148, 163, 184, 0.35);
 }
+
+
+/* ============================================================
+   GigLega Dark Mode v1.1 — Extended Fixes
+   Fixes: DM-01 section headings, DM-02 feature cards,
+          DM-03 HIW badges, DM-04 browse/page-hero,
+          DM-05 form inputs, DM-06 step titles,
+          DM-07 final CTA section
+   ============================================================ */
+
+/* DM-01: Section headings — dark-blue text on dark-navy bg fix */
+[data-theme="dark"] .section-head h2,
+[data-theme="dark"] .gigs-header h2,
+[data-theme="dark"] .final-cta h2,
+[data-theme="dark"] .hiw-col-title,
+[data-theme="dark"] .trust-strip h2 {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .section-head p,
+[data-theme="dark"] .final-cta p {
+  color: #94a3b8;
+}
+
+/* DM-02: Feature card titles and descriptions */
+[data-theme="dark"] .feat-title {
+  color: #e2e8f0;
+}
+
+[data-theme="dark"] .feat-desc {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .feat-card {
+  background: var(--surface);
+  border-color: var(--gray-700);
+}
+
+/* DM-03: How It Works column titles and role badges */
+[data-theme="dark"] .hiw-col-title {
+  color: #f1f5f9;
+  border-bottom-color: var(--gray-700);
+}
+
+[data-theme="dark"] .badge-worker {
+  background: rgba(13, 148, 136, 0.25);
+  color: #5eead4;
+}
+
+[data-theme="dark"] .badge-poster {
+  background: rgba(26, 60, 94, 0.45);
+  color: #93c5fd;
+}
+
+/* DM-04: Browse page and shared page-hero headings */
+[data-theme="dark"] .page-hero h1,
+[data-theme="dark"] .section-title {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .page-hero p,
+[data-theme="dark"] .section-subtitle {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .breadcrumb,
+[data-theme="dark"] .breadcrumb a {
+  color: #64748b;
+}
+
+[data-theme="dark"] .breadcrumb a:hover {
+  color: #94a3b8;
+}
+
+/* DM-05: White form inputs on dark cards — override v1.2 form-group rule */
+[data-theme="dark"] .form-group input,
+[data-theme="dark"] .form-group textarea,
+[data-theme="dark"] .form-group select {
+  background: rgba(15, 23, 42, 0.9) !important;
+  border-color: rgba(148, 163, 184, 0.35) !important;
+  color: #f1f5f9 !important;
+}
+
+[data-theme="dark"] .form-group input::placeholder,
+[data-theme="dark"] .form-group textarea::placeholder {
+  color: #64748b !important;
+}
+
+[data-theme="dark"] .form-group input:focus,
+[data-theme="dark"] .form-group textarea:focus,
+[data-theme="dark"] .form-group select:focus {
+  border-color: #0d9488 !important;
+  box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.12) !important;
+}
+
+/* DM-06: Post-gig step/form card titles */
+[data-theme="dark"] .step-card-title,
+[data-theme="dark"] .form-step-title,
+[data-theme="dark"] .step-label {
+  color: #e2e8f0;
+}
+
+[data-theme="dark"] .step.active .step-label {
+  color: #5eead4;
+}
+
+/* DM-07: Final CTA section — outline button visibility */
+[data-theme="dark"] .final-cta {
+  background: linear-gradient(135deg, rgba(15,23,42,1) 0%, rgba(13,148,136,0.12) 100%);
+}
+
+[data-theme="dark"] .btn-trust-secondary {
+  border-color: rgba(148, 163, 184, 0.55);
+  color: #e2e8f0;
+}
+
+[data-theme="dark"] .btn-trust-secondary:hover {
+  background: rgba(148, 163, 184, 0.1);
+  border-color: #e2e8f0;
+  color: #fff;
+  text-decoration: none;
+}
+
+/* DM-BONUS: Gigs section background consistency */
+[data-theme="dark"] .gigs-section {
+  background: rgba(13, 148, 136, 0.04);
+}
+
+/* DM-BONUS: Testimonial section background consistency */
+[data-theme="dark"] .testi-section {
+  background: rgba(13, 148, 136, 0.03);
+}
+
+/* DM-BONUS: Testi card body text readable */
+[data-theme="dark"] .testi-body {
+  color: #cbd5e1;
+}
+
+[data-theme="dark"] .testi-name {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .testi-card {
+  background: var(--surface);
+  border-color: var(--gray-700);
+}
+
+/* DM-BONUS: HIW step content readability */
+[data-theme="dark"] .hiw-content h4 {
+  color: #e2e8f0;
+}
+
+[data-theme="dark"] .hiw-content p {
+  color: #94a3b8;
+}
+
+/* DM-BONUS: Stat value text in hero section */
+[data-theme="dark"] .hero-stat-num {
+  color: #ffffff;
+}
+
+[data-theme="dark"] .gig-card-title {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .gig-card-desc {
+  color: #94a3b8;
+}
