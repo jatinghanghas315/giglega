@@ -1503,3 +1503,174 @@ textarea:focus-visible {
     gap: 14px;
   }
 }
+
+
+/* ============================================================
+   DARK MODE — BATCH FIX v1.3 (login, stats, cards, inputs, breadcrumb)
+   ============================================================ */
+
+/* --- Login / Register modal form --- */
+[data-theme=dark] .auth-card,
+[data-theme=dark] .login-card {
+  background: var(--surface);
+  border-color: var(--gray-700);
+}
+[data-theme=dark] .auth-card .form-label,
+[data-theme=dark] .auth-tab-btn,
+[data-theme=dark] .tab-label,
+[data-theme=dark] .remember-label,
+[data-theme=dark] .or-divider {
+  color: var(--gray-300) !important;
+}
+[data-theme=dark] .auth-tab-btn.active {
+  color: var(--teal) !important;
+  border-bottom-color: var(--teal);
+}
+[data-theme=dark] .form-input,
+[data-theme=dark] input[type=text],
+[data-theme=dark] input[type=email],
+[data-theme=dark] input[type=password],
+[data-theme=dark] input[type=tel],
+[data-theme=dark] input[type=number],
+[data-theme=dark] input[type=search],
+[data-theme=dark] select,
+[data-theme=dark] textarea {
+  background: var(--gray-800) !important;
+  color: var(--text) !important;
+  border-color: var(--gray-600) !important;
+}
+[data-theme=dark] input::placeholder,
+[data-theme=dark] textarea::placeholder {
+  color: var(--gray-500) !important;
+}
+[data-theme=dark] .or-divider-line,
+[data-theme=dark] .divider-line {
+  background: var(--gray-700) !important;
+}
+[data-theme=dark] .or-divider-text,
+[data-theme=dark] .or-text {
+  color: var(--gray-500) !important;
+  background: var(--surface);
+}
+
+/* --- Stat/counter numbers (low contrast fix) --- */
+[data-theme=dark] .stat-num,
+[data-theme=dark] .strip-stat-num,
+[data-theme=dark] .hero-stat-num,
+[data-theme=dark] .stat-value,
+[data-theme=dark] .counter-num {
+  color: var(--teal) !important;
+}
+[data-theme=dark] .stat-label,
+[data-theme=dark] .strip-stat-lbl,
+[data-theme=dark] .hero-stat-label,
+[data-theme=dark] .stat-desc {
+  color: var(--gray-400) !important;
+}
+
+/* --- Enterprise / Trust-Safety feature card titles & body --- */
+[data-theme=dark] .feature-card-title,
+[data-theme=dark] .feature-title,
+[data-theme=dark] .card-title {
+  color: var(--gray-100) !important;
+}
+[data-theme=dark] .feature-card-body,
+[data-theme=dark] .feature-desc,
+[data-theme=dark] .card-body,
+[data-theme=dark] .card-desc {
+  color: var(--gray-400) !important;
+}
+[data-theme=dark] .feature-card {
+  background: var(--surface);
+  border-color: var(--gray-700);
+}
+
+/* --- Help Center category cards --- */
+[data-theme=dark] .help-category-card,
+[data-theme=dark] .category-card {
+  background: var(--surface) !important;
+  border-color: var(--gray-700) !important;
+  color: var(--gray-200) !important;
+}
+[data-theme=dark] .category-card h3,
+[data-theme=dark] .category-card .card-name,
+[data-theme=dark] .help-category-card h3 {
+  color: var(--gray-100) !important;
+}
+[data-theme=dark] .category-card .article-count,
+[data-theme=dark] .help-category-card .article-count {
+  color: var(--gray-400) !important;
+}
+
+/* --- Browse page search/filter inputs --- */
+[data-theme=dark] .search-bar,
+[data-theme=dark] .search-input,
+[data-theme=dark] .filter-select,
+[data-theme=dark] .filter-btn {
+  background: var(--gray-800) !important;
+  border-color: var(--gray-600) !important;
+  color: var(--text) !important;
+}
+
+/* --- Breadcrumb white bg fix --- */
+[data-theme=dark] .breadcrumb-wrapper,
+[data-theme=dark] .breadcrumb-bar,
+[data-theme=dark] .page-header {
+  background: var(--bg) !important;
+  color: var(--gray-400);
+}
+
+/* --- Section headings low contrast fix --- */
+[data-theme=dark] .section-label,
+[data-theme=dark] .section-eyebrow,
+[data-theme=dark] .section-subtitle {
+  color: var(--gray-400) !important;
+}
+[data-theme=dark] .section-head h2,
+[data-theme=dark] .section-title {
+  color: var(--gray-100) !important;
+}
+[data-theme=dark] .section-head p {
+  color: var(--gray-400) !important;
+}
+
+/* --- Info / contact cards --- */
+[data-theme=dark] .info-card {
+  background: var(--surface) !important;
+  border-color: var(--gray-700) !important;
+}
+[data-theme=dark] .info-card-title,
+[data-theme=dark] .cm-label {
+  color: var(--gray-400) !important;
+  font-size: .72rem;
+  text-transform: uppercase;
+  letter-spacing: .6px;
+}
+[data-theme=dark] .cm-value a,
+[data-theme=dark] .cm-link {
+  color: var(--teal) !important;
+}
+[data-theme=dark] .cm-sub {
+  color: var(--gray-500) !important;
+}
+
+/* --- Press logo cards (about/enterprise) --- */
+[data-theme=dark] .press-logo {
+  background: var(--gray-800) !important;
+  border-color: var(--gray-700) !important;
+  color: var(--gray-300) !important;
+}
+
+/* --- Story / highlight block --- */
+[data-theme=dark] .story-highlight {
+  background: rgba(13,148,136,.08) !important;
+  color: var(--gray-300) !important;
+}
+[data-theme=dark] .story-body,
+[data-theme=dark] .story-visual-sub {
+  color: var(--gray-400) !important;
+}
+[data-theme=dark] .story-visual {
+  background: rgba(13,148,136,.06) !important;
+  border-color: rgba(13,148,136,.2) !important;
+}
