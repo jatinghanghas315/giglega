@@ -172,282 +172,157 @@
   <footer id="main-footer"></footer>
   <div id="toast-container"></div>
 
-  <script>
-  (function () {
+<script type="module">
+import { auth, db } from './firebase-config.js';
+import { collection, query, where, onSnapshot, doc, updateDoc, deleteDoc } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
 
-    var FEE_RATE = 0.06;
-    var GIG_KEY  = (typeof GL !== "undefined" && GL.STORAGE_KEY_GIGS) ? GL.STORAGE_KEY_GIGS : "gl_gigs";
+var FEE_RATE = 0.06;
+var currentUser = null;
+var unsubscribe = null;
 
-    /* ── Auth guard ── */
-    var user = (function() {
-  try {
-    var u = JSON.parse(localStorage.getItem("gl_user") || "null");
-    return (u && u.id) ? u : null;
-  } catch(e) { return null; }
-})();
-if (!user) {
-  window.location.href = "login.html?redirect=dashboard-client.html";
-  return;
+/* ── Auth guard ── */
+onAuthStateChanged(auth, function(user) {
+  if (!user) {
+    window.location.href = 'login.html?redirect=dashboard-client.html';
+    return;
+  }
+  currentUser = user;
+  /* Greeting */
+  var hour = new Date().getHours();
+  var greet = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+  document.getElementById('greetingText').textContent = greet + ', ' + (user.displayName || 'Poster') + '! 👋';
+  /* Load gigs */
+  loadMyGigs(user.uid);
+});
+
+/* ── Tabs ── */
+document.querySelectorAll('.tab-btn').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
+    document.querySelectorAll('.tab-panel').forEach(function(p){ p.classList.remove('active'); });
+    btn.classList.add('active');
+    document.getElementById('tab' + capitalize(btn.dataset.tab)).classList.add('active');
+  });
+});
+
+function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+/* ── Load gigs from Firestore ── */
+function loadMyGigs(uid) {
+  var q = query(collection(db, 'gigs'), where('posterId', '==', uid));
+  if (unsubscribe) unsubscribe();
+  unsubscribe = onSnapshot(q, function(snapshot) {
+    var mine = [];
+    snapshot.forEach(function(docSnap) {
+      mine.push(Object.assign({ id: docSnap.id }, docSnap.data()));
+    });
+    renderAll(mine);
+  }, function(err) {
+    console.error('Error loading gigs:', err);
+    if (typeof showToast === 'function') showToast('❌ Error loading gigs: ' + err.message, 'error');
+  });
 }
 
-    /* ── Breadcrumb ── */
-    if (typeof buildBreadcrumb === "function") {
-      buildBreadcrumb("breadcrumb", [
-        { label: "Home", href: "index.html" },
-        { label: "Dashboard" }
-      ]);
-    }
+/* ── Render ── */
+function renderAll(mine) {
+  var open = mine.filter(function(g){ return g.status === 'open'; });
+  var progress = mine.filter(function(g){ return g.status === 'taken'; });
+  var completed = mine.filter(function(g){ return g.status === 'completed'; });
+  /* Stats */
+  document.getElementById('statTotal').textContent = mine.length;
+  document.getElementById('statOpen').textContent = open.length;
+  document.getElementById('statProgress').textContent = progress.length;
+  document.getElementById('statCompleted').textContent = completed.length;
+  var totalSpent = 0;
+  completed.forEach(function(g){ totalSpent += g.budget || 0; });
+  document.getElementById('statSpent').textContent = '₹' + totalSpent;
+  /* Tab counts */
+  document.getElementById('tabCountOpen').textContent = open.length;
+  document.getElementById('tabCountProgress').textContent = progress.length;
+  document.getElementById('tabCountCompleted').textContent = completed.length;
+  /* Render panels */
+  renderPanel('tabOpen', open, 'open');
+  renderPanel('tabProgress', progress, 'taken');
+  renderPanel('tabCompleted', completed, 'completed');
+  renderPanel('tabAll', mine, 'all');
+}
 
-    /* ── Greeting ── */
-    var hour  = new Date().getHours();
-    var greet = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
-    document.getElementById("greetingText").textContent = greet + ", " + (user.name || "Poster") + "! 👋";
+function renderPanel(elId, gigs, status) {
+  var el = document.getElementById(elId);
+  if (gigs.length === 0) {
+    var msgs = {
+      open: ['No open gigs.', 'Post a new gig to find workers in your area.'],
+      taken: ['No gigs in progress.', 'Once a worker accepts your gig, it appears here.'],
+      completed: ['No completed gigs yet.', 'Completed gigs will show up here with payment history.'],
+      all: ['You haven\'t posted any gigs yet.', 'Click \'Post a New Gig\' to get started!']
+    };
+    var m = msgs[status] || msgs.all;
+    el.innerHTML = emptyHtml(m[0], m[1]);
+    return;
+  }
+  el.innerHTML = gigs.map(function(g){ return gigCardHtml(g); }).join('');
+  bindCardActions(el);
+}
 
-    /* ── Role switch ── */
-    document.getElementById("btnSwitchRole").addEventListener("click", function () {
-      window.location.href = "dashboard-worker.html";
+function timeAgo(iso) {
+  if (!iso) return 'just now';
+  var d = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
+  if (d < 60) return d + 's ago';
+  if (d < 3600) return Math.floor(d/60) + 'm ago';
+  if (d < 86400) return Math.floor(d/3600) + 'h ago';
+  return Math.floor(d/86400) + 'd ago';
+}
+
+function escHtml(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function gigCardHtml(g) {
+  var badge = g.status === 'open' ? '<span class="s-badge s-open">🟢 Open</span>' :
+              g.status === 'taken' ? '<span class="s-badge s-taken">⚡ In Progress</span>' :
+              '<span class="s-badge s-completed">✅ Completed</span>';
+  var pay = g.budget ? '₹' + g.budget + (g.payType === 'hourly' ? '/hr' : g.payType === 'daily' ? '/day' : g.payType === 'weekly' ? '/wk' : '') : 'Pay TBD';
+  return '<div class="gig-card" data-gig-id="' + g.id + '">' +
+    '<div class="gig-card-head"><div class="gig-card-title">' + escHtml(g.title) + '</div>' + badge + '</div>' +
+    '<div class="gig-card-meta">' +
+    (g.location ? '<span class="gig-meta-chip">📍 ' + escHtml(g.location) + '</span>' : '') +
+    '<span class="gig-meta-chip">🕒 ' + timeAgo(g.createdAt) + '</span>' +
+    '<span class="gig-meta-chip">💰 ' + pay + '</span>' +
+    '<span class="gig-meta-chip">👥 ' + (g.workers||1) + ' worker(s)</span>' +
+    '</div>' +
+    (g.category ? '<div style="margin-bottom:8px"><span style="background:rgba(13,148,136,.08);border:1px solid rgba(13,148,136,.15);border-radius:5px;padding:2px 9px;font-size:.7rem;font-weight:700;color:var(--teal)">' + escHtml(g.category) + '</span></div>' : '') +
+    '<div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">' +
+    '<a href="browse.html" class="btn btn-sm btn-outline">View →</a>' +
+    (g.status === 'open' ? '<button class="btn btn-sm btn-danger" data-delete-id="' + g.id + '">🗑️ Delete</button>' : '') +
+    '</div>' +
+    '</div>';
+}
+
+function bindCardActions(container) {
+  container.querySelectorAll('[data-delete-id]').forEach(function(btn) {
+    btn.addEventListener('click', async function() {
+      var gigId = btn.getAttribute('data-delete-id');
+      if (!confirm('Delete this gig? This cannot be undone.')) return;
+      try {
+        await deleteDoc(doc(db, 'gigs', gigId));
+        if (typeof showToast === 'function') showToast('Gig deleted.', 'success');
+      } catch(err) {
+        if (typeof showToast === 'function') showToast('❌ Error: ' + err.message, 'error');
+      }
     });
+  });
+}
 
-    /* ── Tabs ── */
-    document.querySelectorAll(".tab-btn").forEach(function (btn) {
-      btn.addEventListener("click", function () {
-        document.querySelectorAll(".tab-btn").forEach(function (b) { b.classList.remove("active"); });
-        document.querySelectorAll(".tab-panel").forEach(function (p) { p.classList.remove("active"); });
-        btn.classList.add("active");
-        document.getElementById("tab" + capitalize(btn.dataset.tab)).classList.add("active");
-      });
-    });
+function emptyHtml(title, sub) {
+  return '<div class="empty-box"><div class="ei">📭</div><p><strong>' + title + '</strong><br>' + sub + '</p></div>';
+}
 
-    function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+/* Role switch */
+document.getElementById('btnSwitchRole').addEventListener('click', function() {
+  window.location.href = 'dashboard-worker.html';
+});
 
-    /* ── Data ── */
-    function getGigs() { return JSON.parse(localStorage.getItem(GIG_KEY) || "[]"); }
-    function saveGigs(g) { localStorage.setItem(GIG_KEY, JSON.stringify(g)); }
-
-    function getMyGigs() {
-      return getGigs().filter(function (g) { return g.posterId === user.id; });
-    }
-
-    function timeAgo(iso) {
-      var d = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
-      if (d < 60)    return d + "s ago";
-      if (d < 3600)  return Math.floor(d / 60) + "m ago";
-      if (d < 86400) return Math.floor(d / 3600) + "h ago";
-      return Math.floor(d / 86400) + "d ago";
-    }
-
-    function escHtml(s) {
-      return String(s || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
-    }
-
-    function payLabel(t) {
-      if (t === "cash")   return "💵 Cash";
-      if (t === "wallet") return "🔒 Secure Wallet";
-      return "✅ Pay After";
-    }
-
-    /* ═══════════════════════════════════════
-       RENDER
-    ═══════════════════════════════════════ */
-    function render() {
-      var mine      = getMyGigs();
-      var open      = mine.filter(function (g) { return g.status === "open"; });
-      var progress  = mine.filter(function (g) { return g.status === "taken"; });
-      var completed = mine.filter(function (g) { return g.status === "completed"; });
-
-      /* Stats */
-      document.getElementById("statTotal").textContent     = mine.length;
-      document.getElementById("statOpen").textContent      = open.length;
-      document.getElementById("statProgress").textContent  = progress.length;
-      document.getElementById("statCompleted").textContent = completed.length;
-
-      var totalSpent = 0;
-      completed.forEach(function (g) { totalSpent += g.pricePerHr || 0; });
-      document.getElementById("statSpent").textContent = "₹" + totalSpent;
-
-      /* Tab counts */
-      document.getElementById("tabCountOpen").textContent      = open.length;
-      document.getElementById("tabCountProgress").textContent  = progress.length;
-      document.getElementById("tabCountCompleted").textContent = completed.length;
-
-      /* Render panels */
-      renderPanel("tabOpen",      open,      "open");
-      renderPanel("tabProgress",  progress,  "taken");
-      renderPanel("tabCompleted", completed, "completed");
-      renderPanel("tabAll",       mine,      "all");
-    }
-
-    function renderPanel(elId, gigs, status) {
-      var el = document.getElementById(elId);
-      if (gigs.length === 0) {
-        var msgs = {
-          open:      ["No open gigs.", "Post a new gig to find workers in your area."],
-          taken:     ["No gigs in progress.", "Once a worker accepts your gig, it appears here."],
-          completed: ["No completed gigs yet.", "Completed gigs will show up here with payment history."],
-          all:       ["You haven't posted any gigs yet.", "Click 'Post a New Gig' to get started!"]
-        };
-        var m = msgs[status] || msgs.all;
-        el.innerHTML = emptyHtml(m[0], m[1]);
-        return;
-      }
-      el.innerHTML = gigs.map(function (g) { return gigCardHtml(g); }).join("");
-      bindCardActions(el);
-    }
-
-    /* ── Gig card HTML ── */
-    function gigCardHtml(g) {
-      var fee  = Math.round(g.pricePerHr * FEE_RATE);
-      var earn = g.pricePerHr - fee;
-
-      var badgeCls = g.status === "open" ? "s-open" : g.status === "taken" ? "s-taken" : "s-completed";
-      var badgeTxt = g.status === "open" ? "🟢 Open"
-                   : g.status === "taken" ? "⚡ In Progress"
-                   : "✅ Completed";
-
-      /* Worker section */
-      var workerSection = "";
-      if (g.status === "taken" && g.takenBy) {
-        var initials = (g.takenBy || "W").slice(0,2).toUpperCase();
-        workerSection =
-          '<div style="margin-top:12px;margin-bottom:4px;font-size:.78rem;font-weight:700;color:var(--gray-400);text-transform:uppercase">Worker Assigned</div>' +
-          '<div class="worker-row">' +
-            '<div class="worker-info">' +
-              '<div class="worker-avatar">' + initials + '</div>' +
-              '<div>' +
-                '<div class="worker-name">' + escHtml(g.takenBy) + '</div>' +
-                '<div class="worker-phone">Accepted ' + timeAgo(g.takenAt || g.postedAt) + '</div>' +
-              '</div>' +
-            '</div>' +
-            '<div class="worker-actions">' +
-              '<a href="chat.html?gigId=' + g.id + '" class="btn btn-sm btn-primary">💬 Chat</a>' +
-            '</div>' +
-          '</div>';
-      }
-
-      /* Complete bar (only for taken + non-cash) */
-      var completeBar = "";
-      if (g.status === "taken") {
-        completeBar =
-          '<div class="complete-bar">' +
-            '<div class="complete-bar-text">Worker has accepted. Once done, release payment.</div>' +
-            '<button class="btn-mark-complete" data-gig-id="' + g.id + '">✅ Mark Complete & Release Payment</button>' +
-          '</div>';
-      }
-
-      /* Cash fee prompt (shown after completion for cash gigs) */
-      var cashPrompt = "";
-      if (g.status === "completed" && g.payType === "cash") {
-        cashPrompt =
-          '<div class="cash-fee-prompt show">' +
-            '<div class="cash-fee-title">💳 GigLega Support Fee Due</div>' +
-            '<div class="cash-fee-desc">You paid the worker in cash. Please pay the GigLega support fee of <strong>₹' + fee + '</strong> via UPI to keep the platform running.</div>' +
-            '<button class="btn-pay-fee" data-gig-id="' + g.id + '" data-fee="' + fee + '">Pay ₹' + fee + ' Support Fee</button>' +
-          '</div>';
-      }
-
-      return '<div class="gig-card" data-gig-id="' + g.id + '">' +
-        '<div class="gig-card-head">' +
-          '<div class="gig-card-title">' + escHtml(g.title) + '</div>' +
-          '<span class="s-badge ' + badgeCls + '">' + badgeTxt + '</span>' +
-        '</div>' +
-        '<div class="gig-card-meta">' +
-          (g.location ? '<span class="gig-meta-chip">📍 ' + escHtml(g.location) + '</span>' : '') +
-          '<span class="gig-meta-chip">🕒 ' + timeAgo(g.postedAt) + '</span>' +
-          '<span class="gig-meta-chip">' + payLabel(g.payType) + '</span>' +
-          '<span class="gig-meta-chip">💰 ₹' + g.pricePerHr + '/hr</span>' +
-          '<span class="gig-meta-chip">Worker gets ₹' + earn + '</span>' +
-        '</div>' +
-        workerSection +
-        completeBar +
-        cashPrompt +
-       '<div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">' +
-  '<a href="gig-detail.html?id=' + g.id + '" class="btn btn-sm btn-outline">View Gig →</a>' +
-  (g.status === "open"
-    ? '<a href="gig-edit.html?id=' + g.id + '" class="btn btn-sm btn-outline">✏️ Edit</a>' +
-      '<button class="btn btn-sm btn-danger" data-delete-id="' + g.id + '">🗑️ Delete</button>'
-    : '') +
-'</div>'+
-      '</div>';
-    }
-
-    /* ═══════════════════════════════════════
-       BIND ACTIONS
-    ═══════════════════════════════════════ */
-    function bindCardActions(container) {
-
-      /* Mark complete */
-      container.querySelectorAll(".btn-mark-complete").forEach(function (btn) {
-        btn.addEventListener("click", function () {
-          var gigId = btn.getAttribute("data-gig-id");
-          if (!confirm("Mark this gig as complete and release payment to the worker?")) return;
-
-          btn.disabled = true;
-          btn.textContent = "⏳ Processing...";
-
-          var gigs = getGigs();
-          var g    = gigs.find(function (x) { return x.id === gigId; });
-          if (g) {
-            g.status      = "completed";
-            g.completedAt = new Date().toISOString();
-            saveGigs(gigs);
-          }
-
-          /* Inject system msg in chat */
-          var CHAT_KEY = "gl_chats";
-          var chats    = JSON.parse(localStorage.getItem(CHAT_KEY) || "{}");
-          if (!chats[gigId]) chats[gigId] = [];
-          chats[gigId].push({
-            id: "sys_" + Date.now(), type: "system",
-            text: "✅ Gig marked complete by poster. Payment released to worker.",
-            sentAt: new Date().toISOString()
-          });
-          localStorage.setItem(CHAT_KEY, JSON.stringify(chats));
-
-          if (typeof showToast === "function") showToast("✅ Gig completed! Payment released to worker.", "success");
-          setTimeout(render, 600);
-        });
-      });
-
-      /* Pay cash support fee */
-      container.querySelectorAll(".btn-pay-fee").forEach(function (btn) {
-        btn.addEventListener("click", function () {
-          var fee = btn.getAttribute("data-fee");
-          btn.disabled = true;
-          btn.textContent = "⏳ Processing...";
-          setTimeout(function () {
-            if (typeof showToast === "function") showToast("✅ Support fee of ₹" + fee + " paid successfully!", "success");
-            btn.closest(".cash-fee-prompt").innerHTML =
-              '<div style="color:var(--success);font-size:.85rem;font-weight:700">✅ Support fee paid. Thank you!</div>';
-          }, 1200);
-        });
-      });
-
-      /* Delete open gig */
-      container.querySelectorAll("[data-delete-id]").forEach(function (btn) {
-        btn.addEventListener("click", function () {
-          var gigId = btn.getAttribute("data-delete-id");
-          if (!confirm("Delete this gig? This cannot be undone.")) return;
-          var gigs = getGigs().filter(function (g) { return g.id !== gigId; });
-          saveGigs(gigs);
-          if (typeof showToast === "function") showToast("Gig deleted.", "success");
-          render();
-        });
-      });
-    }
-
-    function emptyHtml(title, sub) {
-      return '<div class="empty-box"><div class="ei">📭</div>' +
-        '<p><strong>' + title + '</strong><br>' + sub + '</p></div>';
-    }
-
-    /* ── Storage sync ── */
-    window.addEventListener("storage", function (e) {
-      if (e.key === GIG_KEY) render(); if (e.key === "gl_user" && e.newValue) { user = JSON.parse(e.newValue); var h = new Date().getHours(); var g = h < 12 ? "Good morning" : h < 17 ? "Good afternoon" : "Good evening"; document.getElementById("greetingText").textContent = g + ", " + (user.name || "Poster") + "! 👋"; }
-    });
-
-    render();
-
-  })();
-  </script>
+</script>
 </body>
 </html>
