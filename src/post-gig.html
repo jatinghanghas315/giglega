@@ -1676,7 +1676,7 @@
         // Show success modal
         var modalGigId = document.getElementById('modalGigId');
         if (modalGigId) modalGigId.textContent = '📋 Gig ID: ' + ref.id.slice(0,8).toUpperCase();
-        var overlay = document.getElementById('pgModalOverlay');
+        var overlay = document.getElementById('successModal');
         if (overlay) { overlay.classList.add('open'); overlay.style.display = 'flex'; }
         showToast('🎉 Gig posted successfully!', 'success');
 
