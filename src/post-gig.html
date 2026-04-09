@@ -1429,258 +1429,180 @@
     </div><!-- /pg-body -->
   </main>
 
-  <script>
+  <script type="module">
+    import { auth, db } from './firebase-config.js';
+    import { collection, addDoc } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+    import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
 
-    /* ══════════════════════════════════
-       STATE
-    ══════════════════════════════════ */
-    let selectedCategory = '';
-    let selectedPayType  = 'hourly';
-    let selectedUrgency  = '';
-    let selectedWorkType = 'on-site';
-    let selectedSkills   = [];
-    let selectedPerks    = [];
+    /* ── Auth guard ── */
+    onAuthStateChanged(auth, function(user) {
+      if (!user) {
+        window.location.replace('login.html?redirect=post-gig.html&mode=login');
+      }
+    });
 
-    const PAY_SUFFIXES = {
-      hourly: '/hr',
-      daily:  '/day',
-      fixed:  ' fixed',
-      weekly: '/week',
-    };
+    /* ── State ── */
+    var selectedCategory = '';
+    var selectedPayType = 'hourly';
+    var selectedUrgency = '';
+    var selectedWorkType = 'on-site';
+    var selectedSkills = [];
+    var selectedPerks = [];
+    var PAY_SUFFIXES = { hourly:'/hr', daily:'/day', fixed:' fixed', weekly:'/week' };
 
-    /* ══════════════════════════════════
-       CATEGORY
-    ══════════════════════════════════ */
-    function selectCategory(el) {
-      document.querySelectorAll('.cat-card').forEach(c => c.classList.remove('selected'));
+    /* ── Toast ── */
+    function showToast(msg, type) {
+      if (window.showToast) { window.showToast(msg, type); return; }
+      var t = document.createElement('div');
+      t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a3c5e;color:#fff;padding:10px 22px;border-radius:99px;font-size:.84rem;font-weight:700;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.2)';
+      t.textContent = msg;
+      document.body.appendChild(t);
+      setTimeout(function(){ t.remove(); }, 3000);
+    }
+
+    /* ── Category ── */
+    window.selectCategory = function(el) {
+      document.querySelectorAll('.cat-card').forEach(function(c){ c.classList.remove('selected'); });
       el.classList.add('selected');
       selectedCategory = el.dataset.cat;
       document.getElementById('catErr').classList.remove('visible');
-      updatePreview();
-      updateProgress();
-    }
+      updatePreview(); updateProgress();
+    };
 
-    /* ══════════════════════════════════
-       PAY TYPE
-    ══════════════════════════════════ */
-    function selectPayType(el) {
-      document.querySelectorAll('.pay-tab').forEach(t => t.classList.remove('active'));
+    /* ── Pay type ── */
+    window.selectPayType = function(el) {
+      document.querySelectorAll('.pay-tab').forEach(function(t){ t.classList.remove('active'); });
       el.classList.add('active');
       selectedPayType = el.dataset.pay;
-      const suf = PAY_SUFFIXES[selectedPayType];
-      document.getElementById('payTypeSuffix').textContent  = suf;
+      var suf = PAY_SUFFIXES[selectedPayType];
+      document.getElementById('payTypeSuffix').textContent = suf;
       document.getElementById('payTypeSuffix2').textContent = suf;
       updatePreview();
-    }
+    };
 
-    /* ══════════════════════════════════
-       URGENCY
-    ══════════════════════════════════ */
-    function selectUrgency(el) {
-      document.querySelectorAll('#urgencyRow .urgency-btn').forEach(b => b.classList.remove('selected'));
+    /* ── Urgency ── */
+    window.selectUrgency = function(el) {
+      document.querySelectorAll('#urgencyRow .urgency-btn').forEach(function(b){ b.classList.remove('selected'); });
       el.classList.add('selected');
       selectedUrgency = el.dataset.urgency;
       updateProgress();
-    }
+    };
 
-    /* ══════════════════════════════════
-       WORK TYPE
-    ══════════════════════════════════ */
-    function selectWorkType(el) {
-      document.querySelectorAll('[data-wt]').forEach(b => b.classList.remove('selected'));
+    /* ── Work type ── */
+    window.selectWorkType = function(el) {
+      document.querySelectorAll('[data-wt]').forEach(function(b){ b.classList.remove('selected'); });
       el.classList.add('selected');
       selectedWorkType = el.dataset.wt;
-    }
+    };
 
-    /* ══════════════════════════════════
-       SKILLS
-    ══════════════════════════════════ */
-    function toggleSkill(el) {
+    /* ── Skills ── */
+    window.toggleSkill = function(el) {
       el.classList.toggle('selected');
-      const label = el.textContent.trim();
-      if (el.classList.contains('selected')) {
-        selectedSkills.push(label);
-      } else {
-        selectedSkills = selectedSkills.filter(s => s !== label);
-      }
+      var label = el.textContent.trim();
+      if (el.classList.contains('selected')) { selectedSkills.push(label); }
+      else { selectedSkills = selectedSkills.filter(function(s){ return s !== label; }); }
       updatePreview();
-    }
+    };
 
-    function addCustomSkill() {
-      const inp = document.getElementById('customSkillInput');
-      const val = inp.value.trim();
+    window.addCustomSkill = function() {
+      var inp = document.getElementById('customSkillInput');
+      var val = inp.value.trim();
       if (!val) return;
       if (selectedSkills.length >= 10) { showToast('⚠️ Max 10 skills allowed'); return; }
-
-      const tag = document.createElement('button');
+      var tag = document.createElement('button');
       tag.className = 'skill-tag selected';
-      tag.innerHTML = `✅ ${val} <span class="skill-tag-remove">✕</span>`;
-      tag.onclick = () => {
-        selectedSkills = selectedSkills.filter(s => s !== `✅ ${val}`);
-        tag.remove();
-        updatePreview();
-      };
+      tag.innerHTML = '✅ ' + val + ' <span class="skill-tag-remove">✕</span>';
+      tag.onclick = function() { selectedSkills = selectedSkills.filter(function(s){ return s !== '✅ ' + val; }); tag.remove(); updatePreview(); };
       document.getElementById('skillTagsWrap').appendChild(tag);
-      selectedSkills.push(`✅ ${val}`);
+      selectedSkills.push('✅ ' + val);
       inp.value = '';
       updatePreview();
-    }
+    };
 
-    /* ══════════════════════════════════
-       PERKS
-    ══════════════════════════════════ */
-    function togglePerk(el) {
+    /* ── Perks ── */
+    window.togglePerk = function(el) {
       el.classList.toggle('checked');
-      const label = el.querySelector('.perk-label').textContent.trim();
-      if (el.classList.contains('checked')) {
-        selectedPerks.push(label);
-        el.querySelector('.perk-checkbox').textContent = '✓';
-      } else {
-        selectedPerks = selectedPerks.filter(p => p !== label);
-        el.querySelector('.perk-checkbox').textContent = '';
-      }
-    }
+      var label = el.querySelector('.perk-label').textContent.trim();
+      if (el.classList.contains('checked')) { selectedPerks.push(label); el.querySelector('.perk-checkbox').textContent = '✓'; }
+      else { selectedPerks = selectedPerks.filter(function(p){ return p !== label; }); el.querySelector('.perk-checkbox').textContent = ''; }
+    };
 
-    /* ══════════════════════════════════
-       WORKER STEPPER
-    ══════════════════════════════════ */
-    function stepWorkers(delta) {
-      const inp = document.getElementById('workersCount');
-      let val = parseInt(inp.value) || 1;
-      val = Math.max(1, Math.min(50, val + delta));
+    /* ── Worker stepper ── */
+    window.stepWorkers = function(delta) {
+      var inp = document.getElementById('workersCount');
+      var val = Math.max(1, Math.min(50, (parseInt(inp.value)||1) + delta));
       inp.value = val;
       updatePreview();
-    }
+    };
 
-    /* ══════════════════════════════════
-       CHAR COUNT
-    ══════════════════════════════════ */
-    function updateCharCount(fieldId, countId, max) {
-      const val  = document.getElementById(fieldId).value.length;
-      const el   = document.getElementById(countId);
+    /* ── Char count ── */
+    window.updateCharCount = function(fieldId, countId, max) {
+      var val = document.getElementById(fieldId).value.length;
+      var el = document.getElementById(countId);
       el.textContent = val;
-      const wrap = el.closest('.ff-char-count');
+      var wrap = el.closest('.ff-char-count');
       wrap.classList.toggle('warn', val > max * .85);
       wrap.classList.toggle('over', val >= max);
-    }
+    };
 
-    /* ══════════════════════════════════
-       FIELD VALIDATION
-    ══════════════════════════════════ */
-    function validateField(input) {
-      const val = input.value.trim();
-      const isValid = val.length >= (input.id === 'gigTitle' ? 10 : 1);
+    /* ── Validation ── */
+    window.validateField = function(input) {
+      var val = input.value.trim();
+      var isValid = val.length >= (input.id === 'gigTitle' ? 10 : 1);
       input.classList.toggle('error', !isValid && val.length > 0);
       input.classList.toggle('valid', isValid);
-    }
+    };
 
     function validateAll() {
-      let ok = true;
-
-      const title = document.getElementById('gigTitle').value.trim();
-      if (title.length < 10) {
-        document.getElementById('gigTitleErr').classList.add('visible');
-        document.getElementById('gigTitle').classList.add('error');
-        ok = false;
-      } else {
-        document.getElementById('gigTitleErr').classList.remove('visible');
-      }
-
-      if (!selectedCategory) {
-        document.getElementById('catErr').classList.add('visible');
-        ok = false;
-      }
-
-      const desc = document.getElementById('gigDesc').value.trim();
-      if (desc.length < 20) {
-        document.getElementById('gigDescErr').classList.add('visible');
-        document.getElementById('gigDesc').classList.add('error');
-        ok = false;
-      } else {
-        document.getElementById('gigDescErr').classList.remove('visible');
-      }
-
-      const pay = document.getElementById('payMin').value.trim();
-      if (!pay || isNaN(pay) || Number(pay) < 1) {
-        document.getElementById('payMinErr').classList.add('visible');
-        document.getElementById('payMin').classList.add('error');
-        ok = false;
-      } else {
-        document.getElementById('payMinErr').classList.remove('visible');
-      }
-
-      const date = document.getElementById('gigDate').value;
-      if (!date) {
-        document.getElementById('gigDateErr').classList.add('visible');
-        document.getElementById('gigDate').classList.add('error');
-        ok = false;
-      } else {
-        document.getElementById('gigDateErr').classList.remove('visible');
-      }
-
-      const loc = document.getElementById('gigLocation').value.trim();
-      if (loc.length < 5) {
-        document.getElementById('gigLocationErr').classList.add('visible');
-        document.getElementById('gigLocation').classList.add('error');
-        ok = false;
-      } else {
-        document.getElementById('gigLocationErr').classList.remove('visible');
-      }
-
+      var ok = true;
+      var title = document.getElementById('gigTitle').value.trim();
+      if (title.length < 10) { document.getElementById('gigTitleErr').classList.add('visible'); document.getElementById('gigTitle').classList.add('error'); ok = false; }
+      else { document.getElementById('gigTitleErr').classList.remove('visible'); }
+      if (!selectedCategory) { document.getElementById('catErr').classList.add('visible'); ok = false; }
+      var desc = document.getElementById('gigDesc').value.trim();
+      if (desc.length < 20) { document.getElementById('gigDescErr').classList.add('visible'); document.getElementById('gigDesc').classList.add('error'); ok = false; }
+      else { document.getElementById('gigDescErr').classList.remove('visible'); }
+      var pay = document.getElementById('payMin').value.trim();
+      if (!pay || isNaN(pay) || Number(pay) < 1) { document.getElementById('payMinErr').classList.add('visible'); document.getElementById('payMin').classList.add('error'); ok = false; }
+      else { document.getElementById('payMinErr').classList.remove('visible'); }
+      var date = document.getElementById('gigDate').value;
+      if (!date) { document.getElementById('gigDateErr').classList.add('visible'); document.getElementById('gigDate').classList.add('error'); ok = false; }
+      else { document.getElementById('gigDateErr').classList.remove('visible'); }
+      var loc = document.getElementById('gigLocation').value.trim();
+      if (loc.length < 5) { document.getElementById('gigLocationErr').classList.add('visible'); document.getElementById('gigLocation').classList.add('error'); ok = false; }
+      else { document.getElementById('gigLocationErr').classList.remove('visible'); }
       return ok;
     }
 
-    /* ══════════════════════════════════
-       LIVE PREVIEW
-    ══════════════════════════════════ */
-    function updatePreview() {
-      const title    = document.getElementById('gigTitle').value.trim();
-      const payMin   = document.getElementById('payMin').value;
-      const payMax   = document.getElementById('payMax').value;
-      const location = document.getElementById('gigLocation').value.trim();
-      const date     = document.getElementById('gigDate').value;
-      const workers  = document.getElementById('workersCount').value;
-      const suf      = PAY_SUFFIXES[selectedPayType];
-
-      document.getElementById('prevTitle').textContent =
-        title || 'Gig ka title yahan aayega…';
-
-      document.getElementById('prevCategory').textContent =
-        selectedCategory ? `📋 ${selectedCategory}` : '📋 Category';
-
-      let payStr = '₹ — Pay Rate';
+    /* ── Preview ── */
+    window.updatePreview = function() {
+      var title = document.getElementById('gigTitle').value.trim();
+      var payMin = document.getElementById('payMin').value;
+      var payMax = document.getElementById('payMax').value;
+      var location = document.getElementById('gigLocation').value.trim();
+      var date = document.getElementById('gigDate').value;
+      var workers = document.getElementById('workersCount').value;
+      var suf = PAY_SUFFIXES[selectedPayType];
+      document.getElementById('prevTitle').textContent = title || 'Gig ka title yahan aayega…';
+      document.getElementById('prevCategory').textContent = selectedCategory ? '📋 ' + selectedCategory : '📋 Category';
+      var payStr = '₹ — Pay Rate';
       if (payMin) {
-        payStr = `₹${Number(payMin).toLocaleString('en-IN')}`;
-        if (payMax) payStr += ` – ₹${Number(payMax).toLocaleString('en-IN')}`;
-        payStr += ` ${suf}`;
+        payStr = '₹' + Number(payMin).toLocaleString('en-IN');
+        if (payMax) payStr += ' – ₹' + Number(payMax).toLocaleString('en-IN');
+        payStr += ' ' + suf;
       }
       document.getElementById('prevPay').textContent = payStr;
-
-      document.getElementById('prevLocation').textContent =
-        location ? `📍 ${location.slice(0,45)}${location.length>45?'…':''}` : '📍 Location';
-
-      document.getElementById('prevDate').textContent =
-        date
-          ? `📅 ${new Date(date).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})}`
-          : '📅 Date';
-
-      document.getElementById('prevWorkers').textContent =
-        `👥 ${workers || 1} Worker${workers > 1 ? 's' : ''} needed`;
-
-      // Skills preview
-      const skillsEl = document.getElementById('prevSkills');
-      skillsEl.innerHTML = selectedSkills.slice(0,4).map(s =>
-        `<span class="prev-skill">${s}</span>`
-      ).join('');
-
+      document.getElementById('prevLocation').textContent = location ? '📍 ' + location.slice(0,45) + (location.length>45?'…':'') : '📍 Location';
+      document.getElementById('prevDate').textContent = date ? '📅 ' + new Date(date).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : '📅 Date';
+      document.getElementById('prevWorkers').textContent = '👥 ' + (workers||1) + ' Worker' + (workers > 1 ? 's' : '') + ' needed';
+      var skillsEl = document.getElementById('prevSkills');
+      skillsEl.innerHTML = selectedSkills.slice(0,4).map(function(s){ return '<span class="prev-skill">' + s + '</span>'; }).join('');
       updateProgress();
-    }
+    };
 
-    /* ══════════════════════════════════
-       PROGRESS BAR
-    ══════════════════════════════════ */
+    /* ── Progress ── */
     function updateProgress() {
-      const filled = [
+      var filled = [
         document.getElementById('gigTitle').value.trim().length >= 10,
         !!selectedCategory,
         document.getElementById('gigDesc').value.trim().length >= 20,
@@ -1689,194 +1611,99 @@
         document.getElementById('gigLocation').value.trim().length >= 5,
         !!selectedUrgency,
       ];
-      const count = filled.filter(Boolean).length;
-      const pct   = Math.round((count / filled.length) * 100);
-
+      var count = filled.filter(Boolean).length;
+      var pct = Math.round((count / filled.length) * 100);
       document.getElementById('pgpbFill').style.width = pct + '%';
-      document.getElementById('pgpbPct').textContent  = pct + '%';
-
-      // Step dots
-      const s1 = filled.slice(0,3).filter(Boolean).length;
-      const s2 = filled.slice(3,5).filter(Boolean).length;
-      const s3 = filled.slice(5,7).filter(Boolean).length;
-
-      setDot('dot1', s1 >= 3 ? 'done' : s1 > 0 ? 'active' : '');
-      setDot('dot2', s2 >= 2 ? 'done' : s2 > 0 ? 'active' : '');
-      setDot('dot3', s3 >= 2 ? 'done' : s3 > 0 ? 'active' : '');
-
-      const step = s1 < 3 ? 1 : s2 < 2 ? 2 : 3;
-      document.getElementById('pgpbLabel').textContent = `Step ${step} of 3`;
-
-      // Hero steps
-      setHeroStep('heroStep1', s1 >= 3 ? 'done' : 'active');
-      setHeroStep('heroStep2', s2 >= 2 ? 'done' : s1 >= 3 ? 'active' : '');
-      setHeroStep('heroStep3', s3 >= 2 ? 'done' : s2 >= 2 ? 'active' : '');
+      document.getElementById('pgpbPct').textContent = pct + '%';
     }
+    window.updateProgress = updateProgress;
 
-    function setDot(id, state) {
-      const el = document.getElementById(id);
-      el.className = 'pgpb-step-dot' + (state ? ' ' + state : '');
-    }
-    function setHeroStep(id, state) {
-      const el = document.getElementById(id);
-      el.className = 'pgh-step' + (state ? ' ' + state : '');
-    }
-
-    /* ══════════════════════════════════
-       PHONE TOGGLE
-    ══════════════════════════════════ */
+    /* ── Phone toggle ── */
     document.getElementById('togglePhone').addEventListener('change', function() {
-      document.getElementById('phoneRow').style.display = this.checked ? '' : 'none';
+      var phoneField = document.getElementById('contactPhone');
+      if (phoneField) phoneField.style.display = this.checked ? 'block' : 'none';
     });
 
-    /* ══════════════════════════════════
-       SUBMIT
-    ══════════════════════════════════ */
-    function submitGig() {
+    /* ══════ SUBMIT TO FIRESTORE ══════ */
+    document.getElementById('btnSubmitGig').addEventListener('click', async function() {
       if (!validateAll()) {
-        showToast('⚠️ Sab zaroori fields fill karo pehle!');
-        // Scroll to first error
-        const firstErr = document.querySelector('.ff-input.error, .ff-select.error, .ff-textarea.error');
-        if (firstErr) firstErr.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        showToast('⚠️ Please fill all required fields', 'warning');
+        window.scrollTo({top: 0, behavior: 'smooth'});
+        return;
+      }
+      var user = auth.currentUser;
+      if (!user) {
+        window.location.replace('login.html?redirect=post-gig.html');
         return;
       }
 
-      const btn = document.getElementById('submitBtn');
+      var btn = this;
       btn.disabled = true;
-      btn.innerHTML = '⏳ Posting…';
+      btn.textContent = '⏳ Posting…';
 
-      // ── Save gig to localStorage ──
-    const GIG_KEY = (typeof GL !== 'undefined' && GL.STORAGE_KEY_GIGS) ? GL.STORAGE_KEY_GIGS : 'gl_gigs';
-    let user = null;
-    try { user = JSON.parse(localStorage.getItem('gl_user') || 'null'); } catch(e){}
-    const gigId = 'GL-2026-' + String(Math.floor(Math.random() * 9000) + 1000);
-    const newGig = {
-      id: gigId,
-      posterId: user ? user.id : 'unknown',
-      title: document.getElementById('gigTitle').value.trim(),
-      category: selectedCategory,
-      description: document.getElementById('gigDesc').value.trim(),
-      location: document.getElementById('gigLocation').value.trim(),
-      area: document.getElementById('gigArea').value,
-      pincode: document.getElementById('gigPincode').value,
-      payType: selectedPayType,
-      pricePerHr: Number(document.getElementById('payMin').value) || 0,
-      payMax: Number(document.getElementById('payMax').value) || 0,
-      workers: Number(document.getElementById('workersCount').value) || 1,
-      date: document.getElementById('gigDate').value,
-      time: document.getElementById('gigTime').value,
-      duration: document.getElementById('gigDuration').value,
-      urgency: selectedUrgency,
-      workType: selectedWorkType,
-      skills: selectedSkills,
-      perks: selectedPerks,
-      status: 'open',
-      postedAt: new Date().toISOString(),
-    };
-    const allGigs = JSON.parse(localStorage.getItem(GIG_KEY) || '[]');
-    allGigs.unshift(newGig);
-    localStorage.setItem(GIG_KEY, JSON.stringify(allGigs));
-    document.getElementById('modalGigId').textContent = '📋 Gig ID: ' + gigId;
-    document.getElementById('successModal').classList.add('open');
-    btn.disabled = false;
-    btn.innerHTML = '🚀 Post My Gig Now → (Free)';
-    }
-
-    /* ══════════════════════════════════
-       DRAFT
-    ══════════════════════════════════ */
-    function saveDraft() {
-      const draft = {
-        title:    document.getElementById('gigTitle').value,
-        category: selectedCategory,
-        desc:     document.getElementById('gigDesc').value,
-        payMin:   document.getElementById('payMin').value,
-        payMax:   document.getElementById('payMax').value,
-        payType:  selectedPayType,
-        workers:  document.getElementById('workersCount').value,
-        date:     document.getElementById('gigDate').value,
-        location: document.getElementById('gigLocation').value,
-        skills:   selectedSkills,
-        savedAt:  new Date().toISOString(),
-      };
-      localStorage.setItem('giglega_gig_draft', JSON.stringify(draft));
-      showToast('💾 Draft save ho gaya!');
-    }
-
-    /* ══════════════════════════════════
-       LOAD DRAFT
-    ══════════════════════════════════ */
-    (function loadDraftIfExists() {
       try {
-        const raw = localStorage.getItem('giglega_gig_draft');
-        if (!raw) return;
-        const d = JSON.parse(raw);
-        if (d.title)    document.getElementById('gigTitle').value    = d.title;
-        if (d.desc)     document.getElementById('gigDesc').value     = d.desc;
-        if (d.payMin)   document.getElementById('payMin').value      = d.payMin;
-        if (d.payMax)   document.getElementById('payMax').value      = d.payMax;
-        if (d.workers)  document.getElementById('workersCount').value = d.workers;
-        if (d.date)     document.getElementById('gigDate').value     = d.date;
-        if (d.location) document.getElementById('gigLocation').value = d.location;
+        var gigData = {
+          title:       document.getElementById('gigTitle').value.trim(),
+          description: document.getElementById('gigDesc').value.trim(),
+          category:    selectedCategory,
+          budget:      Number(document.getElementById('payMin').value) || 0,
+          payMax:      Number(document.getElementById('payMax').value) || 0,
+          payType:     selectedPayType,
+          location:    document.getElementById('gigLocation').value.trim(),
+          area:        document.getElementById('gigArea').value || '',
+          pincode:     document.getElementById('gigPincode').value || '',
+          urgency:     selectedUrgency || 'normal',
+          workType:    selectedWorkType,
+          workers:     parseInt(document.getElementById('workersCount').value) || 1,
+          skills:      selectedSkills,
+          perks:       selectedPerks,
+          date:        document.getElementById('gigDate').value,
+          time:        document.getElementById('gigTime').value || '09:00',
+          duration:    document.getElementById('gigDuration').value || 'Full day',
+          hoursNote:   document.getElementById('hoursNote').value || '',
+          extraNotes:  document.getElementById('extraNotes') ? document.getElementById('extraNotes').value : '',
+          status:      'open',
+          posterId:    user.uid,
+          posterName:  user.displayName || 'User',
+          type:        (selectedWorkType === 'remote') ? 'remote' : 'hyperlocal',
+          createdAt:   new Date().toISOString(),
+          applications: 0,
+          views:       0
+        };
 
-        if (d.category) {
-          const catEl = document.querySelector(`.cat-card[data-cat="${d.category}"]`);
-          if (catEl) selectCategory(catEl);
-        }
+        var ref = await addDoc(collection(db, 'gigs'), gigData);
 
-        updatePreview();
+        // Show success modal
+        var modalGigId = document.getElementById('modalGigId');
+        if (modalGigId) modalGigId.textContent = '📋 Gig ID: ' + ref.id.slice(0,8).toUpperCase();
+        var overlay = document.getElementById('pgModalOverlay');
+        if (overlay) overlay.classList.add('open');
+        showToast('🎉 Gig posted successfully!', 'success');
 
-        const savedAt = d.savedAt ? new Date(d.savedAt).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}) : '';
-        showToast(`📂 Draft loaded${savedAt ? ' (saved at ' + savedAt + ')' : ''}`, 3500);
-      } catch {}
-    })();
+      } catch(err) {
+        console.error('Post gig error:', err);
+        showToast('❌ Error posting gig: ' + (err.message || 'Please try again'), 'error');
+        btn.disabled = false;
+        btn.textContent = '🚀 Post My Gig Now → (Free)';
+      }
+    });
 
-    /* ══════════════════════════════════
-       POST ANOTHER
-    ══════════════════════════════════ */
-    function postAnother() {
-      document.getElementById('successModal').classList.remove('open');
-      document.getElementById('gigTitle').value    = '';
-      document.getElementById('gigDesc').value     = '';
-      document.getElementById('payMin').value      = '';
-      document.getElementById('payMax').value      = '';
-      document.getElementById('gigDate').value     = '';
-      document.getElementById('gigLocation').value = '';
-      document.getElementById('workersCount').value = 1;
-      selectedCategory = ''; selectedSkills = []; selectedPerks = [];
-      document.querySelectorAll('.cat-card').forEach(c => c.classList.remove('selected'));
-      document.querySelectorAll('.skill-tag').forEach(s => s.classList.remove('selected'));
-      document.querySelectorAll('.perk-item').forEach(p => { p.classList.remove('checked'); p.querySelector('.perk-checkbox').textContent = ''; });
-      updatePreview();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+    /* ── Draft save ── */
+    document.getElementById('btnDraft') && document.getElementById('btnDraft').addEventListener('click', function() {
+      showToast('💾 Draft saved locally!', 'info');
+    });
 
-    /* ══════════════════════════════════
-       SET MIN DATE TO TODAY
-    ══════════════════════════════════ */
-    (function setMinDate() {
-      const today = new Date().toISOString().split('T')[0];
-      document.getElementById('gigDate').min    = today;
-      document.getElementById('gigEndDate').min = today;
-    })();
-
-    /* ══════════════════════════════════
-       TOAST
-    ══════════════════════════════════ */
-    let toastTimer;
-    function showToast(msg, duration = 2800) {
-      const t = document.getElementById('pgToast');
-      t.textContent = msg;
-      t.classList.add('show');
-      clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => t.classList.remove('show'), duration);
-    }
-
-    /* Init */
-    updatePreview();
-      requireAuth('post-gig.html');
+    /* ── Modal actions ── */
+    document.getElementById('btnModalDashboard') && document.getElementById('btnModalDashboard').addEventListener('click', function() {
+      window.location.href = 'dashboard-client.html';
+    });
+    document.getElementById('btnModalBrowse') && document.getElementById('btnModalBrowse').addEventListener('click', function() {
+      window.location.href = 'browse.html';
+    });
+    document.getElementById('btnModalPostAnother') && document.getElementById('btnModalPostAnother').addEventListener('click', function() {
+      window.location.reload();
+    });
 
   </script>
-
 </body>
 </html>
