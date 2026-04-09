@@ -357,8 +357,17 @@
             role: 'worker'
           }));
         }
-      } catch(e) {}
-      window.location.replace(redirectTo);
+        window.location.replace(redirectTo);
+      } catch(e) {
+        // Firestore failed but user is authenticated — set minimal data
+        localStorage.setItem(USER_KEY, JSON.stringify({
+          id: firebaseUser.uid,
+          name: firebaseUser.displayName || 'User',
+          email: firebaseUser.email,
+          role: 'worker'
+        }));
+        window.location.replace(redirectTo);
+      }
     }
   });
 
