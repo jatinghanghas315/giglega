@@ -389,62 +389,50 @@
 
   <script src="shared.js"></script>
 
-  <script>
+  <script type="module">
+  import { auth, db, googleProvider } from './firebase-config.js';
+  import {
+    signInWithEmailAndPassword,
+    createUserWithEmailAndPassword,
+    signInWithPopup,
+    sendPasswordResetEmail,
+    onAuthStateChanged
+  } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+  import {
+    doc, setDoc, getDoc
+  } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+
   document.addEventListener("DOMContentLoaded", function () {
 
-    /* ── Keys (use GL if available) ── */
-    var USER_KEY  = (typeof GL !== "undefined") ? GL.STORAGE_KEY_USER  : "gl_user";
-    var USERS_KEY = (typeof GL !== "undefined") ? GL.STORAGE_KEY_USERS : "gl_users";
-
-    /* ── Redirect destination ── */
     var redirectTo = getParam("redirect") || "index.html";
     var mode = (getParam("mode") || "").toLowerCase();
     var prefRole = (getParam("role") || "worker").toLowerCase();
-    /* Safety: never redirect back to login or signup */
     if (!redirectTo || /login|signup/i.test(redirectTo)) redirectTo = "index.html";
 
-    /* ✅ Already logged in — go to destination immediately */
-    var alreadyIn = getCurrentUser ? getCurrentUser() : safeParseUser();
-    if (alreadyIn) { window.location.replace(redirectTo); return; }
+    // ✅ If already logged in, redirect immediately
+    onAuthStateChanged(auth, function (user) {
+      if (user) window.location.replace(redirectTo);
+    });
 
-    var DEMO_OTP    = "1234";
-    var resetTarget = null;
-    var otpTimer    = null;
-
-    /* ── Helpers ── */
     function getParam(n) {
       var q = new URLSearchParams(window.location.search).get(n);
       if (q) return q;
       var hash = (window.location.hash || "").replace(/^#/, "");
-      if (!hash) return null;
-      return new URLSearchParams(hash).get(n);
+      return hash ? new URLSearchParams(hash).get(n) : null;
     }
-    function safeParseUser() {
-      try { var u = JSON.parse(localStorage.getItem(USER_KEY)||"null"); return (u&&u.id)?u:null; } catch(e){return null;}
-    }
-    function getUsers()      { try { return JSON.parse(localStorage.getItem(USERS_KEY)||"[]"); } catch(e){ return []; } }
-    function saveUsers(arr)  { localStorage.setItem(USERS_KEY, JSON.stringify(arr)); }
-    function saveUser(u)     { localStorage.setItem(USER_KEY, JSON.stringify(u)); }
-    function isEmail(v)      { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim()); }
-    function isPhone(v)      { return /^[6-9]\d{9}$/.test(v.replace(/\s+/g,"")); }
-    function validId(v)      { return isEmail(v) || isPhone(v); }
-    function hashPw(pw) {
-      var h = 0;
-      for (var i = 0; i < pw.length; i++) { h = ((h << 5) - h) + pw.charCodeAt(i); h |= 0; }
-      return "h" + Math.abs(h).toString(16);
-    }
-    function findUser(id) {
-      var clean = id.trim().replace(/\s+/g,"");
-      return getUsers().find(function(u){ return u.email===clean||u.phone===clean; }) || null;
-    }
+
+    function isEmail(v) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim()); }
+    function isPhone(v) { return /^[6-9]\d{9}$/.test(v.replace(/\s+/g, "")); }
+    function validId(v) { return isEmail(v) || isPhone(v); }
+
     function showErr(id, msg) {
       var el = document.getElementById(id);
       if (!el) return;
       if (msg) el.textContent = msg;
       el.classList.add("show");
     }
-    function hideErr(id) { var el=document.getElementById(id); if(el) el.classList.remove("show"); }
-    function clearErrs()  { document.querySelectorAll(".field-error").forEach(function(e){ e.classList.remove("show"); }); }
+    function hideErr(id) { var el = document.getElementById(id); if (el) el.classList.remove("show"); }
+    function clearErrs() { document.querySelectorAll(".field-error").forEach(function (e) { e.classList.remove("show"); }); }
     function setLoading(id, on) {
       var btn = document.getElementById(id);
       if (!btn) return;
@@ -452,15 +440,14 @@
       btn.classList.toggle("loading", on);
     }
 
-    /* ── Tab switching ── */
+    // ── Tab switching ──
     function showPanel(name) {
-      document.querySelectorAll(".auth-panel").forEach(function(p){ p.classList.remove("active"); });
-      document.querySelectorAll(".auth-tab").forEach(function(t){ t.classList.remove("active"); });
+      document.querySelectorAll(".auth-panel").forEach(function (p) { p.classList.remove("active"); });
+      document.querySelectorAll(".auth-tab").forEach(function (t) { t.classList.remove("active"); });
       var forgot = document.getElementById("panelForgot");
-      var tabs   = document.getElementById("authTabs");
+      var tabs = document.getElementById("authTabs");
       forgot.classList.remove("active");
       tabs.style.display = "grid";
-
       if (name === "login") {
         document.getElementById("panelLogin").classList.add("active");
         document.querySelector('[data-tab="login"]').classList.add("active");
@@ -474,257 +461,227 @@
       }
     }
 
-    document.querySelectorAll(".auth-tab").forEach(function(t){
-      t.addEventListener("click", function(){ showPanel(t.dataset.tab); });
+    document.querySelectorAll(".auth-tab").forEach(function (t) {
+      t.addEventListener("click", function () { showPanel(t.dataset.tab); });
     });
-    document.getElementById("switchToRegister").addEventListener("click", function(){ showPanel("register"); });
+    document.getElementById("switchToRegister").addEventListener("click", function () { showPanel("register"); });
+    document.getElementById("switchToLogin").addEventListener("click", function () { showPanel("login"); });
+    if (mode === "register") showPanel("register");
 
-    if (mode === "register") {
-      showPanel("register");
-    }
-    document.getElementById("switchToLogin").addEventListener("click", function(){ showPanel("login"); });
-
-    /* ── Eye toggles ── */
+    // ── Eye toggles ──
     function bindEye(btnId, inputId) {
       var btn = document.getElementById(btnId);
       var inp = document.getElementById(inputId);
       if (!btn || !inp) return;
-      btn.addEventListener("click", function(){
+      btn.addEventListener("click", function () {
         var isText = inp.type === "text";
         inp.type = isText ? "password" : "text";
         btn.textContent = isText ? "👁️" : "🙈";
       });
     }
-    bindEye("eyeLogin",   "loginPw");
-    bindEye("eyeReg",     "regPw");
+    bindEye("eyeLogin", "loginPw");
+    bindEye("eyeReg", "regPw");
     bindEye("eyeRegConf", "regPwConf");
-    bindEye("eyeNew",     "newPw");
+    bindEye("eyeNew", "newPw");
     bindEye("eyeNewConf", "newPwConf");
 
-    /* ── Password strength ── */
-    document.getElementById("regPw").addEventListener("input", function(){
+    // ── Password strength ──
+    document.getElementById("regPw").addEventListener("input", function () {
       var val = this.value;
       var wrap = document.getElementById("pwStrength");
       if (!val) { wrap.classList.remove("show"); return; }
       wrap.classList.add("show");
       var score = 0;
-      if (val.length >= 6)  score++;
+      if (val.length >= 6) score++;
       if (val.length >= 10) score++;
       if (/[A-Z]/.test(val) && /[a-z]/.test(val)) score++;
       if (/[0-9]/.test(val) && /[^a-zA-Z0-9]/.test(val)) score++;
-      var colors  = ["#ef4444","#f59e0b","#22c55e","#0d9488"];
-      var labels  = ["Weak","Fair","Good","Strong!"];
+      var colors = ["#ef4444", "#f59e0b", "#22c55e", "#0d9488"];
+      var labels = ["Weak", "Fair", "Good", "Strong!"];
       for (var i = 1; i <= 4; i++) {
-        var bar = document.getElementById("pb"+i);
-        if (bar) bar.style.background = i <= score ? colors[score-1] : "var(--gray-200)";
+        var bar = document.getElementById("pb" + i);
+        if (bar) bar.style.background = i <= score ? colors[score - 1] : "var(--gray-200)";
       }
       var lbl = document.getElementById("pwLbl");
-      if (lbl) { lbl.textContent = score > 0 ? labels[score-1] : "Too short"; }
+      if (lbl) lbl.textContent = score > 0 ? labels[score - 1] : "Too short";
     });
 
-    /* ══════════════════
-       LOGIN
-    ══════════════════ */
+    // ══════════════ LOGIN ══════════════
     document.getElementById("btnLogin").addEventListener("click", doLogin);
-    ["loginId","loginPw"].forEach(function(id){
-      document.getElementById(id).addEventListener("keydown", function(e){
-        if (e.key === "Enter") doLogin();
-      });
+    ["loginId", "loginPw"].forEach(function (id) {
+      document.getElementById(id).addEventListener("keydown", function (e) { if (e.key === "Enter") doLogin(); });
     });
 
     function doLogin() {
       clearErrs();
-      var id  = document.getElementById("loginId").value.trim();
-      var pw  = document.getElementById("loginPw").value;
-      var rem = document.getElementById("rememberMe").checked;
-      var ok  = true;
-
-      if (!id)          { showErr("loginIdErr","Please enter your email or phone number."); ok=false; }
-      else if (!validId(id)) { showErr("loginIdErr","Enter a valid email or 10-digit phone number."); ok=false; }
-      if (!pw)          { showErr("loginPwErr","Please enter your password."); ok=false; }
+      var id = document.getElementById("loginId").value.trim();
+      var pw = document.getElementById("loginPw").value;
+      var ok = true;
+      if (!id) { showErr("loginIdErr", "Please enter your email or phone number."); ok = false; }
+      else if (!validId(id)) { showErr("loginIdErr", "Enter a valid email or 10-digit phone number."); ok = false; }
+      if (!pw) { showErr("loginPwErr", "Please enter your password."); ok = false; }
       if (!ok) return;
 
+      // Phone login: require email — phone auth needs Firebase Phone Auth (OTP), not supported here yet
+      if (isPhone(id)) {
+        showErr("loginIdErr", "Phone login coming soon. Please use your email to login.");
+        return;
+      }
+
       setLoading("btnLogin", true);
-      setTimeout(function(){
-        setLoading("btnLogin", false);
-        var user = findUser(id);
-        if (!user) {
-          showErr("loginIdErr","No account found. Please register first.");
-          return;
-        }
-        if (user.password !== hashPw(pw)) {
-          showErr("loginPwErr","Incorrect password. Please try again.");
-          return;
-        }
-        saveUser(user);
-        showToast("✅ Welcome back, " + (user.name||"User") + "!", "success");
-        setTimeout(function(){ window.location.replace(redirectTo); }, 900);
-      }, 800);
+      signInWithEmailAndPassword(auth, id, pw)
+        .then(function (cred) {
+          setLoading("btnLogin", false);
+          showToast("✅ Welcome back!", "success");
+          setTimeout(function () { window.location.replace(redirectTo); }, 900);
+        })
+        .catch(function (err) {
+          setLoading("btnLogin", false);
+          if (err.code === "auth/user-not-found" || err.code === "auth/invalid-credential") {
+            showErr("loginIdErr", "No account found. Please register first.");
+          } else if (err.code === "auth/wrong-password") {
+            showErr("loginPwErr", "Incorrect password. Please try again.");
+          } else {
+            showErr("loginPwErr", err.message);
+          }
+        });
     }
 
-    /* ══════════════════
-       REGISTER
-    ══════════════════ */
+    // ══════════════ REGISTER ══════════════
     document.getElementById("btnRegister").addEventListener("click", doRegister);
-    document.getElementById("regPwConf").addEventListener("keydown", function(e){
-      if (e.key === "Enter") doRegister();
-    });
+    document.getElementById("regPwConf").addEventListener("keydown", function (e) { if (e.key === "Enter") doRegister(); });
 
     function doRegister() {
       clearErrs();
-      var name   = document.getElementById("regName").value.trim();
-      var id     = document.getElementById("regId").value.trim();
-      var city   = document.getElementById("regCity").value.trim();
-      var pw     = document.getElementById("regPw").value;
+      var name = document.getElementById("regName").value.trim();
+      var id = document.getElementById("regId").value.trim();
+      var city = document.getElementById("regCity").value.trim();
+      var pw = document.getElementById("regPw").value;
       var pwConf = document.getElementById("regPwConf").value;
-      var ok     = true;
-
-      if (!name||name.length<2)   { showErr("regNameErr"); ok=false; }
-      if (!id||!validId(id))      { showErr("regIdErr");   ok=false; }
-      if (!city)                  { showErr("regCityErr"); ok=false; }
-      if (!pw||pw.length<6)       { showErr("regPwErr");   ok=false; }
-      if (pw !== pwConf)          { showErr("regPwConfErr"); ok=false; }
+      var ok = true;
+      if (!name || name.length < 2) { showErr("regNameErr"); ok = false; }
+      if (!id || !validId(id)) { showErr("regIdErr"); ok = false; }
+      if (!city) { showErr("regCityErr"); ok = false; }
+      if (!pw || pw.length < 6) { showErr("regPwErr"); ok = false; }
+      if (pw !== pwConf) { showErr("regPwConfErr"); ok = false; }
       if (!ok) return;
 
-      var clean = id.replace(/\s+/g,"");
-      if (findUser(clean)) {
-        showErr("regIdErr","Account already exists with this email/phone. Please login.");
+      if (isPhone(id)) {
+        showErr("regIdErr", "Phone registration coming soon. Please use an email address.");
         return;
       }
 
       setLoading("btnRegister", true);
-      setTimeout(function(){
-        setLoading("btnRegister", false);
-        var newUser = {
-          id:        "usr_" + Date.now(),
-          name:      name,
-          email:     isEmail(clean) ? clean : null,
-          phone:     isPhone(clean) ? clean : null,
-          city:      city,
-          password:  hashPw(pw),
-          createdAt: new Date().toISOString(),
-          skills:    [],
-          avatar:    null,
-          bio:       "",
-          workType:  "",
-          role:      (prefRole === "poster" ? "poster" : "worker"),
-        };
-        var users = getUsers();
-        users.push(newUser);
-        saveUsers(users);
-        saveUser(newUser);
-
-        document.getElementById("panelRegister").style.display   = "none";
-        document.getElementById("authTabs").style.display         = "none";
-        document.getElementById("registerSuccess").classList.add("show");
-        showToast("🎉 Welcome to GigLega, " + name + "!", "success");
-                setTimeout(function(){ window.location.replace(prefRole === "poster" ? "dashboard-client.html" : "dashboard-worker.html"); }, 1800);
-      }, 1000);
+      createUserWithEmailAndPassword(auth, id, pw)
+        .then(function (cred) {
+          var uid = cred.user.uid;
+          // Save user profile to Firestore
+          return setDoc(doc(db, "users", uid), {
+            id: uid,
+            name: name,
+            email: id,
+            phone: null,
+            city: city,
+            role: prefRole === "poster" ? "poster" : "worker",
+            createdAt: new Date().toISOString(),
+            skills: [],
+            avatar: null,
+            bio: "",
+            workType: ""
+          });
+        })
+        .then(function () {
+          setLoading("btnRegister", false);
+          document.getElementById("panelRegister").style.display = "none";
+          document.getElementById("authTabs").style.display = "none";
+          document.getElementById("registerSuccess").classList.add("show");
+          showToast("🎉 Welcome to GigLega, " + name + "!", "success");
+          setTimeout(function () {
+            window.location.replace(prefRole === "poster" ? "dashboard-client.html" : "dashboard-worker.html");
+          }, 1800);
+        })
+        .catch(function (err) {
+          setLoading("btnRegister", false);
+          if (err.code === "auth/email-already-in-use") {
+            showErr("regIdErr", "Account already exists with this email. Please login.");
+          } else {
+            showErr("regIdErr", err.message);
+          }
+        });
     }
 
-    /* ══════════════════
-       FORGOT PASSWORD
-    ══════════════════ */
-    document.getElementById("btnForgot").addEventListener("click", function(){
-      clearErrs(); showPanel("forgot"); showFStep(1);
+    // ══════════════ FORGOT PASSWORD ══════════════
+    document.getElementById("btnForgot").addEventListener("click", function () {
+      clearErrs();
+      showPanel("forgot");
+      showFStep(1);
     });
-    document.getElementById("forgotBack1").addEventListener("click", function(){ showPanel("login"); });
-    document.getElementById("forgotBack2").addEventListener("click", function(){ showFStep(1); });
+    document.getElementById("forgotBack1").addEventListener("click", function () { showPanel("login"); });
+    document.getElementById("forgotBack2").addEventListener("click", function () { showFStep(1); });
 
     function showFStep(n) {
-      [1,2,3].forEach(function(i){
-        document.getElementById("fStep"+i).style.display = i===n ? "block" : "none";
+      [1, 2, 3].forEach(function (i) {
+        document.getElementById("fStep" + i).style.display = i === n ? "block" : "none";
       });
       document.getElementById("forgotSuccess").classList.remove("show");
     }
 
-    document.getElementById("btnSendOtp").addEventListener("click", function(){
+    document.getElementById("btnSendOtp").addEventListener("click", function () {
       clearErrs();
       var id = document.getElementById("forgotId").value.trim();
-      if (!id||!validId(id)) { showErr("forgotIdErr","Enter a valid email or 10-digit phone number."); return; }
-      var user = findUser(id);
-      if (!user) { showErr("forgotIdErr","No account found with this email/phone."); return; }
-      resetTarget = user;
+      if (!id || !isEmail(id)) {
+        showErr("forgotIdErr", "Enter a valid email address to reset your password.");
+        return;
+      }
       setLoading("btnSendOtp", true);
-      setTimeout(function(){
-        setLoading("btnSendOtp", false);
-        document.getElementById("otpSubText").innerHTML =
-          "OTP sent! &nbsp;(Demo: use <strong>1234</strong>)";
-        showFStep(2);
-        startOtpTimer();
-      }, 900);
+      sendPasswordResetEmail(auth, id)
+        .then(function () {
+          setLoading("btnSendOtp", false);
+          // Show success message directly — Firebase sends real email
+          [1, 2, 3].forEach(function (i) { document.getElementById("fStep" + i).style.display = "none"; });
+          document.getElementById("forgotSuccess").classList.add("show");
+          document.querySelector("#forgotSuccess h3").textContent = "Reset Email Sent!";
+          document.querySelector("#forgotSuccess p").textContent = "Check your inbox for a password reset link from Firebase.";
+          showToast("✅ Password reset email sent!", "success");
+        })
+        .catch(function (err) {
+          setLoading("btnSendOtp", false);
+          if (err.code === "auth/user-not-found") {
+            showErr("forgotIdErr", "No account found with this email.");
+          } else {
+            showErr("forgotIdErr", err.message);
+          }
+        });
     });
 
-    /* OTP digit auto-advance */
-    ["od1","od2","od3","od4"].forEach(function(id, i, arr){
-      var inp = document.getElementById(id);
-      inp.addEventListener("input", function(){
-        this.value = this.value.replace(/\D/g,"").slice(0,1);
-        if (this.value && i < arr.length-1) document.getElementById(arr[i+1]).focus();
-      });
-      inp.addEventListener("keydown", function(e){
-        if (e.key==="Backspace" && !this.value && i>0) document.getElementById(arr[i-1]).focus();
-      });
-    });
-
-    function startOtpTimer() {
-      var sec  = 30;
-      var btn  = document.getElementById("btnResend");
-      var disp = document.getElementById("otpCountdown");
-      btn.disabled = true;
-      clearInterval(otpTimer);
-      otpTimer = setInterval(function(){
-        sec--;
-        disp.textContent = sec + "s";
-        if (sec <= 0) { clearInterval(otpTimer); disp.textContent = ""; btn.disabled = false; }
-      }, 1000);
-    }
-
-    document.getElementById("btnResend").addEventListener("click", function(){
-      showToast("OTP resent! (Demo: use 1234)", "success");
-      startOtpTimer();
-    });
-
-    document.getElementById("btnVerifyOtp").addEventListener("click", function(){
-      hideErr("otpErr");
-      var otp = ["od1","od2","od3","od4"].map(function(id){ return document.getElementById(id).value; }).join("");
-      if (otp.length < 4) { showErr("otpErr","Please enter the 4-digit OTP."); return; }
-      setLoading("btnVerifyOtp", true);
-      setTimeout(function(){
-        setLoading("btnVerifyOtp", false);
-        if (otp !== DEMO_OTP) { showErr("otpErr","Incorrect OTP. Try again. (Hint: 1234)"); return; }
-        showFStep(3);
-      }, 700);
-    });
-
-    document.getElementById("btnSetPw").addEventListener("click", function(){
-      hideErr("newPwErr"); hideErr("newPwConfErr");
-      var pw     = document.getElementById("newPw").value;
-      var pwConf = document.getElementById("newPwConf").value;
-      if (!pw||pw.length<6) { showErr("newPwErr"); return; }
-      if (pw!==pwConf)      { showErr("newPwConfErr"); return; }
-      setLoading("btnSetPw", true);
-      setTimeout(function(){
-        setLoading("btnSetPw", false);
-        var users = getUsers();
-        var idx   = users.findIndex(function(u){ return u.id===resetTarget.id; });
-        if (idx > -1) { users[idx].password = hashPw(pw); saveUsers(users); }
-        resetTarget.password = hashPw(pw);
-        saveUser(resetTarget);
-        clearInterval(otpTimer);
-        [1,2,3].forEach(function(i){ document.getElementById("fStep"+i).style.display="none"; });
-        document.getElementById("forgotSuccess").classList.add("show");
-        showToast("✅ Password reset successful!", "success");
-        setTimeout(function(){ window.location.replace(redirectTo); }, 1800);
-      }, 900);
-    });
-
-    /* Google (demo) */
-    document.getElementById("btnGoogleLogin").addEventListener("click", function(){
-      showToast("Google login coming soon! Use email/phone for now.", "warning");
-    });
-
-  });
-  </script>
+    // ══════════════ GOOGLE LOGIN ══════════════
+    document.getElementById("btnGoogleLogin").addEventListener("click", function () {
+      signInWithPopup(auth, googleProvider)
+        .then(function (result) {
+          var user = result.user;
+          // Save to Firestore if new user
+          var userRef = doc(db, "users", user.uid);
+          getDoc(userRef).then(function (snap) {
+            if (!snap.exists()) {
+              setDoc(userRef, {
+                id: user.uid,
+                name: user.displayName || "",
+                email: user.email || "",
+                phone: null,
+                city: "",
+                role: prefRole === "poster" ? "poster" : "worker",
+                createdAt: new Date().toISOString(),
+                skills: [],
+                avatar: user.photoURL || null,
+                bio: "",
+                workType: ""
+              });
+            }
+          });
+          showToast("✅ Logged in with Google!", "success");
+          setTimeout(function () { window.location.replace(redirectTo); }, 900);
+        })
+        .catch(function (err) {
+          if (err.code !== "
 </body>
 </html>
