@@ -1625,7 +1625,7 @@
     });
 
     /* ══════ SUBMIT TO FIRESTORE ══════ */
-    document.getElementById('btnSubmitGig').addEventListener('click', async function() {
+    window.submitGig = async function() {
       if (!validateAll()) {
         showToast('⚠️ Please fill all required fields', 'warning');
         window.scrollTo({top: 0, behavior: 'smooth'});
@@ -1686,12 +1686,10 @@
         btn.disabled = false;
         btn.textContent = '🚀 Post My Gig Now → (Free)';
       }
-    });
+    };
 
     /* ── Draft save ── */
-    document.getElementById('btnDraft') && document.getElementById('btnDraft').addEventListener('click', function() {
-      showToast('💾 Draft saved locally!', 'info');
-    });
+    window.saveDraft = function() { showToast('💾 Draft saved!', 'info'); };
 
     /* ── Modal actions ── */
     document.getElementById('btnModalDashboard') && document.getElementById('btnModalDashboard').addEventListener('click', function() {
