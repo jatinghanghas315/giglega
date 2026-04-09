@@ -501,38 +501,22 @@
   <footer id="main-footer"></footer>
   <div id="toast-container"></div>
 
-  <script>
-  document.addEventListener("DOMContentLoaded", function () {
+  <script type="module">
+    import { auth, db } from './firebase-config.js';
+    import { doc, getDoc, collection, getDocs, query, where, limit, updateDoc, deleteDoc } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+    import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
 
-    /* ── Storage keys ── */
-    var GIGS_KEY   = (typeof GL !== "undefined") ? GL.STORAGE_KEY_GIGS   : "gl_gigs";
-    var USERS_KEY  = (typeof GL !== "undefined") ? GL.STORAGE_KEY_USERS  : "gl_users";
-    var CHATS_KEY  = (typeof GL !== "undefined") ? GL.STORAGE_KEY_CHATS  : "gl_chats";
-    var FEE_RATE   = (typeof GL !== "undefined") ? GL.FEE_RATE : 0.06;
+    var FEE_RATE = 0.06;
+    var currentUser = null;
 
     /* ── Helpers ── */
-    function escH(s) {
-      return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
-    }
+    function escH(s) { return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
     function getParam(n) { return new URLSearchParams(window.location.search).get(n); }
-    function getGigs()   { try { return JSON.parse(localStorage.getItem(GIGS_KEY)||"[]");  } catch(e){ return []; } }
-    function saveGigs(a) { localStorage.setItem(GIGS_KEY, JSON.stringify(a)); }
-    function getUsers()  { try { return JSON.parse(localStorage.getItem(USERS_KEY)||"[]"); } catch(e){ return []; } }
-    function getChats()  { try { return JSON.parse(localStorage.getItem(CHATS_KEY)||"[]"); } catch(e){ return []; } }
-    function saveChats(a){ localStorage.setItem(CHATS_KEY, JSON.stringify(a)); }
-
-    function getUserById(uid) {
-      if (!uid || uid === "demo") return { name: "Demo Poster", id: "demo" };
-      return getUsers().find(function(u){ return u.id === uid; }) || { name: "User", id: uid };
-    }
-    function getUserInitials(name) {
-      return (name||"U").split(" ").map(function(w){ return w[0]; }).join("").slice(0,2).toUpperCase();
-    }
     function timeAgo(iso) {
       if (!iso) return "";
       var d = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
-      if (d < 60)    return d + "s ago";
-      if (d < 3600)  return Math.floor(d/60)  + "m ago";
+      if (d < 60) return d + "s ago";
+      if (d < 3600) return Math.floor(d/60) + "m ago";
       if (d < 86400) return Math.floor(d/3600) + "h ago";
       return Math.floor(d/86400) + "d ago";
     }
@@ -541,434 +525,302 @@
       return new Date(iso).toLocaleDateString("en-IN", { day:"numeric", month:"short", year:"numeric" });
     }
     function fmtCur(n) { return "₹" + Number(n||0).toLocaleString("en-IN"); }
-
-    /* ── Current user ── */
-    var currentUser = (typeof getCurrentUser === "function") ? getCurrentUser() : null;
-
-    /* ── Get gig ID from URL ── */
-    var gigId = getParam("id");
-    if (!gigId) { renderNotFound("No gig ID provided."); return; }
-
-    var allGigs = getGigs();
-    var gig = allGigs.find(function(g){ return g.id === gigId; });
-    if (!gig) { renderNotFound("Gig not found or it may have been removed."); return; }
-
-    /* ── Breadcrumb ── */
-    if (typeof buildBreadcrumb === "function") {
-      buildBreadcrumb("breadcrumb", [
-        { label: "Home",        href: "index.html" },
-        { label: "Browse Gigs", href: "browse.html" },
-        { label: gig.title || "Gig Detail" }
-      ]);
+    function getUserInitials(name) {
+      return (name||"U").split(" ").map(function(w){ return w[0]; }).join("").slice(0,2).toUpperCase();
+    }
+    function showToast(msg, type) {
+      if (window.showToast) { window.showToast(msg, type); return; }
+      var t = document.createElement('div');
+      t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a3c5e;color:#fff;padding:10px 22px;border-radius:99px;font-size:.84rem;font-weight:700;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.2)';
+      t.textContent = msg;
+      document.body.appendChild(t);
+      setTimeout(function(){ t.remove(); }, 3000);
     }
 
-    /* ── Poster info ── */
-    var poster       = getUserById(gig.posterId);
-    var posterInits  = getUserInitials(poster.name);
-    var isOwner      = currentUser && currentUser.id === gig.posterId;
-    var fee          = Math.round((gig.budget||0) * FEE_RATE);
-    var earn         = (gig.budget||0) - fee;
-    var isOpen       = gig.status === "open";
-    var isTaken      = gig.status === "taken";
-
-    /* Check if this user already accepted this gig */
-    var alreadyAccepted = gig.workerId && currentUser && gig.workerId === currentUser.id;
-
-    /* ── Similar gigs (same category, not same id, open) ── */
-    var similar = allGigs.filter(function(g){
-      return g.id !== gigId && g.category === gig.category && g.status === "open";
-    }).slice(0, 4);
-
-    /* ══════════════════
-       RENDER PAGE
-    ══════════════════ */
-    var content = document.getElementById("pageContent");
-
-    /* Status label */
-    var statusLabel = isOpen   ? "✅ Open"   :
-                      isTaken  ? "🔴 Taken"  : "✔️ Done";
-    var statusClass = isOpen   ? "status-open"  :
-                      isTaken  ? "status-taken" : "status-done";
-
-    /* Skills chips */
-    var skillsHtml = "";
-    if (gig.skills && gig.skills.length) {
-      skillsHtml = gig.skills.map(function(s){
-        return '<span class="skill-tag">✓ ' + escH(s) + '</span>';
-      }).join("");
-    }
-
-    /* Similar gigs HTML */
-    var similarHtml = "";
-    if (similar.length) {
-      similar.forEach(function(sg){
-        var sgEarn = Math.round((sg.budget||0) * (1 - FEE_RATE));
-        similarHtml +=
-          '<a class="similar-card" href="gig-detail.html?id=' + escH(sg.id) + '">' +
-            '<div class="similar-icon">' +
-              (sg.type === "hyperlocal" ? "📍" : "🌐") +
-            '</div>' +
-            '<div style="flex:1;min-width:0">' +
-              '<div class="similar-title truncate">' + escH(sg.title) + '</div>' +
-              '<div class="similar-budget">' + fmtCur(sgEarn) + ' earn · ' + escH(sg.category||"") + '</div>' +
-            '</div>' +
-          '</a>';
-      });
-    }
-
-    /* Poster gig stats */
-    var posterGigsPosted  = allGigs.filter(function(g){ return g.posterId === gig.posterId; }).length;
-    var posterGigsDone    = allGigs.filter(function(g){ return g.posterId === gig.posterId && g.status === "done"; }).length;
-
-    content.innerHTML =
-      '<div class="detail-grid">' +
-
-        /* ── LEFT ── */
-        '<div class="detail-main">' +
-
-          /* Header card */
-          '<div class="gig-header">' +
-            '<div class="gig-header-top">' +
-              '<span class="gig-type-tag ' + (gig.type === "hyperlocal" ? "tag-hyperlocal" : "tag-remote") + '">' +
-                (gig.type === "hyperlocal" ? "📍 Hyperlocal" : "🌐 Remote") +
-              '</span>' +
-              '<span class="gig-status-pill ' + statusClass + '">' + statusLabel + '</span>' +
-              (gig.category ? '<span class="gig-cat-tag">🏷️ ' + escH(gig.category) + '</span>' : '') +
-            '</div>' +
-            '<h1 class="gig-title">' + escH(gig.title) + '</h1>' +
-            '<div class="gig-meta-row">' +
-              '<span class="gig-meta-item">📍 <strong>' + escH(gig.location||"Gurugram") + '</strong></span>' +
-              '<span class="gig-meta-item">🕐 Posted <strong>' + timeAgo(gig.createdAt) + '</strong></span>' +
-              (gig.deadline ? '<span class="gig-meta-item">⏰ Deadline <strong>' + escH(gig.deadline) + '</strong></span>' : '') +
-              (gig.duration ? '<span class="gig-meta-item">⏱ Duration <strong>' + escH(gig.duration) + '</strong></span>' : '') +
-            '</div>' +
-          '</div>' +
-
-          /* Description */
-          '<div class="detail-card">' +
-            '<div class="detail-card-title">📝 Description</div>' +
-            '<div class="gig-description">' + escH(gig.description||"No description provided.") + '</div>' +
-          '</div>' +
-
-          /* Skills needed */
-          (skillsHtml ?
-            '<div class="detail-card">' +
-              '<div class="detail-card-title">🛠 Skills Needed</div>' +
-              '<div class="skills-wrap">' + skillsHtml + '</div>' +
-            '</div>' : ''
-          ) +
-
-          /* Timeline / details */
-          '<div class="detail-card">' +
-            '<div class="detail-card-title">📋 Gig Details</div>' +
-            '<div class="timeline">' +
-              '<div class="tl-item"><div class="tl-dot"></div><div><div class="tl-label">Location</div><div class="tl-val">' + escH(gig.location||"Gurugram") + '</div></div></div>' +
-              '<div class="tl-item"><div class="tl-dot"></div><div><div class="tl-label">Type</div><div class="tl-val">' + (gig.type === "hyperlocal" ? "Hyperlocal — in-person" : "Remote — work from anywhere") + '</div></div></div>' +
-              '<div class="tl-item"><div class="tl-dot"></div><div><div class="tl-label">Category</div><div class="tl-val">' + escH(gig.category||"General") + '</div></div></div>' +
-              '<div class="tl-item"><div class="tl-dot"></div><div><div class="tl-label">Posted On</div><div class="tl-val">' + formatDate(gig.createdAt) + '</div></div></div>' +
-              (gig.deadline ? '<div class="tl-item"><div class="tl-dot"></div><div><div class="tl-label">Deadline</div><div class="tl-val">' + escH(gig.deadline) + '</div></div></div>' : '') +
-              (gig.duration ? '<div class="tl-item"><div class="tl-dot"></div><div><div class="tl-label">Est. Duration</div><div class="tl-val">' + escH(gig.duration) + '</div></div></div>' : '') +
-            '</div>' +
-          '</div>' +
-
-          /* Poster info */
-          '<div class="poster-card">' +
-            '<div class="detail-card-title">👤 Posted By</div>' +
-            '<div class="poster-row">' +
-              '<div class="poster-avatar-lg">' + escH(posterInits) + '</div>' +
-              '<div>' +
-                '<div class="poster-name">' + escH(poster.name||"User") + '</div>' +
-                '<div class="poster-since">Member since ' + formatDate(poster.createdAt||gig.createdAt) + '</div>' +
-              '</div>' +
-            '</div>' +
-            '<div class="poster-stats">' +
-              '<div class="ps-item"><div class="ps-val">' + posterGigsPosted + '</div><div class="ps-lbl">Gigs Posted</div></div>' +
-              '<div class="ps-item"><div class="ps-val">' + posterGigsDone   + '</div><div class="ps-lbl">Completed</div></div>' +
-              '<div class="ps-item"><div class="ps-val">' + (poster.city||"Gurugram") + '</div><div class="ps-lbl">Location</div></div>' +
-            '</div>' +
-          '</div>' +
-
-          /* Similar gigs */
-          (similarHtml ?
-            '<div class="detail-card">' +
-              '<div class="detail-card-title">🔁 Similar Gigs</div>' +
-              similarHtml +
-            '</div>' : ''
-          ) +
-
-        '</div>' +
-
-        /* ── RIGHT SIDEBAR ── */
-        '<div class="detail-sidebar">' +
-
-          /* Pricing card */
-          '<div class="pricing-card">' +
-            '<div style="font-size:.8rem;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--gray-400);margin-bottom:14px">💰 Pricing</div>' +
-            '<div class="price-row"><span class="label">Posted Budget</span><span class="value">' + fmtCur(gig.budget) + '</span></div>' +
-            '<div class="price-row"><span class="label">Platform Fee (6%)</span><span class="value" style="color:var(--danger)">−' + fmtCur(fee) + '</span></div>' +
-            '<div class="price-row earn"><span class="label">💰 You Earn</span><span class="value">' + fmtCur(earn) + '</span></div>' +
-            (gig.paymentType ? '<div class="price-row"><span class="label">Payment</span><span class="value">' + escH(gig.paymentType) + '</span></div>' : '') +
-
-            /* Already accepted banner */
-            '<div class="accepted-banner' + (alreadyAccepted ? " show" : "") + '" id="acceptedBanner">' +
-              '<h4>✅ You already accepted this gig!</h4>' +
-              '<p>Chat with the poster for next steps.</p>' +
-            '</div>' +
-
-            /* Action buttons */
-            '<div class="action-zone" id="actionZone">' +
-            '</div>' +
-
-            /* Owner actions */
-            '<div class="owner-actions' + (isOwner ? " show" : "") + '" id="ownerActions">' +
-              '<a href="gig-edit.html?id=' + escH(gigId) + '" class="btn btn-secondary btn-sm" style="width:100%;text-align:center">✏️ Edit Gig</a>' +
-              '<button class="btn btn-sm" id="btnDeleteGig" style="width:100%;border:1.5px solid var(--danger);color:var(--danger);background:transparent;font-weight:700;padding:10px;border-radius:var(--radius-sm);cursor:pointer;font-family:var(--font)">🗑 Delete Gig</button>' +
-            '</div>' +
-
-          '</div>' +
-
-          /* Safety tips */
-          '<div class="safety-card">' +
-            '<div class="safety-title">🛡 Safety Tips</div>' +
-            '<div class="safety-item">✅ <span>Pehle in-app chat mein poster se milne ki jagah confirm karo.</span></div>' +
-            '<div class="safety-item">🚫 <span>Advance payment kabhi bhi bahar mat karo platform ke.</span></div>' +
-            '<div class="safety-item">📞 <span>Personal number share karne ki zaroorat nahi — chat kaafi hai.</span></div>' +
-            '<div class="safety-item">⚠️ <span>Koi bhi problem ho toh <a href="trust-safety.html" style="color:var(--teal)">Trust & Safety</a> report karo.</span></div>' +
-          '</div>' +
-
-        '</div>' +
-
-      '</div>';
-
-    /* ── Build action zone ── */
-    buildActionZone();
-
-    /* ══════════════════
-       ACTION ZONE
-    ══════════════════ */
-    function buildActionZone() {
-      var zone = document.getElementById("actionZone");
-      if (!zone) return;
-      zone.innerHTML = "";
-
-      /* Not logged in */
-      if (!currentUser) {
-        zone.innerHTML =
-          '<a href="login.html?redirect=' + encodeURIComponent("gig-detail.html?id=" + gigId) + '" class="btn-accept">' +
-            '🔑 Login to Accept' +
-          '</a>' +
-          '<a href="browse.html" class="btn-chat">← Browse More Gigs</a>';
-        return;
-      }
-
-      /* Owner of this gig */
-      if (isOwner) {
-        if (gig.workerId) {
-          zone.innerHTML =
-            '<a href="chat.html?gigId=' + escH(gigId) + '" class="btn-chat">💬 Chat with Worker</a>';
-        } else {
-          zone.innerHTML =
-            '<div style="text-align:center;font-size:.84rem;color:var(--gray-500);padding:8px 0">Waiting for a worker to accept...</div>' +
-            '<a href="chat.html?gigId=' + escH(gigId) + '" class="btn-chat">💬 Open Chat</a>';
-        }
-        return;
-      }
-
-      /* Already accepted */
-      if (alreadyAccepted) {
-        zone.innerHTML =
-          '<a href="chat.html?gigId=' + escH(gigId) + '" class="btn-chat">💬 Chat with Poster</a>' +
-          '<a href="browse.html" class="btn btn-secondary btn-sm" style="width:100%;text-align:center">🔍 Find More Gigs</a>';
-        return;
-      }
-
-      /* Gig taken by someone else */
-      if (isTaken) {
-        zone.innerHTML =
-          '<button class="btn-accept" disabled>🔴 Gig Already Taken</button>' +
-          '<a href="browse.html" class="btn-chat">🔍 Browse Other Gigs</a>';
-        return;
-      }
-
-      /* Gig done */
-      if (gig.status === "done") {
-        zone.innerHTML =
-          '<button class="btn-accept" disabled>✔️ Gig Completed</button>' +
-          '<a href="browse.html" class="btn-chat">🔍 Browse Other Gigs</a>';
-        return;
-      }
-
-      /* Open — can accept */
-      zone.innerHTML =
-        '<button class="btn-accept" id="btnAccept">' +
-          '<span class="btn-text">⚡ Accept This Gig</span>' +
-          '<span class="spinner"></span>' +
-        '</button>' +
-        '<a href="chat.html?gigId=' + escH(gigId) + '" class="btn-chat">💬 Ask a Question</a>' +
-        '<button class="btn-save" id="btnSave">🔖 Save Gig</button>';
-
-      /* Bind accept button */
-      document.getElementById("btnAccept").addEventListener("click", openAcceptModal);
-
-      /* Save gig (localStorage bookmarks) */
-      document.getElementById("btnSave").addEventListener("click", function(){
-        var key     = "gl_saved_" + (currentUser.id||"");
-        var saved   = [];
-        try { saved = JSON.parse(localStorage.getItem(key)||"[]"); } catch(e){}
-        var idx = saved.indexOf(gigId);
-        if (idx === -1) {
-          saved.push(gigId);
-          this.textContent = "❤️ Saved!";
-          this.classList.add("saved");
-          showToast("Gig saved to your list!", "success");
-        } else {
-          saved.splice(idx, 1);
-          this.textContent = "🔖 Save Gig";
-          this.classList.remove("saved");
-          showToast("Gig removed from saved.", "info");
-        }
-        localStorage.setItem(key, JSON.stringify(saved));
-      });
-
-      /* Check if already saved */
-      if (currentUser) {
-        var saveKey  = "gl_saved_" + currentUser.id;
-        var savedArr = [];
-        try { savedArr = JSON.parse(localStorage.getItem(saveKey)||"[]"); } catch(e){}
-        if (savedArr.includes(gigId)) {
-          var saveBtn = document.getElementById("btnSave");
-          if (saveBtn) { saveBtn.textContent = "❤️ Saved!"; saveBtn.classList.add("saved"); }
-        }
-      }
-    }
-
-    /* ══════════════════
-       ACCEPT MODAL
-    ══════════════════ */
-    function openAcceptModal() {
-      document.getElementById("modalGigTitle").textContent = gig.title;
-      document.getElementById("modalBudget").textContent   = fmtCur(gig.budget);
-      document.getElementById("modalFee").textContent      = "−" + fmtCur(fee);
-      document.getElementById("modalEarn").textContent     = fmtCur(earn);
-      document.getElementById("acceptModal").classList.add("open");
-    }
-
-    function closeAcceptModal() {
-      document.getElementById("acceptModal").classList.remove("open");
-    }
-
-    document.getElementById("modalClose").addEventListener("click", closeAcceptModal);
-    document.getElementById("modalCancelBtn").addEventListener("click", closeAcceptModal);
-    document.getElementById("acceptModal").addEventListener("click", function(e){
-      if (e.target === this) closeAcceptModal();
-    });
-
-    /* Confirm accept */
-    document.getElementById("modalConfirmBtn").addEventListener("click", function(){
-      var btn = this;
-      btn.disabled = true;
-      btn.querySelector(".btn-text").style.display = "none";
-      btn.querySelector(".spinner").style.display  = "inline-block";
-
-      setTimeout(function(){
-        /* 1. Update gig status */
-        var gigs = getGigs();
-        var idx  = gigs.findIndex(function(g){ return g.id === gigId; });
-        if (idx > -1) {
-          gigs[idx].status   = "taken";
-          gigs[idx].workerId = currentUser.id;
-          gigs[idx].acceptedAt = new Date().toISOString();
-          saveGigs(gigs);
-          gig = gigs[idx]; /* Update local ref */
-        }
-
-        /* 2. Create or get chat room */
-        var chats = getChats();
-        var existingChat = chats.find(function(c){ return c.gigId === gigId; });
-        if (!existingChat) {
-          var newChat = {
-            id:       "chat_" + Date.now(),
-            gigId:    gigId,
-            gigTitle: gig.title,
-            posterId: gig.posterId,
-            workerId: currentUser.id,
-            messages: [{
-              id:        "msg_" + Date.now(),
-              senderId:  "system",
-              text:      currentUser.name + " ne yeh gig accept kar li! Ab baat karo.",
-              type:      "system",
-              createdAt: new Date().toISOString()
-            }],
-            createdAt: new Date().toISOString()
-          };
-          chats.push(newChat);
-          saveChats(chats);
-        }
-
-        /* 3. Push notification to poster */
-        if (typeof pushNotif === "function") {
-          pushNotif({
-            icon:  "⚡",
-            title: "Gig Accepted!",
-            body:  currentUser.name + " ne \"" + gig.title + "\" accept ki.",
-            href:  "chat.html?gigId=" + gigId
-          });
-        }
-
-        btn.disabled = false;
-        btn.querySelector(".btn-text").style.display  = "inline";
-        btn.querySelector(".spinner").style.display   = "none";
-        closeAcceptModal();
-
-        showToast("🎉 Gig accepted! Ab poster se chat karo.", "success");
-
-        /* Redirect to chat */
-        setTimeout(function(){
-          window.location.href = "chat.html?gigId=" + gigId;
-        }, 1000);
-
-      }, 1100);
-    });
-
-    /* ══════════════════
-       OWNER DELETE
-    ══════════════════ */
-    var deleteBtn = document.getElementById("btnDeleteGig");
-    if (deleteBtn) {
-      deleteBtn.addEventListener("click", function(){
-        if (!confirm("Are you sure you want to delete this gig? This cannot be undone.")) return;
-        var gigs = getGigs();
-        var updated = gigs.filter(function(g){ return g.id !== gigId; });
-        saveGigs(updated);
-        showToast("Gig deleted successfully.", "success");
-        setTimeout(function(){ window.location.href = "dashboard-client.html"; }, 900);
-      });
-    }
-
-    /* ══════════════════
-       NOT FOUND
-    ══════════════════ */
+    /* ── Render not found ── */
     function renderNotFound(msg) {
-      if (typeof buildBreadcrumb === "function") {
-        buildBreadcrumb("breadcrumb", [
-          { label: "Home",        href: "index.html" },
-          { label: "Browse Gigs", href: "browse.html" },
-          { label: "Not Found" }
-        ]);
-      }
       document.getElementById("pageContent").innerHTML =
         '<div class="not-found">' +
           '<div class="nf-icon">🔍</div>' +
           '<h2>Gig Not Found</h2>' +
-          '<p>' + escH(msg) + '<br/>Ho sakta hai yeh gig delete ho gayi ho ya link galat ho.</p>' +
-          '<div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">' +
-            '<a href="browse.html" class="btn btn-primary">Browse All Gigs →</a>' +
-            '<a href="index.html"  class="btn btn-secondary">← Go Home</a>' +
-          '</div>' +
+          '<p>' + escH(msg) + '<br>Ho sakta hai yeh gig delete ho gayi ho ya link galat ho.</p>' +
+          '<a href="browse.html" class="btn btn-primary">Browse All Gigs →</a>' +
+          '<a href="index.html" class="btn btn-outline" style="margin-left:10px">← Go Home</a>' +
         '</div>';
     }
 
-  });
+    /* ── Render skeleton ── */
+    function renderSkeleton() {
+      document.getElementById("pageContent").innerHTML =
+        '<div style="padding:32px;max-width:800px;margin:0 auto">' +
+          ['height:14px;width:40%','height:32px;width:80%','height:14px;width:60%','height:120px;width:100%'].map(function(s){
+            return '<div class="skeleton" style="'+s+';border-radius:8px;margin-bottom:16px;background:linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%);background-size:200% 100%;animation:shimmer 1.5s ease-in-out infinite"></div>';
+          }).join('') +
+        '</div>' +
+        '<style>@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}</style>';
+    }
+
+    /* ── Render full gig ── */
+    function renderGig(gig, poster, similar, isOwner) {
+      var fee     = Math.round((gig.budget||0) * FEE_RATE);
+      var earn    = (gig.budget||0) - fee;
+      var isOpen  = gig.status === "open";
+      var isTaken = gig.status === "taken";
+      var isHyper = gig.type === "hyperlocal" || gig.workType === "on-site";
+      var alreadyAccepted = currentUser && gig.workerId === currentUser.uid;
+      var posterName = poster?.name || gig.posterName || "User";
+      var posterInits = getUserInitials(posterName);
+
+      var statusBadge = isOpen
+        ? '<span class="gd-status-badge status-open">✅ Open — Workers Apply Karen</span>'
+        : isTaken
+        ? '<span class="gd-status-badge status-taken">🔴 Already Taken</span>'
+        : '<span class="gd-status-badge status-done">✔️ Completed</span>';
+
+      var skillsHtml = (gig.skills||[]).length
+        ? (gig.skills||[]).map(function(s){ return '<span class="skill-badge">'+escH(s)+'</span>'; }).join("")
+        : '<span style="color:var(--gray-400);font-size:.85rem">No specific skills required</span>';
+
+      var perksHtml = (gig.perks||[]).length
+        ? (gig.perks||[]).map(function(p){ return '<span class="perk-badge">✅ '+escH(p)+'</span>'; }).join("")
+        : '';
+
+      var similarHtml = similar.length
+        ? similar.map(function(sg){
+            var sf = Math.round((sg.budget||0)*FEE_RATE);
+            return '<a href="gig-detail.html?id='+escH(sg.id)+'" class="similar-card">' +
+              '<div class="sim-title">'+escH(sg.title)+'</div>' +
+              '<div class="sim-meta">📍 '+escH(sg.location||'Gurugram')+' &bull; Earn: ₹'+(sg.budget-sf).toLocaleString('en-IN')+'</div>' +
+              '</a>';
+          }).join("")
+        : '<p style="color:var(--gray-400);font-size:.85rem">No similar gigs right now.</p>';
+
+      // Action button logic
+      var actionHtml = "";
+      if (isOwner) {
+        actionHtml =
+          '<button class="btn btn-danger" id="btnDeleteGig">🗑️ Delete This Gig</button>' +
+          '<a href="gig-edit.html?id='+escH(gig.id)+'" class="btn btn-outline" style="margin-left:10px">✏️ Edit Gig</a>';
+      } else if (alreadyAccepted) {
+        actionHtml = '<button class="btn btn-success" disabled>✅ Aapne yeh gig accept kar li hai</button>';
+      } else if (isOpen) {
+        actionHtml = '<button class="btn btn-primary btn-book" id="btnAccept">🚀 Book This Gig →</button>';
+      } else {
+        actionHtml = '<button class="btn btn-outline" disabled>🔴 This Gig is Taken</button>';
+      }
+
+      document.getElementById("pageContent").innerHTML =
+        '<div class="gd-wrapper">' +
+
+          // Header
+          '<div class="gd-header">' +
+            '<div class="gd-header-left">' +
+              statusBadge +
+              '<h1 class="gd-title">'+escH(gig.title)+'</h1>' +
+              '<div class="gd-meta-row">' +
+                '<span class="meta-chip">📍 '+escH(gig.location||gig.area||'Gurugram')+'</span>' +
+                '<span class="meta-chip">'+(isHyper ? '🏠 Hyperlocal' : '🌐 Remote')+'</span>' +
+                '<span class="meta-chip">🏷️ '+escH(gig.category||'General')+'</span>' +
+                '<span class="meta-chip">🕐 '+timeAgo(gig.createdAt)+'</span>' +
+                (gig.urgency === 'urgent' ? '<span class="meta-chip urgent-chip">🔥 Urgent</span>' : '') +
+              '</div>' +
+            '</div>' +
+          '</div>' +
+
+          // Body
+          '<div class="gd-body">' +
+
+            // Main column
+            '<div class="gd-main">' +
+
+              '<div class="gd-section">' +
+                '<h3 class="gd-section-title">📋 Description</h3>' +
+                '<p class="gd-desc">'+escH(gig.description||'No description provided.')+'</p>' +
+              '</div>' +
+
+              '<div class="gd-section">' +
+                '<h3 class="gd-section-title">🛠️ Skills Needed</h3>' +
+                '<div class="skills-wrap">'+skillsHtml+'</div>' +
+              '</div>' +
+
+              (perksHtml ? '<div class="gd-section"><h3 class="gd-section-title">🎁 Perks Included</h3><div class="perks-wrap">'+perksHtml+'</div></div>' : '') +
+
+              '<div class="gd-section">' +
+                '<h3 class="gd-section-title">📅 Schedule</h3>' +
+                '<div class="gd-info-grid">' +
+                  '<div class="gd-info-item"><span class="info-label">Date</span><span class="info-val">'+formatDate(gig.date)+'</span></div>' +
+                  '<div class="gd-info-item"><span class="info-label">Time</span><span class="info-val">'+(gig.time||'Flexible')+'</span></div>' +
+                  '<div class="gd-info-item"><span class="info-label">Duration</span><span class="info-val">'+(gig.duration||'As discussed')+'</span></div>' +
+                  '<div class="gd-info-item"><span class="info-label">Workers Needed</span><span class="info-val">'+(gig.workers||1)+'</span></div>' +
+                '</div>' +
+              '</div>' +
+
+              '<div class="gd-section">' +
+                '<h3 class="gd-section-title">🔥 Similar Gigs</h3>' +
+                '<div class="similar-grid">'+similarHtml+'</div>' +
+              '</div>' +
+
+            '</div>' +
+
+            // Sidebar
+            '<div class="gd-sidebar">' +
+
+              // Pay card
+              '<div class="gd-pay-card">' +
+                '<div class="pay-label">Budget</div>' +
+                '<div class="pay-amount">'+fmtCur(gig.budget)+'</div>' +
+                '<div class="earn-breakdown">' +
+                  '<div class="eb-row"><span>GigLega Fee (6%)</span><span>- '+fmtCur(fee)+'</span></div>' +
+                  '<div class="eb-row eb-earn"><span>You Earn</span><span>'+fmtCur(earn)+'</span></div>' +
+                '</div>' +
+                '<div id="actionZone" class="action-zone">'+actionHtml+'</div>' +
+              '</div>' +
+
+              // Poster card
+              '<div class="gd-poster-card">' +
+                '<h4 class="poster-card-title">Posted By</h4>' +
+                '<div class="poster-info-row">' +
+                  '<div class="poster-av-lg">'+escH(posterInits)+'</div>' +
+                  '<div class="poster-info-text">' +
+                    '<div class="poster-name">'+escH(posterName)+'</div>' +
+                    '<div class="poster-city">📍 '+(poster?.city || gig.area || 'Gurugram')+'</div>' +
+                  '</div>' +
+                '</div>' +
+                '<a href="chat.html?with='+escH(gig.posterId)+'&gig='+escH(gig.id)+'" class="btn btn-outline btn-block" style="margin-top:12px;display:block;text-align:center">💬 Message Poster</a>' +
+              '</div>' +
+
+            '</div>' +
+          '</div>' +
+        '</div>';
+
+      // Bind action buttons AFTER rendering
+      var btnAccept = document.getElementById('btnAccept');
+      if (btnAccept) {
+        btnAccept.addEventListener('click', function() {
+          if (!currentUser) { window.location.href = 'login.html?redirect=gig-detail.html?id='+gig.id; return; }
+          openBookingModal(gig, earn, fee);
+        });
+      }
+
+      var btnDelete = document.getElementById('btnDeleteGig');
+      if (btnDelete) {
+        btnDelete.addEventListener('click', async function() {
+          if (!confirm('Delete this gig? Yeh action undo nahi ho sakta.')) return;
+          try {
+            await deleteDoc(doc(db, 'gigs', gig.id));
+            showToast('🗑️ Gig deleted', 'info');
+            setTimeout(function(){ window.location.href = 'dashboard-client.html'; }, 1000);
+          } catch(e) {
+            showToast('Error deleting gig: ' + e.message, 'error');
+          }
+        });
+      }
+    }
+
+    /* ── Booking modal ── */
+    function openBookingModal(gig, earn, fee) {
+      var modal = document.getElementById('acceptModal');
+      if (!modal) {
+        // Create modal dynamically if it doesn't exist
+        modal = document.createElement('div');
+        modal.id = 'acceptModal';
+        modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px';
+        modal.innerHTML =
+          '<div style="background:#fff;border-radius:16px;padding:32px;max-width:420px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.3)">' +
+            '<h3 style="font-size:1.1rem;font-weight:800;color:#1a3c5e;margin-bottom:16px">🚀 Confirm Booking</h3>' +
+            '<p id="modalGigTitle" style="font-weight:700;margin-bottom:8px"></p>' +
+            '<div style="background:#f0fdf4;border-radius:10px;padding:16px;margin-bottom:20px">' +
+              '<div style="display:flex;justify-content:space-between;margin-bottom:8px"><span>Budget</span><span id="modalBudget" style="font-weight:700"></span></div>' +
+              '<div style="display:flex;justify-content:space-between;margin-bottom:8px"><span>GigLega Fee (6%)</span><span id="modalFee" style="color:#dc2626"></span></div>' +
+              '<div style="display:flex;justify-content:space-between;font-size:1.1rem;font-weight:800;color:#16a34a"><span>You Earn</span><span id="modalEarn"></span></div>' +
+            '</div>' +
+            '<div style="display:flex;gap:10px">' +
+              '<button id="modalCancelBtn" style="flex:1;padding:12px;border:1.5px solid #d1d5db;border-radius:8px;font-weight:700;cursor:pointer;background:#fff">Cancel</button>' +
+              '<button id="modalConfirmBtn" style="flex:2;padding:12px;background:linear-gradient(135deg,#1a3c5e,#0d9488);color:#fff;border:none;border-radius:8px;font-weight:800;cursor:pointer">Confirm Booking ✅</button>' +
+            '</div>' +
+          '</div>';
+        document.body.appendChild(modal);
+      }
+
+      document.getElementById('modalGigTitle').textContent = gig.title;
+      document.getElementById('modalBudget').textContent = fmtCur(gig.budget);
+      document.getElementById('modalFee').textContent = '- ' + fmtCur(fee);
+      document.getElementById('modalEarn').textContent = fmtCur(earn);
+      modal.style.display = 'flex';
+
+      document.getElementById('modalCancelBtn').onclick = function() { modal.style.display = 'none'; };
+      document.getElementById('modalConfirmBtn').onclick = async function() {
+        var confirmBtn = this;
+        confirmBtn.disabled = true; confirmBtn.textContent = '⏳ Booking…';
+        try {
+          await updateDoc(doc(db, 'gigs', gig.id), {
+            status: 'taken',
+            workerId: currentUser.uid,
+            workerName: currentUser.displayName || 'Worker',
+            bookedAt: new Date().toISOString()
+          });
+          modal.style.display = 'none';
+          showToast('🎉 Gig booked! Check your dashboard.', 'success');
+          setTimeout(function(){ window.location.href = 'dashboard-worker.html'; }, 1500);
+        } catch(e) {
+          showToast('Booking failed: ' + e.message, 'error');
+          confirmBtn.disabled = false; confirmBtn.textContent = 'Confirm Booking ✅';
+        }
+      };
+    }
+
+    /* ══════ MAIN INIT ══════ */
+    onAuthStateChanged(auth, function(user) { currentUser = user; });
+
+    async function init() {
+      renderSkeleton();
+      var gigId = getParam('id');
+      if (!gigId) { renderNotFound('No gig ID provided.'); return; }
+
+      try {
+        // Load gig from Firestore
+        var gigSnap = await getDoc(doc(db, 'gigs', gigId));
+        if (!gigSnap.exists()) { renderNotFound('Gig not found or it may have been removed.'); return; }
+        var gig = Object.assign({ id: gigSnap.id }, gigSnap.data());
+
+        // Load poster
+        var poster = null;
+        if (gig.posterId) {
+          try {
+            var posterSnap = await getDoc(doc(db, 'users', gig.posterId));
+            if (posterSnap.exists()) poster = posterSnap.data();
+          } catch(e) {}
+        }
+
+        // Load similar gigs
+        var similar = [];
+        if (gig.category) {
+          try {
+            var simSnap = await getDocs(query(
+              collection(db, 'gigs'),
+              where('category', '==', gig.category),
+              where('status', '==', 'open'),
+              limit(5)
+            ));
+            similar = simSnap.docs
+              .filter(function(d){ return d.id !== gigId; })
+              .slice(0, 4)
+              .map(function(d){ return Object.assign({ id: d.id }, d.data()); });
+          } catch(e) {}
+        }
+
+        var isOwner = currentUser && currentUser.uid === gig.posterId;
+        document.title = (gig.title || 'Gig Detail') + ' — GigLega';
+        renderGig(gig, poster, similar, isOwner);
+
+      } catch(err) {
+        console.error('Error loading gig:', err);
+        renderNotFound('Could not load gig. Please try again.');
+      }
+    }
+
+    init();
+
   </script>
 </body>
 </html>
