@@ -657,221 +657,187 @@
   <footer id="main-footer"></footer>
   <div id="toast-container"></div>
 
-  <script>
-  document.addEventListener("DOMContentLoaded", function () {
+  <script type="module">
+    import { auth, db } from './firebase-config.js';
+    import { collection, getDocs, query, orderBy, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+    import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
 
-    /* ── Storage keys ── */
-    var GIGS_KEY  = (typeof GL !== "undefined") ? GL.STORAGE_KEY_GIGS  : "gl_gigs";
-    var USERS_KEY = (typeof GL !== "undefined") ? GL.STORAGE_KEY_USERS : "gl_users";
-    var FEE_RATE  = (typeof GL !== "undefined") ? GL.FEE_RATE : 0.06;
-
-    /* ── Breadcrumb ── */
-    if (typeof buildBreadcrumb === "function") {
-      buildBreadcrumb("breadcrumb", [
-        { label: "Home", href: "index.html" },
-        { label: "Browse Gigs" }
-      ]);
-    }
-
-    /* ── User ── */
-    var currentUser = (typeof getCurrentUser === "function") ? getCurrentUser() : null;
-    if (currentUser) {
-      document.getElementById("postGigPromo").classList.remove("hidden");
-    }
+    var FEE_RATE = 0.06;
+    var allGigs = [];
+    var usersCache = {};
 
     /* ── Helpers ── */
-    function escH(s) {
-      return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
-    }
+    function escH(s) { return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
     function timeAgo(iso) {
       if (!iso) return "";
       var d = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
-      if (d < 60)    return d + "s ago";
-      if (d < 3600)  return Math.floor(d/60)  + "m ago";
+      if (d < 60) return d + "s ago";
+      if (d < 3600) return Math.floor(d/60) + "m ago";
       if (d < 86400) return Math.floor(d/3600) + "h ago";
       return Math.floor(d/86400) + "d ago";
     }
-    function getUsers() {
-      try { return JSON.parse(localStorage.getItem(USERS_KEY)||"[]"); } catch(e){ return []; }
-    }
     function getUserName(uid) {
       if (!uid || uid === "demo") return "Demo Poster";
-      var u = getUsers().find(function(x){ return x.id === uid; });
-      return u ? (u.name || "User") : "User";
+      return usersCache[uid]?.name || "User";
     }
     function getUserInitials(uid) {
       var n = getUserName(uid);
       return n.split(" ").map(function(w){ return w[0]; }).join("").slice(0,2).toUpperCase();
     }
 
-    /* ── Data ── */
-    var allGigs = [];
-    try { allGigs = JSON.parse(localStorage.getItem(GIGS_KEY)||"[]"); } catch(e){ allGigs = []; }
-
-    /* If empty, seed demo gigs */
-    if (!allGigs.length) {
-      allGigs = [
-        { id:"gig_d1", title:"House Cleaning — 3BHK", description:"Reliable cleaner chahiye full 3BHK ke liye Saturday ko. All supplies provided.", budget:800, category:"House Help", type:"hyperlocal", location:"Sector 56, Gurugram", status:"open", createdAt: new Date(Date.now()-3600000).toISOString(), posterId:"demo" },
-        { id:"gig_d2", title:"Grocery Pickup & Delivery", description:"BigBazaar se saman lana hai ghar pe. Light items only. 1-2 ghante max.", budget:300, category:"Errands", type:"hyperlocal", location:"DLF Phase 3", status:"open", createdAt: new Date(Date.now()-7200000).toISOString(), posterId:"demo" },
-        { id:"gig_d3", title:"Logo Design — Startup", description:"Clean minimal logo chahiye food delivery startup ke liye. 2 concepts.", budget:1500, category:"Design", type:"remote", location:"Remote", status:"open", createdAt: new Date(Date.now()-10800000).toISOString(), posterId:"demo" },
-        { id:"gig_d4", title:"Math Tutor — Class 10", description:"Meri beti ko maths weak hai. Weekend 2 hours daily. Nearby preferred.", budget:600, category:"Tutoring", type:"hyperlocal", location:"Sohna Road", status:"open", createdAt: new Date(Date.now()-14400000).toISOString(), posterId:"demo" },
-        { id:"gig_d5", title:"WordPress Bug Fix", description:"Contact form kaam nahi kar raha simple blog site ka. Quick fix needed.", budget:500, category:"Tech Help", type:"remote", location:"Remote", status:"open", createdAt: new Date(Date.now()-18000000).toISOString(), posterId:"demo" },
-        { id:"gig_d6", title:"Furniture Assembly — IKEA", description:"2 wardrobes + 1 bed assemble karna hai. Tools apne laana.", budget:700, category:"Handyman", type:"hyperlocal", location:"Sector 45, Gurugram", status:"open", createdAt: new Date(Date.now()-21600000).toISOString(), posterId:"demo" },
-        { id:"gig_d7", title:"Dog Walking — Labrador", description:"Mera lab roz subah 7-8 baje walk chahta hai. 5 days a week.", budget:400, category:"Pet Care", type:"hyperlocal", location:"Golf Course Road", status:"open", createdAt: new Date(Date.now()-25200000).toISOString(), posterId:"demo" },
-        { id:"gig_d8", title:"React Developer — Landing Page", description:"Startup ka landing page banana hai React mein. 1 week deadline.", budget:4000, category:"Web Dev", type:"remote", location:"Remote", status:"open", createdAt: new Date(Date.now()-28800000).toISOString(), posterId:"demo" },
-        { id:"gig_d9", title:"Instagram Reels Editing", description:"5 reels edit karni hain already shot footage se. Trending style chahiye.", budget:1200, category:"Social Media", type:"remote", location:"Remote", status:"open", createdAt: new Date(Date.now()-32400000).toISOString(), posterId:"demo" }
-      ];
-      try { localStorage.setItem(GIGS_KEY, JSON.stringify(allGigs)); } catch(e){}
+    /* ── Skeleton ── */
+    function showSkeletons() {
+      var grid = document.getElementById("gigsGrid");
+      grid.innerHTML = Array(6).fill(0).map(function(){
+        return '<div class="skel-card">' +
+          '<div class="skeleton" style="height:14px;width:60%;border-radius:6px;"></div>' +
+          '<div class="skeleton" style="height:24px;width:90%;border-radius:6px;"></div>' +
+          '<div class="skeleton" style="height:14px;width:80%;border-radius:6px;"></div>' +
+          '<div class="skeleton" style="height:50px;border-radius:8px;"></div>' +
+          '<div class="skeleton" style="height:36px;border-radius:8px;"></div>' +
+          '</div>';
+      }).join("");
+      grid.classList.remove("hidden");
+      document.getElementById("browseEmpty").classList.add("hidden");
     }
 
-    /* ── URL params (from index.html search / category click) ── */
-    var urlParams  = new URLSearchParams(window.location.search);
-    var urlQ   = urlParams.get("q")   || "";
-    var urlCat = urlParams.get("cat") || "";
+    /* ── Load gigs from Firestore ── */
+    async function loadGigs() {
+      showSkeletons();
+      try {
+        var snap = await getDocs(query(collection(db, 'gigs'), orderBy('createdAt', 'desc')));
+        allGigs = snap.docs.map(function(d){ return Object.assign({ id: d.id }, d.data()); });
+
+        // Load poster names
+        var uids = [...new Set(allGigs.map(function(g){ return g.posterId; }).filter(Boolean))];
+        await Promise.all(uids.map(async function(uid) {
+          try {
+            var usnap = await getDoc(doc(db, 'users', uid));
+            if (usnap.exists()) usersCache[uid] = usnap.data();
+          } catch(e) {}
+        }));
+      } catch(e) {
+        console.error("Firestore load failed:", e);
+        // Fall back to demo gigs
+        allGigs = [
+          { id:"gig_d1", title:"House Cleaning — 3BHK", description:"Reliable cleaner chahiye full 3BHK ke liye Saturday ko. All supplies provided.", budget:800, category:"House Help", type:"hyperlocal", location:"Sector 56, Gurugram", status:"open", createdAt: new Date(Date.now()-3600000).toISOString(), posterId:"demo" },
+          { id:"gig_d2", title:"Grocery Pickup & Delivery", description:"BigBazaar se saman lana hai ghar pe. Light items only.", budget:300, category:"Errands", type:"hyperlocal", location:"DLF Phase 3", status:"open", createdAt: new Date(Date.now()-7200000).toISOString(), posterId:"demo" },
+          { id:"gig_d3", title:"Logo Design — Startup", description:"Clean minimal logo chahiye food delivery startup ke liye. 2 concepts.", budget:1500, category:"Design", type:"remote", location:"Remote", status:"open", createdAt: new Date(Date.now()-10800000).toISOString(), posterId:"demo" },
+          { id:"gig_d4", title:"React Developer — Landing Page", description:"Startup ka landing page banana hai React mein. 1 week deadline.", budget:4000, category:"Web Dev", type:"remote", location:"Remote", status:"open", createdAt: new Date(Date.now()-28800000).toISOString(), posterId:"demo" }
+        ];
+      }
+
+      var urlParams = new URLSearchParams(window.location.search);
+      state.search = urlParams.get("q") || "";
+      state.category = urlParams.get("cat") || "";
+      if (state.search) document.getElementById("searchInput").value = state.search;
+
+      buildCategoryChips();
+      buildCategoryDropdown();
+      syncChips();
+      render();
+    }
+
+    /* ── Auth check ── */
+    onAuthStateChanged(auth, function(user) {
+      if (user) {
+        var promo = document.getElementById("postGigPromo");
+        if (promo) promo.classList.remove("hidden");
+      }
+    });
 
     /* ── State ── */
-    var state = {
-      search:   urlQ,
-      sort:     "newest",
-      type:     "",
-      category: urlCat,
-      minBudget:"",
-      maxBudget:"",
-      page:     1,
-      perPage:  9,
-      view:     "grid"
-    };
+    var state = { search: "", sort: "newest", type: "", category: "", minBudget:"", maxBudget:"", page:1, perPage:9, view:"grid" };
 
-    /* ── Categories from data ── */
-    var CATS_QUICK = ["All","Hyperlocal","Remote","House Help","Errands","Design","Tech Help","Tutoring","Handyman","Web Dev","Pet Care","Social Media"];
+    var CATS_QUICK = ["All","Hyperlocal","Remote","House Help","Errands","Design","Tech Help","Tutoring","Handyman","Web Dev","Pet Care","Social Media","Delivery","Packing","Event Help","Cleaning","Security","Cooking","Gardening"];
 
-    /* Build category select in advanced panel */
-    var catSet = new Set();
-    allGigs.forEach(function(g){ if(g.category) catSet.add(g.category); });
-    var fpCatEl = document.getElementById("fpCat");
-    catSet.forEach(function(c){
-      var o = document.createElement("option");
-      o.value = c; o.textContent = c;
-      fpCatEl.appendChild(o);
-    });
-
-    /* ── Populate search from URL ── */
-    if (urlQ)   document.getElementById("searchInput").value = urlQ;
-    if (urlCat) { state.category = urlCat; }
-
-    /* ── Quick filter chips ── */
-    var chipRow = document.getElementById("chipRow");
-    CATS_QUICK.forEach(function(cat){
-      var chip = document.createElement("button");
-      chip.className = "filter-chip" + (
-        cat === "All" && !state.category && !state.type ? " active" :
-        cat === state.category ? " active" :
-        cat === "Hyperlocal" && state.type === "hyperlocal" ? " active" :
-        cat === "Remote"     && state.type === "remote"     ? " active" : ""
-      );
-      chip.textContent = cat;
-      chip.dataset.cat = cat;
-      chip.addEventListener("click", function(){
-        if (cat === "All") {
-          state.category = ""; state.type = "";
-        } else if (cat === "Hyperlocal") {
-          state.type = state.type === "hyperlocal" ? "" : "hyperlocal";
-          state.category = "";
-        } else if (cat === "Remote") {
-          state.type = state.type === "remote" ? "" : "remote";
-          state.category = "";
-        } else {
-          state.category = state.category === cat ? "" : cat;
-          state.type = "";
-        }
-        state.page = 1;
-        syncChips();
-        render();
+    function buildCategoryChips() {
+      var chipRow = document.getElementById("chipRow");
+      chipRow.innerHTML = "";
+      CATS_QUICK.forEach(function(cat) {
+        var chip = document.createElement("button");
+        chip.className = "filter-chip" + (cat === "All" && !state.category && !state.type ? " active" : cat === state.category ? " active" : cat === "Hyperlocal" && state.type === "hyperlocal" ? " active" : cat === "Remote" && state.type === "remote" ? " active" : "");
+        chip.textContent = cat;
+        chip.dataset.cat = cat;
+        chip.addEventListener("click", function() {
+          if (cat === "All") { state.category = ""; state.type = ""; }
+          else if (cat === "Hyperlocal") { state.type = state.type === "hyperlocal" ? "" : "hyperlocal"; state.category = ""; }
+          else if (cat === "Remote") { state.type = state.type === "remote" ? "" : "remote"; state.category = ""; }
+          else { state.category = state.category === cat ? "" : cat; state.type = ""; }
+          state.page = 1; syncChips(); render();
+        });
+        chipRow.appendChild(chip);
       });
-      chipRow.appendChild(chip);
-    });
+    }
+
+    function buildCategoryDropdown() {
+      var catSet = new Set(allGigs.map(function(g){ return g.category; }).filter(Boolean));
+      var fpCatEl = document.getElementById("fpCat");
+      fpCatEl.innerHTML = '<option value="">All Categories</option>';
+      catSet.forEach(function(c) {
+        var o = document.createElement("option");
+        o.value = c; o.textContent = c;
+        fpCatEl.appendChild(o);
+      });
+    }
 
     function syncChips() {
-      chipRow.querySelectorAll(".filter-chip").forEach(function(chip){
+      var chipRow = document.getElementById("chipRow");
+      chipRow.querySelectorAll(".filter-chip").forEach(function(chip) {
         var cat = chip.dataset.cat;
         chip.classList.toggle("active",
-          (cat === "All"        && !state.category && !state.type) ||
-          (cat === "Hyperlocal" && state.type === "hyperlocal")    ||
-          (cat === "Remote"     && state.type === "remote")        ||
+          (cat === "All" && !state.category && !state.type) ||
+          (cat === "Hyperlocal" && state.type === "hyperlocal") ||
+          (cat === "Remote" && state.type === "remote") ||
           (cat === state.category && cat !== "All" && cat !== "Hyperlocal" && cat !== "Remote")
         );
       });
     }
 
-    /* ── Filter panel toggle ── */
+    /* ── Filters ── */
     var filterPanel = document.getElementById("filterPanel");
-    document.getElementById("btnFilterToggle").addEventListener("click", function(){
+    document.getElementById("btnFilterToggle").addEventListener("click", function() {
       var open = filterPanel.classList.toggle("open");
       this.classList.toggle("active", open);
     });
-
-    /* ── Apply / clear advanced filters ── */
-    document.getElementById("btnApplyFilters").addEventListener("click", function(){
-      state.category  = document.getElementById("fpCat").value;
-      state.type      = document.getElementById("fpType").value;
+    document.getElementById("btnApplyFilters").addEventListener("click", function() {
+      state.category = document.getElementById("fpCat").value;
+      state.type = document.getElementById("fpType").value;
       state.minBudget = document.getElementById("fpMin").value;
       state.maxBudget = document.getElementById("fpMax").value;
-      state.page      = 1;
-      syncChips();
-      renderActiveFilters();
-      render();
+      state.page = 1; syncChips(); renderActiveFilters(); render();
       filterPanel.classList.remove("open");
       document.getElementById("btnFilterToggle").classList.remove("active");
     });
 
-    document.getElementById("btnClearFilters").addEventListener("click", clearAllFilters);
-
     function clearAllFilters() {
-      state.search = ""; state.type = ""; state.category = "";
-      state.minBudget = ""; state.maxBudget = "";
-      state.page = 1;
+      state.search = ""; state.type = ""; state.category = ""; state.minBudget = ""; state.maxBudget = ""; state.page = 1;
       document.getElementById("searchInput").value = "";
-      document.getElementById("fpCat").value  = "";
+      document.getElementById("fpCat").value = "";
       document.getElementById("fpType").value = "";
-      document.getElementById("fpMin").value  = "";
-      document.getElementById("fpMax").value  = "";
-      syncChips();
-      renderActiveFilters();
-      render();
+      document.getElementById("fpMin").value = "";
+      document.getElementById("fpMax").value = "";
+      syncChips(); renderActiveFilters(); render();
     }
+
+    document.getElementById("btnClearFilters").addEventListener("click", clearAllFilters);
     document.getElementById("btnResetSearch").addEventListener("click", clearAllFilters);
 
-    /* ── Search input ── */
     var searchTimer;
-    document.getElementById("searchInput").addEventListener("input", function(){
+    document.getElementById("searchInput").addEventListener("input", function() {
       clearTimeout(searchTimer);
       var val = this.value;
-      searchTimer = setTimeout(function(){
-        state.search = val.trim();
-        state.page   = 1;
-        render();
-      }, 280);
+      searchTimer = setTimeout(function() { state.search = val.trim(); state.page = 1; render(); }, 280);
     });
 
-    /* ── Sort ── */
-    document.getElementById("sortSelect").addEventListener("change", function(){
-      state.sort = this.value;
-      state.page = 1;
-      render();
+    document.getElementById("sortSelect").addEventListener("change", function() { state.sort = this.value; state.page = 1; render(); });
+    document.getElementById("btnGrid").addEventListener("click", function() {
+      state.view = "grid"; document.getElementById("gigsGrid").classList.remove("view-list");
+      this.classList.add("active"); document.getElementById("btnList").classList.remove("active");
     });
-
-    /* ── View toggle ── */
-    document.getElementById("btnGrid").addEventListener("click", function(){
-      state.view = "grid";
-      document.getElementById("gigsGrid").classList.remove("view-list");
-      this.classList.add("active");
-      document.getElementById("btnList").classList.remove("active");
-    });
-    document.getElementById("btnList").addEventListener("click", function(){
-      state.view = "list";
-      document.getElementById("gigsGrid").classList.add("view-list");
-      this.classList.add("active");
-      document.getElementById("btnGrid").classList.remove("active");
+    document.getElementById("btnList").addEventListener("click", function() {
+      state.view = "list"; document.getElementById("gigsGrid").classList.add("view-list");
+      this.classList.add("active"); document.getElementById("btnGrid").classList.remove("active");
     });
 
     /* ── Active filter tags ── */
@@ -879,33 +845,22 @@
       var container = document.getElementById("activeFilters");
       container.innerHTML = "";
       var tags = [];
-      if (state.category)  tags.push({ key:"category",  label:"📂 " + state.category });
-      if (state.type)      tags.push({ key:"type",      label: state.type === "hyperlocal" ? "📍 Hyperlocal" : "🌐 Remote" });
+      if (state.category) tags.push({ key:"category", label:"📂 " + state.category });
+      if (state.type) tags.push({ key:"type", label: state.type === "hyperlocal" ? "📍 Hyperlocal" : "🌐 Remote" });
       if (state.minBudget) tags.push({ key:"minBudget", label:"₹" + state.minBudget + " min" });
       if (state.maxBudget) tags.push({ key:"maxBudget", label:"₹" + state.maxBudget + " max" });
-      if (state.search)    tags.push({ key:"search",    label:'🔍 "' + state.search + '"' });
-
-      tags.forEach(function(t){
+      if (state.search) tags.push({ key:"search", label:'🔍 "' + state.search + '"' });
+      tags.forEach(function(t) {
         var el = document.createElement("span");
         el.className = "af-tag";
-        el.innerHTML = escH(t.label) +
-          '<button class="af-remove" title="Remove filter">✕</button>';
-        el.querySelector(".af-remove").addEventListener("click", function(){
+        el.innerHTML = escH(t.label) + '<button class="af-remove" title="Remove filter">✕</button>';
+        el.querySelector(".af-remove").addEventListener("click", function() {
           state[t.key] = "";
           if (t.key === "search") document.getElementById("searchInput").value = "";
-          if (t.key === "category") document.getElementById("fpCat").value = "";
-          if (t.key === "type")     document.getElementById("fpType").value = "";
-          if (t.key === "minBudget") document.getElementById("fpMin").value = "";
-          if (t.key === "maxBudget") document.getElementById("fpMax").value = "";
-          state.page = 1;
-          syncChips();
-          renderActiveFilters();
-          render();
+          state.page = 1; syncChips(); renderActiveFilters(); render();
         });
         container.appendChild(el);
       });
-
-      /* Update filter badge */
       var badge = document.getElementById("filterBadge");
       var count = (state.category?1:0)+(state.type?1:0)+(state.minBudget?1:0)+(state.maxBudget?1:0);
       badge.textContent = count;
@@ -913,25 +868,18 @@
       document.getElementById("btnFilterToggle").classList.toggle("active", count > 0);
     }
 
-    /* ══════════════════
-       FILTER + SORT
-    ══════════════════ */
+    /* ── Filter + Sort ── */
     function getFiltered() {
-      var q   = state.search.toLowerCase();
+      var q = state.search.toLowerCase();
       var min = state.minBudget ? parseFloat(state.minBudget) : null;
       var max = state.maxBudget ? parseFloat(state.maxBudget) : null;
-
-      return allGigs.filter(function(g){
-        /* Search */
+      return allGigs.filter(function(g) {
         if (q) {
           var hay = [(g.title||""),(g.description||""),(g.category||""),(g.location||"")].join(" ").toLowerCase();
           if (!hay.includes(q)) return false;
         }
-        /* Type chip */
         if (state.type && g.type !== state.type) return false;
-        /* Category */
         if (state.category && g.category !== state.category) return false;
-        /* Budget */
         if (min !== null && (g.budget||0) < min) return false;
         if (max !== null && (g.budget||0) > max) return false;
         return true;
@@ -941,91 +889,64 @@
     function getSorted(arr) {
       var copy = arr.slice();
       switch(state.sort) {
-        case "oldest":     copy.sort(function(a,b){ return new Date(a.createdAt)-new Date(b.createdAt); }); break;
-        case "budget-high":copy.sort(function(a,b){ return (b.budget||0)-(a.budget||0); }); break;
+        case "oldest": copy.sort(function(a,b){ return new Date(a.createdAt)-new Date(b.createdAt); }); break;
+        case "budget-high": copy.sort(function(a,b){ return (b.budget||0)-(a.budget||0); }); break;
         case "budget-low": copy.sort(function(a,b){ return (a.budget||0)-(b.budget||0); }); break;
-        case "earn-high":  copy.sort(function(a,b){ return ((b.budget||0)*(1-FEE_RATE))-((a.budget||0)*(1-FEE_RATE)); }); break;
-        default:           copy.sort(function(a,b){ return new Date(b.createdAt)-new Date(a.createdAt); }); break;
+        case "earn-high": copy.sort(function(a,b){ return ((b.budget||0)*(1-FEE_RATE))-((a.budget||0)*(1-FEE_RATE)); }); break;
+        default: copy.sort(function(a,b){ return new Date(b.createdAt)-new Date(a.createdAt); }); break;
       }
       return copy;
     }
 
-    /* ══════════════════
-       RENDER CARDS
-    ══════════════════ */
+    /* ── Card ── */
     function makeCard(gig) {
-      var fee    = Math.round((gig.budget||0) * FEE_RATE);
-      var earn   = (gig.budget||0) - fee;
-      var isHyper = gig.type === "hyperlocal";
+      var fee = Math.round((gig.budget||0) * FEE_RATE);
+      var earn = (gig.budget||0) - fee;
+      var isHyper = gig.type === "hyperlocal" || gig.workType === "on-site";
       var isTaken = gig.status === "taken";
-
       return '<div class="gig-card' + (isTaken ? " taken" : "") + '" ' +
-               'onclick="window.location.href=\'gig-detail.html?id=' + escH(gig.id) + '\'">' +
-
+        'onclick="window.location.href=\'gig-detail.html?id=' + escH(gig.id) + '\'">' +
         '<div class="gig-card-left">' +
-
-          '<div class="gig-top-row">' +
-            '<span class="gig-type-tag ' + (isHyper ? "tag-hyperlocal" : "tag-remote") + '">' +
-              (isHyper ? "📍 Hyperlocal" : "🌐 Remote") +
-            '</span>' +
-            '<span class="gig-status-badge status-' + (gig.status||"open") + '">' +
-              (gig.status === "open" ? "✅ Open" : gig.status === "taken" ? "🔴 Taken" : "✔️ Done") +
-            '</span>' +
-          '</div>' +
-
-          '<div class="gig-card-title">' + escH(gig.title) + '</div>' +
-          '<div class="gig-card-desc line-clamp-2">' + escH(gig.description||"") + '</div>' +
-
-          '<div class="gig-card-meta">' +
-            '<span class="meta-chip">📍 ' + escH(gig.location||"Gurugram") + '</span>' +
-            '<span class="meta-chip">🕐 ' + timeAgo(gig.createdAt) + '</span>' +
-            (gig.category ? '<span class="meta-chip">🏷️ ' + escH(gig.category) + '</span>' : '') +
-          '</div>' +
-
-          '<div class="gig-earn-strip">' +
-            '<div><div class="earn-label">You Earn</div><div class="earn-val">₹' + earn.toLocaleString("en-IN") + '</div></div>' +
-            '<div style="text-align:right"><div class="earn-label">Budget</div><div class="budget-val">₹' + (gig.budget||0).toLocaleString("en-IN") + '</div></div>' +
-          '</div>' +
-
+        '<div class="gig-top-row">' +
+        '<span class="gig-type-tag ' + (isHyper ? "tag-hyperlocal" : "tag-remote") + '">' + (isHyper ? "📍 Hyperlocal" : "🌐 Remote") + '</span>' +
+        '<span class="gig-status-badge status-' + (gig.status||"open") + '">' + (gig.status === "open" ? "✅ Open" : gig.status === "taken" ? "🔴 Taken" : "✔️ Done") + '</span>' +
         '</div>' +
-
+        '<div class="gig-card-title">' + escH(gig.title) + '</div>' +
+        '<div class="gig-card-desc">' + escH((gig.description||"").slice(0,120)) + (gig.description && gig.description.length > 120 ? "…" : "") + '</div>' +
+        '<div class="gig-card-meta">' +
+        '<span class="meta-chip">📍 ' + escH(gig.location||gig.area||"Gurugram") + '</span>' +
+        '<span class="meta-chip">🕐 ' + timeAgo(gig.createdAt) + '</span>' +
+        (gig.category ? '<span class="meta-chip">🏷️ ' + escH(gig.category) + '</span>' : '') +
+        '</div>' +
+        '<div class="gig-earn-strip">' +
+        '<div><div class="earn-label">You Earn</div><div class="earn-val">₹' + earn.toLocaleString("en-IN") + '</div></div>' +
+        '<div style="text-align:right"><div class="earn-label">Budget</div><div class="budget-val">₹' + (gig.budget||0).toLocaleString("en-IN") + '</div></div>' +
+        '</div>' +
+        '</div>' +
         '<div class="gig-card-right">' +
-          '<div class="gig-footer">' +
-            '<div class="poster-info">' +
-              '<div class="poster-av">' + escH(getUserInitials(gig.posterId)) + '</div>' +
-              '<span>' + escH(getUserName(gig.posterId)) + '</span>' +
-            '</div>' +
-            '<a href="gig-detail.html?id=' + escH(gig.id) + '" ' +
-               'class="btn btn-primary btn-sm" ' +
-               'onclick="event.stopPropagation()" ' +
-               'style="white-space:nowrap">' +
-              (isTaken ? "View" : "Book This Gig →") +
-            '</a>' +
-          '</div>' +
+        '<div class="gig-footer">' +
+        '<div class="poster-info">' +
+        '<div class="poster-av">' + escH(getUserInitials(gig.posterId)) + '</div>' +
+        '<span>' + escH(getUserName(gig.posterId)) + '</span>' +
         '</div>' +
-
-      '</div>';
+        '<a href="gig-detail.html?id=' + escH(gig.id) + '" class="btn btn-primary btn-sm" onclick="event.stopPropagation()" style="white-space:nowrap">' +
+        (isTaken ? "View" : "Book This Gig →") + '</a>' +
+        '</div>' +
+        '</div>' +
+        '</div>';
     }
 
-    /* ══════════════════
-       RENDER PAGINATION
-    ══════════════════ */
+    /* ── Pagination ── */
     function renderPagination(total) {
-      var pg        = document.getElementById("pagination");
+      var pg = document.getElementById("pagination");
       var totalPages = Math.ceil(total / state.perPage);
-      pg.innerHTML  = "";
+      pg.innerHTML = "";
       if (totalPages <= 1) return;
-
-      /* Prev */
-      var prev = document.createElement("button");
-      prev.className = "pg-btn"; prev.textContent = "←";
-      prev.disabled = state.page === 1;
+      var prev = document.createElement("button"); prev.className = "pg-btn"; prev.textContent = "←"; prev.disabled = state.page === 1;
       prev.addEventListener("click", function(){ state.page--; render(); window.scrollTo({top:0,behavior:"smooth"}); });
       pg.appendChild(prev);
-
-      /* Page numbers */
       for (var i = 1; i <= totalPages; i++) {
-        (function(n){
+        (function(n) {
           var btn = document.createElement("button");
           btn.className = "pg-btn" + (n === state.page ? " active" : "");
           btn.textContent = n;
@@ -1033,55 +954,37 @@
           pg.appendChild(btn);
         })(i);
       }
-
-      /* Next */
-      var next = document.createElement("button");
-      next.className = "pg-btn"; next.textContent = "→";
-      next.disabled = state.page === totalPages;
+      var next = document.createElement("button"); next.className = "pg-btn"; next.textContent = "→"; next.disabled = state.page === Math.ceil(total/state.perPage);
       next.addEventListener("click", function(){ state.page++; render(); window.scrollTo({top:0,behavior:"smooth"}); });
       pg.appendChild(next);
     }
 
-    /* ══════════════════
-       MAIN RENDER
-    ══════════════════ */
+    /* ── Main render ── */
     function render() {
       var filtered = getFiltered();
-      var sorted   = getSorted(filtered);
-      var total    = sorted.length;
-      var start    = (state.page - 1) * state.perPage;
-      var paged    = sorted.slice(start, start + state.perPage);
+      var sorted = getSorted(filtered);
+      var total = sorted.length;
+      var start = (state.page - 1) * state.perPage;
+      var paged = sorted.slice(start, start + state.perPage);
 
-      /* Results count */
-      document.getElementById("resultsCount").innerHTML =
-        'Showing <strong>' + paged.length + '</strong> of <strong>' + total + '</strong> gigs';
+      document.getElementById("resultsCount").innerHTML = 'Showing <strong>' + paged.length + '</strong> of <strong>' + total + '</strong> gigs';
+      document.getElementById("browseSubtitle").textContent = total + " gig" + (total !== 1 ? "s" : "") + " available";
 
-      /* Subtitle */
-      document.getElementById("browseSubtitle").textContent =
-        total + " gig" + (total !== 1 ? "s" : "") + " available";
-
-      var grid  = document.getElementById("gigsGrid");
+      var grid = document.getElementById("gigsGrid");
       var empty = document.getElementById("browseEmpty");
-
       if (!paged.length) {
-        grid.innerHTML  = "";
-        grid.classList.add("hidden");
-        empty.classList.remove("hidden");
+        grid.innerHTML = ""; grid.classList.add("hidden"); empty.classList.remove("hidden");
       } else {
-        empty.classList.add("hidden");
-        grid.classList.remove("hidden");
+        empty.classList.add("hidden"); grid.classList.remove("hidden");
         grid.innerHTML = paged.map(makeCard).join("");
       }
-
       renderActiveFilters();
       renderPagination(total);
     }
 
-    /* ── Initial render ── */
-    if (urlCat) { syncChips(); }
-    render();
+    /* ── Init ── */
+    loadGigs();
 
-  });
   </script>
 </body>
 </html>
