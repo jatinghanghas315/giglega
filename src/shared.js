@@ -1,6 +1,6 @@
 /* CACHE BUSTER v1.5.0 — auto-clears old SW on first load */
 (function(){
-  var APP_BUILD = '1.6.0';
+  var APP_BUILD = '1.7.0';
   var stored = localStorage.getItem('gl_app_build');
   if (stored !== APP_BUILD) {
     localStorage.setItem('gl_app_build', APP_BUILD);
