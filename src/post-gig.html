@@ -1637,7 +1637,7 @@
         return;
       }
 
-      var btn = this;
+      var btn = document.getElementById('submitBtn');
       btn.disabled = true;
       btn.textContent = '⏳ Posting…';
 
@@ -1661,7 +1661,7 @@
           time:        document.getElementById('gigTime').value || '09:00',
           duration:    document.getElementById('gigDuration').value || 'Full day',
           hoursNote:   document.getElementById('hoursNote').value || '',
-          extraNotes:  document.getElementById('extraNotes') ? document.getElementById('extraNotes').value : '',
+          additionalNotes:  document.getElementById('additionalNotes') ? document.getElementById('additionalNotes').value : '',
           status:      'open',
           posterId:    user.uid,
           posterName:  user.displayName || 'User',
