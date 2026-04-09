@@ -819,8 +819,7 @@
       }
     }
 
-    init();
 
   </script>
-</body>
+var _authReady = false; onAuthStateChanged(auth, function(user) { currentUser = user; if (!_authReady) { _authReady = true; init(); } });
 </html>
