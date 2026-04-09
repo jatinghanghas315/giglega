@@ -35,8 +35,7 @@
       }
     });
 
-    async function loadChat() {
-      // Create conversation ID: sorted userIds + gigId
+        document.getElementById('messagesContainer').innerHTML = '<div style="padding:40px;text-align:center;color:var(--gray-400)">No conversation selected. Please select a gig and user to chat with.</div>';      // Create conversation ID: sorted userIds + gigId
       const ids = [currentUser.uid, otherUserId].sort();
       convId = ids.join('_') + '_' + gigId;
 
