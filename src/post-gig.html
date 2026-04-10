@@ -1,1841 +1,758 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Post a Gig — GigLega | Hire Verified Workers in Gurugram</title>
-  <meta name="description" content="Post a gig on GigLega and hire verified workers in Gurugram for cleaning, delivery, tutoring & more. Free to post. Pay only on completion. Secure payments, 6% low fee." />
-    <meta name="keywords" content="post gig Gurugram, hire workers near me, gig economy India, find help Gurugram NCR" />
-  <meta property="og:title" content="Post a Gig - GigLega | Hire Verified Workers" />
-  <meta property="og:description" content="Post a gig on GigLega and hire verified workers in Gurugram NCR. Free to post, pay only on completion. 6% low fee." />
-  <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://giglega.vercel.app/post-gig.html" />
-  <meta property="og:image" content="https://giglega.vercel.app/logo.png" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <link rel="stylesheet" href="styles.css" />
-    <link rel="stylesheet" href="theme-dark.css" />
-    
-  <link rel="stylesheet" href="mobile.css?v=20260410-1828" />
-<script src="shared.js?v=20260411" defer></script>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Post a Gig — GigLega</title>
+  <link rel="stylesheet" href="styles.css"/>
+  <link rel="stylesheet" href="theme-dark.css"/>
+  <link rel="stylesheet" href="mobile.css?v=20260410-1828"/>
+  <script src="shared.js?v=20260411" defer></script>
   <style>
+    /* ── Layout ── */
+    .pg-wrap{max-width:560px;margin:0 auto;padding:24px 16px 120px;}
 
-    /* ══════════════════════════════════
-       WRAPPER
-    ══════════════════════════════════ */
-    .pg-wrapper { min-height: 100vh; background: var(--bg); }
+    /* ── Progress bar ── */
+    .pg-progress{display:flex;align-items:center;gap:0;margin-bottom:32px;}
+    .pg-step{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;cursor:pointer;}
+    .pg-step-dot{width:34px;height:34px;border-radius:50%;border:2px solid var(--gray-200);
+      background:var(--surface);color:var(--gray-400);
+      display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:800;
+      transition:all .3s;}
+    .pg-step.done   .pg-step-dot{background:var(--teal);border-color:var(--teal);color:#fff;}
+    .pg-step.active .pg-step-dot{background:var(--primary);border-color:var(--primary);color:#fff;
+      box-shadow:0 0 0 4px rgba(1,105,111,.12);}
+    .pg-step-label{font-size:.68rem;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:.3px;}
+    .pg-step.active .pg-step-label,.pg-step.done .pg-step-label{color:var(--primary);}
+    .pg-line{flex:1;height:2px;background:var(--gray-200);margin-bottom:18px;transition:background .4s;}
+    .pg-line.done{background:var(--teal);}
 
-    /* ══════════════════════════════════
-       HERO
-    ══════════════════════════════════ */
-    .pg-hero {
-      background: linear-gradient(135deg, #0b1e35 0%, #1a3c5e 45%, #064e3b 100%);
-      padding: 36px 20px 80px;
-      position: relative; overflow: hidden;
-    }
-    .pg-hero::before {
-      content: "";
-      position: absolute; inset: 0;
-      background:
-        radial-gradient(ellipse at 10% 80%, rgba(13,148,136,.22) 0%, transparent 50%),
-        radial-gradient(ellipse at 90% 15%, rgba(110,231,183,.08) 0%, transparent 50%);
-      pointer-events: none;
-    }
-    .pg-hero::after {
-      content: "";
-      position: absolute; inset: 0;
-      background-image:
-        linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
-      background-size: 52px 52px; pointer-events: none;
-    }
-    .pg-hero-inner {
-      max-width: 860px; margin: 0 auto;
-      position: relative; z-index: 1;
-      display: flex; align-items: flex-start;
-      justify-content: space-between; gap: 24px; flex-wrap: wrap;
-    }
-    .pgh-tag {
-      display: inline-flex; align-items: center; gap: 6px;
-      background: rgba(255,255,255,.1);
-      border: 1px solid rgba(255,255,255,.15);
-      border-radius: var(--radius-full);
-      padding: 4px 14px;
-      font-size: .72rem; font-weight: 700;
-      color: rgba(255,255,255,.75);
-      text-transform: uppercase; letter-spacing: .5px;
-      margin-bottom: 14px;
-    }
-    .pgh-title {
-      font-size: clamp(1.6rem, 3.5vw, 2.2rem);
-      font-weight: 900; color: #fff;
-      letter-spacing: -.4px; line-height: 1.18;
-      margin-bottom: 8px;
-    }
-    .pgh-title span { color: #6ee7b7; }
-    .pgh-sub {
-      font-size: .9rem; color: rgba(255,255,255,.6);
-      font-weight: 600; line-height: 1.65;
-      max-width: 420px;
-    }
+    /* ── Step cards ── */
+    .pg-card{background:var(--surface);border:1.5px solid var(--gray-200);border-radius:var(--radius);
+      padding:24px;box-shadow:var(--shadow-sm);display:none;
+      animation:slide-in .28s cubic-bezier(.16,1,.3,1);}
+    .pg-card.active{display:block;}
+    @keyframes slide-in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+    .pg-card-title{font-size:1.05rem;font-weight:800;color:var(--text);margin-bottom:6px;}
+    .pg-card-sub{font-size:.8rem;color:var(--gray-400);margin-bottom:22px;}
 
-    /* Progress steps (right side) */
-    .pgh-steps {
-      display: flex; flex-direction: column; gap: 8px;
-      flex-shrink: 0;
-    }
-    @media(max-width:640px) { .pgh-steps { flex-direction: row; flex-wrap: wrap; } }
-    .pgh-step {
-      display: flex; align-items: center; gap: 10px;
-      background: rgba(255,255,255,.08);
-      border: 1px solid rgba(255,255,255,.12);
-      border-radius: 10px;
-      padding: 9px 14px; min-width: 180px;
-      transition: background .2s;
-    }
-    .pgh-step.active {
-      background: rgba(13,148,136,.2);
-      border-color: rgba(13,148,136,.35);
-    }
-    .pgh-step.done {
-      background: rgba(5,150,105,.15);
-      border-color: rgba(5,150,105,.3);
-    }
-    .pgs-num {
-      width: 26px; height: 26px; border-radius: 50%;
-      background: rgba(255,255,255,.12);
-      display: flex; align-items: center; justify-content: center;
-      font-size: .76rem; font-weight: 900; color: rgba(255,255,255,.7);
-      flex-shrink: 0;
-    }
-    .pgh-step.active .pgs-num { background: var(--teal); color: #fff; }
-    .pgh-step.done   .pgs-num { background: #059669; color: #fff; }
-    .pgs-info {}
-    .pgs-label { font-size: .78rem; font-weight: 800; color: rgba(255,255,255,.85); }
-    .pgs-sub   { font-size: .66rem; font-weight: 600; color: rgba(255,255,255,.45); }
+    /* ── Field ── */
+    .field{margin-bottom:20px;}
+    .field-label{font-size:.76rem;font-weight:700;color:var(--gray-500);text-transform:uppercase;
+      letter-spacing:.3px;margin-bottom:7px;display:flex;align-items:center;gap:6px;}
+    .field-label .req{color:var(--primary);font-size:.9rem;}
+    .field-input{width:100%;padding:11px 14px;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);
+      background:var(--bg);color:var(--text);font-size:.9rem;font-family:inherit;
+      transition:border-color .2s,box-shadow .2s;outline:none;}
+    .field-input:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(1,105,111,.09);}
+    .field-input.error{border-color:#e53e3e;box-shadow:0 0 0 3px rgba(229,62,62,.08);}
+    textarea.field-input{resize:none;line-height:1.6;}
+    .field-hint{font-size:.72rem;color:var(--gray-400);margin-top:5px;}
+    .field-err{font-size:.72rem;color:#e53e3e;margin-top:4px;display:none;}
+    .field-err.show{display:block;}
+    [data-theme=dark] .field-input{background:var(--gray-800);border-color:var(--gray-600);}
 
-    /* ══════════════════════════════════
-       PROGRESS BAR (sticky)
-    ══════════════════════════════════ */
-    .pg-progress-bar {
-      background: var(--surface);
-      border-bottom: 1.5px solid var(--gray-200);
-      position: sticky; top: 0; z-index: 40;
-      box-shadow: var(--shadow-sm);
-    }
-    [data-theme=dark] .pg-progress-bar { border-color: var(--gray-700); }
-    .pgpb-inner {
-      max-width: 860px; margin: 0 auto;
-      padding: 12px 20px;
-      display: flex; align-items: center; gap: 16px;
-    }
-    .pgpb-label {
-      font-size: .78rem; font-weight: 800;
-      color: var(--gray-500); white-space: nowrap; flex-shrink: 0;
-    }
-    .pgpb-track {
-      flex: 1; height: 6px; background: var(--gray-100);
-      border-radius: 4px; overflow: hidden;
-    }
-    [data-theme=dark] .pgpb-track { background: var(--gray-700); }
-    .pgpb-fill {
-      height: 100%; border-radius: 4px;
-      background: linear-gradient(90deg, var(--primary), var(--teal));
-      transition: width .4s ease;
-    }
-    .pgpb-pct {
-      font-size: .76rem; font-weight: 900;
-      color: var(--teal); flex-shrink: 0;
-    }
-    .pgpb-steps {
-      display: flex; gap: 6px; flex-shrink: 0;
-    }
-    .pgpb-step-dot {
-      width: 8px; height: 8px; border-radius: 50%;
-      background: var(--gray-200); transition: background .3s;
-    }
-    .pgpb-step-dot.done   { background: #059669; }
-    .pgpb-step-dot.active { background: var(--teal); }
-    [data-theme=dark] .pgpb-step-dot { background: var(--gray-600); }
+    /* ── Category pills ── */
+    .cat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+    @media(max-width:420px){.cat-grid{grid-template-columns:repeat(3,1fr);}}
+    .cat-pill{border:1.5px solid var(--gray-200);border-radius:10px;padding:10px 6px;
+      text-align:center;cursor:pointer;background:var(--bg);transition:all .18s;
+      display:flex;flex-direction:column;align-items:center;gap:4px;-webkit-tap-highlight-color:transparent;}
+    .cat-pill:hover{border-color:var(--primary);background:rgba(1,105,111,.04);}
+    .cat-pill.sel{border-color:var(--primary);background:rgba(1,105,111,.07);color:var(--primary);}
+    .cat-pill .cat-emoji{font-size:1.4rem;line-height:1;}
+    .cat-pill .cat-name{font-size:.65rem;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.2px;}
+    .cat-pill.sel .cat-name{color:var(--primary);}
+    [data-theme=dark] .cat-pill{background:var(--gray-800);border-color:var(--gray-600);}
 
-    /* ══════════════════════════════════
-       MAIN BODY
-    ══════════════════════════════════ */
-    .pg-body {
-      max-width: 860px; margin: 0 auto;
-      padding: 28px 20px 80px;
-      display: grid;
-      grid-template-columns: 1fr 280px;
-      gap: 24px; align-items: start;
-    }
-    @media(max-width:800px) { .pg-body { grid-template-columns: 1fr; } }
+    /* ── Duration pills ── */
+    .dur-pills{display:flex;flex-wrap:wrap;gap:8px;}
+    .dur-pill{padding:9px 16px;border:1.5px solid var(--gray-200);border-radius:20px;
+      font-size:.82rem;font-weight:700;color:var(--gray-500);cursor:pointer;
+      background:var(--bg);transition:all .18s;-webkit-tap-highlight-color:transparent;}
+    .dur-pill:hover{border-color:var(--primary);}
+    .dur-pill.sel{border-color:var(--primary);background:rgba(1,105,111,.07);color:var(--primary);}
+    [data-theme=dark] .dur-pill{background:var(--gray-800);border-color:var(--gray-600);}
 
-    /* ══════════════════════════════════
-       FORM CARD
-    ══════════════════════════════════ */
-    .pg-card {
-      background: var(--surface);
-      border: 1.5px solid var(--gray-200);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow-sm);
-      overflow: hidden;
-      margin-bottom: 20px;
-    }
-    [data-theme=dark] .pg-card { border-color: var(--gray-700); }
+    /* ── Row layout ── */
+    .row-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    @media(max-width:380px){.row-2{grid-template-columns:1fr;}}
 
-    .pg-card-header {
-      padding: 16px 22px;
-      border-bottom: 1.5px solid var(--gray-100);
-      background: linear-gradient(135deg, rgba(26,60,94,.03), rgba(13,148,136,.04));
-      display: flex; align-items: center; gap: 10px;
-    }
-    [data-theme=dark] .pg-card-header { border-color: var(--gray-700); }
-    .pgch-num {
-      width: 30px; height: 30px; border-radius: 50%;
-      background: linear-gradient(135deg, var(--primary), var(--teal));
-      display: flex; align-items: center; justify-content: center;
-      font-size: .8rem; font-weight: 900; color: #fff; flex-shrink: 0;
-    }
-    .pgch-title {
-      font-size: .96rem; font-weight: 800; color: var(--primary); flex: 1;
-    }
-    .pgch-optional {
-      font-size: .7rem; font-weight: 700; color: var(--gray-400);
-      background: var(--gray-100); padding: 2px 8px; border-radius: 5px;
-    }
-    [data-theme=dark] .pgch-optional { background: var(--gray-700); color: var(--gray-400); }
+    /* ── GPS button ── */
+    .gps-row{display:flex;gap:8px;align-items:flex-start;}
+    .gps-row .field-input{flex:1;}
+    .btn-gps{flex-shrink:0;padding:11px 13px;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);
+      background:var(--bg);cursor:pointer;font-size:.9rem;transition:all .2s;white-space:nowrap;color:var(--text);}
+    .btn-gps:hover{border-color:var(--primary);color:var(--primary);}
+    .btn-gps.loading{border-color:var(--teal);color:var(--teal);animation:gps-spin .8s linear infinite;}
+    @keyframes gps-spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+    [data-theme=dark] .btn-gps{background:var(--gray-800);border-color:var(--gray-600);}
 
-    .pg-card-body { padding: 22px; }
+    /* ── Budget meter ── */
+    .budget-wrap{position:relative;}
+    .budget-prefix{position:absolute;left:13px;top:50%;transform:translateY(-50%);
+      font-weight:800;color:var(--primary);font-size:1rem;pointer-events:none;}
+    .budget-input{padding-left:28px !important;}
+    .budget-meter{margin-top:10px;border-radius:10px;padding:10px 13px;
+      font-size:.8rem;font-weight:600;display:flex;align-items:center;gap:8px;
+      transition:all .3s;background:var(--gray-100);}
+    .budget-meter.low  {background:rgba(229,62,62,.08);color:#c53030;}
+    .budget-meter.warn {background:rgba(245,158,11,.08);color:#b45309;}
+    .budget-meter.fair {background:rgba(16,185,129,.08);color:#059669;}
+    .budget-meter.high {background:rgba(59,130,246,.08);color:#1d4ed8;}
+    .budget-meter.idle {background:var(--gray-100);color:var(--gray-400);}
+    [data-theme=dark] .budget-meter.idle{background:var(--gray-700);color:var(--gray-400);}
+    [data-theme=dark] .budget-meter.low {background:rgba(229,62,62,.12);}
+    [data-theme=dark] .budget-meter.warn{background:rgba(245,158,11,.1);}
+    [data-theme=dark] .budget-meter.fair{background:rgba(16,185,129,.1);}
+    [data-theme=dark] .budget-meter.high{background:rgba(59,130,246,.1);}
+    .budget-slider-row{margin-top:8px;display:flex;align-items:center;gap:10px;}
+    .budget-slider{flex:1;accent-color:var(--primary);}
+    .budget-quickbtn{padding:4px 10px;border:1.5px solid var(--gray-200);border-radius:12px;
+      font-size:.72rem;font-weight:700;color:var(--gray-500);cursor:pointer;background:var(--bg);
+      transition:all .18s;white-space:nowrap;}
+    .budget-quickbtn:hover{border-color:var(--primary);color:var(--primary);}
+    [data-theme=dark] .budget-quickbtn{background:var(--gray-800);border-color:var(--gray-600);}
 
-    /* ══════════════════════════════════
-       FORM FIELDS
-    ══════════════════════════════════ */
-    .ff-group { margin-bottom: 20px; }
-    .ff-group:last-child { margin-bottom: 0; }
+    /* ── Urgency toggle ── */
+    .urgency-wrap{display:flex;gap:10px;}
+    .urg-opt{flex:1;padding:12px;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);
+      text-align:center;cursor:pointer;transition:all .2s;-webkit-tap-highlight-color:transparent;}
+    .urg-opt .urg-icon{font-size:1.5rem;display:block;margin-bottom:4px;}
+    .urg-opt .urg-label{font-size:.78rem;font-weight:700;color:var(--gray-500);}
+    .urg-opt .urg-sub{font-size:.68rem;color:var(--gray-400);margin-top:2px;}
+    .urg-opt:hover{border-color:var(--primary);}
+    .urg-opt.sel-normal{border-color:var(--primary);background:rgba(1,105,111,.06);}
+    .urg-opt.sel-normal .urg-label{color:var(--primary);}
+    .urg-opt.sel-urgent{border-color:#e53e3e;background:rgba(229,62,62,.06);}
+    .urg-opt.sel-urgent .urg-label{color:#c53030;}
+    [data-theme=dark] .urg-opt{background:var(--gray-800);}
 
-    .ff-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-    }
-    @media(max-width:560px) { .ff-row { grid-template-columns: 1fr; } }
+    /* ── Preview card (step 3) ── */
+    .preview-card{border:1.5px solid var(--gray-200);border-radius:var(--radius);
+      padding:18px;background:var(--bg);margin-top:20px;margin-bottom:16px;}
+    .preview-badge{display:inline-flex;align-items:center;gap:5px;font-size:.7rem;font-weight:800;
+      text-transform:uppercase;letter-spacing:.3px;padding:3px 10px;border-radius:12px;margin-bottom:10px;}
+    .preview-badge.normal{background:rgba(1,105,111,.1);color:var(--primary);}
+    .preview-badge.urgent{background:rgba(229,62,62,.1);color:#c53030;}
+    .preview-title{font-size:1rem;font-weight:800;color:var(--text);margin-bottom:6px;line-height:1.3;}
+    .preview-meta{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;}
+    .preview-chip{font-size:.74rem;color:var(--gray-500);display:flex;align-items:center;gap:4px;}
+    .preview-budget{font-size:1.25rem;font-weight:900;color:var(--primary);margin-top:8px;}
+    .preview-desc{font-size:.82rem;color:var(--gray-500);line-height:1.6;margin-top:8px;
+      display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
 
-    .ff-row-3 {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 14px;
-    }
-    @media(max-width:640px) { .ff-row-3 { grid-template-columns: 1fr 1fr; } }
-    @media(max-width:400px) { .ff-row-3 { grid-template-columns: 1fr; } }
+    /* ── Advanced accordion ── */
+    .adv-toggle{display:flex;align-items:center;gap:8px;width:100%;padding:12px 16px;
+      border:1.5px dashed var(--gray-200);border-radius:var(--radius-sm);
+      background:transparent;cursor:pointer;font-size:.82rem;font-weight:700;color:var(--gray-400);
+      transition:all .2s;margin-bottom:0;}
+    .adv-toggle:hover{border-color:var(--primary);color:var(--primary);}
+    .adv-arrow{margin-left:auto;transition:transform .25s;}
+    .adv-toggle.open .adv-arrow{transform:rotate(180deg);}
+    .adv-body{display:none;padding:16px 0 0;}
+    .adv-body.open{display:block;}
 
-    .ff-label {
-      display: block;
-      font-size: .8rem; font-weight: 700;
-      color: var(--gray-600); margin-bottom: 7px;
-    }
-    [data-theme=dark] .ff-label { color: var(--gray-400); }
-    .ff-required { color: var(--danger); margin-left: 2px; }
-    .ff-hint {
-      font-size: .72rem; font-weight: 600;
-      color: var(--gray-400); margin-top: 5px;
-      display: flex; align-items: center; gap: 4px;
-    }
+    /* ── Nav buttons ── */
+    .pg-nav{display:flex;gap:10px;margin-top:20px;}
+    .btn-back{flex:0;padding:12px 18px;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);
+      font-size:.88rem;font-weight:700;color:var(--gray-500);background:transparent;cursor:pointer;transition:all .2s;}
+    .btn-back:hover{border-color:var(--primary);color:var(--primary);}
+    .btn-next{flex:1;padding:13px;background:var(--primary);color:#fff;border:none;border-radius:var(--radius-sm);
+      font-size:.95rem;font-weight:800;cursor:pointer;transition:all .2s;
+      box-shadow:0 4px 14px rgba(1,105,111,.25);}
+    .btn-next:hover{background:var(--primary-dark);transform:translateY(-1px);}
+    .btn-next:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+    .btn-post{flex:1;padding:14px;background:linear-gradient(135deg,var(--primary),var(--teal));
+      color:#fff;border:none;border-radius:var(--radius-sm);font-size:1rem;font-weight:800;
+      cursor:pointer;box-shadow:0 4px 16px rgba(1,105,111,.3);transition:all .2s;}
+    .btn-post:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 6px 22px rgba(1,105,111,.4);}
+    .btn-post:disabled{opacity:.5;cursor:not-allowed;transform:none;}
 
-    .ff-input,
-    .ff-select,
-    .ff-textarea {
-      width: 100%; padding: 10px 13px;
-      border: 1.5px solid var(--gray-200);
-      border-radius: var(--radius-sm);
-      background: var(--surface); color: var(--text);
-      font-family: var(--font); font-size: .9rem;
-      transition: border .2s, box-shadow .2s;
-      box-sizing: border-box;
-    }
-    .ff-input:focus,
-    .ff-select:focus,
-    .ff-textarea:focus {
-      outline: none;
-      border-color: var(--teal);
-      box-shadow: 0 0 0 3px rgba(13,148,136,.1);
-    }
-    .ff-input.error,
-    .ff-select.error,
-    .ff-textarea.error {
-      border-color: var(--danger);
-      box-shadow: 0 0 0 3px rgba(239,68,68,.08);
-    }
-    .ff-input.valid,
-    .ff-select.valid,
-    .ff-textarea.valid {
-      border-color: #059669;
-    }
-    [data-theme=dark] .ff-input,
-    [data-theme=dark] .ff-select,
-    [data-theme=dark] .ff-textarea {
-      border-color: var(--gray-600);
-      background: var(--gray-800);
-    }
-    .ff-textarea { resize: vertical; min-height: 96px; line-height: 1.65; }
+    /* ── Custom duration input ── */
+    .custom-dur{margin-top:10px;display:none;}
+    .custom-dur.show{display:block;}
 
-    .ff-error-msg {
-      font-size: .74rem; font-weight: 700;
-      color: var(--danger); margin-top: 5px;
-      display: none; align-items: center; gap: 4px;
-    }
-    .ff-error-msg.visible { display: flex; }
+    /* ── GPS status strip ── */
+    .gps-status{font-size:.74rem;margin-top:6px;display:flex;align-items:center;gap:6px;display:none;}
+    .gps-status.show{display:flex;}
+    .gps-status.ok{color:#059669;} .gps-status.err{color:#e53e3e;} .gps-status.load{color:#b45309;}
 
-    /* Input with icon */
-    .ff-input-wrap { position: relative; }
-    .ff-input-icon {
-      position: absolute; left: 12px; top: 50%;
-      transform: translateY(-50%);
-      font-size: .9rem; pointer-events: none;
-    }
-    .ff-input-wrap .ff-input { padding-left: 36px; }
-    .ff-input-suffix {
-      position: absolute; right: 12px; top: 50%;
-      transform: translateY(-50%);
-      font-size: .78rem; font-weight: 700; color: var(--gray-400);
-    }
-
-    /* Character count */
-    .ff-char-count {
-      text-align: right; font-size: .72rem;
-      font-weight: 600; color: var(--gray-400); margin-top: 4px;
-    }
-    .ff-char-count.warn { color: #d97706; }
-    .ff-char-count.over { color: var(--danger); }
-
-    /* ══════════════════════════════════
-       CATEGORY PICKER
-    ══════════════════════════════════ */
-    .category-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
-    }
-    @media(max-width:580px) { .category-grid { grid-template-columns: repeat(3,1fr); } }
-    @media(max-width:380px) { .category-grid { grid-template-columns: repeat(2,1fr); } }
-
-    .cat-card {
-      border: 1.5px solid var(--gray-200);
-      border-radius: 12px; padding: 12px 8px;
-      text-align: center; cursor: pointer;
-      transition: all .18s; background: var(--bg);
-      user-select: none;
-    }
-    .cat-card:hover {
-      border-color: rgba(13,148,136,.3);
-      background: rgba(13,148,136,.03);
-      transform: translateY(-1px);
-    }
-    .cat-card.selected {
-      border-color: rgba(13,148,136,.5);
-      background: rgba(13,148,136,.08);
-      box-shadow: 0 2px 10px rgba(13,148,136,.12);
-    }
-    [data-theme=dark] .cat-card {
-      background: var(--gray-800); border-color: var(--gray-600);
-    }
-    [data-theme=dark] .cat-card.selected {
-      background: rgba(13,148,136,.12); border-color: rgba(13,148,136,.4);
-    }
-    .cc-icon  { font-size: 1.5rem; margin-bottom: 5px; line-height: 1; display: block; }
-    .cc-label { font-size: .72rem; font-weight: 700; color: var(--text); line-height: 1.3; }
-    .cat-card.selected .cc-label { color: var(--teal); }
-
-    /* ══════════════════════════════════
-       PAY RATE TOGGLE
-    ══════════════════════════════════ */
-    .pay-type-tabs {
-      display: flex; gap: 0;
-      border: 1.5px solid var(--gray-200);
-      border-radius: var(--radius-sm);
-      overflow: hidden; margin-bottom: 14px;
-    }
-    [data-theme=dark] .pay-type-tabs { border-color: var(--gray-600); }
-    .pay-tab {
-      flex: 1; padding: 9px 12px;
-      text-align: center; cursor: pointer;
-      font-size: .8rem; font-weight: 700;
-      color: var(--gray-500);
-      background: none; border: none;
-      font-family: var(--font);
-      transition: all .15s;
-      border-right: 1px solid var(--gray-200);
-    }
-    .pay-tab:last-child { border-right: none; }
-    .pay-tab:hover { background: rgba(13,148,136,.04); color: var(--teal); }
-    .pay-tab.active {
-      background: rgba(13,148,136,.1);
-      color: var(--teal); font-weight: 900;
-    }
-    [data-theme=dark] .pay-tab { border-color: var(--gray-600); }
-
-    /* ══════════════════════════════════
-       SKILL TAGS
-    ══════════════════════════════════ */
-    .skill-tags-wrap {
-      display: flex; flex-wrap: wrap; gap: 8px;
-      margin-bottom: 10px;
-    }
-    .skill-tag {
-      display: inline-flex; align-items: center; gap: 6px;
-      padding: 5px 12px; border-radius: var(--radius-full);
-      border: 1.5px solid var(--gray-200);
-      background: none; color: var(--gray-500);
-      font-size: .76rem; font-weight: 700;
-      cursor: pointer; font-family: var(--font);
-      transition: all .15s;
-    }
-    .skill-tag:hover { border-color: var(--teal); color: var(--teal); }
-    .skill-tag.selected {
-      background: rgba(13,148,136,.08);
-      border-color: rgba(13,148,136,.35); color: var(--teal);
-    }
-    [data-theme=dark] .skill-tag { border-color: var(--gray-600); color: var(--gray-400); }
-    .skill-tag-remove { font-size: .7rem; opacity: .6; }
-
-    /* Custom skill add */
-    .skill-add-row {
-      display: flex; gap: 8px; margin-top: 8px;
-    }
-    .skill-add-row .ff-input { flex: 1; }
-    .btn-skill-add {
-      padding: 8px 14px; border-radius: var(--radius-sm);
-      background: rgba(13,148,136,.1);
-      border: 1.5px solid rgba(13,148,136,.25);
-      color: var(--teal); font-size: .8rem; font-weight: 800;
-      cursor: pointer; font-family: var(--font); white-space: nowrap;
-      transition: all .15s;
-    }
-    .btn-skill-add:hover { background: rgba(13,148,136,.18); }
-
-    /* ══════════════════════════════════
-       DATE / TIME PICKER ROWS
-    ══════════════════════════════════ */
-    .datetime-row {
-      display: grid; grid-template-columns: 1fr 1fr 1fr;
-      gap: 12px;
-    }
-    @media(max-width:560px) { .datetime-row { grid-template-columns: 1fr 1fr; } }
-
-    /* ══════════════════════════════════
-       WORKER COUNT STEPPER
-    ══════════════════════════════════ */
-    .stepper-wrap {
-      display: flex; align-items: center; gap: 0;
-      border: 1.5px solid var(--gray-200);
-      border-radius: var(--radius-sm);
-      overflow: hidden; width: fit-content;
-    }
-    [data-theme=dark] .stepper-wrap { border-color: var(--gray-600); }
-    .stepper-btn {
-      width: 40px; height: 42px;
-      border: none; background: var(--gray-100);
-      color: var(--text); font-size: 1.1rem;
-      cursor: pointer; font-family: var(--font);
-      transition: background .15s; font-weight: 900;
-      display: flex; align-items: center; justify-content: center;
-    }
-    .stepper-btn:hover { background: rgba(13,148,136,.1); color: var(--teal); }
-    [data-theme=dark] .stepper-btn { background: var(--gray-700); }
-    .stepper-val {
-      width: 56px; text-align: center;
-      font-size: 1rem; font-weight: 900; color: var(--primary);
-      border: none; border-left: 1px solid var(--gray-200);
-      border-right: 1px solid var(--gray-200);
-      background: var(--surface); font-family: var(--font);
-      padding: 0; height: 42px;
-      -moz-appearance: textfield;
-    }
-    .stepper-val::-webkit-outer-spin-button,
-    .stepper-val::-webkit-inner-spin-button { -webkit-appearance: none; }
-    [data-theme=dark] .stepper-val { border-color: var(--gray-600); background: var(--gray-800); }
-
-    /* ══════════════════════════════════
-       PERKS CHECKLIST
-    ══════════════════════════════════ */
-    .perks-grid {
-      display: grid; grid-template-columns: 1fr 1fr;
-      gap: 8px;
-    }
-    @media(max-width:440px) { .perks-grid { grid-template-columns: 1fr; } }
-    .perk-item {
-      display: flex; align-items: center; gap: 10px;
-      padding: 10px 12px;
-      border: 1.5px solid var(--gray-200);
-      border-radius: 10px; cursor: pointer;
-      transition: all .15s; background: var(--bg);
-    }
-    .perk-item:hover { border-color: rgba(13,148,136,.3); }
-    .perk-item.checked {
-      border-color: rgba(13,148,136,.4);
-      background: rgba(13,148,136,.06);
-    }
-    [data-theme=dark] .perk-item { background: var(--gray-800); border-color: var(--gray-600); }
-    .perk-checkbox {
-      width: 18px; height: 18px;
-      border: 2px solid var(--gray-300);
-      border-radius: 4px;
-      background: none; flex-shrink: 0;
-      display: flex; align-items: center; justify-content: center;
-      transition: all .15s; font-size: .7rem; color: #fff;
-    }
-    .perk-item.checked .perk-checkbox {
-      background: var(--teal); border-color: var(--teal);
-    }
-    .perk-icon  { font-size: 1.1rem; flex-shrink: 0; }
-    .perk-label { font-size: .82rem; font-weight: 700; color: var(--text); }
-
-    /* ══════════════════════════════════
-       CONTACT / VISIBILITY TOGGLES
-    ══════════════════════════════════ */
-    .toggle-row {
-      display: flex; align-items: center;
-      justify-content: space-between; gap: 14px;
-      padding: 12px 0;
-      border-bottom: 1px solid var(--gray-100);
-    }
-    .toggle-row:last-child { border-bottom: none; padding-bottom: 0; }
-    [data-theme=dark] .toggle-row { border-color: var(--gray-700); }
-    .tr-info {}
-    .tr-label { font-size: .88rem; font-weight: 700; color: var(--text); margin-bottom: 2px; }
-    .tr-sub   { font-size: .74rem; color: var(--gray-400); font-weight: 600; }
-
-    .tog-switch {
-      position: relative; width: 44px; height: 24px; flex-shrink: 0;
-    }
-    .tog-switch input { opacity: 0; width: 0; height: 0; }
-    .tog-slider {
-      position: absolute; inset: 0;
-      background: var(--gray-300); border-radius: 24px;
-      cursor: pointer; transition: background .2s;
-    }
-    .tog-slider::before {
-      content: "";
-      position: absolute;
-      width: 18px; height: 18px; border-radius: 50%;
-      background: #fff; left: 3px; top: 3px;
-      transition: transform .2s;
-      box-shadow: 0 1px 4px rgba(0,0,0,.15);
-    }
-    .tog-switch input:checked + .tog-slider { background: var(--teal); }
-    .tog-switch input:checked + .tog-slider::before { transform: translateX(20px); }
-    [data-theme=dark] .tog-slider { background: var(--gray-600); }
-
-    /* ══════════════════════════════════
-       URGENCY SELECTOR
-    ══════════════════════════════════ */
-    .urgency-row { display: flex; gap: 10px; flex-wrap: wrap; }
-    .urgency-btn {
-      flex: 1; min-width: 100px;
-      padding: 10px 12px; border-radius: 10px;
-      border: 1.5px solid var(--gray-200);
-      background: none; cursor: pointer;
-      font-family: var(--font); text-align: center;
-      transition: all .15s;
-    }
-    .urgency-btn:hover { border-color: var(--teal); }
-    .urgency-btn.selected { border-color: rgba(13,148,136,.4); background: rgba(13,148,136,.07); }
-    .urgency-btn.urgent.selected { border-color: rgba(239,68,68,.4); background: rgba(239,68,68,.06); }
-    .ub-icon  { font-size: 1.2rem; margin-bottom: 4px; display: block; }
-    .ub-label { font-size: .76rem; font-weight: 800; color: var(--text); }
-    .ub-sub   { font-size: .68rem; font-weight: 600; color: var(--gray-400); margin-top: 2px; }
-    [data-theme=dark] .urgency-btn { border-color: var(--gray-600); }
-
-    /* ══════════════════════════════════
-       PREVIEW CARD
-    ══════════════════════════════════ */
-    .pg-preview-card {
-      background: var(--surface);
-      border: 1.5px solid rgba(13,148,136,.2);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow-sm);
-      overflow: hidden;
-      position: sticky; top: 70px;
-    }
-    [data-theme=dark] .pg-preview-card { border-color: rgba(13,148,136,.25); }
-    .ppc-header {
-      padding: 14px 18px;
-      background: linear-gradient(135deg, rgba(13,148,136,.1), rgba(5,150,105,.06));
-      border-bottom: 1.5px solid rgba(13,148,136,.15);
-      font-size: .84rem; font-weight: 800; color: var(--teal);
-      display: flex; align-items: center; gap: 7px;
-    }
-    .ppc-body { padding: 16px; }
-
-    .prev-gig-card {
-      background: var(--bg);
-      border: 1.5px solid var(--gray-200);
-      border-radius: 12px; padding: 14px;
-      margin-bottom: 14px;
-    }
-    [data-theme=dark] .prev-gig-card { border-color: var(--gray-700); background: var(--gray-800); }
-
-    .prev-title {
-      font-size: .92rem; font-weight: 900;
-      color: var(--primary); margin-bottom: 6px;
-      min-height: 18px;
-    }
-    .prev-category {
-      display: inline-flex; align-items: center; gap: 5px;
-      background: rgba(13,148,136,.08);
-      border: 1px solid rgba(13,148,136,.15);
-      border-radius: 5px; padding: 2px 9px;
-      font-size: .68rem; font-weight: 800; color: var(--teal);
-      margin-bottom: 10px;
-    }
-    .prev-meta {
-      display: flex; flex-direction: column; gap: 5px;
-      margin-bottom: 10px;
-    }
-    .prev-meta-row {
-      display: flex; align-items: center; gap: 7px;
-      font-size: .78rem; color: var(--gray-500); font-weight: 600;
-    }
-    .prev-pay {
-      font-size: 1.1rem; font-weight: 900;
-      color: #059669; margin-bottom: 8px;
-    }
-    .prev-skills {
-      display: flex; flex-wrap: wrap; gap: 5px;
-    }
-    .prev-skill {
-      font-size: .66rem; font-weight: 700;
-      padding: 2px 8px; border-radius: 4px;
-      background: rgba(26,60,94,.06); color: var(--primary);
-      border: 1px solid rgba(26,60,94,.1);
-    }
-    [data-theme=dark] .prev-skill { background: rgba(255,255,255,.06); }
-
-    /* Posting fee summary */
-    .fee-summary {}
-    .fee-row {
-      display: flex; align-items: center;
-      justify-content: space-between;
-      padding: 7px 0;
-      border-bottom: 1px dashed var(--gray-200);
-      font-size: .82rem;
-    }
-    .fee-row:last-child { border-bottom: none; }
-    [data-theme=dark] .fee-row { border-color: var(--gray-700); }
-    .fee-lbl { color: var(--gray-500); font-weight: 600; }
-    .fee-val { font-weight: 800; color: var(--text); }
-    .fee-val.free { color: #059669; }
-    .fee-val.total { color: var(--primary); font-size: .96rem; }
-
-    /* ══════════════════════════════════
-       INFO BOXES
-    ══════════════════════════════════ */
-    .pg-info-box {
-      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-      padding: 11px 14px; margin-bottom: 20px;
-      font-size: .85rem; line-height: 1.65;
-    }
-    .pg-info-box.teal  { background: rgba(13,148,136,.07); border-left: 3px solid var(--teal); }
-    .pg-info-box.green { background: rgba(16,185,129,.06); border-left: 3px solid #059669; }
-    .pg-info-box.amber { background: rgba(245,158,11,.07); border-left: 3px solid #f59e0b; }
-
-    /* ══════════════════════════════════
-       SUBMIT ROW
-    ══════════════════════════════════ */
-    .pg-submit-row {
-      background: var(--surface);
-      border: 1.5px solid var(--gray-200);
-      border-radius: var(--radius);
-      padding: 20px 22px;
-      display: flex; align-items: center;
-      gap: 14px; flex-wrap: wrap;
-      box-shadow: var(--shadow);
-    }
-    [data-theme=dark] .pg-submit-row { border-color: var(--gray-700); }
-
-    .btn-pg-submit {
-      display: inline-flex; align-items: center; gap: 9px;
-      padding: 13px 32px;
-      border-radius: var(--radius-sm);
-      background: linear-gradient(135deg, #059669, #0d9488);
-      border: none; color: #fff;
-      font-size: .96rem; font-weight: 900;
-      cursor: pointer; font-family: var(--font);
-      box-shadow: 0 4px 16px rgba(5,150,105,.3);
-      transition: all .2s;
-    }
-    .btn-pg-submit:hover {
-      box-shadow: 0 6px 22px rgba(5,150,105,.45);
-      transform: translateY(-1px);
-    }
-    .btn-pg-submit:disabled {
-      opacity: .55; cursor: not-allowed; transform: none;
-    }
-    .btn-pg-draft {
-      display: inline-flex; align-items: center; gap: 7px;
-      padding: 13px 22px;
-      border-radius: var(--radius-sm);
-      border: 1.5px solid var(--gray-200);
-      background: none; color: var(--gray-600);
-      font-size: .9rem; font-weight: 800;
-      cursor: pointer; font-family: var(--font);
-      transition: all .15s;
-    }
-    .btn-pg-draft:hover { border-color: var(--teal); color: var(--teal); }
-    [data-theme=dark] .btn-pg-draft { border-color: var(--gray-600); color: var(--gray-400); }
-
-    .pg-submit-note {
-      font-size: .76rem; color: var(--gray-400); font-weight: 600;
-      line-height: 1.6; flex: 1; min-width: 180px;
-    }
-
-    /* ══════════════════════════════════
-       SUCCESS MODAL
-    ══════════════════════════════════ */
-    .pg-modal-overlay {
-      position: fixed; inset: 0;
-      background: rgba(0,0,0,.55);
-      backdrop-filter: blur(4px);
-      z-index: 100; display: none;
-      align-items: center; justify-content: center;
-      padding: 24px;
-    }
-    .pg-modal-overlay.open { display: flex; }
-
-    .pg-modal {
-      background: var(--surface);
-      border: 1.5px solid var(--gray-200);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow-xl);
-      max-width: 480px; width: 100%;
-      padding: 36px 32px; text-align: center;
-      position: relative;
-      animation: modalIn .3s cubic-bezier(.34,1.56,.64,1);
-    }
-    @keyframes modalIn {
-      from { transform: scale(.88) translateY(20px); opacity: 0; }
-      to   { transform: scale(1) translateY(0); opacity: 1; }
-    }
-    [data-theme=dark] .pg-modal { border-color: var(--gray-700); }
-
-    .modal-confetti { font-size: 3.5rem; margin-bottom: 12px; animation: bounce 1s ease-in-out infinite alternate; }
-    @keyframes bounce { from { transform: scale(1); } to { transform: scale(1.12) rotate(5deg); } }
-    .modal-title { font-size: 1.4rem; font-weight: 900; color: var(--primary); margin-bottom: 8px; }
-    .modal-sub   { font-size: .88rem; color: var(--gray-500); line-height: 1.7; margin-bottom: 20px; }
-    .modal-gig-id {
-      display: inline-flex; align-items: center; gap: 6px;
-      background: rgba(13,148,136,.08);
-      border: 1.5px solid rgba(13,148,136,.2);
-      border-radius: 8px; padding: 8px 16px;
-      font-size: .84rem; font-weight: 800; color: var(--teal);
-      margin-bottom: 24px;
-    }
-    .modal-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
-    .btn-modal-primary {
-      padding: 11px 24px; border-radius: var(--radius-sm);
-      background: linear-gradient(135deg, var(--primary), var(--teal));
-      border: none; color: #fff;
-      font-size: .9rem; font-weight: 800;
-      cursor: pointer; font-family: var(--font);
-      transition: opacity .15s;
-    }
-    .btn-modal-primary:hover { opacity: .88; }
-    .btn-modal-outline {
-      padding: 11px 20px; border-radius: var(--radius-sm);
-      border: 1.5px solid var(--gray-200);
-      background: none; color: var(--gray-600);
-      font-size: .9rem; font-weight: 700;
-      cursor: pointer; font-family: var(--font);
-      transition: all .15s;
-    }
-    .btn-modal-outline:hover { border-color: var(--teal); color: var(--teal); }
-    [data-theme=dark] .btn-modal-outline { border-color: var(--gray-600); color: var(--gray-400); }
-
-    /* ══════════════════════════════════
-       TOAST
-    ══════════════════════════════════ */
-    .pg-toast {
-      position: fixed; bottom: 28px; left: 50%;
-      transform: translateX(-50%) translateY(20px);
-      background: var(--primary); color: #fff;
-      padding: 10px 22px; border-radius: var(--radius-full);
-      font-size: .84rem; font-weight: 700;
-      opacity: 0; transition: all .3s;
-      pointer-events: none; z-index: 200;
-      white-space: nowrap; box-shadow: var(--shadow-md);
-    }
-    .pg-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-
-      /* ══════════════════════════════════
-       IMAGE UPLOAD
-       ══════════════════════════════════ */
-    .image-upload-wrap { margin-top: 10px; }
-    .upload-btn {
-      display: flex; align-items: center; gap: 10px;
-      padding: 16px 20px; border-radius: var(--radius-sm);
-      border: 2px dashed var(--gray-300);
-      background: var(--bg); cursor: pointer;
-      transition: all .2s; text-align: center;
-      justify-content: center;
-    }
-    .upload-btn:hover {
-      border-color: var(--teal);
-      background: rgba(13,148,136,.04);
-    }
-    .upload-icon { font-size: 1.5rem; }
-    .upload-text { font-size: .88rem; font-weight: 700; color: var(--gray-600); }
-    [data-theme=dark] .upload-btn { border-color: var(--gray-600); background: var(--gray-800); }
-    .image-preview-grid {
-      display: grid; grid-template-columns: repeat(3, 1fr);
-      gap: 10px; margin-top: 12px;
-    }
-    .preview-item {
-      position: relative; border-radius: 8px;
-      overflow: hidden; aspect-ratio: 1;
-      border: 1.5px solid var(--gray-200);
-    }
-    .preview-item img {
-      width: 100%; height: 100%; object-fit: cover;
-    }
-    .preview-remove {
-      position: absolute; top: 5px; right: 5px;
-      width: 24px; height: 24px; border-radius: 50%;
-      background: rgba(239,68,68,.9); color: #fff;
-      border: none; cursor: pointer; font-size: .8rem;
-      display: flex; align-items: center; justify-content: center;
-      transition: background .2s;
-    }
-    .preview-remove:hover { background: rgba(220,38,38,1); }
-    [data-theme=dark] .preview-item { border-color: var(--gray-600); }  </style>
+    /* ── Success overlay ── */
+    .success-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:999;
+      align-items:center;justify-content:center;padding:24px;}
+    .success-overlay.show{display:flex;}
+    .success-box{background:var(--surface);border-radius:var(--radius);padding:32px 28px;
+      text-align:center;max-width:360px;width:100%;box-shadow:var(--shadow-lg);}
+    .success-icon{font-size:3.5rem;margin-bottom:12px;}
+    .success-title{font-size:1.2rem;font-weight:800;margin-bottom:6px;}
+    .success-sub{font-size:.85rem;color:var(--gray-400);margin-bottom:20px;}
+    .success-btns{display:flex;gap:10px;flex-direction:column;}
+  </style>
 </head>
 <body>
+<div id="main-nav" role="navigation"></div>
+<main>
+<div class="pg-wrap">
 
-  <div id="page-loader"></div>
-  <div id="announce-bar"></div>
-  <nav id="main-nav"></nav>
+  <!-- Header -->
+  <div style="margin-bottom:24px;">
+    <h1 style="font-size:1.4rem;font-weight:900;color:var(--text);margin-bottom:4px;">📋 Post a Gig</h1>
+    <p style="font-size:.82rem;color:var(--gray-400);">60 seconds se kam mein gig post karo — bilkul free.</p>
+  </div>
 
-  <div class="pg-toast"     id="pgToast"></div>
-
-  <!-- Success Modal -->
-  <div class="pg-modal-overlay" id="successModal">
-    <div class="pg-modal">
-      <div class="modal-confetti">🎉</div>
-      <div class="modal-title">Gig Live Ho Gaya!</div>
-      <div class="modal-sub">
-        Tumhara gig successfully post ho gaya hai. Workers abhi apply karna shuru kar denge — usually <strong>15–30 minutes</strong> mein pehla application aata hai!
-      </div>
-      <div class="modal-gig-id" id="modalGigId">📋 Gig ID: GL-2026-0001</div>
-      <div class="modal-actions">
-        <button class="btn-modal-primary" onclick="window.location.href='dashboard-client.html'">
-          📊 Dashboard Dekho
-        </button>
-        <button class="btn-modal-outline" onclick="window.location.href='browse.html'">
-          🔍 Browse Gigs
-        </button>
-        <button class="btn-modal-outline" onclick="postAnother()">
-          ➕ Ek Aur Post Karo
-        </button>
-      </div>
+  <!-- Progress -->
+  <div class="pg-progress" id="pgProgress">
+    <div class="pg-step active" id="pstep1" onclick="goStep(1)">
+      <div class="pg-step-dot" id="pdot1">1</div>
+      <div class="pg-step-label">Kya?</div>
+    </div>
+    <div class="pg-line" id="pline1"></div>
+    <div class="pg-step" id="pstep2" onclick="goStep(2)">
+      <div class="pg-step-dot" id="pdot2">2</div>
+      <div class="pg-step-label">Kab & Kahan?</div>
+    </div>
+    <div class="pg-line" id="pline2"></div>
+    <div class="pg-step" id="pstep3" onclick="goStep(3)">
+      <div class="pg-step-dot" id="pdot3">3</div>
+      <div class="pg-step-label">Review</div>
     </div>
   </div>
 
-  <main class="pg-wrapper">
+  <!-- ══ STEP 1 — What? ══ -->
+  <div class="pg-card active" id="card1">
+    <div class="pg-card-title">Kya kaam chahiye?</div>
+    <div class="pg-card-sub">Title, category aur thodi si detail — bas itna kaafi hai.</div>
 
-    <!-- ══════════════════════════════════
-         HERO
-    ══════════════════════════════════ -->
-    <section class="pg-hero">
-      <div class="pg-hero-inner">
-        <div>
-          <div class="pgh-tag">📋 Post a Gig</div>
-          <h1 class="pgh-title">Worker <span>Hire Karo</span></h1>
-          <p class="pgh-sub">
-            3 simple steps mein gig post karo — Gurugram ke verified workers
-            turant apply karne lagte hain. Payment safe, kaam fast. 💪
-          </p>
-        </div>
-        <div class="pgh-steps">
-          <div class="pgh-step active" id="heroStep1">
-            <div class="pgs-num">1</div>
-            <div class="pgs-info">
-              <div class="pgs-label">Gig Details</div>
-              <div class="pgs-sub">Title, category, description</div>
-            </div>
-          </div>
-          <div class="pgh-step" id="heroStep2">
-            <div class="pgs-num">2</div>
-            <div class="pgs-info">
-              <div class="pgs-label">Pay & Schedule</div>
-              <div class="pgs-sub">Rate, date, workers needed</div>
-            </div>
-          </div>
-          <div class="pgh-step" id="heroStep3">
-            <div class="pgs-num">3</div>
-            <div class="pgs-info">
-              <div class="pgs-label">Location & Review</div>
-              <div class="pgs-sub">Address, perks, publish</div>
-            </div>
-          </div>
-        </div>
+    <div class="field">
+      <div class="field-label">Gig Title <span class="req">*</span></div>
+      <input class="field-input" id="fTitle" type="text" maxlength="80"
+        placeholder="e.g. Packing Helper — Sector 37 Warehouse"
+        oninput="charCount(this,'titleCount',80);updatePreview()"/>
+      <div class="field-hint"><span id="titleCount">0</span>/80 characters</div>
+      <div class="field-err" id="errTitle">Title daalo (min 8 characters)</div>
+    </div>
+
+    <div class="field">
+      <div class="field-label">Category <span class="req">*</span></div>
+      <div class="cat-grid" id="catGrid">
+        <div class="cat-pill" data-cat="cleaning"  onclick="pickCat(this)"><span class="cat-emoji">🧹</span><span class="cat-name">Cleaning</span></div>
+        <div class="cat-pill" data-cat="delivery"  onclick="pickCat(this)"><span class="cat-emoji">📦</span><span class="cat-name">Delivery</span></div>
+        <div class="cat-pill" data-cat="moving"    onclick="pickCat(this)"><span class="cat-emoji">🚚</span><span class="cat-name">Moving</span></div>
+        <div class="cat-pill" data-cat="cooking"   onclick="pickCat(this)"><span class="cat-emoji">🍳</span><span class="cat-name">Cooking</span></div>
+        <div class="cat-pill" data-cat="teaching"  onclick="pickCat(this)"><span class="cat-emoji">📚</span><span class="cat-name">Teaching</span></div>
+        <div class="cat-pill" data-cat="repair"    onclick="pickCat(this)"><span class="cat-emoji">🔧</span><span class="cat-name">Repair</span></div>
+        <div class="cat-pill" data-cat="gardening" onclick="pickCat(this)"><span class="cat-emoji">🌿</span><span class="cat-name">Garden</span></div>
+        <div class="cat-pill" data-cat="security"  onclick="pickCat(this)"><span class="cat-emoji">🔒</span><span class="cat-name">Security</span></div>
+        <div class="cat-pill" data-cat="driving"   onclick="pickCat(this)"><span class="cat-emoji">🚗</span><span class="cat-name">Driving</span></div>
+        <div class="cat-pill" data-cat="errands"   onclick="pickCat(this)"><span class="cat-emoji">🛒</span><span class="cat-name">Errands</span></div>
+        <div class="cat-pill" data-cat="event"     onclick="pickCat(this)"><span class="cat-emoji">🎪</span><span class="cat-name">Event</span></div>
+        <div class="cat-pill" data-cat="other"     onclick="pickCat(this)"><span class="cat-emoji">⚡</span><span class="cat-name">Other</span></div>
       </div>
-    </section>
+      <div class="field-err" id="errCat">Category choose karo</div>
+    </div>
 
-    <!-- Progress bar -->
-    <div class="pg-progress-bar">
-      <div class="pgpb-inner">
-        <div class="pgpb-label" id="pgpbLabel">Step 1 of 3</div>
-        <div class="pgpb-track">
-          <div class="pgpb-fill" id="pgpbFill" style="width:33%"></div>
+    <div class="field">
+      <div class="field-label">Kya kaam karna hoga? <span class="req">*</span></div>
+      <textarea class="field-input" id="fDesc" rows="4" maxlength="500"
+        placeholder="Kya kaam hai? Kab se kab tak? Koi special skill chahiye? Tools milenge ya khud laane honge?&#10;&#10;Jitna clear, utna better — workers jaldi apply karte hain."
+        oninput="charCount(this,'descCount',500);updatePreview()"></textarea>
+      <div class="field-hint"><span id="descCount">0</span>/500 characters</div>
+      <div class="field-err" id="errDesc">Thodi description daalo (min 20 characters)</div>
+    </div>
+
+    <div class="pg-nav">
+      <button class="btn-next" onclick="nextStep(1)">Aage → Kab & Kahan?</button>
+    </div>
+  </div>
+
+  <!-- ══ STEP 2 — When & Where? ══ -->
+  <div class="pg-card" id="card2">
+    <div class="pg-card-title">Kab aur kahan?</div>
+    <div class="pg-card-sub">Schedule, location aur payment set karo.</div>
+
+    <div class="field">
+      <div class="field-label">Date & Time <span class="req">*</span></div>
+      <div class="row-2">
+        <input class="field-input" type="date" id="fDate" oninput="updatePreview()"/>
+        <input class="field-input" type="time" id="fTime" value="09:00" oninput="updatePreview()"/>
+      </div>
+      <div class="field-err" id="errDate">Date select karo</div>
+    </div>
+
+    <div class="field">
+      <div class="field-label">Duration <span class="req">*</span></div>
+      <div class="dur-pills">
+        <div class="dur-pill" data-dur="1 hour"    data-hrs="1" onclick="pickDur(this)">1 Hour</div>
+        <div class="dur-pill" data-dur="2 hours"   data-hrs="2" onclick="pickDur(this)">2 Hours</div>
+        <div class="dur-pill" data-dur="Half day"  data-hrs="4" onclick="pickDur(this)">Half Day</div>
+        <div class="dur-pill" data-dur="Full day"  data-hrs="8" onclick="pickDur(this)">Full Day</div>
+        <div class="dur-pill" data-dur="custom"    data-hrs="0" onclick="pickDur(this)">✏️ Custom</div>
+      </div>
+      <div class="custom-dur" id="customDurWrap">
+        <input class="field-input" type="number" id="fCustomHrs" min="1" max="24" placeholder="e.g. 3 (hours)" oninput="updateBudgetMeter();updatePreview()"/>
+      </div>
+      <div class="field-err" id="errDur">Duration select karo</div>
+    </div>
+
+    <div class="field">
+      <div class="field-label">Location / Area <span class="req">*</span></div>
+      <div class="gps-row">
+        <input class="field-input" id="fArea" type="text"
+          placeholder="e.g. Sector 37, Gurugram"
+          oninput="updatePreview()"/>
+        <button class="btn-gps" id="btnGps" onclick="detectGPS()" title="Apni current location use karo">
+          📍
+        </button>
+      </div>
+      <div class="gps-status" id="gpsStatus"></div>
+      <div class="field-err" id="errArea">Area / location daalo</div>
+    </div>
+
+    <div class="field">
+      <div class="field-label">Budget <span class="req">*</span>
+        <span style="font-size:.68rem;color:var(--gray-400);font-weight:500;text-transform:none;letter-spacing:0;">— fair pay for fair work</span>
+      </div>
+      <div class="budget-wrap">
+        <span class="budget-prefix">₹</span>
+        <input class="field-input budget-input" type="number" id="fBudget" min="50" max="10000"
+          placeholder="e.g. 500" oninput="updateBudgetMeter();updatePreview()"/>
+      </div>
+      <!-- Quick-set suggested amounts -->
+      <div class="budget-slider-row">
+        <input type="range" class="budget-slider" id="budgetSlider" min="50" max="5000" step="50" value="500"
+          oninput="document.getElementById('fBudget').value=this.value;updateBudgetMeter();updatePreview()"/>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:7px;" id="quickAmts"></div>
+      <div class="budget-meter idle" id="budgetMeter">
+        <span id="budgetMeterIcon">💡</span>
+        <span id="budgetMeterText">Category aur duration select karo — suggested amount dikhayenge.</span>
+      </div>
+      <div class="field-hint">Min ₹50 · Max ₹10,000 · Platform 6% fee worker se nahi, aapki side se hogi</div>
+      <div class="field-err" id="errBudget">Valid amount daalo (₹50 – ₹10,000)</div>
+    </div>
+
+    <div class="pg-nav">
+      <button class="btn-back" onclick="goStep(1)">← Back</button>
+      <button class="btn-next" onclick="nextStep(2)">Aage → Review karo</button>
+    </div>
+  </div>
+
+  <!-- ══ STEP 3 — Review & Post ══ -->
+  <div class="pg-card" id="card3">
+    <div class="pg-card-title">Review karke post karo ✅</div>
+    <div class="pg-card-sub">Ek baar dekho — phir ek tap mein live!</div>
+
+    <!-- Urgency -->
+    <div class="field">
+      <div class="field-label">Urgency</div>
+      <div class="urgency-wrap">
+        <div class="urg-opt sel-normal" id="urgNormal" onclick="pickUrg('normal')">
+          <span class="urg-icon">🟢</span>
+          <div class="urg-label">Normal</div>
+          <div class="urg-sub">24h+ mein karna hai</div>
         </div>
-        <div class="pgpb-pct"  id="pgpbPct">33%</div>
-        <div class="pgpb-steps">
-          <div class="pgpb-step-dot active" id="dot1"></div>
-          <div class="pgpb-step-dot"        id="dot2"></div>
-          <div class="pgpb-step-dot"        id="dot3"></div>
+        <div class="urg-opt" id="urgUrgent" onclick="pickUrg('urgent')">
+          <span class="urg-icon">🔥</span>
+          <div class="urg-label">Urgent!</div>
+          <div class="urg-sub">Aaj ya abhi chahiye</div>
         </div>
       </div>
     </div>
 
-    <!-- ══════════════════════════════════
-         BODY
-    ══════════════════════════════════ -->
-    <div class="pg-body">
+    <!-- Live Preview -->
+    <div class="field-label" style="margin-bottom:8px;">Preview — workers isko dekhenge</div>
+    <div class="preview-card" id="previewCard">
+      <div class="preview-badge normal" id="pvBadge">🟢 Normal</div>
+      <div class="preview-title" id="pvTitle">—</div>
+      <div class="preview-meta">
+        <span class="preview-chip">📂 <span id="pvCat">—</span></span>
+        <span class="preview-chip">📍 <span id="pvArea">—</span></span>
+        <span class="preview-chip">⏱ <span id="pvDur">—</span></span>
+        <span class="preview-chip">📅 <span id="pvDate">—</span></span>
+      </div>
+      <div class="preview-desc" id="pvDesc">—</div>
+      <div class="preview-budget">₹<span id="pvBudget">—</span></div>
+    </div>
 
-      <!-- ════ LEFT — FORM ════ -->
-      <div>
+    <!-- Advanced Options -->
+    <button class="adv-toggle" id="advToggle" onclick="toggleAdv()">
+      ⚙️ Advanced Options (optional)
+      <span class="adv-arrow">▼</span>
+    </button>
+    <div class="adv-body" id="advBody">
+      <div class="field">
+        <div class="field-label">Skills / Tags</div>
+        <input class="field-input" id="fSkills" type="text" placeholder="e.g. Driving licence, Physical strength, Cooking"/>
+        <div class="field-hint">Comma se alag karo</div>
+      </div>
+      <div class="field">
+        <div class="field-label">Kitne Workers Chahiye?</div>
+        <input class="field-input" id="fWorkers" type="number" min="1" max="50" placeholder="1" value="1"/>
+      </div>
+      <div class="field">
+        <div class="field-label">Perks / Benefits</div>
+        <input class="field-input" id="fPerks" type="text" placeholder="e.g. Khana milega, Travel allowance"/>
+      </div>
+      <div class="field">
+        <div class="field-label">Pincode</div>
+        <input class="field-input" id="fPincode" type="text" maxlength="6" placeholder="e.g. 122001"/>
+      </div>
+      <div class="field">
+        <div class="field-label">Additional Notes</div>
+        <textarea class="field-input" id="fNotes" rows="3"
+          placeholder="ID proof, entry details, specific instructions..."></textarea>
+      </div>
+    </div>
 
-        <!-- ─────────────────────────────
-             SECTION 1: GIG DETAILS
-        ───────────────────────────────── -->
-        <div class="pg-info-box teal">
-          💡 <strong>Tip:</strong> Clear title aur detailed description wale gigs pe <strong>3x zyada applications</strong> aati hain. Jitna detail doge, utna better!
-        </div>
+    <div class="pg-nav" style="margin-top:20px;">
+      <button class="btn-back" onclick="goStep(2)">← Back</button>
+      <button class="btn-post" id="btnPost" onclick="submitGig()">🚀 Post Gig — Free!</button>
+    </div>
+  </div>
 
-        <div class="pg-card" id="section1">
-          <div class="pg-card-header">
-            <div class="pgch-num">1</div>
-            <div class="pgch-title">📋 Gig ki Basic Details</div>
-          </div>
-          <div class="pg-card-body">
+</div><!-- pg-wrap -->
+</main>
+<div id="main-footer" role="contentinfo"></div>
 
-            <!-- Gig Title -->
-            <div class="ff-group">
-              <label class="ff-label" for="gigTitle">
-                Gig ka Title <span class="ff-required">*</span>
-              </label>
-              <input
-                class="ff-input" type="text" id="gigTitle"
-                placeholder="e.g. Warehouse Packing Helper needed — Sector 37"
-                maxlength="80"
-                oninput="updatePreview(); updateCharCount('gigTitle','titleCount',80); validateField(this)"
-              />
-              <div class="ff-char-count"><span id="titleCount">0</span> / 80</div>
-              <div class="ff-error-msg" id="gigTitleErr">⚠️ Title zaroori hai — min 10 characters</div>
-              <div class="ff-hint">💡 Location aur task dono title mein daalo — workers dhundne mein easy hota hai</div>
-            </div>
+<!-- Success Modal -->
+<div class="success-overlay" id="successOverlay">
+  <div class="success-box">
+    <div class="success-icon">🎉</div>
+    <div class="success-title">Gig Live Ho Gayi!</div>
+    <div class="success-sub" id="successSub">Workers ko notifications ja rahi hain — applications jald aayenge!</div>
+    <div class="success-btns">
+      <button class="btn-post" onclick="window.location.href='dashboard-client.html'">📊 Dashboard Dekho</button>
+      <button class="btn-back" style="border:1.5px solid var(--gray-200);padding:11px;"
+        onclick="window.location.href='browse.html'">🔍 Browse Gigs</button>
+    </div>
+  </div>
+</div>
 
-            <!-- Category -->
-            <div class="ff-group">
-              <label class="ff-label">
-                Category <span class="ff-required">*</span>
-              </label>
-              <div class="category-grid" id="categoryGrid">
-                <div class="cat-card" data-cat="Delivery" onclick="selectCategory(this)">
-                  <span class="cc-icon">🛵</span>
-                  <span class="cc-label">Delivery</span>
-                </div>
-                <div class="cat-card" data-cat="Packing" onclick="selectCategory(this)">
-                  <span class="cc-icon">📦</span>
-                  <span class="cc-label">Packing</span>
-                </div>
-                <div class="cat-card" data-cat="Event Helper" onclick="selectCategory(this)">
-                  <span class="cc-icon">🎪</span>
-                  <span class="cc-label">Event Helper</span>
-                </div>
-                <div class="cat-card" data-cat="Home Shifting" onclick="selectCategory(this)">
-                  <span class="cc-icon">🚛</span>
-                  <span class="cc-label">Home Shifting</span>
-                </div>
-                <div class="cat-card" data-cat="Cleaning" onclick="selectCategory(this)">
-                  <span class="cc-icon">🧹</span>
-                  <span class="cc-label">Cleaning</span>
-                </div>
-                <div class="cat-card" data-cat="Repair" onclick="selectCategory(this)">
-                  <span class="cc-icon">🔧</span>
-                  <span class="cc-label">Repair</span>
-                </div>
-                <div class="cat-card" data-cat="Data Entry" onclick="selectCategory(this)">
-                  <span class="cc-icon">💻</span>
-                  <span class="cc-label">Data Entry</span>
-                </div>
-                <div class="cat-card" data-cat="Security" onclick="selectCategory(this)">
-                  <span class="cc-icon">🔒</span>
-                  <span class="cc-label">Security</span>
-                </div>
-                <div class="cat-card" data-cat="Cooking" onclick="selectCategory(this)">
-                  <span class="cc-icon">👨‍🍳</span>
-                  <span class="cc-label">Cooking</span>
-                </div>
-                <div class="cat-card" data-cat="Gardening" onclick="selectCategory(this)">
-                  <span class="cc-icon">🌿</span>
-                  <span class="cc-label">Gardening</span>
-                </div>
-                <div class="cat-card" data-cat="Tutoring" onclick="selectCategory(this)">
-                  <span class="cc-icon">📚</span>
-                  <span class="cc-label">Tutoring</span>
-                </div>
-                <div class="cat-card" data-cat="Other" onclick="selectCategory(this)">
-                  <span class="cc-icon">➕</span>
-                  <span class="cc-label">Other</span>
-                </div>
-              </div>
-              <div class="ff-error-msg" id="catErr">⚠️ Ek category select karna zaroori hai</div>
-            </div>
+<script type="module">
+import { auth, db } from './firebase-config.js';
+import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+import { collection, addDoc, serverTimestamp }
+  from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
 
-            <!-- Description -->
-            <div class="ff-group">
-              <label class="ff-label" for="gigDesc">
-                What help do you need today? <span class="ff-required">*</span>
-              </label>
-              <textarea
-                class="ff-textarea" id="gigDesc"
-                placeholder="Kya kaam karna hoga? Tools/equipment milenge ya khud laane honge? Dress code hai? Koi specific skill chahiye? Kitna physical kaam hai?&#10;&#10;Jitna detail doge utna better — workers ko sab pehle se pata hona chahiye."
-                maxlength="600"
-                oninput="updateCharCount('gigDesc','descCount',600); updatePreview()"
-                style="min-height:120px"
-              ></textarea>
-              <div class="ff-char-count"><span id="descCount">0</span> / 600 · Min 50 characters recommended</div>
-              <div class="ff-error-msg" id="gigDescErr">⚠️ Description zaroori hai</div>
-            </div>
+/* ── State ── */
+var currentUser   = null;
+var currentStep   = 1;
+var selCat        = '';
+var selDur        = '';
+var selDurHrs     = 0;
+var selUrg        = 'normal';
+var posterLat     = null;
+var posterLng     = null;
 
-            <!-- Skills required -->
-            <div class="ff-group">
-              <label class="ff-label">Required Skills / Tags <span style="color:var(--gray-400);font-weight:600">(optional)</span></label>
-              <div class="skill-tags-wrap" id="skillTagsWrap">
-                <button class="skill-tag" onclick="toggleSkill(this)">💪 Physical Strength</button>
-                <button class="skill-tag" onclick="toggleSkill(this)">🛵 Own Vehicle</button>
-                <button class="skill-tag" onclick="toggleSkill(this)">📱 Smartphone</button>
-                <button class="skill-tag" onclick="toggleSkill(this)">🗺️ Area Knowledge</button>
-                <button class="skill-tag" onclick="toggleSkill(this)">🧮 Basic Counting</button>
-                <button class="skill-tag" onclick="toggleSkill(this)">📦 Packing Experience</button>
-                <button class="skill-tag" onclick="toggleSkill(this)">🤝 Team Player</button>
-                <button class="skill-tag" onclick="toggleSkill(this)">🔧 Tool Handling</button>
-                <button class="skill-tag" onclick="toggleSkill(this)">🚗 Driving License</button>
-                <button class="skill-tag" onclick="toggleSkill(this)">💬 Hindi Speaking</button>
-              </div>
-              <div class="skill-add-row">
-                <input class="ff-input" type="text" id="customSkillInput" placeholder="Custom skill add karo…" maxlength="30" onkeydown="if(event.key==='Enter'){event.preventDefault();addCustomSkill()}" />
-                <button class="btn-skill-add" onclick="addCustomSkill()">➕ Add</button>
-              </div>
-            </div>
+/* ── Market rate table (₹/hour, Gurugram 2026) ── */
+var RATES = {
+  cleaning:  {perHour:100,minHour:80,  name:'🧹 Cleaning'},
+  delivery:  {perHour:90, minHour:60,  name:'📦 Delivery'},
+  moving:    {perHour:160,minHour:130, name:'🚚 Moving'},
+  cooking:   {perHour:130,minHour:100, name:'🍳 Cooking'},
+  teaching:  {perHour:280,minHour:200, name:'📚 Teaching'},
+  repair:    {perHour:200,minHour:150, name:'🔧 Repair'},
+  gardening: {perHour:100,minHour:80,  name:'🌿 Gardening'},
+  security:  {perHour:80, minHour:60,  name:'🔒 Security'},
+  driving:   {perHour:160,minHour:120, name:'🚗 Driving'},
+  errands:   {perHour:80, minHour:60,  name:'🛒 Errands'},
+  event:     {perHour:120,minHour:80,  name:'🎪 Event'},
+  other:     {perHour:100,minHour:70,  name:'⚡ Other'}
+};
 
-            <!-- Urgency -->
-            <div class="ff-group">
-              <label class="ff-label">Kitni Urgency Hai? <span class="ff-required">*</span></label>
-              <div class="urgency-row" id="urgencyRow">
-                <button class="urgency-btn" data-urgency="flexible" onclick="selectUrgency(this)">
-                  <span class="ub-icon">🟢</span>
-                  <div class="ub-label">Flexible</div>
-                  <div class="ub-sub">Koi rush nahi</div>
-                </button>
-                <button class="urgency-btn" data-urgency="normal" onclick="selectUrgency(this)">
-                  <span class="ub-icon">🟡</span>
-                  <div class="ub-label">Normal</div>
-                  <div class="ub-sub">1–2 din mein</div>
-                </button>
-                <button class="urgency-btn urgent" data-urgency="urgent" onclick="selectUrgency(this)">
-                  <span class="ub-icon">🔴</span>
-                  <div class="ub-label">Urgent!</div>
-                  <div class="ub-sub">Aaj ya kal chahiye</div>
-                </button>
-              </div>
-            </div>
+/* ── Helpers ── */
+function el(id){return document.getElementById(id);}
+function show(id){el(id).classList.add('show');}
+function hide(id){el(id).classList.remove('show');}
 
-          </div>
-        </div>
+window.charCount = function(inp,countId,max){
+  el(countId).textContent = inp.value.length;
+};
 
-        <!-- ─────────────────────────────
-             SECTION 2: PAY & SCHEDULE
-        ───────────────────────────────── -->
-        <div class="pg-card" id="section2">
-          <div class="pg-card-header">
-            <div class="pgch-num">2</div>
-            <div class="pgch-title">💰 Payment & Schedule</div>
-          </div>
-          <div class="pg-card-body">
+/* ── Category ── */
+window.pickCat = function(pill){
+  document.querySelectorAll('.cat-pill').forEach(function(p){p.classList.remove('sel');});
+  pill.classList.add('sel');
+  selCat = pill.dataset.cat;
+  hide('errCat');
+  updateBudgetMeter();
+  updatePreview();
+};
 
-            <!-- Pay type tabs -->
-            <div class="ff-group">
-              <label class="ff-label">Payment Type <span class="ff-required">*</span></label>
-              <div class="pay-type-tabs" id="payTypeTabs">
-                <button class="pay-tab active" data-pay="hourly"  onclick="selectPayType(this)">⏰ Per Hour</button>
-                <button class="pay-tab"        data-pay="daily"   onclick="selectPayType(this)">📅 Per Day</button>
-                <button class="pay-tab"        data-pay="fixed"   onclick="selectPayType(this)">🎯 Fixed Price</button>
-                <button class="pay-tab"        data-pay="weekly"  onclick="selectPayType(this)">📆 Per Week</button>
-              </div>
-              <div class="ff-row">
-                <div>
-                  <label class="ff-label" for="payMin">
-                    Min Pay (₹) <span class="ff-required">*</span>
-                  </label>
-                  <div class="ff-input-wrap">
-                    <span class="ff-input-icon">₹</span>
-                    <input
-                      class="ff-input" type="number" id="payMin"
-                      placeholder="e.g. 500" min="1" max="99999"
-                      oninput="updatePreview(); validateField(this)"
-                    />
-                    <span class="ff-input-suffix" id="payTypeSuffix">/hr</span>
-                  </div>
-                  <div class="ff-error-msg" id="payMinErr">⚠️ Minimum pay daalna zaroori hai</div>
-                </div>
-                <div>
-                  <label class="ff-label" for="payMax">Max Pay (₹) <span style="color:var(--gray-400);font-weight:600">(optional)</span></label>
-                  <div class="ff-input-wrap">
-                    <span class="ff-input-icon">₹</span>
-                    <input
-                      class="ff-input" type="number" id="payMax"
-                      placeholder="e.g. 800" min="1" max="99999"
-                      oninput="updatePreview()"
-                    />
-                    <span class="ff-input-suffix" id="payTypeSuffix2">/hr</span>
-                  </div>
-                  <div class="ff-hint">💡 Range dene se zyada applications aati hain</div>
-                </div>
-              </div>
-            </div>
+/* ── Duration ── */
+window.pickDur = function(pill){
+  document.querySelectorAll('.dur-pill').forEach(function(p){p.classList.remove('sel');});
+  pill.classList.add('sel');
+  selDur  = pill.dataset.dur;
+  selDurHrs = parseFloat(pill.dataset.hrs)||0;
+  hide('errDur');
+  var cdw = el('customDurWrap');
+  if(selDur==='custom'){cdw.classList.add('show');}else{cdw.classList.remove('show');}
+  updateBudgetMeter();
+  updatePreview();
+};
 
-            <!-- Workers needed -->
-            <div class="ff-group">
-              <label class="ff-label">Kitne Workers Chahiye? <span class="ff-required">*</span></label>
-              <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
-                <div class="stepper-wrap">
-                  <button class="stepper-btn" onclick="stepWorkers(-1)">−</button>
-                  <input class="stepper-val" type="number" id="workersCount" value="1" min="1" max="50" oninput="updatePreview()" />
-                  <button class="stepper-btn" onclick="stepWorkers(1)">+</button>
-                </div>
-                <div style="font-size:.82rem;color:var(--gray-400);font-weight:600">workers required</div>
-              </div>
-            </div>
+/* ── Budget meter ── */
+window.updateBudgetMeter = function(){
+  var budget = Number(el('fBudget').value)||0;
+  var hrs    = selDurHrs;
+  if(selDur==='custom') hrs = Number(el('fCustomHrs').value)||0;
+  var meter  = el('budgetMeter');
+  var rate   = selCat ? RATES[selCat] : null;
 
-            <!-- Date & Time -->
-            <div class="ff-group">
-              <label class="ff-label">Gig Start Date & Time <span class="ff-required">*</span></label>
-              <div class="datetime-row">
-                <div>
-                  <label class="ff-label" for="gigDate" style="font-size:.74rem">Start Date</label>
-                  <input class="ff-input" type="date" id="gigDate" oninput="updatePreview(); validateField(this)" />
-                  <div class="ff-error-msg" id="gigDateErr">⚠️ Date select karo</div>
-                </div>
-                <div>
-                  <label class="ff-label" for="gigTime" style="font-size:.74rem">Start Time</label>
-                  <input class="ff-input" type="time" id="gigTime" value="09:00" oninput="updatePreview()" />
-                </div>
-                <div>
-                  <label class="ff-label" for="gigDuration" style="font-size:.74rem">Duration</label>
-                  <select class="ff-select" id="gigDuration" oninput="updatePreview()">
-                    <option value="">Select…</option>
-                    <option value="2 hours">2 Hours</option>
-                    <option value="4 hours">4 Hours</option>
-                    <option value="Half day">Half Day (5 hrs)</option>
-                    <option value="Full day" selected>Full Day (8 hrs)</option>
-                    <option value="2 days">2 Days</option>
-                    <option value="3 days">3 Days</option>
-                    <option value="1 week">1 Week</option>
-                    <option value="Ongoing">Ongoing</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            <!-- End date (optional) -->
-            <div class="ff-group">
-              <label class="ff-label" for="gigEndDate">
-                End Date <span style="color:var(--gray-400);font-weight:600">(optional — recurring gig ke liye)</span>
-              </label>
-              <input class="ff-input" type="date" id="gigEndDate" style="max-width:220px" />
-            </div>
-
-            <!-- Working hours note -->
-            <div class="ff-group">
-              <label class="ff-label" for="hoursNote">Working Hours / Shifts Detail <span style="color:var(--gray-400);font-weight:600">(optional)</span></label>
-              <input
-                class="ff-input" type="text" id="hoursNote"
-                placeholder="e.g. 9 AM – 6 PM, 1 hr lunch break, No overtime"
-              />
-            </div>
-
-          </div>
-        </div>
-
-        <!-- ─────────────────────────────
-             SECTION 3: LOCATION & PERKS
-        ───────────────────────────────── -->
-        <div class="pg-card" id="section3">
-          <div class="pg-card-header">
-            <div class="pgch-num">3</div>
-            <div class="pgch-title">📍 Location & Additional Details</div>
-          </div>
-          <div class="pg-card-body">
-
-            <!-- Location -->
-            <div class="ff-group">
-              <label class="ff-label" for="gigLocation">
-                Kaam ki Location (Address) <span class="ff-required">*</span>
-              </label>
-              <div class="ff-input-wrap">
-                <span class="ff-input-icon">📍</span>
-                <input
-                  class="ff-input" type="text" id="gigLocation"
-                  placeholder="e.g. Plot 15, Sector 37, Gurugram, Haryana — Near HUDA City Centre Metro"
-                  oninput="updatePreview(); validateField(this)"
-                />
-              </div>
-              <div class="ff-error-msg" id="gigLocationErr">⚠️ Location daalna zaroori hai</div>
-              <div class="ff-hint">💡 Landmark ya metro station bhi daalo — workers ko dhundne mein asaan hoga</div>
-            </div>
-
-            <!-- Area / Sector -->
-            <div class="ff-row">
-              <div>
-                <label class="ff-label" for="gigArea">Area / Sector <span class="ff-required">*</span></label>
-                <select class="ff-select" id="gigArea" oninput="updatePreview()">
-                  <option value="">Select Area…</option>
-                  <optgroup label="Gurugram">
-                    <option>Sector 14</option>
-                    <option>Sector 18</option>
-                    <option>Sector 29</option>
-                    <option>Sector 37</option>
-                    <option>Sector 44</option>
-                    <option>Sector 56</option>
-                    <option>DLF Cyber City</option>
-                    <option>DLF Phase 1–5</option>
-                    <option>Golf Course Road</option>
-                    <option>Sohna Road</option>
-                    <option>MG Road</option>
-                    <option>Manesar</option>
-                    <option>IMT Manesar</option>
-                    <option>Palam Vihar</option>
-                    <option>Udyog Vihar</option>
-                  </optgroup>
-                  <optgroup label="Delhi NCR">
-                    <option>South Delhi</option>
-                    <option>West Delhi</option>
-                    <option>Dwarka</option>
-                    <option>Noida Sec 62</option>
-                    <option>Noida Sec 18</option>
-                    <option>Greater Noida</option>
-                    <option>Faridabad</option>
-                    <option>Ghaziabad</option>
-                  </optgroup>
-                  <option value="other">Other (mention in address)</option>
-                </select>
-              </div>
-              <div>
-                <label class="ff-label" for="gigPincode">Pincode</label>
-                <input
-                  class="ff-input" type="text" id="gigPincode"
-                  placeholder="e.g. 122001" maxlength="6"
-                  oninput="this.value=this.value.replace(/\D/g,'')"
-                />
-              </div>
-            </div>
-
-            <!-- Work type -->
-            <div class="ff-group" style="margin-top:18px">
-              <label class="ff-label">Kaam Kahan Hoga?</label>
-              <div class="urgency-row">
-                <button class="urgency-btn selected" data-wt="on-site" onclick="selectWorkType(this)">
-                  <span class="ub-icon">🏢</span>
-                  <div class="ub-label">On-Site</div>
-                  <div class="ub-sub">Worker aayega</div>
-                </button>
-                <button class="urgency-btn" data-wt="remote" onclick="selectWorkType(this)">
-                  <span class="ub-icon">💻</span>
-                  <div class="ub-label">Remote</div>
-                  <div class="ub-sub">Ghar se kaam</div>
-                </button>
-                <button class="urgency-btn" data-wt="hybrid" onclick="selectWorkType(this)">
-                  <span class="ub-icon">🔄</span>
-                  <div class="ub-label">Hybrid</div>
-                  <div class="ub-sub">Dono</div>
-                </button>
-              </div>
-            </div>
-
-            <!-- Perks -->
-            <div class="ff-group" style="margin-top:18px">
-              <label class="ff-label">Worker ko Kya Milega? <span style="color:var(--gray-400);font-weight:600">(Perks — optional)</span></label>
-              <div class="perks-grid" id="perksGrid">
-                <div class="perk-item" onclick="togglePerk(this)">
-                  <div class="perk-checkbox"></div>
-                  <span class="perk-icon">🍱</span>
-                  <span class="perk-label">Khana / Lunch</span>
-                </div>
-                <div class="perk-item" onclick="togglePerk(this)">
-                  <div class="perk-checkbox"></div>
-                  <span class="perk-icon">☕</span>
-                  <span class="perk-label">Chai / Nashta</span>
-                </div>
-                <div class="perk-item" onclick="togglePerk(this)">
-                  <div class="perk-checkbox"></div>
-                  <span class="perk-icon">🚗</span>
-                  <span class="perk-label">Transport / Drop</span>
-                </div>
-                <div class="perk-item" onclick="togglePerk(this)">
-                  <div class="perk-checkbox"></div>
-                  <span class="perk-icon">💊</span>
-                  <span class="perk-label">Medical Cover</span>
-                </div>
-                <div class="perk-item" onclick="togglePerk(this)">
-                  <div class="perk-checkbox"></div>
-                  <span class="perk-icon">🛠️</span>
-                  <span class="perk-label">Tools Provided</span>
-                </div>
-                <div class="perk-item" onclick="togglePerk(this)">
-                  <div class="perk-checkbox"></div>
-                  <span class="perk-icon">👕</span>
-                  <span class="perk-label">Uniform Diya</span>
-                </div>
-                <div class="perk-item" onclick="togglePerk(this)">
-                  <div class="perk-checkbox"></div>
-                  <span class="perk-icon">💰</span>
-                  <span class="perk-label">Bonus on Completion</span>
-                </div>
-                <div class="perk-item" onclick="togglePerk(this)">
-                  <div class="perk-checkbox"></div>
-                  <span class="perk-icon">🔄</span>
-                  <span class="perk-label">Repeat Work Available</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Contact & visibility -->
-            <div class="ff-group" style="margin-top:20px">
-              <label class="ff-label">Contact & Visibility Settings</label>
-              <div>
-                <div class="toggle-row">
-                  <div class="tr-info">
-                    <div class="tr-label">📞 Phone Number Show Karo</div>
-                    <div class="tr-sub">Workers directly call kar sakenge</div>
-                  </div>
-                  <label class="tog-switch">
-                    <input type="checkbox" id="togglePhone" checked />
-                    <span class="tog-slider"></span>
-                  </label>
-                </div>
-                <div class="toggle-row" id="phoneRow">
-                  <div style="flex:1">
-                    <input class="ff-input" type="tel" id="contactPhone" placeholder="e.g. 98765 43210" maxlength="10" oninput="this.value=this.value.replace(/\D/g,'')" />
-                  </div>
-                </div>
-                <div class="toggle-row">
-                  <div class="tr-info">
-                    <div class="tr-label">💬 WhatsApp se Contact Allow Karo</div>
-                    <div class="tr-sub">Workers WhatsApp pe message kar sakenge</div>
-                  </div>
-                  <label class="tog-switch">
-                    <input type="checkbox" id="toggleWA" checked />
-                    <span class="tog-slider"></span>
-                  </label>
-                </div>
-                <div class="toggle-row">
-                  <div class="tr-info">
-                    <div class="tr-label">🔔 Instant Applications Notify Karo</div>
-                    <div class="tr-sub">Har naya application aane pe notification milegi</div>
-                  </div>
-                  <label class="tog-switch">
-                    <input type="checkbox" id="toggleNotif" checked />
-                    <span class="tog-slider"></span>
-                  </label>
-                </div>
-                <div class="toggle-row">
-                  <div class="tr-info">
-                    <div class="tr-label">⭐ Sirf Verified Workers Ko Dikhao</div>
-                    <div class="tr-sub">Only GigLega-verified workers — screened, rated, and trusted</div>
-                  </div>
-                  <label class="tog-switch">
-                    <input type="checkbox" id="toggleVerified" />
-                    <span class="tog-slider"></span>
-                  </label>
-                </div>
-              </div>
-            </div>
-
-            <!-- Additional notes -->
-            <div class="ff-group">
-              <label class="ff-label" for="additionalNotes">
-                Koi Aur Important Info? <span style="color:var(--gray-400);font-weight:600">(optional)</span>
-              </label>
-              
-          <!-- Gig Images Upload -->
-          <div class="ff-group">
-            <label class="ff-label">
-              📷 Gig ki Photos Upload Karo (optional)
-            </label>
-            <div class="image-upload-wrap">
-              <input 
-                type="file" 
-                id="gigImages" 
-                accept="image/*" 
-                multiple 
-                max="3"
-                onchange="handleImageUpload(this)"
-                style="display:none"
-              />
-              <label for="gigImages" class="upload-btn">
-                <span class="upload-icon">📁</span>
-                <span class="upload-text">Click to upload images (max 3)</span>
-              </label>
-              <div id="imagePreview" class="image-preview-grid"></div>
-            </div>
-            <div class="ff-hint">💡 Photos daaloge toh 2x zyada applications aati hain. Max 3 images, each under 2MB</div>
-          </div>
-              <textarea
-                class="ff-textarea" id="additionalNotes"
-                placeholder="e.g. ID proof saath laana zaroori hai. Gate pe naam Rahul Kumar ko bata dena. Kaam ka mahaul accha hai — repeat hire possible."
-                maxlength="300"
-                oninput="updateCharCount('additionalNotes','notesCount',300)"
-                style="min-height:80px"
-              ></textarea>
-              <div class="ff-char-count"><span id="notesCount">0</span> / 300</div>
-            </div>
-
-          </div>
-        </div>
-
-        <!-- ─────────────────────────────
-             SUBMIT ROW
-        ───────────────────────────────── -->
-        <div class="pg-submit-row">
-          <button class="btn-pg-submit" id="submitBtn" onclick="submitGig()">
-            🚀 Post My Gig Now → (Free)
-          </button>
-          <button class="btn-pg-draft" onclick="saveDraft()">
-            💾 Draft Save Karo
-          </button>
-          <div class="pg-submit-note">
-            ✅ GigLega pe pehla gig post <strong>bilkul free</strong> hai. Payment sirf tab hoti hai jab gig complete ho. No hidden charges!
-          </div>
-        </div>
-
-      </div><!-- /left col -->
-
-      <!-- ════ RIGHT — SIDEBAR PREVIEW ════ -->
-      <div>
-        <div class="pg-preview-card">
-          <div class="ppc-header">👁️ Live Preview — Aise dikhega</div>
-          <div class="ppc-body">
-
-            <div class="prev-gig-card">
-              <div class="prev-title" id="prevTitle">Gig ka title yahan aayega…</div>
-              <div class="prev-category" id="prevCategory">📋 Category</div>
-              <div class="prev-pay" id="prevPay">₹ — Pay Rate</div>
-              <div class="prev-meta">
-                <div class="prev-meta-row" id="prevLocation">📍 Location</div>
-                <div class="prev-meta-row" id="prevDate">📅 Date</div>
-                <div class="prev-meta-row" id="prevWorkers">👥 Workers needed</div>
-              </div>
-              <div class="prev-skills" id="prevSkills"></div>
-            </div>
-
-            <!-- Fee breakdown -->
-            <div style="font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.4px;color:var(--gray-400);margin-bottom:8px">
-              💰 Posting Cost
-            </div>
-            <div class="fee-summary">
-              <div class="fee-row">
-                <span class="fee-lbl">Posting Fee</span>
-                <span class="fee-val free">FREE</span>
-              </div>
-              <div class="fee-row">
-                <span class="fee-lbl">Platform Commission</span>
-                <span class="fee-val">6% (on completion)</span>
-              </div>
-              <div class="fee-row">
-                <span class="fee-lbl">Payment Protection</span>
-                <span class="fee-val free">Included ✅</span>
-              </div>
-              <div class="fee-row">
-                <span class="fee-lbl" style="font-weight:800;color:var(--text)">Total Due Now</span>
-                <span class="fee-val total free">₹0</span>
-              </div>
-            </div>
-
-            <!-- Trust signals -->
-            <div style="margin-top:14px;display:flex;flex-direction:column;gap:6px">
-              <div style="font-size:.74rem;color:var(--gray-400);font-weight:600;display:flex;align-items:center;gap:6px">
-                ⚡ <span>Avg. <strong style="color:var(--text)">15 min</strong> mein pehla application</span>
-              </div>
-              <div style="font-size:.74rem;color:var(--gray-400);font-weight:600;display:flex;align-items:center;gap:6px">
-                👥 <span><strong style="color:var(--text)">120+</strong> verified workers Gurugram mein</span>
-              </div>
-              <div style="font-size:.74rem;color:var(--gray-400);font-weight:600;display:flex;align-items:center;gap:6px">
-                🔒 <span>Payment <strong style="color:var(--text)">escrow protected</strong></span>
-              </div>
-              <div style="font-size:.74rem;color:var(--gray-400);font-weight:600;display:flex;align-items:center;gap:6px">
-                ⭐ <span>Workers rated <strong style="color:var(--text)">4.8/5</strong> avg</span>
-              </div>
-            </div>
-
-          </div>
-        </div>
-
-        <!-- Tips card -->
-        <div class="pg-info-box amber" style="border-radius:var(--radius);margin-top:0">
-          🎯 <strong>Pro Tips for More Applications:</strong>
-          <ul style="margin-top:8px;padding-left:16px;font-size:.82rem;line-height:1.9;color:var(--gray-600)">
-            <li>Pay range clearly likhna — vague pay pe kam apply hota hai</li>
-            <li>Exact location + landmark dena</li>
-            <li>Perks tick karna — food/chai wale gigs pe 2x applies</li>
-            <li>Urgent tag lagao agar aaj chahiye</li>
-          </ul>
-        </div>
-
-      </div><!-- /sidebar -->
-
-    </div><!-- /pg-body -->
-  </main>
-
-  <script type="module">
-    import { auth, db } from './firebase-config.js';
-    import { collection, addDoc } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
-    import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
-
-    /* ── Auth guard auth, db, storage 
-      import { ref as storageRef, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js';
-    
-    /* ── Silent GPS capture when posting ── */
-    var _posterLat = null, _posterLng = null;
-    if(navigator.geolocation){
-      navigator.geolocation.getCurrentPosition(function(p){
-        _posterLat = p.coords.latitude;
-        _posterLng = p.coords.longitude;
-      }, function(){}, {enableHighAccuracy:true, timeout:8000, maximumAge:60000});
-    }
-
-    onAuthStateChanged(auth, function(user) {
-      if (!user) {
-        window.location.replace('login.html?redirect=post-gig.html&mode=login');
-      }
+  // Quick suggest buttons
+  var qa = el('quickAmts'); qa.innerHTML='';
+  if(rate && hrs>0){
+    var suggested = Math.round(rate.perHour * hrs / 50)*50;
+    var minOk     = Math.round(rate.minHour * hrs / 50)*50;
+    var opts = [minOk, suggested, Math.round(suggested*1.3/50)*50];
+    opts.forEach(function(amt){
+      var btn=document.createElement('button');
+      btn.className='budget-quickbtn';
+      btn.textContent='₹'+amt;
+      btn.onclick=function(){el('fBudget').value=amt;el('budgetSlider').value=amt;updateBudgetMeter();updatePreview();};
+      qa.appendChild(btn);
     });
+  }
 
-    /* ── State ── */
-    var selectedCategory = '';
-      var uploadedImages = []; // Store uploaded image URLs
-  var imageFiles = []; // Store selected files
+  if(!budget){
+    meter.className='budget-meter idle';
+    el('budgetMeterIcon').textContent='💡';
+    el('budgetMeterText').textContent = rate&&hrs>0
+      ? 'Suggested: ₹'+Math.round(rate.perHour*hrs/50)*50+' (₹'+rate.perHour+'/hr)'
+      : 'Amount daalo ya category + duration select karo.';
+    return;
+  }
+  if(budget<50){
+    meter.className='budget-meter low';
+    el('budgetMeterIcon').textContent='❌';
+    el('budgetMeterText').textContent='Minimum ₹50 chahiye — is se post nahi ho sakta.';
+    return;
+  }
+  if(!rate||!hrs){
+    meter.className='budget-meter idle';
+    el('budgetMeterIcon').textContent='💡';
+    el('budgetMeterText').textContent='₹'+budget+' — category aur duration select karo for guidance.';
+    return;
+  }
+  var fairMin = rate.minHour  * hrs;
+  var fairMid = rate.perHour  * hrs;
+  var fairMax = rate.perHour  * hrs * 1.4;
+  if(budget < fairMin*0.6){
+    meter.className='budget-meter low';
+    el('budgetMeterIcon').textContent='⚠️';
+    el('budgetMeterText').textContent='Bahut kam — worker accept nahi karega. Min ₹'+Math.round(fairMin)+' hona chahiye.';
+  } else if(budget < fairMin){
+    meter.className='budget-meter warn';
+    el('budgetMeterIcon').textContent='📉';
+    el('budgetMeterText').textContent='Market rate se thoda kam. Fair pay: ₹'+Math.round(fairMin)+'–₹'+Math.round(fairMid)+'.';
+  } else if(budget <= fairMax){
+    meter.className='budget-meter fair';
+    el('budgetMeterIcon').textContent='✅';
+    el('budgetMeterText').textContent='Fair pay! ₹'+Math.round(fairMin)+'–₹'+Math.round(fairMid)+' is range ka hona chahiye.';
+  } else {
+    meter.className='budget-meter high';
+    el('budgetMeterIcon').textContent='⬆️';
+    el('budgetMeterText').textContent='Market rate se upar — workers zaroor apply karenge!';
+  }
+};
 
-  /* ── Image Upload Handler ── */
-  window.handleImageUpload = function(input) {
-    var files = Array.from(input.files);
-    if (files.length > 3) {
-      showToast('⚠️ Max 3 images allowed', 'warning');
-      files = files.slice(0, 3);
+/* ── Urgency ── */
+window.pickUrg = function(urg){
+  selUrg=urg;
+  el('urgNormal').className='urg-opt'+(urg==='normal'?' sel-normal':'');
+  el('urgUrgent').className='urg-opt'+(urg==='urgent'?' sel-urgent':'');
+  updatePreview();
+};
+
+/* ── GPS ── */
+window.detectGPS = function(){
+  var btn=el('btnGps'), stat=el('gpsStatus');
+  btn.classList.add('loading'); btn.textContent='🔄';
+  stat.className='gps-status show load'; stat.textContent='📡 Location detect ho rahi hai...';
+  if(!navigator.geolocation){
+    stat.className='gps-status show err'; stat.textContent='GPS browser mein support nahi.';
+    btn.classList.remove('loading'); btn.textContent='📍'; return;
+  }
+  navigator.geolocation.getCurrentPosition(async function(pos){
+    posterLat=pos.coords.latitude; posterLng=pos.coords.longitude;
+    try{
+      var r=await fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat='+posterLat+'&lon='+posterLng,
+        {headers:{'User-Agent':'GigLega/1.0'}});
+      var d=await r.json();
+      var addr=d.address||{};
+      var sector=addr.suburb||addr.neighbourhood||addr.quarter||'';
+      var city  =addr.city||addr.town||addr.county||'Gurugram';
+      var pin   =addr.postcode||'';
+      if(sector) el('fArea').value=sector+(city?', '+city:'');
+      else el('fArea').value=city;
+      if(pin) el('fPincode') && (el('fPincode').value=pin);
+      stat.className='gps-status show ok'; stat.textContent='✅ Location detect hui: '+el('fArea').value;
+      updatePreview();
+    }catch(e){
+      el('fArea').value='Gurugram';
+      stat.className='gps-status show ok'; stat.textContent='✅ Approximate location set ki.';
     }
-    
-    // Validate file sizes
-    var valid = files.filter(function(f) { return f.size <= 2 * 1024 * 1024; });
-    if (valid.length < files.length) {
-      showToast('⚠️ Some images over 2MB were skipped', 'warning');
-    }
-    
-    imageFiles = valid;
-    var preview = document.getElementById('imagePreview');
-    preview.innerHTML = '';
-    
-    valid.forEach(function(file, idx) {
-      var reader = new FileReader();
-      reader.onload = function(e) {
-        var div = document.createElement('div');
-        div.className = 'preview-item';
-        div.innerHTML = '<img src="' + e.target.result + '" alt="Preview"><button class="preview-remove" onclick="removeImage(' + idx + ')">✕</button>';
-        preview.appendChild(div);
-      };
-      reader.readAsDataURL(file);
-    });
+    btn.classList.remove('loading'); btn.textContent='✅';
+  },function(err){
+    var m={1:'GPS permission deny.',2:'Signal nahi mila.',3:'Timeout — try again.'};
+    stat.className='gps-status show err'; stat.textContent='❌ '+(m[err.code]||'GPS error');
+    btn.classList.remove('loading'); btn.textContent='📍';
+  },{enableHighAccuracy:true,timeout=12000,maximumAge:0});
+};
+
+/* ── Live preview ── */
+window.updatePreview = function(){
+  var title=el('fTitle').value.trim()||'Gig Title';
+  var cat  =selCat?(RATES[selCat]?RATES[selCat].name:selCat):'—';
+  var area =el('fArea')?el('fArea').value.trim()||'—':'—';
+  var dur  =selDur==='custom'?((el('fCustomHrs').value||'?')+' hours'):selDur||'—';
+  var budget=el('fBudget').value||'—';
+  var desc =el('fDesc').value.trim()||'—';
+  var dateVal=el('fDate').value;
+  var dateStr=dateVal?new Date(dateVal).toLocaleDateString('en-IN',{day:'numeric',month:'short'}):'—';
+  var isUrg=selUrg==='urgent';
+  el('pvTitle').textContent=title;
+  el('pvCat').textContent=cat;
+  el('pvArea').textContent=area;
+  el('pvDur').textContent=dur;
+  el('pvDate').textContent=dateStr;
+  el('pvBudget').textContent=budget;
+  el('pvDesc').textContent=desc;
+  var badge=el('pvBadge');
+  badge.className='preview-badge '+(isUrg?'urgent':'normal');
+  badge.textContent=isUrg?'🔥 Urgent':'🟢 Normal';
+};
+
+/* ── Advanced toggle ── */
+window.toggleAdv = function(){
+  var t=el('advToggle'),b=el('advBody');
+  t.classList.toggle('open'); b.classList.toggle('open');
+};
+
+/* ── Step navigation ── */
+window.goStep = function(n){
+  if(n>currentStep) return; // only go back
+  setStep(n);
+};
+
+function setStep(n){
+  currentStep=n;
+  [1,2,3].forEach(function(i){
+    el('card'+i).classList.toggle('active', i===n);
+    var dot=el('pstep'+i);
+    if(i<n) dot.className='pg-step done';
+    else if(i===n) dot.className='pg-step active';
+    else dot.className='pg-step';
+    el('pdot'+i).textContent=i<n?'✓':i;
+  });
+  if(el('pline1')) el('pline1').classList.toggle('done',n>1);
+  if(el('pline2')) el('pline2').classList.toggle('done',n>2);
+  window.scrollTo({top:0,behavior:'smooth'});
+  if(n===3) updatePreview();
+}
+
+window.nextStep = function(from){
+  if(from===1&&!validateStep1()) return;
+  if(from===2&&!validateStep2()) return;
+  setStep(from+1);
+};
+
+/* ── Validation ── */
+function validateStep1(){
+  var ok=true;
+  var title=el('fTitle').value.trim();
+  if(title.length<8){el('errTitle').classList.add('show');el('fTitle').classList.add('error');ok=false;}
+  else{el('errTitle').classList.remove('show');el('fTitle').classList.remove('error');}
+  if(!selCat){el('errCat').classList.add('show');ok=false;}
+  var desc=el('fDesc').value.trim();
+  if(desc.length<20){el('errDesc').classList.add('show');el('fDesc').classList.add('error');ok=false;}
+  else{el('errDesc').classList.remove('show');el('fDesc').classList.remove('error');}
+  return ok;
+}
+function validateStep2(){
+  var ok=true;
+  if(!el('fDate').value){el('errDate').classList.add('show');ok=false;}
+  else el('errDate').classList.remove('show');
+  if(!selDur){el('errDur').classList.add('show');ok=false;}
+  else el('errDur').classList.remove('show');
+  if(!el('fArea').value.trim()){el('errArea').classList.add('show');ok=false;}
+  else el('errArea').classList.remove('show');
+  var b=Number(el('fBudget').value)||0;
+  if(b<50||b>10000){el('errBudget').classList.add('show');ok=false;}
+  else el('errBudget').classList.remove('show');
+  return ok;
+}
+
+/* ── Submit ── */
+window.submitGig = function(){
+  if(!validateStep1()||!validateStep2()) return;
+  if(!currentUser){window.location.href='login.html?redirect=post-gig.html';return;}
+  var btn=el('btnPost');
+  btn.disabled=true; btn.textContent='⏳ Post ho raha hai...';
+
+  var hrs = selDurHrs;
+  if(selDur==='custom') hrs=Number(el('fCustomHrs').value)||0;
+  var skillsRaw=el('fSkills').value||'';
+  var skills=skillsRaw?skillsRaw.split(',').map(function(s){return s.trim();}).filter(Boolean):[];
+
+  var gigData={
+    title:       el('fTitle').value.trim(),
+    description: el('fDesc').value.trim(),
+    category:    selCat,
+    budget:      Number(el('fBudget').value)||0,
+    payMax:      Number(el('fBudget').value)||0,
+    payType:     'fixed',
+    location:    el('fArea').value.trim(),
+    area:        el('fArea').value.trim(),
+    pincode:     el('fPincode') ? (el('fPincode').value||'') : '',
+    urgency:     selUrg,
+    workType:    'on-site',
+    workers:     parseInt(el('fWorkers').value)||1,
+    skills:      skills,
+    perks:       el('fPerks').value ? el('fPerks').value.split(',').map(function(s){return s.trim();}) : [],
+    date:        el('fDate').value,
+    time:        el('fTime').value||'09:00',
+    duration:    selDur==='custom'?(hrs+' hours'):selDur,
+    durationHrs: hrs,
+    hoursNote:   '',
+    additionalNotes: el('fNotes').value||'',
+    status:      'open',
+    lat:         posterLat,
+    lng:         posterLng,
+    posterId:    currentUser.uid,
+    posterName:  currentUser.displayName||'User',
+    type:        'hyperlocal',
+    createdAt:   new Date().toISOString(),
+    applications:0,
+    views:       0,
+    images:      []
   };
-  
-  window.removeImage = function(idx) {
-    imageFiles.splice(idx, 1);
-    var input = document.getElementById('gigImages');
-    input.value = '';
-    window.handleImageUpload({files: imageFiles});
-  };
-    var selectedPayType = 'hourly';
-    var selectedUrgency = '';
-    var selectedWorkType = 'on-site';
-    var selectedSkills = [];
-    var selectedPerks = [];
-    var PAY_SUFFIXES = { hourly:'/hr', daily:'/day', fixed:' fixed', weekly:'/week' };
 
-    /* ── Toast ── */
-    function showToast(msg, type) {
-      if (window.showToast) { window.showToast(msg, type); return; }
-      var t = document.createElement('div');
-      t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a3c5e;color:#fff;padding:10px 22px;border-radius:99px;font-size:.84rem;font-weight:700;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.2)';
-      t.textContent = msg;
-      document.body.appendChild(t);
-      setTimeout(function(){ t.remove(); }, 3000);
-    }
-
-    /* ── Category ── */
-    window.selectCategory = function(el) {
-      document.querySelectorAll('.cat-card').forEach(function(c){ c.classList.remove('selected'); });
-      el.classList.add('selected');
-      selectedCategory = el.dataset.cat;
-      document.getElementById('catErr').classList.remove('visible');
-      updatePreview(); updateProgress();
-    };
-
-    /* ── Pay type ── */
-    window.selectPayType = function(el) {
-      document.querySelectorAll('.pay-tab').forEach(function(t){ t.classList.remove('active'); });
-      el.classList.add('active');
-      selectedPayType = el.dataset.pay;
-      var suf = PAY_SUFFIXES[selectedPayType];
-      document.getElementById('payTypeSuffix').textContent = suf;
-      document.getElementById('payTypeSuffix2').textContent = suf;
-      updatePreview();
-    };
-
-    /* ── Urgency ── */
-    window.selectUrgency = function(el) {
-      document.querySelectorAll('#urgencyRow .urgency-btn').forEach(function(b){ b.classList.remove('selected'); });
-      el.classList.add('selected');
-      selectedUrgency = el.dataset.urgency;
-      updateProgress();
-    };
-
-    /* ── Work type ── */
-    window.selectWorkType = function(el) {
-      document.querySelectorAll('[data-wt]').forEach(function(b){ b.classList.remove('selected'); });
-      el.classList.add('selected');
-      selectedWorkType = el.dataset.wt;
-    };
-
-    /* ── Skills ── */
-    window.toggleSkill = function(el) {
-      el.classList.toggle('selected');
-      var label = el.textContent.trim();
-      if (el.classList.contains('selected')) { selectedSkills.push(label); }
-      else { selectedSkills = selectedSkills.filter(function(s){ return s !== label; }); }
-      updatePreview();
-    };
-
-    window.addCustomSkill = function() {
-      var inp = document.getElementById('customSkillInput');
-      var val = inp.value.trim();
-      if (!val) return;
-      if (selectedSkills.length >= 10) { showToast('⚠️ Max 10 skills allowed'); return; }
-      var tag = document.createElement('button');
-      tag.className = 'skill-tag selected';
-      tag.innerHTML = '✅ ' + val + ' <span class="skill-tag-remove">✕</span>';
-      tag.onclick = function() { selectedSkills = selectedSkills.filter(function(s){ return s !== '✅ ' + val; }); tag.remove(); updatePreview(); };
-      document.getElementById('skillTagsWrap').appendChild(tag);
-      selectedSkills.push('✅ ' + val);
-      inp.value = '';
-      updatePreview();
-    };
-
-    /* ── Perks ── */
-    window.togglePerk = function(el) {
-      el.classList.toggle('checked');
-      var label = el.querySelector('.perk-label').textContent.trim();
-      if (el.classList.contains('checked')) { selectedPerks.push(label); el.querySelector('.perk-checkbox').textContent = '✓'; }
-      else { selectedPerks = selectedPerks.filter(function(p){ return p !== label; }); el.querySelector('.perk-checkbox').textContent = ''; }
-    };
-
-    /* ── Worker stepper ── */
-    window.stepWorkers = function(delta) {
-      var inp = document.getElementById('workersCount');
-      var val = Math.max(1, Math.min(50, (parseInt(inp.value)||1) + delta));
-      inp.value = val;
-      updatePreview();
-    };
-
-    /* ── Char count ── */
-    window.updateCharCount = function(fieldId, countId, max) {
-      var val = document.getElementById(fieldId).value.length;
-      var el = document.getElementById(countId);
-      el.textContent = val;
-      var wrap = el.closest('.ff-char-count');
-      wrap.classList.toggle('warn', val > max * .85);
-      wrap.classList.toggle('over', val >= max);
-    };
-
-    /* ── Validation ── */
-    window.validateField = function(input) {
-      var val = input.value.trim();
-      var isValid = val.length >= (input.id === 'gigTitle' ? 10 : 1);
-      input.classList.toggle('error', !isValid && val.length > 0);
-      input.classList.toggle('valid', isValid);
-    };
-
-    function validateAll() {
-      var ok = true;
-      var title = document.getElementById('gigTitle').value.trim();
-      if (title.length < 10) { document.getElementById('gigTitleErr').classList.add('visible'); document.getElementById('gigTitle').classList.add('error'); ok = false; }
-      else { document.getElementById('gigTitleErr').classList.remove('visible'); }
-      if (!selectedCategory) { document.getElementById('catErr').classList.add('visible'); ok = false; }
-      var desc = document.getElementById('gigDesc').value.trim();
-      if (desc.length < 20) { document.getElementById('gigDescErr').classList.add('visible'); document.getElementById('gigDesc').classList.add('error'); ok = false; }
-      else { document.getElementById('gigDescErr').classList.remove('visible'); }
-      var pay = document.getElementById('payMin').value.trim();
-      if (!pay || isNaN(pay) || Number(pay) < 1) { document.getElementById('payMinErr').classList.add('visible'); document.getElementById('payMin').classList.add('error'); ok = false; }
-      else { document.getElementById('payMinErr').classList.remove('visible'); }
-      var date = document.getElementById('gigDate').value;
-      if (!date) { document.getElementById('gigDateErr').classList.add('visible'); document.getElementById('gigDate').classList.add('error'); ok = false; }
-      else { document.getElementById('gigDateErr').classList.remove('visible'); }
-      var loc = document.getElementById('gigLocation').value.trim();
-      if (loc.length < 5) { document.getElementById('gigLocationErr').classList.add('visible'); document.getElementById('gigLocation').classList.add('error'); ok = false; }
-      else { document.getElementById('gigLocationErr').classList.remove('visible'); }
-      return ok;
-    }
-
-    /* ── Preview ── */
-    window.updatePreview = function() {
-      var title = document.getElementById('gigTitle').value.trim();
-      var payMin = document.getElementById('payMin').value;
-      var payMax = document.getElementById('payMax').value;
-      var location = document.getElementById('gigLocation').value.trim();
-      var date = document.getElementById('gigDate').value;
-      var workers = document.getElementById('workersCount').value;
-      var suf = PAY_SUFFIXES[selectedPayType];
-      document.getElementById('prevTitle').textContent = title || 'Gig ka title yahan aayega…';
-      document.getElementById('prevCategory').textContent = selectedCategory ? '📋 ' + selectedCategory : '📋 Category';
-      var payStr = '₹ — Pay Rate';
-      if (payMin) {
-        payStr = '₹' + Number(payMin).toLocaleString('en-IN');
-        if (payMax) payStr += ' – ₹' + Number(payMax).toLocaleString('en-IN');
-        payStr += ' ' + suf;
-      }
-      document.getElementById('prevPay').textContent = payStr;
-      document.getElementById('prevLocation').textContent = location ? '📍 ' + location.slice(0,45) + (location.length>45?'…':'') : '📍 Location';
-      document.getElementById('prevDate').textContent = date ? '📅 ' + new Date(date).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : '📅 Date';
-      document.getElementById('prevWorkers').textContent = '👥 ' + (workers||1) + ' Worker' + (workers > 1 ? 's' : '') + ' needed';
-      var skillsEl = document.getElementById('prevSkills');
-      skillsEl.innerHTML = selectedSkills.slice(0,4).map(function(s){ return '<span class="prev-skill">' + s + '</span>'; }).join('');
-      updateProgress();
-    };
-
-    /* ── Progress ── */
-    function updateProgress() {
-      var filled = [
-        document.getElementById('gigTitle').value.trim().length >= 10,
-        !!selectedCategory,
-        document.getElementById('gigDesc').value.trim().length >= 20,
-        !!document.getElementById('payMin').value,
-        !!document.getElementById('gigDate').value,
-        document.getElementById('gigLocation').value.trim().length >= 5,
-        !!selectedUrgency,
-      ];
-      var count = filled.filter(Boolean).length;
-      var pct = Math.round((count / filled.length) * 100);
-      document.getElementById('pgpbFill').style.width = pct + '%';
-      document.getElementById('pgpbPct').textContent = pct + '%';
-    }
-    window.updateProgress = updateProgress;
-
-    /* ── Phone toggle ── */
-    document.getElementById('togglePhone').addEventListener('change', function() {
-      var phoneField = document.getElementById('contactPhone');
-      if (phoneField) phoneField.style.display = this.checked ? 'block' : 'none';
+  addDoc(collection(db,'gigs'),gigData)
+    .then(function(ref){
+      el('successSub').textContent='Gig ID: '+ref.id.slice(0,8).toUpperCase()+' — Workers ko notify kar diya gaya!';
+      el('successOverlay').classList.add('show');
+    })
+    .catch(function(err){
+      window.GL&&window.GL.showToast('❌ Error: '+err.message,'error');
+      btn.disabled=false; btn.textContent='🚀 Post Gig — Free!';
     });
+};
 
-    /* ══════ SUBMIT TO FIRESTORE ══════ */
-    window.submitGig = async function() {
-      if (!validateAll()) {
-        showToast('⚠️ Please fill all required fields', 'warning');
-        window.scrollTo({top: 0, behavior: 'smooth'});
-        return;
-      }
-      var user = auth.currentUser;
-      if (!user) {
-        window.location.replace('login.html?redirect=post-gig.html');
-        return;
-      }
+/* ── Set today as min date ── */
+(function(){
+  var d=new Date(),y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0');
+  el('fDate').min=y+'-'+m+'-'+day;
+  el('fDate').value=y+'-'+m+'-'+day;
+})();
 
-      var btn = document.getElementById('submitBtn');
-      btn.disabled = true;
-      btn.textContent = '⏳ Posting…';
-
-      try {
-              // Upload images to Firebase Storage if any
-      if (imageFiles.length > 0) {
-        btn.textContent = '⌛ Uploading images...';
-        for (var i = 0; i < imageFiles.length; i++) {
-          var file = imageFiles[i];
-          var timestamp = Date.now();
-          var fileName = 'gig_' + timestamp + '_' + i + '_' + file.name;
-          var fileRef = storageRef(storage, 'gigs/' + user.uid + '/' + fileName);
-          var snapshot = await uploadBytes(fileRef, file);
-          var url = await getDownloadURL(snapshot.ref);
-          uploadedImages.push(url);
-        }
-      }
-      
-        var gigData = {
-          title:       document.getElementById('gigTitle').value.trim(),
-          description: document.getElementById('gigDesc').value.trim(),
-          category:    selectedCategory,
-          budget:      Number(document.getElementById('payMin').value) || 0,
-          payMax:      Number(document.getElementById('payMax').value) || 0,
-          payType:     selectedPayType,
-          location:    document.getElementById('gigLocation').value.trim(),
-          area:        document.getElementById('gigArea').value || '',
-          pincode:     document.getElementById('gigPincode').value || '',
-          urgency:     selectedUrgency || 'normal',
-          workType:    selectedWorkType,
-          workers:     parseInt(document.getElementById('workersCount').value) || 1,
-          skills:      selectedSkills,
-          perks:       selectedPerks,
-          date:        document.getElementById('gigDate').value,
-          time:        document.getElementById('gigTime').value || '09:00',
-          duration:    document.getElementById('gigDuration').value || 'Full day',
-          hoursNote:   document.getElementById('hoursNote').value || '',
-          additionalNotes:  document.getElementById('additionalNotes') ? document.getElementById('additionalNotes').value : '',
-          status:      'open',
-          lat:         _posterLat,
-          lng:         _posterLng,
-          posterId:    user.uid,
-          posterName:  user.displayName || 'User',
-          type:        (selectedWorkType === 'remote') ? 'remote' : 'hyperlocal',
-          createdAt:   new Date().toISOString(),
-          applications: 0,
-          views:       0,
-        images: uploadedImages
-        };
-
-        var ref = await addDoc(collection(db, 'gigs'), gigData);
-
-        // Show success modal
-        var modalGigId = document.getElementById('modalGigId');
-        if (modalGigId) modalGigId.textContent = '📋 Gig ID: ' + ref.id.slice(0,8).toUpperCase();
-        var overlay = document.getElementById('successModal');
-        if (overlay) { overlay.classList.add('open'); overlay.style.display = 'flex'; }
-        showToast('🎉 Gig posted successfully!', 'success');
-
-      } catch(err) {
-        console.error('Post gig error:', err);
-        showToast('❌ Error posting gig: ' + (err.message || 'Please try again'), 'error');
-        btn.disabled = false;
-        btn.textContent = '🚀 Post My Gig Now → (Free)';
-      }
-    };
-
-    /* ── Draft save ── */
-    window.saveDraft = function() { showToast('💾 Draft saved!', 'info'); };
-
-    /* ── Modal actions ── */
-    document.getElementById('btnModalDashboard') && document.getElementById('btnModalDashboard').addEventListener('click', function() {
-      window.location.href = 'dashboard-client.html';
-    });
-    document.getElementById('btnModalBrowse') && document.getElementById('btnModalBrowse').addEventListener('click', function() {
-      window.location.href = 'browse.html';
-    });
-    document.getElementById('btnModalPostAnother') && document.getElementById('btnModalPostAnother').addEventListener('click', function() {
-      window.location.reload();
-    });
-
-  </script>
+/* ── Auth guard ── */
+onAuthStateChanged(auth,function(user){
+  if(!user){window.location.replace('login.html?redirect=post-gig.html');return;}
+  currentUser=user;
+});
+</script>
 </body>
 </html>
