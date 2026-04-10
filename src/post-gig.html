@@ -764,6 +764,47 @@
 
   </style>
 </head>
+      /* ══════════════════════════════════
+       IMAGE UPLOAD
+       ══════════════════════════════════ */
+    .image-upload-wrap { margin-top: 10px; }
+    .upload-btn {
+      display: flex; align-items: center; gap: 10px;
+      padding: 16px 20px; border-radius: var(--radius-sm);
+      border: 2px dashed var(--gray-300);
+      background: var(--bg); cursor: pointer;
+      transition: all .2s; text-align: center;
+      justify-content: center;
+    }
+    .upload-btn:hover {
+      border-color: var(--teal);
+      background: rgba(13,148,136,.04);
+    }
+    .upload-icon { font-size: 1.5rem; }
+    .upload-text { font-size: .88rem; font-weight: 700; color: var(--gray-600); }
+    [data-theme=dark] .upload-btn { border-color: var(--gray-600); background: var(--gray-800); }
+    .image-preview-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 10px; margin-top: 12px;
+    }
+    .preview-item {
+      position: relative; border-radius: 8px;
+      overflow: hidden; aspect-ratio: 1;
+      border: 1.5px solid var(--gray-200);
+    }
+    .preview-item img {
+      width: 100%; height: 100%; object-fit: cover;
+    }
+    .preview-remove {
+      position: absolute; top: 5px; right: 5px;
+      width: 24px; height: 24px; border-radius: 50%;
+      background: rgba(239,68,68,.9); color: #fff;
+      border: none; cursor: pointer; font-size: .8rem;
+      display: flex; align-items: center; justify-content: center;
+      transition: background .2s;
+    }
+    .preview-remove:hover { background: rgba(220,38,38,1); }
+    [data-theme=dark] .preview-item { border-color: var(--gray-600); }
 <body>
 
   <div id="page-loader"></div>
@@ -1323,6 +1364,30 @@
               <label class="ff-label" for="additionalNotes">
                 Koi Aur Important Info? <span style="color:var(--gray-400);font-weight:600">(optional)</span>
               </label>
+              
+          <!-- Gig Images Upload -->
+          <div class="ff-group">
+            <label class="ff-label">
+              📷 Gig ki Photos Upload Karo (optional)
+            </label>
+            <div class="image-upload-wrap">
+              <input 
+                type="file" 
+                id="gigImages" 
+                accept="image/*" 
+                multiple 
+                max="3"
+                onchange="handleImageUpload(this)"
+                style="display:none"
+              />
+              <label for="gigImages" class="upload-btn">
+                <span class="upload-icon">📁</span>
+                <span class="upload-text">Click to upload images (max 3)</span>
+              </label>
+              <div id="imagePreview" class="image-preview-grid"></div>
+            </div>
+            <div class="ff-hint">💡 Photos daaloge toh 2x zyada applications aati hain. Max 3 images, each under 2MB</div>
+          </div>
               <textarea
                 class="ff-textarea" id="additionalNotes"
                 placeholder="e.g. ID proof saath laana zaroori hai. Gate pe naam Rahul Kumar ko bata dena. Kaam ka mahaul accha hai — repeat hire possible."
@@ -1434,7 +1499,8 @@
     import { collection, addDoc } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
     import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
 
-    /* ── Auth guard ── */
+    /* ── Auth guard auth, db, storage 
+      import { ref as storageRef, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js';
     onAuthStateChanged(auth, function(user) {
       if (!user) {
         window.location.replace('login.html?redirect=post-gig.html&mode=login');
@@ -1443,6 +1509,45 @@
 
     /* ── State ── */
     var selectedCategory = '';
+      var uploadedImages = []; // Store uploaded image URLs
+  var imageFiles = []; // Store selected files
+
+  /* ── Image Upload Handler ── */
+  window.handleImageUpload = function(input) {
+    var files = Array.from(input.files);
+    if (files.length > 3) {
+      showToast('⚠️ Max 3 images allowed', 'warning');
+      files = files.slice(0, 3);
+    }
+    
+    // Validate file sizes
+    var valid = files.filter(function(f) { return f.size <= 2 * 1024 * 1024; });
+    if (valid.length < files.length) {
+      showToast('⚠️ Some images over 2MB were skipped', 'warning');
+    }
+    
+    imageFiles = valid;
+    var preview = document.getElementById('imagePreview');
+    preview.innerHTML = '';
+    
+    valid.forEach(function(file, idx) {
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        var div = document.createElement('div');
+        div.className = 'preview-item';
+        div.innerHTML = '<img src="' + e.target.result + '" alt="Preview"><button class="preview-remove" onclick="removeImage(' + idx + ')">✕</button>';
+        preview.appendChild(div);
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+  
+  window.removeImage = function(idx) {
+    imageFiles.splice(idx, 1);
+    var input = document.getElementById('gigImages');
+    input.value = '';
+    window.handleImageUpload({files: imageFiles});
+  };
     var selectedPayType = 'hourly';
     var selectedUrgency = '';
     var selectedWorkType = 'on-site';
@@ -1642,6 +1747,20 @@
       btn.textContent = '⏳ Posting…';
 
       try {
+              // Upload images to Firebase Storage if any
+      if (imageFiles.length > 0) {
+        btn.textContent = '⌛ Uploading images...';
+        for (var i = 0; i < imageFiles.length; i++) {
+          var file = imageFiles[i];
+          var timestamp = Date.now();
+          var fileName = 'gig_' + timestamp + '_' + i + '_' + file.name;
+          var fileRef = storageRef(storage, 'gigs/' + user.uid + '/' + fileName);
+          var snapshot = await uploadBytes(fileRef, file);
+          var url = await getDownloadURL(snapshot.ref);
+          uploadedImages.push(url);
+        }
+      }
+      
         var gigData = {
           title:       document.getElementById('gigTitle').value.trim(),
           description: document.getElementById('gigDesc').value.trim(),
@@ -1668,7 +1787,8 @@
           type:        (selectedWorkType === 'remote') ? 'remote' : 'hyperlocal',
           createdAt:   new Date().toISOString(),
           applications: 0,
-          views:       0
+          views:       0,
+        images: uploadedImages
         };
 
         var ref = await addDoc(collection(db, 'gigs'), gigData);
