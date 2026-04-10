@@ -6,7 +6,7 @@
   <title>Post a Gig — GigLega</title>
   <link rel="stylesheet" href="styles.css"/>
   <link rel="stylesheet" href="theme-dark.css"/>
-  <link rel="stylesheet" href="mobile.css?v=20260410-1828"/>
+  <link rel="stylesheet" href="mobile.css?v=20260411-0200"/>
   <script src="shared.js?v=20260411" defer></script>
   <style>
     body{
@@ -47,6 +47,13 @@
       box-shadow:0 0 0 4px rgba(1,105,111,.12);}
     .pg-step-label{font-size:.68rem;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:.3px;}
     .pg-step.active .pg-step-label,.pg-step.done .pg-step-label{color:var(--primary);}
+
+    /* Step slide transitions */
+    .pg-panel { transition: opacity .25s ease, transform .25s ease; }
+    .pg-panel.hidden { opacity: 0; pointer-events: none; position: absolute; transform: translateX(12px); }
+    .pg-panel:not(.hidden) { opacity: 1; transform: translateX(0); }
+    .pg-steps { position: relative; }
+
     .pg-line{flex:1;height:2px;background:var(--gray-200);margin-bottom:18px;transition:background .4s;}
     .pg-line.done{background:var(--teal);}
 
@@ -206,15 +213,15 @@
 <div class="pg-wrap">
 
   <div style="margin-bottom:24px;">
-    <h1 style="font-size:1.4rem;font-weight:900;color:var(--text);margin-bottom:4px;">📋 Post a Gig</h1>
+    <h1 style="font-size:1.4rem;font-weight:900;color:var(--text);margin-bottom:4px;font-family:var(--font-display)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:8px"><path d="M12 5v14M5 12h14"/></svg>Post a Gig</h1>
     <p style="font-size:.82rem;color:var(--gray-400);">60 seconds mein gig post karo — bilkul free.</p>
   </div>
 
   <!-- Progress -->
   <div class="pg-progress" id="pgProgress">
-    <div class="pg-step active" id="pstep1"><div class="pg-step-dot" id="pdot1">1</div><div class="pg-step-label">Kya?</div></div>
+    <div class="pg-step active" id="pstep1"><div class="pg-step-dot" id="pdot1">1</div><div class="pg-step-label">Details</div></div>
     <div class="pg-line" id="pline1"></div>
-    <div class="pg-step" id="pstep2"><div class="pg-step-dot" id="pdot2">2</div><div class="pg-step-label">Kab & Kahan?</div></div>
+    <div class="pg-step" id="pstep2"><div class="pg-step-dot" id="pdot2">2</div><div class="pg-step-label">Schedule</div></div>
     <div class="pg-line" id="pline2"></div>
     <div class="pg-step" id="pstep3"><div class="pg-step-dot" id="pdot3">3</div><div class="pg-step-label">Review</div></div>
   </div>
