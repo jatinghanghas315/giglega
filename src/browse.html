@@ -678,10 +678,10 @@
     }
     function getUserName(uid) {
       if (!uid || uid === "demo") return "Demo Poster";
-      return usersCache[uid]?.name || "User";
+      return usersCache[uid]?.name || null;
     }
-    function getUserInitials(uid) {
-      var n = getUserName(uid);
+    function getUserInitials(uid, fallbackName) {
+      var n = getUserName(uid) || fallbackName || "U";
       return n.split(" ").map(function(w){ return w[0]; }).join("").slice(0,2).toUpperCase();
     }
 
@@ -927,7 +927,7 @@
         '<div class="gig-footer">' +
         '<div class="poster-info">' +
         '<div class="poster-av">' + escH(getUserInitials(gig.posterId)) + '</div>' +
-        '<span>' + escH(getUserName(gig.posterId)) + '</span>' +
+        '<span>' + escH(gig.posterName || getUserName(gig.posterId) || 'User') + '</span>' +
         '</div>' +
         '<a href="gig-detail.html?id=' + escH(gig.id) + '" class="btn btn-primary btn-sm" onclick="event.stopPropagation()" style="white-space:nowrap">' +
         (isTaken ? "View" : "Book This Gig →") + '</a>' +
