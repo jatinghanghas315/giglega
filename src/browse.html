@@ -834,12 +834,25 @@
     }
 
     /* ── Auth check ── */
+    /* ── Auth → then load gigs (ensures Firestore auth token is ready) ── */
+    var _gigsLoaded = false;
     onAuthStateChanged(auth, function(user) {
+      // Show post-gig promo for logged-in users
       if (user) {
         var promo = document.getElementById("postGigPromo");
         if (promo) promo.classList.remove("hidden");
       }
+      // Load gigs once after auth state is known (auth or anon)
+      if (!_gigsLoaded) {
+        _gigsLoaded = true;
+        loadGigs();
+      }
     });
+
+    // Safety fallback: if onAuthStateChanged hasn't fired in 3s, load anyway
+    setTimeout(function() {
+      if (!_gigsLoaded) { _gigsLoaded = true; loadGigs(); }
+    }, 3000);
 
     /* ── State ── */
     var state = { search: "", sort: "newest", type: "", category: "", minBudget:"", maxBudget:"", page:1, perPage:9, view:"grid" };
@@ -1100,8 +1113,7 @@
       renderPagination(total);
     }
 
-    /* ── Init ── */
-    loadGigs();
+    /* ── Init: loadGigs() is now triggered by onAuthStateChanged above ── */
 
   </script>
 </body>
