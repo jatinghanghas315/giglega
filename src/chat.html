@@ -17,14 +17,17 @@
     @keyframes uploading { 0%{width:0%} 100%{width:100%} }
   </style>
   <script type="module">
-    import { auth, db, storage } from './firebase-config.js';
+    import { auth, db } from './firebase-config.js';
     import {
       collection, doc, getDoc, setDoc, addDoc, query,
       orderBy, onSnapshot, serverTimestamp
     } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
     import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+    // Storage imported directly in chat only — not from firebase-config
+    import { getStorage } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js';
     import { ref as storageRef, uploadBytes, getDownloadURL }
       from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js';
+    import { getApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
 
     let currentUser = null;
     let convId      = null;
@@ -161,7 +164,7 @@
     /* ── Upload photo/video ── */
     async function uploadMedia(file){
       if(!convId||!currentUser) return;
-      if(!storage){ alert("Firebase Storage not configured."); return; }
+      const storage = getStorage(); // init Storage per-module
       const maxSize = 20*1024*1024; // 20MB
       if(file.size > maxSize){ alert("File 20MB se chhoti honi chahiye."); return; }
 
