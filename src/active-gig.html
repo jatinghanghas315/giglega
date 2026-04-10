@@ -4,639 +4,688 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Active Gig — GigLega</title>
-  <meta name="description" content="Your active gig on GigLega. Verify location and mark gig as complete to receive payment." />
+  <meta name="description" content="Track or complete your active gig on GigLega." />
   <link rel="stylesheet" href="styles.css" />
   <link rel="stylesheet" href="theme-dark.css" />
   <link rel="stylesheet" href="mobile.css?v=20260410-1828" />
   <script src="shared.js?v=20260411" defer></script>
   <style>
-    .ag-wrap { max-width: 680px; margin: 0 auto; padding: 24px 16px 100px; }
+    .ag-wrap { max-width: 700px; margin: 0 auto; padding: 24px 16px 100px; }
 
-    /* ── Page header ── */
+    /* Badge */
     .ag-badge {
       display: inline-flex; align-items: center; gap: 6px;
-      background: rgba(13,148,136,.1); color: var(--teal);
-      font-size: .75rem; font-weight: 800; text-transform: uppercase; letter-spacing: .5px;
+      font-size: .74rem; font-weight: 800; text-transform: uppercase; letter-spacing: .5px;
       padding: 4px 12px; border-radius: 20px; margin-bottom: 12px;
     }
-    .ag-badge span { width: 8px; height: 8px; background: var(--teal); border-radius: 50%;
-      animation: pulse-dot 1.4s ease-in-out infinite; }
-    @keyframes pulse-dot {
-      0%,100% { transform: scale(1); opacity: 1; }
-      50%      { transform: scale(1.5); opacity: .5; }
-    }
+    .ag-badge.worker { background: rgba(13,148,136,.1); color: var(--teal); }
+    .ag-badge.poster { background: rgba(245,158,11,.1); color: #b45309; }
+    .ag-badge .dot { width: 8px; height: 8px; border-radius: 50%; animation: bdot 1.4s ease-in-out infinite; }
+    .ag-badge.worker .dot { background: var(--teal); }
+    .ag-badge.poster .dot { background: #f59e0b; }
+    @keyframes bdot { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.6);opacity:.5} }
 
-    /* ── Gig info card ── */
-    .gig-info-card {
+    /* Cards */
+    .ag-card {
       background: var(--surface); border: 1.5px solid var(--gray-200);
-      border-radius: var(--radius); padding: 22px; margin-bottom: 20px;
+      border-radius: var(--radius); padding: 22px; margin-bottom: 18px;
       box-shadow: var(--shadow-sm);
     }
-    .gig-info-title { font-size: 1.15rem; font-weight: 800; color: var(--text); margin-bottom: 12px; }
-    .gig-info-row { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 8px; }
-    .gig-info-icon { font-size: 1rem; width: 20px; text-align: center; flex-shrink: 0; margin-top: 1px; }
-    .gig-info-label { font-size: .78rem; font-weight: 700; color: var(--gray-400);
-      text-transform: uppercase; letter-spacing: .3px; margin-bottom: 1px; }
-    .gig-info-value { font-size: .9rem; color: var(--text); font-weight: 600; }
-    .gig-pay-chip {
+    .ag-card-title { font-size: .95rem; font-weight: 800; color: var(--primary);
+      display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+    .info-row { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
+    .info-icon { font-size: 1rem; width: 20px; text-align: center; flex-shrink: 0; margin-top: 2px; }
+    .info-label { font-size: .71rem; font-weight: 700; color: var(--gray-400); text-transform: uppercase; letter-spacing: .3px; }
+    .info-value { font-size: .9rem; color: var(--text); font-weight: 600; }
+
+    /* Worker card (poster view) */
+    .worker-card {
+      display: flex; align-items: center; gap: 14px;
+      background: var(--surface); border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius); padding: 16px 20px; margin-bottom: 18px;
+      box-shadow: var(--shadow-sm);
+    }
+    .w-avatar {
+      width: 48px; height: 48px; border-radius: 50%; flex-shrink: 0;
+      background: linear-gradient(135deg, var(--primary), var(--teal));
+      color: #fff; display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; font-weight: 800;
+    }
+    .w-name  { font-size: .95rem; font-weight: 800; color: var(--text); margin-bottom: 2px; }
+    .w-sub   { font-size: .76rem; color: var(--gray-400); }
+    .w-chat  {
+      margin-left: auto; flex-shrink: 0; display: inline-flex; align-items: center; gap: 6px;
+      padding: 9px 16px; background: var(--teal); color: #fff; border-radius: var(--radius-sm);
+      font-size: .82rem; font-weight: 700; text-decoration: none; transition: background .2s;
+    }
+    .w-chat:hover { background: var(--primary); color: #fff; text-decoration: none; }
+
+    /* Chat quick (worker view) */
+    .chat-quick {
+      display: flex; align-items: center; gap: 12px; padding: 14px 18px;
+      background: var(--surface); border: 1.5px solid var(--gray-200); border-radius: var(--radius);
+      text-decoration: none; color: var(--text); font-weight: 700; font-size: .9rem;
+      transition: all .2s; margin-bottom: 18px; box-shadow: var(--shadow-sm);
+    }
+    .chat-quick:hover { border-color: var(--teal); color: var(--teal); text-decoration: none; }
+    .chat-quick-sub { font-size: .76rem; color: var(--gray-400); font-weight: 500; }
+
+    /* Pay chip */
+    .pay-chip {
       display: inline-flex; align-items: center; gap: 6px;
       background: rgba(16,185,129,.1); color: #059669;
-      font-size: .85rem; font-weight: 800; padding: 5px 14px; border-radius: 20px;
-      margin-top: 4px;
+      font-size: .85rem; font-weight: 800; padding: 5px 14px; border-radius: 20px; margin-top: 4px;
     }
-    [data-theme=dark] .gig-pay-chip { background: rgba(16,185,129,.12); color: #34d399; }
+    [data-theme=dark] .pay-chip { background: rgba(16,185,129,.12); color: #34d399; }
 
-    /* ── Steps card ── */
-    .steps-card {
-      background: var(--surface); border: 1.5px solid var(--gray-200);
-      border-radius: var(--radius); overflow: hidden; margin-bottom: 20px;
-      box-shadow: var(--shadow-sm);
-    }
-    .steps-card-header {
-      padding: 16px 20px; border-bottom: 1px solid var(--gray-200);
-      font-size: .93rem; font-weight: 800; color: var(--primary);
-      display: flex; align-items: center; gap: 8px;
-    }
-    .step-item {
-      padding: 18px 20px; border-bottom: 1px solid var(--gray-100);
-      display: flex; gap: 14px; align-items: flex-start;
-      transition: background .2s;
-    }
-    .step-item:last-child { border-bottom: none; }
-    .step-item.done { background: rgba(16,185,129,.04); }
-    .step-item.active-step { background: rgba(13,148,136,.04); }
-    .step-item.locked { opacity: .45; pointer-events: none; }
-
+    /* ══ WORKER STEPS ══ */
+    .steps-card { background: var(--surface); border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius); overflow: hidden; margin-bottom: 18px; box-shadow: var(--shadow-sm); }
+    .steps-hdr { padding: 14px 20px; border-bottom: 1px solid var(--gray-200);
+      font-size: .9rem; font-weight: 800; color: var(--primary); }
+    .step { display: flex; gap: 14px; align-items: flex-start; padding: 16px 20px;
+      border-bottom: 1px solid var(--gray-100); transition: background .2s; }
+    .step:last-child { border-bottom: none; }
+    .step.done    { background: rgba(16,185,129,.04); }
+    .step.current { background: rgba(13,148,136,.04); }
+    .step.locked  { opacity: .4; pointer-events: none; }
     .step-num {
       width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
       display: flex; align-items: center; justify-content: center;
-      font-size: .82rem; font-weight: 800; background: var(--gray-100); color: var(--gray-500);
-      border: 2px solid var(--gray-200); transition: all .3s;
+      font-size: .8rem; font-weight: 800; transition: all .3s;
+      background: var(--gray-100); color: var(--gray-500); border: 2px solid var(--gray-200);
     }
-    .step-item.done .step-num {
-      background: rgba(16,185,129,.15); color: #059669; border-color: #059669;
-    }
-    .step-item.active-step .step-num {
-      background: rgba(13,148,136,.15); color: var(--teal); border-color: var(--teal);
-    }
+    .step.done    .step-num { background: rgba(16,185,129,.15); color: #059669; border-color: #059669; }
+    .step.current .step-num { background: rgba(13,148,136,.15); color: var(--teal); border-color: var(--teal); }
     .step-body { flex: 1; min-width: 0; }
-    .step-title { font-size: .9rem; font-weight: 700; color: var(--text); margin-bottom: 4px; }
-    .step-desc { font-size: .8rem; color: var(--gray-400); line-height: 1.5; }
+    .step-title { font-size: .88rem; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+    .step-desc  { font-size: .78rem; color: var(--gray-400); line-height: 1.5; }
 
-    /* GPS status bar */
-    .gps-status {
-      display: flex; align-items: center; gap: 8px; margin-top: 10px;
-      padding: 8px 12px; border-radius: var(--radius-sm);
-      font-size: .82rem; font-weight: 600;
-    }
-    .gps-status.idle { background: var(--gray-100); color: var(--gray-500); }
-    .gps-status.loading { background: rgba(245,158,11,.08); color: #b45309; }
-    .gps-status.success { background: rgba(16,185,129,.08); color: #059669; }
-    .gps-status.error { background: rgba(239,68,68,.08); color: #dc2626; }
-    .gps-status.too-far { background: rgba(239,68,68,.08); color: #dc2626; }
-    [data-theme=dark] .gps-status.idle { background: var(--gray-800); color: var(--gray-400); }
+    /* GPS status */
+    .gps-bar { display: flex; align-items: center; gap: 8px; margin-top: 10px;
+      padding: 8px 12px; border-radius: var(--radius-sm); font-size: .8rem; font-weight: 600; }
+    .gps-bar.idle    { background: var(--gray-100); color: var(--gray-500); }
+    .gps-bar.loading { background: rgba(245,158,11,.08); color: #b45309; }
+    .gps-bar.ok      { background: rgba(16,185,129,.08); color: #059669; }
+    .gps-bar.far     { background: rgba(239,68,68,.08); color: #dc2626; }
+    .gps-bar.err     { background: rgba(239,68,68,.08); color: #dc2626; }
+    [data-theme=dark] .gps-bar.idle { background: var(--gray-800); color: var(--gray-400); }
 
-    /* OTP boxes */
-    .otp-wrap { display: flex; gap: 8px; margin-top: 12px; }
+    /* OTP boxes (worker entry) */
+    .otp-boxes { display: flex; gap: 8px; margin-top: 12px; }
     .otp-box {
       width: 46px; height: 56px; border: 2px solid var(--gray-200); border-radius: var(--radius-sm);
-      font-size: 1.4rem; font-weight: 800; text-align: center; color: var(--text);
-      background: var(--surface); transition: border-color .2s, box-shadow .2s;
-      outline: none;
+      font-size: 1.4rem; font-weight: 800; text-align: center;
+      background: var(--surface); color: var(--text); outline: none;
+      transition: border-color .2s, box-shadow .2s;
     }
     .otp-box:focus { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(13,148,136,.12); }
     .otp-box.filled { border-color: var(--teal); color: var(--teal); }
     [data-theme=dark] .otp-box { background: var(--gray-800); border-color: var(--gray-600); }
-
-    /* OTP request info */
-    .otp-requested-info {
-      display: none; margin-top: 10px; padding: 10px 14px;
+    .otp-countdown { font-size: .72rem; color: var(--gray-400); margin-top: 6px; text-align: right; }
+    .otp-countdown.urgent { color: #dc2626; font-weight: 700; }
+    .otp-msg { display: none; margin-top: 10px; padding: 10px 14px;
       background: rgba(245,158,11,.08); border: 1px solid rgba(245,158,11,.2);
-      border-radius: var(--radius-sm); font-size: .82rem; color: #b45309;
-    }
-    .otp-requested-info.show { display: flex; align-items: center; gap: 8px; }
-    [data-theme=dark] .otp-requested-info { background: rgba(245,158,11,.07); color: #fbbf24; }
+      border-radius: var(--radius-sm); font-size: .8rem; color: #b45309; align-items: center; gap: 8px; }
+    .otp-msg.show { display: flex; }
+    [data-theme=dark] .otp-msg { background: rgba(245,158,11,.07); color: #fbbf24; }
 
     /* Complete button */
-    .btn-complete-gig {
-      width: 100%; padding: 14px 20px; font-size: 1rem; font-weight: 800;
-      border-radius: var(--radius-sm); cursor: pointer; border: none;
-      background: linear-gradient(135deg, var(--primary) 0%, var(--teal) 100%);
-      color: #fff; box-shadow: 0 4px 14px rgba(13,148,136,.3);
-      transition: all .2s; display: flex; align-items: center; justify-content: center; gap: 8px;
+    .btn-complete {
+      width: 100%; padding: 14px; font-size: 1rem; font-weight: 800; border: none;
+      border-radius: var(--radius-sm); cursor: pointer; color: #fff;
+      background: linear-gradient(135deg, var(--primary), var(--teal));
+      box-shadow: 0 4px 14px rgba(13,148,136,.3); transition: all .2s;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
     }
-    .btn-complete-gig:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(13,148,136,.4); }
-    .btn-complete-gig:disabled { opacity: .4; cursor: not-allowed; transform: none; box-shadow: none; }
+    .btn-complete:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(13,148,136,.4); }
+    .btn-complete:disabled { opacity: .4; cursor: not-allowed; transform: none; box-shadow: none; }
 
-    /* Chat link */
-    .chat-quick {
-      display: flex; align-items: center; gap: 10px; padding: 14px 18px;
-      background: var(--surface); border: 1.5px solid var(--gray-200); border-radius: var(--radius);
-      text-decoration: none; color: var(--text); font-weight: 700; font-size: .9rem;
-      transition: all .2s; margin-bottom: 20px; box-shadow: var(--shadow-sm);
+    /* ══ POSTER TIMELINE ══ */
+    .tl-step { display: flex; gap: 16px; align-items: flex-start; padding: 12px 0; }
+    .tl-left { display: flex; flex-direction: column; align-items: center; width: 36px; flex-shrink: 0; }
+    .tl-dot {
+      width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .9rem; font-weight: 800; transition: all .3s;
+      border: 2px solid var(--gray-200); background: var(--surface); color: var(--gray-400);
     }
-    .chat-quick:hover { border-color: var(--teal); color: var(--teal); text-decoration: none; }
-    .chat-quick-icon { font-size: 1.4rem; }
-    .chat-quick-sub { font-size: .78rem; color: var(--gray-400); font-weight: 500; margin-top: 1px; }
+    .tl-dot.done    { background: rgba(16,185,129,.12); color: #059669; border-color: #059669; }
+    .tl-dot.active  { background: rgba(245,158,11,.12); color: #b45309; border-color: #f59e0b;
+      animation: tl-glow 1.6s ease-in-out infinite; }
+    @keyframes tl-glow { 0%,100%{box-shadow:0 0 0 0 rgba(245,158,11,.3)} 50%{box-shadow:0 0 0 6px rgba(245,158,11,0)} }
+    .tl-line { width: 2px; flex: 1; min-height: 20px; background: var(--gray-200); margin-top: 4px; }
+    .tl-line.done { background: #059669; }
+    .tl-body { flex: 1; padding-top: 5px; }
+    .tl-title { font-size: .88rem; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+    .tl-sub   { font-size: .76rem; color: var(--gray-400); line-height: 1.5; }
+    .tl-time  { font-size: .7rem; color: var(--gray-400); margin-top: 2px; }
 
-    /* Completion success */
-    .completion-success {
-      display: none; text-align: center; padding: 48px 24px;
-      background: var(--surface); border: 1.5px solid var(--gray-200); border-radius: var(--radius);
+    /* OTP reveal (poster view) */
+    .otp-reveal {
+      display: none; background: var(--surface);
+      border: 2px solid rgba(245,158,11,.4); border-radius: var(--radius);
+      padding: 22px 20px; margin-bottom: 18px;
+      box-shadow: 0 4px 20px rgba(245,158,11,.12); text-align: center;
     }
-    .completion-success.show { display: block; }
-    .success-icon { font-size: 4rem; margin-bottom: 16px; line-height: 1; }
-    .success-title { font-size: 1.5rem; font-weight: 800; color: var(--text); margin-bottom: 8px; }
-    .success-sub { font-size: .9rem; color: var(--gray-400); margin-bottom: 8px; }
-    .success-amount { font-size: 2rem; font-weight: 800; color: #059669; margin: 12px 0; }
+    .otp-reveal.show { display: block; }
+    .otp-reveal-hdr { font-size: .8rem; font-weight: 800; color: #b45309; text-transform: uppercase;
+      letter-spacing: .5px; margin-bottom: 4px; display: flex; align-items: center; justify-content: center; gap: 6px; }
+    .otp-reveal-for { font-size: .78rem; color: var(--gray-500); margin-bottom: 16px; }
+    .otp-digits { display: flex; gap: 8px; justify-content: center; margin-bottom: 12px; flex-wrap: wrap; }
+    .otp-dig {
+      width: 50px; height: 62px; background: rgba(245,158,11,.08);
+      border: 2px solid rgba(245,158,11,.35); border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2rem; font-weight: 900; color: #92400e; font-variant-numeric: tabular-nums;
+    }
+    [data-theme=dark] .otp-dig { background: rgba(245,158,11,.1); color: #fbbf24; border-color: rgba(245,158,11,.3); }
+    .otp-reveal-note { font-size: .8rem; color: var(--gray-500); margin-bottom: 6px; }
+    .otp-reveal-exp  { font-size: .72rem; color: var(--gray-400); }
+    .otp-reveal-exp.urgent { color: #dc2626; font-weight: 700; }
+
+    /* Done / Success */
+    .ag-done { display: none; text-align: center; padding: 48px 24px;
+      background: var(--surface); border: 1.5px solid var(--gray-200); border-radius: var(--radius); }
+    .ag-done.show { display: block; }
+    .ag-done-icon { font-size: 4rem; margin-bottom: 16px; line-height: 1; }
+
+    /* Empty */
+    .ag-empty { text-align: center; padding: 64px 24px; }
+    .ag-empty .icon { font-size: 3.5rem; margin-bottom: 16px; }
 
     /* Skeleton */
-    .ag-skeleton { animation: skel-pulse 1.4s ease-in-out infinite; }
-    @keyframes skel-pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
-
-    /* Empty state */
-    .no-active-gig { text-align: center; padding: 64px 24px; }
-    .no-active-gig .icon { font-size: 3.5rem; margin-bottom: 16px; }
-
-    /* Countdown */
-    .otp-countdown {
-      font-size: .75rem; color: var(--gray-400); margin-top: 6px; text-align: right;
-    }
-    .otp-countdown.urgent { color: #dc2626; font-weight: 700; }
+    .ag-skel { animation: ag-sk 1.4s ease-in-out infinite; background: var(--gray-100); border-radius: 10px; }
+    @keyframes ag-sk { 0%,100%{opacity:1} 50%{opacity:.4} }
+    [data-theme=dark] .ag-skel { background: var(--gray-700); }
   </style>
 </head>
 <body>
   <div id="main-nav" role="navigation"></div>
+  <main>
 
-  <main id="mainContent">
-    <!-- Loading skeleton -->
+    <!-- Skeleton -->
     <div class="ag-wrap" id="skelWrap">
-      <div style="height:28px;background:var(--gray-100);border-radius:8px;width:200px;margin-bottom:20px;" class="ag-skeleton"></div>
-      <div style="height:160px;background:var(--gray-100);border-radius:12px;margin-bottom:16px;" class="ag-skeleton"></div>
-      <div style="height:280px;background:var(--gray-100);border-radius:12px;" class="ag-skeleton"></div>
+      <div style="height:24px;width:180px;margin-bottom:14px;" class="ag-skel"></div>
+      <div style="height:150px;margin-bottom:14px;" class="ag-skel"></div>
+      <div style="height:80px;margin-bottom:14px;" class="ag-skel"></div>
+      <div style="height:280px;" class="ag-skel"></div>
     </div>
 
-    <!-- No active gig -->
-    <div class="ag-wrap" id="noGigWrap" style="display:none;">
-      <div class="no-active-gig">
+    <!-- Empty -->
+    <div class="ag-wrap" id="emptyWrap" style="display:none;">
+      <div class="ag-empty">
         <div class="icon">🔍</div>
-        <h2 style="font-size:1.2rem;font-weight:800;color:var(--text);margin-bottom:8px;">Koi Active Gig Nahi</h2>
-        <p style="color:var(--gray-400);font-size:.9rem;margin-bottom:24px;">
-          Abhi koi active gig nahi hai. Browse karo aur naya gig accept karo.
-        </p>
-        <a href="browse.html" class="btn btn-primary">🔍 Gigs Browse Karo</a>
+        <h2 style="font-size:1.15rem;font-weight:800;color:var(--text);margin-bottom:8px;" id="emptyTitle">Koi Active Gig Nahi</h2>
+        <p style="color:var(--gray-400);font-size:.88rem;margin-bottom:24px;" id="emptyBody">Abhi koi active gig nahi hai.</p>
+        <a href="browse.html" class="btn btn-primary" id="emptyBtn">🔍 Gigs Browse Karo</a>
       </div>
     </div>
 
-    <!-- Main active gig content -->
-    <div class="ag-wrap" id="gigWrap" style="display:none;">
+    <!-- Main -->
+    <div class="ag-wrap" id="mainWrap" style="display:none;">
 
-      <!-- Badge -->
-      <div class="ag-badge"><span></span> Active Gig</div>
-      <h1 style="font-size:1.4rem;font-weight:800;color:var(--text);margin-bottom:20px;" id="agPageTitle">Apna Active Gig</h1>
+      <!-- Badge + heading -->
+      <div class="ag-badge" id="agBadge"><span class="dot"></span><span id="agBadgeText">Active Gig</span></div>
+      <h1 style="font-size:1.35rem;font-weight:800;color:var(--text);margin-bottom:20px;" id="agHeading">Active Gig</h1>
 
-      <!-- Gig info -->
-      <div class="gig-info-card" id="gigInfoCard">
-        <div class="gig-info-title" id="gigTitle">—</div>
-        <div class="gig-info-row">
-          <span class="gig-info-icon">📍</span>
-          <div><div class="gig-info-label">Location</div><div class="gig-info-value" id="gigLocation">—</div></div>
-        </div>
-        <div class="gig-info-row">
-          <span class="gig-info-icon">📅</span>
-          <div><div class="gig-info-label">Date & Time</div><div class="gig-info-value" id="gigDateTime">—</div></div>
-        </div>
-        <div class="gig-info-row">
-          <span class="gig-info-icon">👤</span>
-          <div><div class="gig-info-label">Poster</div><div class="gig-info-value" id="gigPoster">—</div></div>
-        </div>
-        <div style="margin-top:8px;">
-          <div class="gig-pay-chip">💰 <span id="gigPay">—</span></div>
-        </div>
+      <!-- ═══════════════════════════════════
+           GIG INFO (shared both modes)
+      ═══════════════════════════════════ -->
+      <div class="ag-card">
+        <div class="ag-card-title">📋 Gig Details</div>
+        <div class="info-row"><span class="info-icon">📝</span>
+          <div><div class="info-label">Title</div><div class="info-value" id="gTitle">—</div></div></div>
+        <div class="info-row"><span class="info-icon">📍</span>
+          <div><div class="info-label">Location</div><div class="info-value" id="gLocation">—</div></div></div>
+        <div class="info-row"><span class="info-icon">📅</span>
+          <div><div class="info-label">Date & Time</div><div class="info-value" id="gDateTime">—</div></div></div>
+        <div class="info-row"><span class="info-icon">👤</span>
+          <div><div class="info-label" id="gPersonLabel">Poster</div><div class="info-value" id="gPerson">—</div></div></div>
+        <div><span class="pay-chip">💰 <span id="gPay">—</span></span></div>
       </div>
 
-      <!-- Chat quick link -->
-      <a href="#" class="chat-quick" id="chatLink">
-        <span class="chat-quick-icon">💬</span>
-        <div>
-          <div>Poster se chat karo</div>
-          <div class="chat-quick-sub">Kaam ke baare mein baat karo</div>
+      <!-- ═══════════════════════════════════
+           POSTER VIEW: worker card + timeline
+      ═══════════════════════════════════ -->
+      <div id="posterView" style="display:none;">
+
+        <!-- Worker card -->
+        <div class="worker-card" id="workerCard">
+          <div class="w-avatar" id="wAvatar">?</div>
+          <div><div class="w-name" id="wName">—</div><div class="w-sub">⚡ Kaam kar raha hai</div></div>
+          <a href="#" class="w-chat" id="wChatBtn">💬 Chat</a>
         </div>
-        <span style="margin-left:auto;color:var(--teal);">→</span>
-      </a>
 
-      <!-- Completion success (hidden until done) -->
-      <div class="completion-success" id="completionSuccess">
-        <div class="success-icon">🎉</div>
-        <div class="success-title">Gig Complete!</div>
-        <div class="success-sub">Badhai ho! Tumhara payment process ho raha hai.</div>
-        <div class="success-amount" id="successAmount">₹0</div>
-        <div style="font-size:.82rem;color:var(--gray-400);margin-bottom:24px;">Payment wallet mein credit ho jayegi.</div>
-        <a href="dashboard-worker.html" class="btn btn-primary">📊 Dashboard Dekho</a>
-      </div>
+        <!-- OTP reveal -->
+        <div class="otp-reveal" id="otpReveal">
+          <div class="otp-reveal-hdr"><span>🔑</span> Worker ka OTP</div>
+          <div class="otp-reveal-for" id="otpRevealFor"></div>
+          <div style="font-size:.8rem;color:var(--gray-500);margin-bottom:14px;">Yeh code worker ko batao — woh ise enter karke gig complete karega.</div>
+          <div class="otp-digits" id="otpDigits"></div>
+          <div class="otp-reveal-note">Sirf worker ko batao — kisi aur ko mat batana.</div>
+          <div class="otp-reveal-exp" id="otpRevealExp"></div>
+        </div>
 
-      <!-- 3-step completion flow -->
-      <div id="completionFlow">
-        <div class="steps-card">
-          <div class="steps-card-header">⚡ Gig Complete Karo</div>
+        <!-- Timeline -->
+        <div class="ag-card">
+          <div class="ag-card-title">📊 Progress Timeline</div>
+          <div id="timeline">
+            <div class="tl-step">
+              <div class="tl-left"><div class="tl-dot done" id="tld1">✓</div><div class="tl-line done" id="tll1"></div></div>
+              <div class="tl-body"><div class="tl-title">Gig Booked</div><div class="tl-sub">Worker ne gig accept kar li.</div><div class="tl-time" id="tlt1"></div></div>
+            </div>
+            <div class="tl-step">
+              <div class="tl-left"><div class="tl-dot active" id="tld2">⚡</div><div class="tl-line" id="tll2"></div></div>
+              <div class="tl-body"><div class="tl-title">Worker Kaam Kar Raha Hai</div><div class="tl-sub" id="tls2">Worker location pe kaam kar raha hai.</div></div>
+            </div>
+            <div class="tl-step">
+              <div class="tl-left"><div class="tl-dot" id="tld3">🔑</div><div class="tl-line" id="tll3"></div></div>
+              <div class="tl-body"><div class="tl-title">OTP Request</div><div class="tl-sub" id="tls3">Worker ne abhi OTP nahi manga.</div><div class="tl-time" id="tlt3"></div></div>
+            </div>
+            <div class="tl-step">
+              <div class="tl-left"><div class="tl-dot" id="tld4">✅</div></div>
+              <div class="tl-body"><div class="tl-title">Gig Complete</div><div class="tl-sub" id="tls4">OTP verify hone ke baad complete hogi.</div><div class="tl-time" id="tlt4"></div></div>
+            </div>
+          </div>
+        </div>
 
-          <!-- Step 1: GPS -->
-          <div class="step-item active-step" id="step1">
-            <div class="step-num" id="step1Num">1</div>
+        <!-- Poster done -->
+        <div class="ag-done" id="posterDone">
+          <div class="ag-done-icon">🎉</div>
+          <h2 style="font-size:1.3rem;font-weight:800;color:var(--text);margin-bottom:8px;">Gig Complete Ho Gayi!</h2>
+          <p style="color:var(--gray-400);font-size:.88rem;margin-bottom:8px;">Worker ne kaam poora kar diya.</p>
+          <div style="font-size:1.7rem;font-weight:800;color:#dc2626;margin:12px 0;" id="posterDoneAmt"></div>
+          <div style="font-size:.78rem;color:var(--gray-400);margin-bottom:22px;">Wallet se deducted (6% platform fee included)</div>
+          <a href="dashboard-client.html" class="btn btn-primary">📊 Dashboard Dekho</a>
+        </div>
+
+      </div><!-- end posterView -->
+
+      <!-- ═══════════════════════════════════
+           WORKER VIEW: GPS + OTP steps
+      ═══════════════════════════════════ -->
+      <div id="workerView" style="display:none;">
+
+        <!-- Chat quick link -->
+        <a href="#" class="chat-quick" id="chatLink">
+          <span style="font-size:1.4rem;">💬</span>
+          <div><div>Poster se chat karo</div><div class="chat-quick-sub">Kaam ke baare mein baat karo</div></div>
+          <span style="margin-left:auto;color:var(--teal);">→</span>
+        </a>
+
+        <!-- Worker done -->
+        <div class="ag-done" id="workerDone">
+          <div class="ag-done-icon">🎉</div>
+          <h2 style="font-size:1.3rem;font-weight:800;color:var(--text);margin-bottom:8px;">Gig Complete!</h2>
+          <p style="color:var(--gray-400);font-size:.88rem;margin-bottom:8px;">Badhai ho! Payment process ho rahi hai.</p>
+          <div style="font-size:1.7rem;font-weight:800;color:#059669;margin:12px 0;" id="workerDoneAmt"></div>
+          <div style="font-size:.78rem;color:var(--gray-400);margin-bottom:22px;">Aapke wallet mein credit hogi.</div>
+          <a href="dashboard-worker.html" class="btn btn-primary">📊 Dashboard Dekho</a>
+        </div>
+
+        <!-- Steps -->
+        <div class="steps-card" id="workerSteps">
+          <div class="steps-hdr">⚡ Gig Complete Karo</div>
+
+          <!-- Step 1 GPS -->
+          <div class="step current" id="s1">
+            <div class="step-num" id="sn1">1</div>
             <div class="step-body">
-              <div class="step-title">Apni Location Verify Karo</div>
-              <div class="step-desc">GPS se confirm karo ki tum gig site ke paas ho (15 meter radius).</div>
-              <div class="gps-status idle" id="gpsStatus">
-                <span>📍</span> <span id="gpsText">GPS abhi verify nahi hua</span>
-              </div>
-              <button class="btn btn-secondary" style="margin-top:10px;font-size:.85rem;padding:9px 16px;" id="btnCheckGps">
-                📍 Location Check Karo
-              </button>
-              <div id="gpsDistanceInfo" style="display:none;font-size:.78rem;color:var(--gray-400);margin-top:6px;"></div>
+              <div class="step-title">Location Verify Karo</div>
+              <div class="step-desc">GPS se confirm karo ki tum gig site ke 15m radius mein ho.</div>
+              <div class="gps-bar idle" id="gpsBar"><span>📍</span><span id="gpsTxt">GPS abhi check nahi hua</span></div>
+              <button class="btn btn-secondary" style="margin-top:10px;font-size:.83rem;padding:9px 16px;" id="btnGps">📍 Location Check Karo</button>
+              <div id="gpsExtra" style="display:none;font-size:.76rem;color:var(--gray-400);margin-top:6px;"></div>
             </div>
           </div>
 
-          <!-- Step 2: Request OTP -->
-          <div class="step-item locked" id="step2">
-            <div class="step-num" id="step2Num">2</div>
+          <!-- Step 2 Request OTP -->
+          <div class="step locked" id="s2">
+            <div class="step-num" id="sn2">2</div>
             <div class="step-body">
               <div class="step-title">Poster se OTP Maango</div>
-              <div class="step-desc">Button dabaao — poster ke dashboard pe ek OTP generate hoga. Poster tumhe woh OTP batayega.</div>
-              <button class="btn btn-secondary" style="margin-top:10px;font-size:.85rem;padding:9px 16px;" id="btnRequestOtp">
-                🔑 OTP Request Karo
-              </button>
-              <div class="otp-requested-info" id="otpRequestedInfo">
-                <span>⏳</span>
-                <span>OTP request bhej di! Poster se OTP lo — Step 3 mein enter karo.</span>
-              </div>
+              <div class="step-desc">Button dabaao — poster ke dashboard pe OTP generate hoga. Poster tumhe code batayega.</div>
+              <button class="btn btn-secondary" style="margin-top:10px;font-size:.83rem;padding:9px 16px;" id="btnReqOtp">🔑 OTP Request Karo</button>
+              <div class="otp-msg" id="otpMsg"><span>⏳</span><span>OTP request bhej di! Poster se code lo — Step 3 mein enter karo.</span></div>
             </div>
           </div>
 
-          <!-- Step 3: Enter OTP -->
-          <div class="step-item locked" id="step3">
-            <div class="step-num" id="step3Num">3</div>
+          <!-- Step 3 Enter OTP -->
+          <div class="step locked" id="s3">
+            <div class="step-num" id="sn3">3</div>
             <div class="step-body">
-              <div class="step-title">Poster ka OTP Daalo</div>
-              <div class="step-desc">Poster ne jo 6-digit OTP bataya hai woh neeche daalo.</div>
-              <div class="otp-wrap" id="otpBoxes">
-                <input class="otp-box" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]" autocomplete="one-time-code" />
-                <input class="otp-box" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]" />
-                <input class="otp-box" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]" />
-                <input class="otp-box" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]" />
-                <input class="otp-box" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]" />
-                <input class="otp-box" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]" />
+              <div class="step-title">OTP Enter Karo</div>
+              <div class="step-desc">Poster ne jo 6-digit code bataya woh neeche daalo.</div>
+              <div class="otp-boxes" id="otpBoxes">
+                <input class="otp-box" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]" autocomplete="one-time-code"/>
+                <input class="otp-box" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]"/>
+                <input class="otp-box" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]"/>
+                <input class="otp-box" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]"/>
+                <input class="otp-box" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]"/>
+                <input class="otp-box" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]"/>
               </div>
-              <div class="otp-countdown" id="otpCountdown"></div>
-              <button class="btn-complete-gig" style="margin-top:14px;" id="btnCompleteGig" disabled>
-                ✅ Gig Complete Karo
-              </button>
+              <div class="otp-countdown" id="otpCd"></div>
+              <button class="btn-complete" style="margin-top:14px;" id="btnComplete" disabled>✅ Gig Complete Karo</button>
             </div>
           </div>
+        </div><!-- steps-card -->
 
-        </div><!-- end steps-card -->
-      </div><!-- end completionFlow -->
+      </div><!-- end workerView -->
 
-    </div><!-- end gigWrap -->
+    </div><!-- mainWrap -->
   </main>
-
   <div id="main-footer" role="contentinfo"></div>
 
   <script type="module">
-    import { initializeApp }    from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
-    import { getAuth, onAuthStateChanged }
-                                from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
-    import { getFirestore, collection, query, where, getDocs,
-             doc, getDoc, updateDoc, addDoc, serverTimestamp, limit }
-                                from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+    import { getApps, initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
+    import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+    import { getFirestore, collection, query, where, limit,
+             getDocs, doc, getDoc, onSnapshot, updateDoc, addDoc, serverTimestamp }
+      from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
 
-    var app  = initializeApp(window.GL ? window.GL.FIREBASE_CONFIG : {
+    /* ── Safe Firebase init (avoids duplicate app error) ── */
+    var FB_CFG = {
       apiKey:"AIzaSyDTLKfbQc3HuF5mPxfyVJtMwI7DEkPi_7g",
       authDomain:"giglega-v2.firebaseapp.com",
       projectId:"giglega-v2",
       storageBucket:"giglega-v2.appspot.com",
       messagingSenderId:"726280449452",
       appId:"1:726280449452:web:7c2a47d23c41f4a67e8c5d"
-    });
+    };
+    var app  = getApps().length ? getApps()[0] : initializeApp(FB_CFG);
     var auth = getAuth(app);
     var db   = getFirestore(app);
 
+    /* ── State ── */
     var currentUser = null;
     var activeGig   = null;
     var gigId       = null;
-    var gpsVerified = false;
-    var otpRequested = false;
+    var gpsOk       = false;
+    var otpSent     = false;
+    var unsubSnap   = null;
+    var cdTimer     = null;
 
     /* ── Helpers ── */
-    function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-    function showToast(msg,type){ if(window.GL) window.GL.showToast(msg,type); }
     function el(id){ return document.getElementById(id); }
+    function toast(m,t){ window.GL && window.GL.showToast(m,t); }
+    function fmtDt(iso){ if(!iso) return ''; var d=new Date(iso); return d.toLocaleDateString('en-IN',{day:'numeric',month:'short'})+' • '+d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}); }
 
-    /* ── Haversine distance (meters) ── */
-    function haversine(lat1,lng1,lat2,lng2){
-      var R=6371000, dLat=(lat2-lat1)*Math.PI/180, dLng=(lng2-lng1)*Math.PI/180;
-      var a=Math.sin(dLat/2)*Math.sin(dLat/2)+
-            Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*
-            Math.sin(dLng/2)*Math.sin(dLng/2);
+    function haversine(la1,lo1,la2,lo2){
+      var R=6371000,dL=(la2-la1)*Math.PI/180,dO=(lo2-lo1)*Math.PI/180;
+      var a=Math.sin(dL/2)*Math.sin(dL/2)+Math.cos(la1*Math.PI/180)*Math.cos(la2*Math.PI/180)*Math.sin(dO/2)*Math.sin(dO/2);
       return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
     }
-
-    /* ── Geocode text address → lat/lng via Nominatim ── */
-    async function geocodeAddress(addr,area,pin){
-      var q = [addr,area,pin,'Gurugram','Haryana','India'].filter(Boolean).join(', ');
-      var url = 'https://nominatim.openstreetmap.org/search?format=json&limit=1&q='+encodeURIComponent(q);
+    async function geocode(loc,area,pin){
+      var q=[loc,area,pin,'Gurugram','India'].filter(Boolean).join(', ');
       try{
-        var r = await fetch(url,{headers:{'User-Agent':'GigLega/1.0 contact@giglega.in'}});
-        var d = await r.json();
+        var r=await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&q='+encodeURIComponent(q),{headers:{'User-Agent':'GigLega/1.0'}});
+        var d=await r.json();
         if(d&&d.length) return {lat:parseFloat(d[0].lat),lng:parseFloat(d[0].lon)};
       }catch(e){}
       return null;
     }
 
-    /* ── Step unlock helpers ── */
-    function unlockStep(n){
-      el('step'+n).classList.remove('locked');
-      el('step'+n).classList.add('active-step');
-    }
-    function doneStep(n){
-      el('step'+n).classList.remove('active-step','locked');
-      el('step'+n).classList.add('done');
-      el('step'+n+'Num').textContent = '✓';
-    }
-    function setGpsStatus(state,text){
-      var s=el('gpsStatus');
-      s.className='gps-status '+state;
-      el('gpsText').textContent=text;
-    }
+    /* ── Step helpers (worker) ── */
+    function stepDone(n){ var s=el('s'+n),num=el('sn'+n); s.className='step done'; num.textContent='✓'; }
+    function stepActive(n){ el('s'+n).className='step current'; }
+    function setGps(state,txt){ var b=el('gpsBar'); b.className='gps-bar '+state; el('gpsTxt').textContent=txt; }
 
-    /* ── Step 1: GPS check ── */
-    el('btnCheckGps').addEventListener('click', async function(){
-      var btn=this; btn.disabled=true; btn.textContent='📡 Location le raha hai...';
-      setGpsStatus('loading','GPS location le raha hai...');
-
-      if(!navigator.geolocation){ setGpsStatus('error','Browser GPS support nahi karta'); btn.disabled=false; btn.textContent='📍 Location Check Karo'; return; }
-
-      navigator.geolocation.getCurrentPosition(async function(pos){
-        var workerLat=pos.coords.latitude, workerLng=pos.coords.longitude;
-        var acc=pos.coords.accuracy;
-
-        if(acc>80){
-          setGpsStatus('error','GPS signal weak hai (±'+Math.round(acc)+'m). Bahar jao ya retry karo.');
-          btn.disabled=false; btn.textContent='📍 Retry Karo';
-          el('gpsDistanceInfo').style.display='none';
-          return;
-        }
-
-        // Get gig coords
-        var gigLat=null, gigLng=null;
-        if(activeGig.lat && activeGig.lng){
-          gigLat=Number(activeGig.lat); gigLng=Number(activeGig.lng);
-        } else {
-          setGpsStatus('loading','Gig location geocode ho raha hai...');
-          var coords = await geocodeAddress(activeGig.location, activeGig.area, activeGig.pincode);
-          if(coords){ gigLat=coords.lat; gigLng=coords.lng; }
-        }
-
-        if(!gigLat||!gigLng){
-          // GPS coords unavailable — let worker proceed with warning
-          setGpsStatus('success','⚠️ Location auto-verify nahi ho paya — manual proceed ho raha hai.');
-          el('gpsDistanceInfo').style.display='block';
-          el('gpsDistanceInfo').textContent='📍 Apni location: '+workerLat.toFixed(5)+', '+workerLng.toFixed(5);
-          gpsVerified=true; doneStep(1); unlockStep(2);
-          el('btnCheckGps').style.display='none';
-          return;
-        }
-
-        var dist=Math.round(haversine(workerLat,workerLng,gigLat,gigLng));
-        var distInfo=el('gpsDistanceInfo');
-        distInfo.style.display='block';
-
-        if(dist<=15){
-          setGpsStatus('success','✅ Tum gig site ke paas ho! ('+dist+'m)');
-          distInfo.textContent='📍 Distance: '+dist+' meters — verified ✓';
-          gpsVerified=true; doneStep(1); unlockStep(2);
-          el('btnCheckGps').style.display='none';
-          // Save worker coords to gig doc silently
-          try{
-            await updateDoc(doc(db,'gigs',gigId),{workerLastLat:workerLat,workerLastLng:workerLng});
-          }catch(e){}
-          showToast('📍 Location verified!','success');
-        } else {
-          setGpsStatus('too-far','❌ Tum gig site se '+dist+' meter door ho (15m chahiye)');
-          distInfo.textContent='📍 Aur nazdik jao — abhi '+dist+'m door ho.';
-          btn.disabled=false; btn.textContent='📍 Dobara Check Karo';
-          showToast('Aur nazdik jao — '+dist+'m door ho','warning');
-        }
-
-      }, function(err){
-        var msgs={1:'GPS permission deny kar di. Browser settings mein allow karo.',
-                  2:'GPS signal nahi mila. Kuch seconds wait karo.',
-                  3:'GPS timeout. Phir se try karo.'};
-        setGpsStatus('error', msgs[err.code]||'GPS error aaya');
-        btn.disabled=false; btn.textContent='📍 Retry Karo';
-      },{enableHighAccuracy:true, timeout:15000, maximumAge:0});
-    });
-
-    /* ── Step 2: Request OTP ── */
-    el('btnRequestOtp').addEventListener('click', async function(){
-      if(!gpsVerified){ showToast('Pehle location verify karo','warning'); return; }
-      var btn=this; btn.disabled=true; btn.textContent='⏳ Request bhej raha hai...';
-
-      try{
-        // Generate 6-digit OTP
-        var otp='';
-        for(var i=0;i<6;i++) otp+=Math.floor(Math.random()*10);
-        var expiry=new Date(Date.now()+30*60*1000).toISOString(); // 30 min
-
-        await updateDoc(doc(db,'gigs',gigId),{
-          completionOTP:           otp,
-          completionOTPExpiry:     expiry,
-          completionRequested:     true,
-          completionRequestedAt:   new Date().toISOString()
-        });
-
-        // Notify poster
-        await addDoc(collection(db,'notifications',activeGig.posterId,'items'),{
-          type:      'otp_requested',
-          title:     '🔑 Worker ne OTP maanga!',
-          body:      (activeGig.workerName||'Worker')+' ne gig "'+activeGig.title+'" complete karne ke liye OTP manga hai.',
-          gigId:     gigId,
-          workerId:  currentUser.uid,
-          read:      false,
-          createdAt: serverTimestamp()
-        });
-
-        otpRequested=true;
-        el('otpRequestedInfo').classList.add('show');
-        doneStep(2); unlockStep(3);
-        startOtpCountdown(expiry);
-        el('otpBoxes').querySelectorAll('.otp-box')[0].focus();
-        showToast('OTP request bhej di! Poster se code lo.','success');
-        btn.style.display='none';
-      }catch(e){
-        showToast('Error: '+e.message,'error');
-        btn.disabled=false; btn.textContent='🔑 OTP Request Karo';
-      }
-    });
-
-    /* ── OTP countdown timer ── */
-    var countdownTimer=null;
-    function startOtpCountdown(expiry){
-      if(countdownTimer) clearInterval(countdownTimer);
-      function update(){
+    /* ── Countdown ── */
+    function startCd(expiry, elId, urgCls){
+      if(cdTimer) clearInterval(cdTimer);
+      function tick(){
         var ms=new Date(expiry)-Date.now();
-        if(ms<=0){ el('otpCountdown').textContent='OTP expire ho gaya — naya request karo'; el('otpCountdown').className='otp-countdown urgent'; clearInterval(countdownTimer); return; }
-        var m=Math.floor(ms/60000), s=Math.floor((ms%60000)/1000);
-        el('otpCountdown').textContent='OTP valid: '+m+'m '+String(s).padStart(2,'0')+'s';
-        if(ms<300000) el('otpCountdown').className='otp-countdown urgent';
+        if(ms<=0){ el(elId).textContent='⚠️ OTP expire ho gaya'; el(elId).className=urgCls+' urgent'; clearInterval(cdTimer); return; }
+        var m=Math.floor(ms/60000),s=Math.floor((ms%60000)/1000);
+        el(elId).textContent='⏳ Valid: '+m+'m '+String(s).padStart(2,'0')+'s';
+        if(ms<300000) el(elId).className=urgCls+' urgent';
       }
-      update(); countdownTimer=setInterval(update,1000);
+      tick(); cdTimer=setInterval(tick,1000);
     }
 
-    /* ── OTP box keyboard handling ── */
-    var otpInputs=[].slice.call(el('otpBoxes').querySelectorAll('.otp-box'));
-    otpInputs.forEach(function(inp,i){
-      inp.addEventListener('input',function(e){
-        var v=this.value.replace(/[^0-9]/g,'');
-        this.value=v.slice(-1);
-        if(v&&i<5) otpInputs[i+1].focus();
+    /* ══════ POSTER RENDER ══════ */
+    function renderPoster(gig, id){
+      el('skelWrap').style.display='none';
+      el('mainWrap').style.display='block';
+      el('posterView').style.display='block';
+
+      var badge=el('agBadge'); badge.className='ag-badge poster';
+      el('agBadgeText').textContent='Gig In Progress';
+      el('agHeading').textContent='Apni Active Gig Track Karo';
+      el('gPersonLabel').textContent='Worker';
+
+      // Gig info
+      el('gTitle').textContent    = gig.title||'—';
+      el('gLocation').textContent = [gig.location,gig.area,gig.pincode].filter(Boolean).join(', ')||'—';
+      el('gDateTime').textContent = [(gig.date||''),(gig.time||'')].filter(Boolean).join(' • ')||'—';
+      el('gPerson').textContent   = gig.workerName||'Worker';
+      el('gPay').textContent      = '₹'+(gig.budget||0).toLocaleString('en-IN');
+
+      // Worker card
+      var init=(gig.workerName||'W').split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);
+      el('wAvatar').textContent=init; el('wName').textContent=gig.workerName||'Worker';
+      el('wChatBtn').href='chat.html?with='+encodeURIComponent(gig.workerId||'')+'&gig='+encodeURIComponent(id);
+
+      // Timeline booked time
+      if(gig.bookedAt) el('tlt1').textContent=fmtDt(gig.bookedAt);
+
+      // OTP requested
+      if(gig.completionRequested && gig.completionOTP && gig.status==='taken'){
+        el('otpReveal').classList.add('show');
+        el('otpRevealFor').textContent='"'+(gig.title||'')+'" ke liye OTP';
+        el('otpDigits').innerHTML=String(gig.completionOTP).split('').map(function(d){
+          return '<div class="otp-dig">'+d+'</div>';
+        }).join('');
+        if(gig.completionOTPExpiry) startCd(gig.completionOTPExpiry,'otpRevealExp','otp-reveal-exp');
+        // Timeline OTP step
+        el('tld2').className='tl-dot done'; el('tld2').textContent='✓'; el('tll2').classList.add('done');
+        el('tld3').className='tl-dot active';
+        el('tls3').textContent='Worker ne OTP request kar diya — usse code batao.';
+        if(gig.completionRequestedAt) el('tlt3').textContent=fmtDt(gig.completionRequestedAt);
+      }
+
+      // Completed
+      if(gig.status==='completed'){
+        if(cdTimer) clearInterval(cdTimer);
+        el('otpReveal').classList.remove('show');
+        ['tld1','tld2','tld3','tld4'].forEach(function(x){ el(x).className='tl-dot done'; el(x).textContent='✓'; });
+        ['tll1','tll2','tll3'].forEach(function(x){ el(x)&&el(x).classList.add('done'); });
+        if(gig.completedAt) el('tlt4').textContent=fmtDt(gig.completedAt);
+        el('tls4').textContent='Gig successfully complete ho gai!';
+        el('posterDoneAmt').textContent='₹'+(gig.budget||0).toLocaleString('en-IN')+' Deducted';
+        el('posterDone').classList.add('show');
+        el('agBadgeText').textContent='Completed ✅'; el('agHeading').textContent='Gig Complete Ho Gayi!';
+      }
+    }
+
+    /* ══════ WORKER RENDER ══════ */
+    function renderWorker(gig, id){
+      el('skelWrap').style.display='none';
+      el('mainWrap').style.display='block';
+      el('workerView').style.display='block';
+
+      var badge=el('agBadge'); badge.className='ag-badge worker';
+      el('agBadgeText').textContent='Active Gig';
+      el('agHeading').textContent='Apna Active Gig';
+      el('gPersonLabel').textContent='Poster';
+
+      // Gig info
+      el('gTitle').textContent    = gig.title||'—';
+      el('gLocation').textContent = [gig.location,gig.area,gig.pincode].filter(Boolean).join(', ')||'—';
+      el('gDateTime').textContent = [(gig.date||''),(gig.time||'')].filter(Boolean).join(' • ')||'—';
+      el('gPerson').textContent   = gig.posterName||'—';
+      el('gPay').textContent      = '₹'+(gig.budget||0).toLocaleString('en-IN');
+      el('chatLink').href         = 'chat.html?with='+encodeURIComponent(gig.posterId||'')+'&gig='+encodeURIComponent(id);
+
+      // Already completed
+      if(gig.status==='completed'){
+        el('workerSteps').style.display='none';
+        el('workerDoneAmt').textContent='₹'+(gig.workerEarnings||0).toLocaleString('en-IN');
+        el('workerDone').classList.add('show');
+        el('agBadgeText').textContent='Completed ✅'; el('agHeading').textContent='Gig Complete!';
+        return;
+      }
+
+      // OTP already requested — restore state
+      if(gig.completionRequested){
+        gpsOk=true; otpSent=true;
+        stepDone(1); stepDone(2); stepActive(3);
+        el('otpMsg').classList.add('show');
+        el('btnGps').style.display='none'; el('btnReqOtp').style.display='none';
+        if(gig.completionOTPExpiry) startCd(gig.completionOTPExpiry,'otpCd','otp-countdown');
+        el('otpBoxes').querySelectorAll('.otp-box')[0].focus();
+      }
+    }
+
+    /* ══ GPS step (worker only) ══ */
+    el('btnGps').addEventListener('click', async function(){
+      var btn=this; btn.disabled=true; btn.textContent='📡 Location le raha hai...';
+      setGps('loading','GPS location le raha hai...');
+      if(!navigator.geolocation){ setGps('err','Browser GPS support nahi karta'); btn.disabled=false; return; }
+      navigator.geolocation.getCurrentPosition(async function(pos){
+        var wLat=pos.coords.latitude, wLng=pos.coords.longitude, acc=pos.coords.accuracy;
+        if(acc>80){ setGps('err','Signal weak (±'+Math.round(acc)+'m). Bahar jao aur retry karo.'); btn.disabled=false; btn.textContent='📍 Retry'; return; }
+        // Get gig coords
+        var gLat=null, gLng=null;
+        if(activeGig.lat&&activeGig.lng){ gLat=Number(activeGig.lat); gLng=Number(activeGig.lng); }
+        else{ setGps('loading','Gig address geocode ho raha hai...'); var c=await geocode(activeGig.location,activeGig.area,activeGig.pincode); if(c){gLat=c.lat;gLng=c.lng;} }
+        if(!gLat||!gLng){
+          setGps('ok','⚠️ Location auto-verify nahi hua — proceed karo.'); gpsOk=true;
+          stepDone(1); stepActive(2); btn.style.display='none';
+          return;
+        }
+        var dist=Math.round(haversine(wLat,wLng,gLat,gLng));
+        el('gpsExtra').style.display='block';
+        if(dist<=15){
+          setGps('ok','✅ Tum gig site ke paas ho ('+dist+'m)');
+          el('gpsExtra').textContent='📍 Distance: '+dist+'m — verified ✓';
+          gpsOk=true; stepDone(1); stepActive(2); btn.style.display='none';
+          try{ await updateDoc(doc(db,'gigs',gigId),{workerLastLat:wLat,workerLastLng:wLng}); }catch(e){}
+          toast('📍 Location verified!','success');
+        } else {
+          setGps('far','❌ Tum '+dist+'m door ho (15m chahiye)');
+          el('gpsExtra').textContent='Aur nazdik jao — abhi '+dist+'m door.';
+          btn.disabled=false; btn.textContent='📍 Dobara Check Karo';
+        }
+      }, function(err){
+        var m={1:'GPS permission deny. Browser settings mein allow karo.',2:'GPS signal nahi mila.',3:'GPS timeout. Try again.'};
+        setGps('err',m[err.code]||'GPS error'); btn.disabled=false; btn.textContent='📍 Retry';
+      },{enableHighAccuracy:true,timeout:15000,maximumAge:0});
+    });
+
+    /* ══ Request OTP (worker) ══ */
+    el('btnReqOtp').addEventListener('click', async function(){
+      if(!gpsOk){ toast('Pehle location verify karo','warning'); return; }
+      var btn=this; btn.disabled=true; btn.textContent='⏳ Bhej raha hai...';
+      try{
+        var otp=''; for(var i=0;i<6;i++) otp+=Math.floor(Math.random()*10);
+        var exp=new Date(Date.now()+30*60*1000).toISOString();
+        await updateDoc(doc(db,'gigs',gigId),{completionOTP:otp,completionOTPExpiry:exp,completionRequested:true,completionRequestedAt:new Date().toISOString()});
+        await addDoc(collection(db,'notifications',activeGig.posterId,'items'),{
+          type:'otp_requested',title:'🔑 Worker ne OTP manga!',
+          body:(activeGig.workerName||'Worker')+' ne gig "'+activeGig.title+'" complete karne ke liye OTP manga.',
+          gigId:gigId,workerId:currentUser.uid,read:false,createdAt:serverTimestamp()
+        });
+        otpSent=true; el('otpMsg').classList.add('show');
+        stepDone(2); stepActive(3);
+        startCd(exp,'otpCd','otp-countdown');
+        el('otpBoxes').querySelectorAll('.otp-box')[0].focus();
+        toast('OTP request bhej di! Poster se code lo.','success');
+        btn.style.display='none';
+      }catch(e){ toast('Error: '+e.message,'error'); btn.disabled=false; btn.textContent='🔑 OTP Request Karo'; }
+    });
+
+    /* ══ OTP boxes (worker) ══ */
+    var boxes=[].slice.call(el('otpBoxes').querySelectorAll('.otp-box'));
+    boxes.forEach(function(inp,i){
+      inp.addEventListener('input',function(){
+        this.value=this.value.replace(/[^0-9]/g,'').slice(-1);
+        if(this.value&&i<5) boxes[i+1].focus();
         this.classList.toggle('filled',!!this.value);
-        checkOtpFilled();
+        el('btnComplete').disabled=!boxes.every(function(b){return b.value.length===1;});
       });
       inp.addEventListener('keydown',function(e){
-        if(e.key==='Backspace'&&!this.value&&i>0){ otpInputs[i-1].focus(); otpInputs[i-1].value=''; otpInputs[i-1].classList.remove('filled'); }
-        if(e.key==='ArrowLeft'&&i>0) otpInputs[i-1].focus();
-        if(e.key==='ArrowRight'&&i<5) otpInputs[i+1].focus();
+        if(e.key==='Backspace'&&!this.value&&i>0){boxes[i-1].focus();boxes[i-1].value='';boxes[i-1].classList.remove('filled');}
       });
       inp.addEventListener('paste',function(e){
         e.preventDefault();
-        var pasted=(e.clipboardData||window.clipboardData).getData('text').replace(/[^0-9]/g,'');
-        pasted.split('').slice(0,6).forEach(function(ch,j){
-          if(otpInputs[i+j]){ otpInputs[i+j].value=ch; otpInputs[i+j].classList.add('filled'); }
-        });
-        checkOtpFilled();
+        var p=(e.clipboardData||window.clipboardData).getData('text').replace(/[^0-9]/g,'');
+        p.split('').slice(0,6).forEach(function(ch,j){if(boxes[i+j]){boxes[i+j].value=ch;boxes[i+j].classList.add('filled');}});
+        el('btnComplete').disabled=!boxes.every(function(b){return b.value.length===1;});
       });
     });
-    function checkOtpFilled(){
-      var filled=otpInputs.every(function(b){ return b.value.length===1; });
-      el('btnCompleteGig').disabled=!filled;
-    }
-    function getEnteredOtp(){
-      return otpInputs.map(function(b){ return b.value; }).join('');
-    }
 
-    /* ── Step 3: Submit OTP & complete gig ── */
-    el('btnCompleteGig').addEventListener('click', async function(){
+    /* ══ Complete gig (worker) ══ */
+    el('btnComplete').addEventListener('click', async function(){
       var btn=this; btn.disabled=true; btn.textContent='⏳ Verify ho raha hai...';
       try{
-        var gigSnap = await getDoc(doc(db,'gigs',gigId));
-        var gigData = gigSnap.data();
-
-        // Check expiry
-        if(gigData.completionOTPExpiry && new Date(gigData.completionOTPExpiry)<new Date()){
-          showToast('OTP expire ho gaya! Naya OTP request karo.','error');
-          btn.disabled=false; btn.textContent='✅ Gig Complete Karo';
-          return;
-        }
-
-        var entered=getEnteredOtp();
-        if(entered !== String(gigData.completionOTP)){
-          showToast('❌ Galat OTP — poster se dobara pucho','error');
-          otpInputs.forEach(function(b){ b.value=''; b.classList.remove('filled'); });
-          otpInputs[0].focus();
-          btn.disabled=false; btn.textContent='✅ Gig Complete Karo';
-          return;
-        }
-
-        // OTP correct — mark complete
-        var pay = Number(gigData.budget||0);
-        var fee = Math.round(pay*0.06);
-        var workerEarnings = pay - fee;
-
-        await updateDoc(doc(db,'gigs',gigId),{
-          status:       'completed',
-          completedAt:  new Date().toISOString(),
-          workerEarnings: workerEarnings,
-          platformFee:  fee
-        });
-
-        // Notify poster
-        await addDoc(collection(db,'notifications',gigData.posterId,'items'),{
-          type:'gig_completed', title:'✅ Gig Complete Ho Gai!',
-          body:'"'+gigData.title+'" gig complete ho gai. Worker ko payment process ho rahi hai.',
-          gigId:gigId, read:false, createdAt:serverTimestamp()
-        });
-        // Notify worker
-        await addDoc(collection(db,'notifications',currentUser.uid,'items'),{
-          type:'payment_incoming', title:'💰 Payment Processing!',
-          body:'Badhai ho! ₹'+workerEarnings+' aapke wallet mein credit ho rahi hai.',
-          gigId:gigId, read:false, createdAt:serverTimestamp()
-        });
-
-        // Show success
-        el('completionFlow').style.display='none';
-        el('chatLink').style.display='none';
-        el('successAmount').textContent='₹'+workerEarnings.toLocaleString('en-IN');
-        el('completionSuccess').classList.add('show');
-        showToast('🎉 Gig complete! ₹'+workerEarnings+' credit hogi.','success');
-
-      }catch(e){
-        showToast('Error: '+e.message,'error');
-        btn.disabled=false; btn.textContent='✅ Gig Complete Karo';
-      }
+        var snap=await getDoc(doc(db,'gigs',gigId));
+        var g=snap.data();
+        if(g.completionOTPExpiry&&new Date(g.completionOTPExpiry)<new Date()){ toast('OTP expire ho gaya! Naya request karo.','error'); btn.disabled=false; btn.textContent='✅ Gig Complete Karo'; return; }
+        var entered=boxes.map(function(b){return b.value;}).join('');
+        if(entered!==String(g.completionOTP)){ toast('❌ Galat OTP — poster se dobara pucho','error'); boxes.forEach(function(b){b.value='';b.classList.remove('filled');}); boxes[0].focus(); btn.disabled=false; btn.textContent='✅ Gig Complete Karo'; return; }
+        var pay=Number(g.budget||0), fee=Math.round(pay*0.06), earn=pay-fee;
+        await updateDoc(doc(db,'gigs',gigId),{status:'completed',completedAt:new Date().toISOString(),workerEarnings:earn,platformFee:fee});
+        await addDoc(collection(db,'notifications',g.posterId,'items'),{type:'gig_completed',title:'✅ Gig Complete!',body:'"'+g.title+'" gig complete ho gai.',gigId:gigId,read:false,createdAt:serverTimestamp()});
+        await addDoc(collection(db,'notifications',currentUser.uid,'items'),{type:'payment_incoming',title:'💰 Payment!',body:'Badhai! ₹'+earn+' wallet mein credit ho rahi hai.',gigId:gigId,read:false,createdAt:serverTimestamp()});
+        el('workerSteps').style.display='none';
+        el('workerDoneAmt').textContent='₹'+earn.toLocaleString('en-IN');
+        el('workerDone').classList.add('show');
+        toast('🎉 Gig complete! ₹'+earn+' credit hogi.','success');
+      }catch(e){ toast('Error: '+e.message,'error'); btn.disabled=false; btn.textContent='✅ Gig Complete Karo'; }
     });
 
-    /* ── Render gig ── */
-    function renderGig(gig, id){
-      activeGig=gig; gigId=id;
-      el('skelWrap').style.display='none';
-      el('gigWrap').style.display='block';
-      el('gigTitle').textContent = gig.title||'—';
-      el('gigLocation').textContent = [gig.location,gig.area,gig.pincode].filter(Boolean).join(', ')||'—';
-      el('gigDateTime').textContent = [(gig.date||''),(gig.time||'')].filter(Boolean).join(' • ')||'—';
-      el('gigPoster').textContent = gig.posterName||'—';
-      el('gigPay').textContent = '₹'+(gig.budget||0).toLocaleString('en-IN')+(gig.payMax?'–₹'+gig.payMax.toLocaleString('en-IN'):'');
-      // Chat link
-      el('chatLink').href = 'chat.html?with='+encodeURIComponent(gig.posterId)+'&gig='+encodeURIComponent(id);
-      // If already completed
-      if(gig.status==='completed'){
-        el('completionFlow').style.display='none';
-        el('chatLink').style.display='none';
-        el('successAmount').textContent='₹'+(gig.workerEarnings||0).toLocaleString('en-IN');
-        el('completionSuccess').classList.add('show');
-        el('agPageTitle').textContent='Completed Gig';
-        el('agBadge') && (el('agBadge').textContent='Completed');
-      }
-      // If OTP already requested but not completed
-      if(gig.completionRequested && gig.status==='taken'){
-        gpsVerified=true; otpRequested=true;
-        doneStep(1); doneStep(2); unlockStep(3);
-        el('otpRequestedInfo').classList.add('show');
-        if(gig.completionOTPExpiry) startOtpCountdown(gig.completionOTPExpiry);
-      }
-    }
-
-    /* ── Init ── */
+    /* ══ INIT ══ */
     onAuthStateChanged(auth, async function(user){
       if(!user){ window.location.replace('login.html?redirect=active-gig.html'); return; }
       currentUser=user;
-      try{
-        var q=query(collection(db,'gigs'),
-          where('workerId','==',user.uid),
-          where('status','in',['taken','completed']),
-          limit(1));
-        var snap=await getDocs(q);
-        if(snap.empty){
+
+      // Determine mode from GL session or Firestore user doc
+      var mode = (window.GL && window.GL.getCurrentUser && window.GL.getCurrentUser()) 
+                 ? (window.GL.getCurrentUser().mode || 'worker') 
+                 : 'worker';
+
+      var params=new URLSearchParams(window.location.search);
+      var paramId=params.get('id');
+      var gigDocId=null;
+
+      if(paramId){
+        gigDocId=paramId;
+      } else {
+        try{
+          var q, snap;
+          if(mode==='poster'){
+            q=query(collection(db,'gigs'),where('posterId','==',user.uid),where('status','in',['taken','completed']),limit(1));
+          } else {
+            q=query(collection(db,'gigs'),where('workerId','==',user.uid),where('status','in',['taken','completed']),limit(1));
+          }
+          snap=await getDocs(q);
+          if(snap.empty){
+            el('skelWrap').style.display='none';
+            el('emptyWrap').style.display='block';
+            if(mode==='poster'){
+              el('emptyTitle').textContent='Koi Active Gig Nahi';
+              el('emptyBody').textContent='Jab koi worker aapki gig accept karega, yahan track kar paoge.';
+              el('emptyBtn').textContent='➕ Gig Post Karo'; el('emptyBtn').href='post-gig.html';
+            }
+            return;
+          }
+          gigDocId=snap.docs[0].id;
+        }catch(e){
           el('skelWrap').style.display='none';
-          el('noGigWrap').style.display='block';
-        } else {
-          var d=snap.docs[0];
-          renderGig(d.data(),d.id);
+          el('emptyWrap').style.display='block';
+          return;
         }
-      }catch(e){
-        el('skelWrap').style.display='none';
-        el('noGigWrap').style.display='block';
-        showToast('Error loading gig: '+e.message,'error');
       }
+
+      // Real-time listener
+      unsubSnap=onSnapshot(doc(db,'gigs',gigDocId),function(snap){
+        if(!snap.exists()){el('skelWrap').style.display='none';el('emptyWrap').style.display='block';return;}
+        activeGig=snap.data(); gigId=snap.id;
+        if(mode==='poster') renderPoster(activeGig,gigDocId);
+        else renderWorker(activeGig,gigDocId);
+      },function(){ /* fallback already shown */ });
     });
   </script>
 </body>
