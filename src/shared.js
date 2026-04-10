@@ -1,6 +1,6 @@
 /* CACHE BUSTER v1.5.0 — auto-clears old SW on first load */
 (function(){
-  var APP_BUILD = '1.7.0';
+  var APP_BUILD = '1.8.0';
   var stored = localStorage.getItem('gl_app_build');
   if (stored !== APP_BUILD) {
     localStorage.setItem('gl_app_build', APP_BUILD);
@@ -314,9 +314,19 @@
             '</div>' +
             '<div class="nav-dropdown-divider"></div>' +
 
-            dropdownItem("⚡", "Worker Dashboard", "dashboard-worker.html", currentPage) +
-            dropdownItem("📋", "Poster Dashboard",  "dashboard-client.html", currentPage) +
-            dropdownItem("👤", "My Profile",         "profile.html",          currentPage) +
+            (user.mode === "worker"
+              ? dropdownItem("⚡", "Worker Dashboard", "dashboard-worker.html", currentPage)
+              : dropdownItem("📋", "Poster Dashboard",  "dashboard-client.html", currentPage)) +
+            dropdownItem("👤", "My Profile", "profile.html", currentPage) +
+            dropdownItem("💬", "My Chats",   "chat.html",    currentPage) +
+
+            '<div class="nav-dropdown-divider"></div>' +
+
+            '<button class="nav-dd-item nav-dd-switch" id="navSwitchModeBtn" role="menuitem">' +
+              '<span class="nav-dd-icon">' + (user.mode === "worker" ? "📋" : "⚡") + '</span>' +
+              '<span>Switch to ' + (user.mode === "worker" ? "Poster" : "Worker") + ' Mode</span>' +
+              '<span class="nav-dd-mode-badge">' + (user.mode === "worker" ? "Poster" : "Worker") + '</span>' +
+            '</button>' +
 
             '<div class="nav-dropdown-divider"></div>' +
 
@@ -325,14 +335,14 @@
 
             '<div class="nav-dropdown-divider"></div>' +
 
-            dropdownItem("💰", "My Wallet",       "wallet.html",        currentPage) +
+            dropdownItem("💰", "My Wallet", "wallet.html", currentPage) +
             '<a href="notifications.html" class="nav-dd-item" role="menuitem">' +
               '<span class="nav-dd-icon">🔔</span>' +
               '<span>Notifications</span>' +
               (notifCount > 0 ? '<span class="dd-badge">' + notifCount + '</span>' : '') +
             '</a>' +
-            dropdownItem("⭐", "My Reviews",    "reviews.html",       currentPage) +
-            dropdownItem("❓", "Help Center",   "help-center.html",   currentPage) +
+            dropdownItem("⭐", "My Reviews",  "reviews.html",     currentPage) +
+            dropdownItem("❓", "Help Center", "help-center.html", currentPage) +
 
             '<div class="nav-dropdown-divider"></div>' +
             '<button class="nav-dd-item nav-dd-logout" id="navLogoutBtn" role="menuitem">' +
@@ -370,8 +380,13 @@
         pubLinks +
         '<div class="nav-mobile-divider"></div>' +
         (user
-          ? '<a href="dashboard-worker.html" class="nav-mobile-link">⚡ Worker Dashboard</a>' +
-            '<a href="dashboard-client.html" class="nav-mobile-link">📋 Poster Dashboard</a>' +
+          ? (user.mode === "worker"
+              ? '<a href="dashboard-worker.html" class="nav-mobile-link">⚡ Worker Dashboard</a>'
+              : '<a href="dashboard-client.html" class="nav-mobile-link">📋 Poster Dashboard</a>') +
+            '<a href="chat.html"             class="nav-mobile-link">💬 My Chats</a>' +
+            '<button class="nav-mobile-link nav-mobile-switch" id="mobileSwithModeBtn">'+
+              (user.mode === "worker" ? "📋 Switch to Poster Mode" : "⚡ Switch to Worker Mode") +
+            '</button>' +
             '<a href="post-gig.html"         class="nav-mobile-link">➕ Post a Gig</a>' +
             '<a href="profile.html"          class="nav-mobile-link">👤 My Profile</a>' +
             '<a href="wallet.html"           class="nav-mobile-link">💰 My Wallet</a>' +
@@ -432,6 +447,21 @@
     if (logoutBtn) logoutBtn.addEventListener("click", logoutUser);
     var mobileLogout = document.getElementById("mobileLogoutBtn");
     if (mobileLogout) mobileLogout.addEventListener("click", logoutUser);
+
+    /* Mode switch */
+    function switchMode() {
+      var u = getCurrentUser();
+      if (!u) return;
+      u.mode = (u.mode === "worker") ? "poster" : "worker";
+      setCurrentUser(u);
+      showToast((u.mode === "worker" ? "⚡ Switched to Worker Mode" : "📋 Switched to Poster Mode"), "success", 2500);
+      closeAllDropdowns();
+      renderNav();
+    }
+    var switchBtn = document.getElementById("navSwitchModeBtn");
+    if (switchBtn) switchBtn.addEventListener("click", switchMode);
+    var mobileSwitchBtn = document.getElementById("mobileSwithModeBtn");
+    if (mobileSwitchBtn) mobileSwitchBtn.addEventListener("click", switchMode);
 
     /* Hamburger */
     var hamburger  = document.getElementById("navHamburger");
@@ -902,3 +932,4 @@
   }
 
 })(window);
+
