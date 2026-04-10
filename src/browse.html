@@ -800,11 +800,14 @@
     async function loadGigs() {
       showSkeletons();
       try {
-        var snap = await getDocs(query(collection(db, 'gigs'), orderBy('createdAt', 'desc')));
+        // Simple collection fetch — NO orderBy (avoids missing-index errors)
+        // Sorting is handled in JS by getSorted()
+        var snap = await getDocs(collection(db, 'gigs'));
         allGigs = snap.docs.map(function(d){ return Object.assign({ id: d.id }, d.data()); });
+        console.log('[GigLega] Firestore returned', allGigs.length, 'gigs');
 
-        // Load poster names
-        var uids = [...new Set(allGigs.map(function(g){ return g.posterId; }).filter(Boolean))];
+        // Load poster display names
+        var uids = [...new Set(allGigs.map(function(g){ return g.posterId; }).filter(function(u){ return u && u !== 'demo'; }))];
         await Promise.all(uids.map(async function(uid) {
           try {
             var usnap = await getDoc(doc(db, 'users', uid));
@@ -812,8 +815,8 @@
           } catch(e) {}
         }));
       } catch(e) {
-        console.error("Firestore load failed:", e);
-        // Fall back to demo gigs
+        console.error('[GigLega] Firestore error:', e.code, e.message);
+        // Fall back to demo gigs so page is never empty
         allGigs = [
           { id:"gig_d1", title:"House Cleaning — 3BHK", description:"Reliable cleaner chahiye full 3BHK ke liye Saturday ko. All supplies provided.", budget:800, category:"House Help", type:"hyperlocal", location:"Sector 56, Gurugram", status:"open", createdAt: new Date(Date.now()-3600000).toISOString(), posterId:"demo" },
           { id:"gig_d2", title:"Grocery Pickup & Delivery", description:"BigBazaar se saman lana hai ghar pe. Light items only.", budget:300, category:"Errands", type:"hyperlocal", location:"DLF Phase 3", status:"open", createdAt: new Date(Date.now()-7200000).toISOString(), posterId:"demo" },
@@ -997,11 +1000,20 @@
     function getSorted(arr) {
       var copy = arr.slice();
       switch(state.sort) {
-        case "oldest": copy.sort(function(a,b){ return new Date(a.createdAt)-new Date(b.createdAt); }); break;
+        case "oldest": copy.sort(function(a,b){
+          var ta = a.createdAt && a.createdAt.toDate ? a.createdAt.toDate() : new Date(a.createdAt || a.createdAtISO || 0);
+          var tb = b.createdAt && b.createdAt.toDate ? b.createdAt.toDate() : new Date(b.createdAt || b.createdAtISO || 0);
+          return ta - tb;
+        }); break;
         case "budget-high": copy.sort(function(a,b){ return (b.budget||0)-(a.budget||0); }); break;
         case "budget-low": copy.sort(function(a,b){ return (a.budget||0)-(b.budget||0); }); break;
         case "earn-high": copy.sort(function(a,b){ return ((b.budget||0)*(1-FEE_RATE))-((a.budget||0)*(1-FEE_RATE)); }); break;
-        default: copy.sort(function(a,b){ return new Date(b.createdAt)-new Date(a.createdAt); }); break;
+        default: copy.sort(function(a,b){
+          // handle both Firestore Timestamp objects and ISO strings
+          var ta = a.createdAt && a.createdAt.toDate ? a.createdAt.toDate() : new Date(a.createdAt || a.createdAtISO || 0);
+          var tb = b.createdAt && b.createdAt.toDate ? b.createdAt.toDate() : new Date(b.createdAt || b.createdAtISO || 0);
+          return tb - ta;
+        }); break;
       }
       return copy;
     }

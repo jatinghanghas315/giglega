@@ -647,7 +647,7 @@ function submitGig(){
     hoursNote:'', additionalNotes:$('fNotes').value||'',
     status:'open', lat:posterLat, lng:posterLng,
     posterId:currentUser.uid, posterName:currentUser.displayName||'User',
-    type:'hyperlocal', createdAt:new Date().toISOString(),
+    type:'hyperlocal', createdAt:serverTimestamp(), createdAtISO:new Date().toISOString(),
     applications:0, views:0, images:[]
   };
   addDoc(collection(db,'gigs'),gig)
