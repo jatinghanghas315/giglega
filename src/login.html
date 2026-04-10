@@ -3,95 +3,805 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Login — GigLega</title>
+  <title>Login / Register — GigLega</title>
+  <meta name="description" content="Login or create a free GigLega account. Post gigs or find local work in Gurugram NCR.">
+  <meta name="robots" content="noindex, nofollow">
   <link rel="icon" href="../favicon.ico">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="theme-dark.css" />
-  
-  <link rel="stylesheet" href="mobile.css?v=20260411-0215" />
-<style>
-    .auth-page{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px 16px;background:linear-gradient(135deg,rgba(26,60,94,.04) 0%,rgba(13,148,136,.06) 100%)}
-    .auth-card{background:var(--surface);border:1.5px solid var(--gray-200);border-radius:var(--radius);box-shadow:var(--shadow-lg);width:100%;max-width:460px;overflow:hidden}
-    .auth-brand{background:linear-gradient(135deg,var(--primary) 0%,var(--teal) 100%);padding:28px 32px 24px;text-align:center;color:#fff}
-    .auth-logo{font-size:1.9rem;font-weight:900;letter-spacing:-1.5px;margin-bottom:4px;font-family:var(--font-display)}
-    .auth-logo span{opacity:.75}
-    .auth-tagline{font-size:.82rem;opacity:.75}
-    .auth-tabs{display:grid;grid-template-columns:1fr 1fr;border-bottom:2px solid var(--gray-200)}
-    .auth-tab{padding:14px;border:none;background:transparent;font-weight:700;font-size:.9rem;color:var(--gray-500);cursor:pointer;border-bottom:2.5px solid transparent;margin-bottom:-2px;transition:var(--transition);font-family:var(--font)}
-    .auth-tab.active{color:var(--primary);border-bottom-color:var(--primary);background:rgba(26,60,94,.03)}
-    .auth-tab:hover:not(.active){color:var(--gray-700);background:var(--gray-50)}
-    .auth-body{padding:28px 32px 32px}
-    @media(max-width:480px){.auth-body{padding:20px 20px 24px}}
-    .auth-panel{display:none}
-    .auth-panel.active{display:block}
-    .field{margin-bottom:18px}
-    .field label{display:block;font-weight:600;font-size:.86rem;color:var(--gray-700);margin-bottom:6px}
-    .field-input-wrap{position:relative}
-    .field-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:1rem;pointer-events:none;display:flex;align-items:center;color:var(--gray-400)}
-    .field input{width:100%;padding:11px 14px;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);font-size:.93rem;background:var(--surface);color:var(--text);font-family:var(--font);transition:border .2s,box-shadow .2s;box-sizing:border-box}
-    .field input.has-icon{padding-left:38px}
-    .field input.has-icon-right{padding-right:42px}
-    .field input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(13,148,136,.1)}
-    .field input.is-error{border-color:var(--danger)}
-    .field-error{font-size:.76rem;color:var(--danger);margin-top:5px;font-weight:600;display:none}
-    .field-error.show{display:block}
-    .btn-eye{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1rem;color:var(--gray-400);padding:4px;line-height:1}
-    .btn-eye:hover{color:var(--gray-700)}
-    .pw-strength{margin-top:8px;display:none}
-    .pw-strength.show{display:block}
-    .pw-bars{display:flex;gap:4px;margin-bottom:4px}
-    .pw-bar{flex:1;height:4px;border-radius:2px;background:var(--gray-200);transition:background .3s}
-    .pw-lbl{font-size:.74rem;font-weight:600;color:var(--gray-400)}
-    .check-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:8px}
-    .check-label{display:flex;align-items:center;gap:8px;font-size:.83rem;color:var(--gray-600);cursor:pointer;user-select:none}
-    .check-label input{width:15px;height:15px;accent-color:var(--teal);cursor:pointer}
-    .btn-forgot{background:none;border:none;color:var(--teal);font-size:.83rem;font-weight:600;cursor:pointer;padding:0;font-family:var(--font)}
-    .btn-forgot:hover{text-decoration:underline}
-    .btn-submit{width:100%;padding:13px;background:var(--teal);color:#fff;border:none;border-radius:var(--radius-sm);font-weight:800;font-size:.95rem;cursor:pointer;transition:transform .15s,box-shadow .15s,opacity .2s;box-shadow:0 3px 12px rgba(13,148,136,.3);margin-bottom:16px;font-family:var(--font);display:flex;align-items:center;justify-content:center;gap:8px}
-    .btn-submit:hover:not(:disabled){background:var(--primary);transform:translateY(-2px);box-shadow:0 5px 18px rgba(13,148,136,.4)}
-    .btn-submit:disabled{opacity:.55;transform:none;cursor:not-allowed;box-shadow:none}
-    .btn-submit .spinner{display:none;width:16px;height:16px;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:spin .65s linear infinite}
-    .btn-submit.loading .btn-text{display:none}
-    .btn-submit.loading .spinner{display:inline-block}
-    @keyframes spin{to{transform:rotate(360deg)}}
-    .btn-social{width:100%;padding:11px;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);background:var(--surface);color:var(--gray-700);font-weight:600;font-size:.88rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:var(--transition);margin-bottom:10px;font-family:var(--font)}
-    .btn-social:hover{border-color:var(--teal);background:rgba(13,148,136,.04)}
-    .auth-switch{text-align:center;font-size:.83rem;color:var(--gray-500)}
-    .auth-switch button{background:none;border:none;color:var(--teal);font-weight:700;cursor:pointer;font-size:.83rem;padding:0;font-family:var(--font)}
-    .auth-switch button:hover{text-decoration:underline}
-    .terms-note{font-size:.74rem;color:var(--gray-400);text-align:center;line-height:1.6;margin-top:12px}
-    .terms-note a{color:var(--teal)}
-    .terms-note a:hover{text-decoration:underline}
-    .forgot-panel{display:none;padding:28px 32px 32px}
-    .forgot-panel.active{display:block}
-    @media(max-width:480px){.forgot-panel{padding:20px 20px 24px}}
-    .forgot-back{background:none;border:none;color:var(--teal);font-weight:700;font-size:.84rem;cursor:pointer;padding:0;margin-bottom:20px;display:flex;align-items:center;gap:5px;font-family:var(--font)}
-    .forgot-back:hover{text-decoration:underline}
-    .forgot-title{font-size:1.1rem;font-weight:800;color:var(--primary);margin-bottom:6px}
-    .forgot-sub{font-size:.84rem;color:var(--gray-500);margin-bottom:22px;line-height:1.5}
-    .auth-success{text-align:center;padding:32px 24px;display:none}
-    .auth-success.show{display:block}
-    .auth-success .s-icon{font-size:3rem;margin-bottom:14px}
-    .auth-success h3{font-size:1.1rem;font-weight:800;color:var(--success);margin-bottom:8px}
-    .auth-success p{font-size:.85rem;color:var(--gray-500);line-height:1.6}
+  <link rel="stylesheet" href="mobile.css?v=20260411-0215">
+  <style>
+    /* ── Auth Page Layout ── */
+    .auth-page {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+      background-color: var(--bg);
+      background-image:
+        radial-gradient(ellipse 70% 50% at 50% -10%, rgba(13,148,136,.07) 0%, transparent 60%);
+    }
+    .auth-wrap {
+      width: 100%;
+      max-width: 460px;
+    }
+
+    /* ── Card ── */
+    .auth-card {
+      background: var(--surface);
+      border: 1px solid var(--gray-200);
+      border-radius: 16px;
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+    }
+
+    /* ── Brand header ── */
+    .auth-brand {
+      background: linear-gradient(135deg, #0c4a6e 0%, var(--primary) 50%, var(--teal) 100%);
+      padding: 28px 32px 24px;
+      text-align: center;
+      color: #fff;
+      position: relative;
+      overflow: hidden;
+    }
+    .auth-brand::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 70% 50%, rgba(255,255,255,.08) 0%, transparent 60%);
+    }
+    .auth-logo {
+      font-size: 2rem;
+      font-weight: 900;
+      letter-spacing: -1.5px;
+      margin-bottom: 4px;
+      font-family: 'Satoshi', var(--font-display, sans-serif);
+      position: relative;
+    }
+    .auth-logo span { opacity: .7; }
+    .auth-tagline {
+      font-size: .82rem;
+      opacity: .8;
+      position: relative;
+      font-weight: 500;
+    }
+
+    /* ── Tabs ── */
+    .auth-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border-bottom: 1.5px solid var(--gray-200);
+    }
+    .auth-tab {
+      padding: 14px;
+      border: none;
+      background: transparent;
+      font-weight: 700;
+      font-size: .9rem;
+      color: var(--gray-500);
+      cursor: pointer;
+      border-bottom: 2.5px solid transparent;
+      margin-bottom: -1.5px;
+      transition: color .18s, border-color .18s, background .18s;
+      font-family: var(--font, sans-serif);
+    }
+    .auth-tab.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+      background: rgba(13,148,136,.04);
+    }
+    .auth-tab:hover:not(.active) {
+      color: var(--gray-700);
+      background: var(--gray-50);
+    }
+
+    /* ── Body ── */
+    .auth-body { padding: 28px 32px 32px; }
+    @media (max-width: 480px) { .auth-body { padding: 20px 20px 24px; } }
+
+    .auth-panel { display: none; }
+    .auth-panel.active { display: block; }
+
+    /* ── Fields ── */
+    .field { margin-bottom: 18px; }
+    .field label {
+      display: block;
+      font-size: .82rem;
+      font-weight: 600;
+      color: var(--gray-700);
+      margin-bottom: 6px;
+    }
+    .field input, .field select {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1.5px solid var(--gray-300);
+      border-radius: 10px;
+      font-size: .92rem;
+      background: var(--bg);
+      color: var(--text);
+      transition: border-color .18s, box-shadow .18s;
+      font-family: var(--font, sans-serif);
+    }
+    .field input:focus, .field select:focus {
+      outline: none;
+      border-color: var(--teal);
+      box-shadow: 0 0 0 3px rgba(13,148,136,.1);
+    }
+    .field input::placeholder { color: var(--gray-400); }
+    .field-err {
+      font-size: .78rem;
+      color: var(--danger, #dc2626);
+      margin-top: 4px;
+      display: none;
+    }
+    .field-err.show { display: block; }
+    .field-hint {
+      font-size: .75rem;
+      color: var(--gray-500);
+      margin-top: 4px;
+    }
+
+    /* Password strength */
+    .pw-strength-row {
+      display: flex;
+      gap: 4px;
+      margin-top: 6px;
+    }
+    .pw-bar {
+      height: 3px;
+      flex: 1;
+      border-radius: 2px;
+      background: var(--gray-200);
+      transition: background .25s;
+    }
+    .pw-bar.weak   { background: #ef4444; }
+    .pw-bar.fair   { background: #f97316; }
+    .pw-bar.good   { background: #eab308; }
+    .pw-bar.strong { background: #22c55e; }
+    .pw-lbl {
+      font-size: .74rem;
+      color: var(--gray-500);
+      margin-top: 3px;
+    }
+
+    /* Password toggle */
+    .pw-wrap { position: relative; }
+    .pw-wrap input { padding-right: 42px; }
+    .pw-toggle {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--gray-400);
+      cursor: pointer;
+      padding: 4px;
+      display: flex;
+      align-items: center;
+      transition: color .15s;
+    }
+    .pw-toggle:hover { color: var(--gray-700); }
+
+    /* Role selector */
+    .role-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+    .role-opt {
+      border: 1.5px solid var(--gray-300);
+      border-radius: 10px;
+      padding: 12px 10px;
+      cursor: pointer;
+      text-align: center;
+      transition: border-color .18s, background .18s;
+      background: var(--bg);
+    }
+    .role-opt:hover { border-color: var(--teal); background: rgba(13,148,136,.04); }
+    .role-opt.selected { border-color: var(--teal); background: rgba(13,148,136,.07); }
+    .role-opt input { display: none; }
+    .role-icon { font-size: 1.4rem; margin-bottom: 4px; }
+    .role-name { font-size: .82rem; font-weight: 700; color: var(--text); display: block; }
+    .role-desc { font-size: .73rem; color: var(--gray-500); }
+
+    /* Divider */
+    .auth-divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 20px 0;
+      color: var(--gray-400);
+      font-size: .78rem;
+    }
+    .auth-divider::before, .auth-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--gray-200);
+    }
+
+    /* Google button */
+    .btn-google {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 10px 16px;
+      border: 1.5px solid var(--gray-300);
+      border-radius: 10px;
+      background: var(--surface);
+      color: var(--text);
+      font-size: .9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: border-color .18s, background .18s, box-shadow .18s;
+      font-family: var(--font, sans-serif);
+    }
+    .btn-google:hover {
+      border-color: var(--gray-400);
+      background: var(--gray-50);
+      box-shadow: var(--shadow-sm);
+    }
+    .btn-google svg { flex-shrink: 0; }
+
+    /* Submit button */
+    .btn-auth {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: none;
+      background: var(--primary);
+      color: #fff;
+      font-size: .95rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background .18s, box-shadow .18s, transform .1s;
+      font-family: var(--font, sans-serif);
+      margin-top: 4px;
+    }
+    .btn-auth:hover:not(:disabled) {
+      background: var(--teal);
+      box-shadow: 0 4px 16px rgba(13,148,136,.25);
+    }
+    .btn-auth:active:not(:disabled) { transform: scale(.98); }
+    .btn-auth:disabled { opacity: .6; cursor: not-allowed; }
+    .btn-auth .spinner {
+      display: inline-block;
+      width: 14px; height: 14px;
+      border: 2px solid rgba(255,255,255,.4);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin .6s linear infinite;
+      margin-right: 6px;
+      vertical-align: middle;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Forgot link */
+    .forgot-link {
+      display: block;
+      text-align: right;
+      font-size: .78rem;
+      color: var(--teal);
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: -10px;
+      margin-bottom: 16px;
+      background: none;
+      border: none;
+      padding: 0;
+      font-family: var(--font, sans-serif);
+    }
+    .forgot-link:hover { text-decoration: underline; }
+
+    /* Switch link */
+    .auth-switch {
+      text-align: center;
+      font-size: .83rem;
+      color: var(--gray-500);
+      margin-top: 18px;
+    }
+    .auth-switch button {
+      background: none;
+      border: none;
+      color: var(--teal);
+      font-weight: 700;
+      cursor: pointer;
+      font-size: .83rem;
+      padding: 0;
+      font-family: var(--font, sans-serif);
+    }
+    .auth-switch button:hover { text-decoration: underline; }
+
+    /* Success state */
+    .auth-success { text-align: center; padding: 32px 24px; display: none; }
+    .auth-success.show { display: block; }
+    .auth-success .s-icon { font-size: 3rem; margin-bottom: 14px; }
+    .auth-success h3 { font-size: 1.1rem; font-weight: 800; color: var(--success, #059669); margin-bottom: 8px; }
+    .auth-success p { font-size: .85rem; color: var(--gray-500); line-height: 1.6; }
+
+    /* Forgot panel */
+    .forgot-panel { display: none; }
+    .forgot-panel.active { display: block; }
+    .forgot-back {
+      background: none;
+      border: none;
+      color: var(--teal);
+      font-weight: 700;
+      font-size: .83rem;
+      cursor: pointer;
+      padding: 0;
+      margin-bottom: 16px;
+      font-family: var(--font, sans-serif);
+    }
+    .forgot-back:hover { text-decoration: underline; }
+
     /* Toast */
-    #gl-toast-box{position:fixed;bottom:24px;right:24px;z-index:99999;display:flex;flex-direction:column;gap:10px;pointer-events:none}
-    .gl-toast{padding:12px 18px;border-radius:10px;font-size:.88rem;font-weight:600;color:#fff;box-shadow:0 6px 24px rgba(0,0,0,.18);opacity:0;transform:translateY(12px);transition:opacity .3s,transform .3s;pointer-events:none;max-width:300px}
-    .gl-toast.show{opacity:1;transform:translateY(0)}
-    .gl-toast.success{background:#059669}
-    .gl-toast.error{background:#dc2626}
-    .gl-toast.warning{background:#d97706}
-    .gl-toast.info{background:#2563eb}
-    /* Dark */
-    
+    #gl-toast-box {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 99999;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      pointer-events: none;
+    }
+    .gl-toast {
+      padding: 12px 18px;
+      border-radius: 10px;
+      font-size: .88rem;
+      font-weight: 600;
+      color: #fff;
+      box-shadow: 0 6px 24px rgba(0,0,0,.18);
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity .3s, transform .3s;
+      pointer-events: none;
+      max-width: 300px;
+    }
+    .gl-toast.show { opacity: 1; transform: translateY(0); }
+    .gl-toast.success { background: #059669; }
+    .gl-toast.error   { background: #dc2626; }
+    .gl-toast.warning { background: #d97706; }
+    .gl-toast.info    { background: #2563eb; }
+
+    /* Trust badges below card */
+    .auth-trust {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+    .trust-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: .75rem;
+      color: var(--gray-500);
+      font-weight: 500;
+    }
+    .trust-item svg { color: var(--teal); flex-shrink: 0; }
+
+    /* ── Dark mode overrides ── */
+    [data-theme="dark"] .auth-card {
+      background: var(--surface);
+      border-color: var(--border);
+    }
+    [data-theme="dark"] .auth-tabs { border-bottom-color: var(--border); }
+    [data-theme="dark"] .auth-tab.active {
+      color: var(--teal);
+      border-bottom-color: var(--teal);
+      background: var(--teal-subtle);
+    }
+    [data-theme="dark"] .field input,
+    [data-theme="dark"] .field select {
+      background: var(--surface-3);
+      border-color: var(--border);
+      color: var(--text);
+    }
+    [data-theme="dark"] .field input:focus,
+    [data-theme="dark"] .field select:focus {
+      border-color: rgba(79,195,200,.5);
+      box-shadow: 0 0 0 3px rgba(79,195,200,.12);
+    }
+    [data-theme="dark"] .field input::placeholder { color: var(--text-faint); }
+    [data-theme="dark"] .role-opt {
+      background: var(--surface-2);
+      border-color: var(--border);
+    }
+    [data-theme="dark"] .role-opt:hover,
+    [data-theme="dark"] .role-opt.selected {
+      border-color: rgba(79,195,200,.35);
+      background: var(--teal-subtle);
+    }
+    [data-theme="dark"] .btn-google {
+      background: var(--surface-2);
+      border-color: var(--border);
+      color: var(--text);
+    }
+    [data-theme="dark"] .btn-google:hover {
+      background: var(--surface-3);
+      border-color: rgba(255,255,255,.15);
+    }
+    [data-theme="dark"] .auth-divider::before,
+    [data-theme="dark"] .auth-divider::after { background: var(--border); }
+    [data-theme="dark"] .pw-bar { background: var(--surface-3); }
+    [data-theme="dark"] .btn-auth {
+      background: var(--teal);
+      color: #0d1117;
+    }
+    [data-theme="dark"] .btn-auth:hover:not(:disabled) {
+      background: var(--teal-bright);
+    }
+    [data-theme="dark"] .auth-page {
+      background-image: radial-gradient(ellipse 70% 50% at 50% -10%, rgba(79,195,200,.07) 0%, transparent 60%);
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══ PAGE ══════════════════════════════════════════════════ -->
+<div class="auth-page">
+  <div class="auth-wrap">
+
+    <!-- Card -->
+    <div class="auth-card">
+
+      <!-- Brand Header -->
+      <div class="auth-brand">
+        <div class="auth-logo">Gig<span>Lega</span></div>
+        <div class="auth-tagline">Gurugram's hyperlocal gig platform</div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="auth-tabs" id="authTabs">
+        <button class="auth-tab active" id="tabLogin" onclick="switchTab('login')">Login</button>
+        <button class="auth-tab" id="tabRegister" onclick="switchTab('register')">Register</button>
+      </div>
+
+      <!-- Body -->
+      <div class="auth-body">
+
+        <!-- ═══ LOGIN PANEL ═══ -->
+        <div class="auth-panel active" id="panelLogin">
+
+          <!-- Google -->
+          <button class="btn-google" id="btnGoogleLogin">
+            <svg width="18" height="18" viewBox="0 0 48 48" fill="none">
+              <path fill="#4285F4" d="M47.5 24.6c0-1.6-.1-3.2-.4-4.7H24v8.9h13.2c-.6 3-2.3 5.5-4.9 7.2v6h7.9c4.6-4.3 7.3-10.6 7.3-17.4z"/>
+              <path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.9-6c-2.2 1.5-5 2.4-8 2.4-6.1 0-11.3-4.1-13.2-9.7H2.7v6.2C6.6 42.7 14.8 48 24 48z"/>
+              <path fill="#FBBC04" d="M10.8 28.9c-.5-1.5-.8-3-.8-4.9s.3-3.4.8-4.9v-6.2H2.7A23.9 23.9 0 0 0 0 24c0 3.9.9 7.5 2.7 10.7l8.1-5.8z"/>
+              <path fill="#E94235" d="M24 9.5c3.5 0 6.5 1.2 8.9 3.5l6.7-6.7C35.8 2.4 30.4 0 24 0 14.8 0 6.6 5.3 2.7 13.3l8.1 5.8C12.7 13.6 17.9 9.5 24 9.5z"/>
+            </svg>
+            Continue with Google
+          </button>
+
+          <div class="auth-divider">or login with email</div>
+
+          <!-- Email -->
+          <div class="field">
+            <label for="loginId">Email Address</label>
+            <input type="email" id="loginId" placeholder="you@email.com" autocomplete="email">
+            <div class="field-err" id="loginIdErr">Please enter your email address.</div>
+          </div>
+
+          <!-- Password -->
+          <div class="field">
+            <label for="loginPw">Password</label>
+            <div class="pw-wrap">
+              <input type="password" id="loginPw" placeholder="Enter your password" autocomplete="current-password">
+              <button type="button" class="pw-toggle" onclick="togglePw('loginPw',this)" aria-label="Show password">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+            <div class="field-err" id="loginPwErr">Please enter your password.</div>
+          </div>
+
+          <button class="forgot-link" onclick="showForgot()">Forgot password?</button>
+
+          <button class="btn-auth" id="btnLogin">Login to GigLega</button>
+
+          <div class="auth-switch">
+            Don't have an account? <button onclick="switchTab('register')">Register free</button>
+          </div>
+        </div>
+
+        <!-- ═══ REGISTER PANEL ═══ -->
+        <div class="auth-panel" id="panelRegister">
+
+          <!-- Role selector -->
+          <div class="field">
+            <label>I want to…</label>
+            <div class="role-row">
+              <div class="role-opt selected" id="roleWorker" onclick="selectRole('worker')">
+                <input type="radio" name="role" value="worker" checked>
+                <div class="role-icon">💼</div>
+                <span class="role-name">Find Work</span>
+                <div class="role-desc">Apply to gigs near me</div>
+              </div>
+              <div class="role-opt" id="rolePoster" onclick="selectRole('poster')">
+                <input type="radio" name="role" value="poster">
+                <div class="role-icon">📋</div>
+                <span class="role-name">Post Gigs</span>
+                <div class="role-desc">Hire people near me</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Google -->
+          <button class="btn-google" id="btnGoogleReg" onclick="document.getElementById('btnGoogleLogin').click()">
+            <svg width="18" height="18" viewBox="0 0 48 48" fill="none">
+              <path fill="#4285F4" d="M47.5 24.6c0-1.6-.1-3.2-.4-4.7H24v8.9h13.2c-.6 3-2.3 5.5-4.9 7.2v6h7.9c4.6-4.3 7.3-10.6 7.3-17.4z"/>
+              <path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.9-6c-2.2 1.5-5 2.4-8 2.4-6.1 0-11.3-4.1-13.2-9.7H2.7v6.2C6.6 42.7 14.8 48 24 48z"/>
+              <path fill="#FBBC04" d="M10.8 28.9c-.5-1.5-.8-3-.8-4.9s.3-3.4.8-4.9v-6.2H2.7A23.9 23.9 0 0 0 0 24c0 3.9.9 7.5 2.7 10.7l8.1-5.8z"/>
+              <path fill="#E94235" d="M24 9.5c3.5 0 6.5 1.2 8.9 3.5l6.7-6.7C35.8 2.4 30.4 0 24 0 14.8 0 6.6 5.3 2.7 13.3l8.1 5.8C12.7 13.6 17.9 9.5 24 9.5z"/>
+            </svg>
+            Register with Google
+          </button>
+
+          <div class="auth-divider">or register with email</div>
+
+          <!-- Full name -->
+          <div class="field">
+            <label for="regName">Full Name</label>
+            <input type="text" id="regName" placeholder="e.g. Rahul Sharma" autocomplete="name">
+            <div class="field-err" id="regNameErr">Please enter your full name (min 2 chars).</div>
+          </div>
+
+          <!-- Email -->
+          <div class="field">
+            <label for="regId">Email Address</label>
+            <input type="email" id="regId" placeholder="you@email.com" autocomplete="email">
+            <div class="field-err" id="regIdErr">Please enter a valid email address.</div>
+          </div>
+
+          <!-- City -->
+          <div class="field">
+            <label for="regCity">Your City / Area</label>
+            <input type="text" id="regCity" placeholder="e.g. Sector 56, Gurugram" value="Gurugram" autocomplete="address-level2">
+            <div class="field-err" id="regCityErr">Please enter your city or area.</div>
+          </div>
+
+          <!-- Password -->
+          <div class="field">
+            <label for="regPw">Create Password</label>
+            <div class="pw-wrap">
+              <input type="password" id="regPw" placeholder="Min 6 characters" autocomplete="new-password">
+              <button type="button" class="pw-toggle" onclick="togglePw('regPw',this)" aria-label="Show password">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+            <div class="pw-strength-row" id="pwBars">
+              <div class="pw-bar" id="pwB1"></div>
+              <div class="pw-bar" id="pwB2"></div>
+              <div class="pw-bar" id="pwB3"></div>
+              <div class="pw-bar" id="pwB4"></div>
+            </div>
+            <div class="pw-lbl" id="pwLbl"></div>
+            <div class="field-err" id="regPwErr">Password must be at least 6 characters.</div>
+          </div>
+
+          <!-- Confirm password -->
+          <div class="field">
+            <label for="regPwConf">Confirm Password</label>
+            <div class="pw-wrap">
+              <input type="password" id="regPwConf" placeholder="Repeat your password" autocomplete="new-password">
+              <button type="button" class="pw-toggle" onclick="togglePw('regPwConf',this)" aria-label="Show password">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+            <div class="field-err" id="regPwConfErr">Passwords do not match.</div>
+          </div>
+
+          <div class="field-hint" style="margin-bottom:16px;font-size:.75rem;color:var(--gray-500)">
+            By registering you agree to GigLega's <a href="terms.html" style="color:var(--teal)">Terms</a> &amp; <a href="privacy-policy.html" style="color:var(--teal)">Privacy Policy</a>.
+          </div>
+
+          <button class="btn-auth" id="btnRegister">Create Free Account</button>
+
+          <div class="auth-switch">
+            Already have an account? <button onclick="switchTab('login')">Login here</button>
+          </div>
+
+          <!-- Register success -->
+          <div class="auth-success" id="registerSuccess">
+            <div class="s-icon">🎉</div>
+            <h3>Welcome to GigLega!</h3>
+            <p>Your account has been created. Redirecting you to your dashboard…</p>
+          </div>
+        </div>
+
+        <!-- ═══ FORGOT PASSWORD PANEL ═══ -->
+        <div class="forgot-panel" id="panelForgot">
+          <button class="forgot-back" onclick="hideForgot()">← Back to Login</button>
+          <div id="fStep1">
+            <div class="field" style="margin-bottom:8px">
+              <label for="forgotId">Registered Email Address</label>
+              <input type="email" id="forgotId" placeholder="you@email.com">
+              <div class="field-err" id="forgotIdErr">Please enter a valid email address.</div>
+            </div>
+            <button class="btn-auth" id="btnSendOtp" style="margin-top:12px">Send Reset Email</button>
+          </div>
+          <div class="auth-success" id="forgotSuccess"></div>
+        </div>
+
+      </div><!-- /.auth-body -->
+    </div><!-- /.auth-card -->
+
+    <!-- Trust badges -->
+    <div class="auth-trust">
+      <div class="trust-item">
+        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        Secure &amp; encrypted
+      </div>
+      <div class="trust-item">
+        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        Free to join
+      </div>
+      <div class="trust-item">
+        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Gurugram NCR
+      </div>
+    </div>
+
+  </div><!-- /.auth-wrap -->
+</div><!-- /.auth-page -->
+
+<!-- Toast container -->
+<div id="gl-toast-box"></div>
+
+<!-- ══ SCRIPT ══════════════════════════════════════════════ -->
+<script type="module">
+  import { initializeApp }                              from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
+  import { getAuth, GoogleAuthProvider, signInWithPopup,
+           signInWithEmailAndPassword,
+           createUserWithEmailAndPassword,
+           updateProfile,
+           sendPasswordResetEmail }                     from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+  import { getFirestore, doc, getDoc, setDoc }          from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+
+  /* ── Firebase init ── */
+  const firebaseConfig = {
+    apiKey:            "AIzaSyC5t9BzQZSvLZr45u_SvCllOl0VuwHBWTs",
+    authDomain:        "giglega.firebaseapp.com",
+    projectId:         "giglega",
+    storageBucket:     "giglega.firebasestorage.app",
+    messagingSenderId: "259241349840",
+    appId:             "1:259241349840:web:26cbc53a276cc1a0da04d5"
+  };
+  const app            = initializeApp(firebaseConfig);
+  const auth           = getAuth(app);
+  const db             = getFirestore(app);
+  const googleProvider = new GoogleAuthProvider();
+
+  /* ── Constants ── */
+  const USER_KEY = 'giglega_user';
+  const params   = new URLSearchParams(window.location.search);
+  const hash     = new URLSearchParams((window.location.hash || '').replace(/^#/, ''));
+  const redirectTo = params.get('redirect') || hash.get('redirect') || 'index.html';
+  let   prefRole   = params.get('role') || hash.get('role') || 'worker';
+
+  /* ── Dark mode toggle (global) ── */
+  (function(){
+    const saved = null; // no localStorage in sandboxed env
+    const sys   = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', sys);
+  })();
+
+  /* ── Helpers ── */
+  function isEmail(v) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
+
+  function clearErrs() {
+    document.querySelectorAll('.field-err').forEach(el => el.classList.remove('show'));
+  }
+  function showErr(id, msg) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (msg) el.textContent = msg;
+    el.classList.add('show');
+  }
+
+  function setLoading(btnId, on) {
+    const btn = document.getElementById(btnId);
+    if (!btn) return;
+    btn.disabled = on;
+    if (on) {
+      btn.dataset.origText = btn.textContent;
+      btn.innerHTML = '<span class="spinner"></span> Please wait…';
+    } else {
+      btn.innerHTML = btn.dataset.origText || btn.innerHTML;
+    }
+  }
+
+  function showToast(msg, type = 'info') {
+    const box = document.getElementById('gl-toast-box');
+    const t   = document.createElement('div');
+    t.className = 'gl-toast ' + type;
+    t.textContent = msg;
+    box.appendChild(t);
+    requestAnimationFrame(() => { requestAnimationFrame(() => { t.classList.add('show'); }); });
+    setTimeout(() => {
+      t.classList.remove('show');
+      setTimeout(() => t.remove(), 350);
+    }, 3200);
+  }
+
+  /* ── Tab switching ── */
+  window.switchTab = function(tab) {
+    document.getElementById('panelLogin').classList.toggle('active', tab === 'login');
+    document.getElementById('panelRegister').classList.toggle('active', tab === 'register');
+    document.getElementById('tabLogin').classList.toggle('active', tab === 'login');
+    document.getElementById('tabRegister').classList.toggle('active', tab === 'register');
+    clearErrs();
+    if (tab === 'register' && prefRole) {
+      selectRole(prefRole);
+    }
+  };
+
+  /* ── Forgot password ── */
+  window.showForgot = function() {
+    document.getElementById('panelLogin').classList.remove('active');
+    document.getElementById('authTabs').style.display = 'none';
+    document.getElementById('panelForgot').classList.add('active');
+  };
+  window.hideForgot = function() {
+    document.getElementById('panelForgot').classList.remove('active');
+    document.getElementById('authTabs').style.display = '';
+    document.getElementById('panelLogin').classList.add('active');
+    clearErrs();
+  };
+
+  /* ── Role selector ── */
+  window.selectRole = function(role) {
+    prefRole = role;
+    document.getElementById('roleWorker').classList.toggle('selected', role === 'worker');
+    document.getElementById('rolePoster').classList.toggle('selected', role === 'poster');
+  };
+  if (params.get('mode') === 'register' || hash.get('mode') === 'register') {
+    switchTab('register');
+  }
+  if (prefRole) selectRole(prefRole);
+
+  /* ── Password visibility toggle ── */
+  window.togglePw = function(inputId, btn) {
+    const inp = document.getElementById(inputId);
+    const show = inp.type === 'password';
+    inp.type = show ? 'text' : 'password';
+    btn.innerHTML = show
+      ? '<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>'
+      : '<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
+  };
+
+  /* ── Password strength ── */
+  document.getElementById('regPw').addEventListener('input', function() {
+    const pw = this.value;
+    let score = 0;
+    if (pw.length >= 6)  score++;
+    if (pw.length >= 10) score++;
+    if (/[A-Z]/.test(pw) && /[0-9]/.test(pw)) score++;
+    if (/[^A-Za-z0-9]/.test(pw)) score++;
+    const classes = ['weak','fair','good','strong'];
+    const labels  = ['Weak','Fair','Good','Strong'];
+    for (let i = 1; i <= 4; i++) {
+      const bar = document.getElementById('pwB' + i);
+      bar.className = 'pw-bar';
+      if (i <= score) bar.classList.add(classes[score - 1]);
+    }
     const lbl = document.getElementById('pwLbl');
-    if (lbl) lbl.textContent = score > 0 ? labels[score-1] : 'Too short';
+    if (lbl) lbl.textContent = score > 0 ? labels[score - 1] : '';
   });
 
-  /* ════════════════════ LOGIN ════════════════════ */
+  /* ═══════════════════════ LOGIN ═══════════════════════════ */
   document.getElementById('btnLogin').addEventListener('click', doLogin);
   ['loginId','loginPw'].forEach(id => {
     document.getElementById(id).addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
@@ -130,7 +840,7 @@
     }
   }
 
-  /* ════════════════════ REGISTER ════════════════════ */
+  /* ═══════════════════════ REGISTER ═══════════════════════ */
   document.getElementById('btnRegister').addEventListener('click', doRegister);
   document.getElementById('regPwConf').addEventListener('keydown', e => { if (e.key === 'Enter') doRegister(); });
 
@@ -147,7 +857,7 @@
     if (!id || !isEmail(id))       { showErr('regIdErr','Enter a valid email address.'); ok = false; }
     if (!city)                     { showErr('regCityErr'); ok = false; }
     if (!pw || pw.length < 6)      { showErr('regPwErr'); ok = false; }
-    if (pw !== pwConf)             { showErr('regPwConfErr'); ok = false; }
+    if (pw !== pwConf)             { showErr('regPwConfErr','Passwords do not match.'); ok = false; }
     if (!ok) return;
 
     setLoading('btnRegister', true);
@@ -183,24 +893,23 @@
       setLoading('btnRegister', false);
       const code = err.code || '';
       if (code === 'auth/email-already-in-use') {
-        showErr('regIdErr','Account already exists with this email. Please login.');
+        showErr('regIdErr','Account already exists. Please login instead.');
       } else if (code === 'auth/invalid-email') {
         showErr('regIdErr','Invalid email address.');
       } else if (code === 'auth/weak-password') {
-        showErr('regPwErr','Password is too weak. Use at least 6 characters.');
+        showErr('regPwErr','Password too weak. Use at least 6 characters.');
       } else {
         showErr('regIdErr', err.message || 'Registration failed. Please try again.');
       }
     }
   }
 
-  /* ════════════════════ GOOGLE LOGIN ════════════════════ */
+  /* ═══════════════════════ GOOGLE ═════════════════════════ */
   document.getElementById('btnGoogleLogin').addEventListener('click', async () => {
     try {
       const result = await signInWithPopup(auth, googleProvider);
       const user   = result.user;
-
-      const snap = await getDoc(doc(db, 'users', user.uid));
+      const snap   = await getDoc(doc(db, 'users', user.uid));
       let userData;
 
       if (snap.exists()) {
@@ -227,12 +936,12 @@
       setTimeout(() => window.location.replace(redirectTo), 900);
     } catch (err) {
       if (err.code !== 'auth/popup-closed-by-user' && err.code !== 'auth/cancelled-popup-request') {
-        showToast('Google login failed: ' + (err.message || 'Please try again.'), 'error');
+        showToast('Google login failed. Please try again.', 'error');
       }
     }
   });
 
-  /* ════════════════════ FORGOT PASSWORD ════════════════════ */
+  /* ═══════════════════════ FORGOT PASSWORD ════════════════ */
   document.getElementById('btnSendOtp').addEventListener('click', async () => {
     clearErrs();
     const id = document.getElementById('forgotId').value.trim();
@@ -240,7 +949,6 @@
       showErr('forgotIdErr','Please enter a valid email address.');
       return;
     }
-
     setLoading('btnSendOtp', true);
     try {
       await sendPasswordResetEmail(auth, id);
@@ -248,11 +956,15 @@
       document.getElementById('fStep1').style.display = 'none';
       document.getElementById('forgotSuccess').innerHTML = `
         <div class="s-icon">📧</div>
-        <h3 style="color:var(--success)">Reset Email Sent!</h3>
-        <p>We sent a password reset link to <strong>${id}</strong>.<br>
-        Check your inbox (and spam folder) and click the link to set a new password.</p>
-        <button onclick="location.reload()" style="margin-top:16px;background:none;border:1.5px solid var(--teal);color:var(--teal);padding:9px 22px;border-radius:8px;font-weight:700;cursor:pointer;font-family:var(--font)">← Back to Login</button>
-      `;
+        <h3 style="color:var(--success,#059669)">Reset Email Sent!</h3>
+        <p>We sent a reset link to <strong>${id}</strong>.<br>
+           Check your inbox (and spam folder) and click the link.</p>
+        <button onclick="hideForgot();location.reload()"
+          style="margin-top:16px;background:none;border:1.5px solid var(--teal);
+                 color:var(--teal);padding:9px 22px;border-radius:8px;
+                 font-weight:700;cursor:pointer;font-family:inherit">
+          ← Back to Login
+        </button>`;
       document.getElementById('forgotSuccess').classList.add('show');
       showToast('✅ Reset link sent to ' + id, 'success');
     } catch (err) {
