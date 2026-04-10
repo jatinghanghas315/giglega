@@ -571,7 +571,9 @@
         await updateDoc(doc(db,'gigs',gigId),{completionOTP:otp,completionOTPExpiry:exp,completionRequested:true,completionRequestedAt:new Date().toISOString()});
         await addDoc(collection(db,'notifications',activeGig.posterId,'items'),{
           type:'otp_requested',title:'🔑 Worker ne OTP manga!',
-          body:(activeGig.workerName||'Worker')+' ne gig "'+activeGig.title+'" complete karne ke liye OTP manga.',
+          body:(activeGig.workerName||'Worker')+' ne gig "'+activeGig.title+'" complete karne ke liye OTP manga. Active Gig page pe OTP dekho.',
+          gigId:gigId,
+          link:'active-gig.html?id='+gigId,
           gigId:gigId,workerId:currentUser.uid,read:false,createdAt:serverTimestamp()
         });
         otpSent=true; el('otpMsg').classList.add('show');
@@ -647,11 +649,17 @@
       } else {
         // Run poster + worker queries in parallel — Firestore tells us the role
         try{
+          // Query by single field only — avoids composite index requirement
+          // Filter status client-side
           var STATUSES = ['taken','completed'];
-          var [posterSnap, workerSnap] = await Promise.all([
-            getDocs(query(collection(db,'gigs'), where('posterId','==',user.uid), where('status','in',STATUSES), limit(3))),
-            getDocs(query(collection(db,'gigs'), where('workerId','==',user.uid), where('status','in',STATUSES), limit(3)))
+          var [posterAll, workerAll] = await Promise.all([
+            getDocs(query(collection(db,'gigs'), where('posterId','==',user.uid), limit(20))),
+            getDocs(query(collection(db,'gigs'), where('workerId','==',user.uid), limit(20)))
           ]);
+          var posterSnap = {empty:true, docs: posterAll.docs.filter(function(d){ return STATUSES.indexOf(d.data().status)!==-1; })};
+          posterSnap.empty = posterSnap.docs.length === 0;
+          var workerSnap = {empty:true, docs: workerAll.docs.filter(function(d){ return STATUSES.indexOf(d.data().status)!==-1; })};
+          workerSnap.empty = workerSnap.docs.length === 0;
 
           var hasPoster = !posterSnap.empty;
           var hasWorker = !workerSnap.empty;
