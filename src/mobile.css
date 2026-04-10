@@ -1,0 +1,729 @@
+/* ============================================================
+   GigLega — mobile.css  v1.0
+   App-grade mobile polish — loaded on every page
+   Tested: 375px, 390px, 412px, 430px, 540px, 768px
+   ============================================================ */
+
+/* ══════════════════════════════════════════════════════════
+   1. GLOBAL — overflow, tap, safe-area, touch
+══════════════════════════════════════════════════════════ */
+
+html {
+  overflow-x: hidden;
+}
+
+body {
+  overflow-x: hidden;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+/* iOS safe-area insets */
+.main-nav {
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+/* Prevent bottom content hiding behind iPhone home bar */
+.main-footer {
+  padding-bottom: calc(24px + env(safe-area-inset-bottom));
+}
+
+.sticky-cta-bar {
+  padding-bottom: calc(12px + env(safe-area-inset-bottom));
+}
+
+/* ══════════════════════════════════════════════════════════
+   2. GLOBAL TOUCH — 44px targets, no hover on touch
+══════════════════════════════════════════════════════════ */
+
+@media (max-width: 768px) {
+  .btn, button, [role="button"] {
+    min-height: 44px;
+  }
+
+  a.nav-link, .nav-mobile-link {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+  }
+
+  /* Prevent iOS zoom on input focus */
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+
+  /* Smooth touch scrolling everywhere */
+  * {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Active tap states for feedback */
+  .btn:active,
+  .gig-card:active,
+  .conv-item:active,
+  .gig-item:active {
+    opacity: 0.85;
+    transform: scale(0.99);
+    transition: opacity 0.1s, transform 0.1s;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   3. GLOBAL — tables scroll instead of overflow
+══════════════════════════════════════════════════════════ */
+
+@media (max-width: 768px) {
+  .table-wrap,
+  .compare-section .compare-inner,
+  .pp-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: var(--radius-sm);
+  }
+
+  table {
+    min-width: 480px;
+  }
+
+  .compare-table,
+  .pp-table {
+    min-width: 560px;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   4. MODAL — slide up from bottom on mobile
+══════════════════════════════════════════════════════════ */
+
+@media (max-width: 540px) {
+  .modal-overlay {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .modal {
+    border-radius: 20px 20px 0 0;
+    max-width: 100% !important;
+    width: 100% !important;
+    max-height: 90dvh;
+    overflow-y: auto;
+    padding-bottom: calc(20px + env(safe-area-inset-bottom));
+    margin: 0;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   5. NAV — additional polish at tiny sizes
+══════════════════════════════════════════════════════════ */
+
+@media (max-width: 380px) {
+  .nav-inner {
+    padding: 0 12px;
+  }
+
+  .nav-logo {
+    font-size: 1.15rem;
+  }
+
+  .nav-icon-btn {
+    padding: 6px;
+    font-size: .85rem;
+  }
+}
+
+/* Dark mode mobile nav */
+@media (max-width: 768px) {
+  [data-theme=dark] .nav-mobile-menu {
+    background: var(--bg);
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   6. ANNOUNCE BAR
+══════════════════════════════════════════════════════════ */
+
+@media (max-width: 480px) {
+  .announce-bar {
+    font-size: .72rem;
+    padding: 8px 36px 8px 14px;
+    line-height: 1.4;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   7. DASHBOARD — CLIENT (dashboard-client.html)
+      ZERO mobile breakpoints — full coverage added here
+══════════════════════════════════════════════════════════ */
+
+@media (max-width: 600px) {
+  /* Top bar → stack */
+  .dash-topbar {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 10px !important;
+  }
+
+  .topbar-actions {
+    width: 100%;
+    display: flex;
+    gap: 8px;
+  }
+
+  .btn-switch-role,
+  .btn-post-new {
+    flex: 1;
+    justify-content: center;
+    font-size: .82rem;
+    padding: 10px 8px;
+    white-space: nowrap;
+  }
+
+  /* Stat cards → 2 col */
+  .stats-row {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 10px !important;
+  }
+
+  .stat-card {
+    padding: 14px 12px !important;
+  }
+
+  .stat-value {
+    font-size: 1.3rem !important;
+  }
+
+  /* Tabs → horizontal scroll */
+  .tab-bar {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 2px;
+    gap: 2px !important;
+    scrollbar-width: none;
+  }
+  .tab-bar::-webkit-scrollbar { display: none; }
+
+  .tab-btn {
+    white-space: nowrap;
+    padding: 9px 14px !important;
+    font-size: .8rem !important;
+    flex-shrink: 0;
+  }
+
+  /* Gig cards */
+  .gig-card {
+    padding: 14px !important;
+  }
+
+  .gig-card-head {
+    flex-direction: column !important;
+    gap: 6px !important;
+  }
+
+  /* Worker rows → wrap + full-width actions */
+  .worker-row {
+    flex-wrap: wrap !important;
+    gap: 10px !important;
+  }
+
+  .worker-actions {
+    width: 100% !important;
+    display: flex !important;
+    gap: 8px !important;
+  }
+
+  .worker-actions .btn {
+    flex: 1 !important;
+    justify-content: center !important;
+    font-size: .8rem !important;
+    padding: 10px 6px !important;
+  }
+
+  /* View worker button */
+  .btn-view-worker,
+  .btn-chat-worker,
+  .btn-mark-done {
+    flex: 1;
+    justify-content: center;
+    font-size: .8rem;
+    padding: 10px 6px;
+  }
+}
+
+@media (max-width: 380px) {
+  .stats-row {
+    grid-template-columns: 1fr !important;
+  }
+
+  .stat-value {
+    font-size: 1.15rem !important;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   8. DASHBOARD — WORKER (dashboard-worker.html)
+      ZERO mobile breakpoints — full coverage added here
+══════════════════════════════════════════════════════════ */
+
+@media (max-width: 600px) {
+  /* Top bar */
+  .dash-topbar {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+  }
+
+  .btn-switch-role {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Wallet card on mobile */
+  .wallet-card {
+    padding: 20px 16px !important;
+  }
+
+  .wallet-top {
+    flex-direction: column !important;
+    gap: 12px !important;
+  }
+
+  .wallet-amount {
+    font-size: 1.8rem !important;
+  }
+
+  .btn-withdraw {
+    width: 100% !important;
+    text-align: center;
+  }
+
+  .wallet-breakdown {
+    gap: 16px !important;
+  }
+
+  /* Gig list items */
+  .gig-item {
+    flex-direction: column !important;
+    gap: 10px !important;
+    padding: 14px !important;
+  }
+
+  .gig-item-right {
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100%;
+  }
+
+  .gig-earn {
+    font-size: .9rem !important;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   9. CHAT (chat.html)
+      Already has @640px but missing safe-area, input fixes
+══════════════════════════════════════════════════════════ */
+
+@media (max-width: 640px) {
+  /* Use dynamic viewport height for keyboard-aware height */
+  .chat-shell {
+    height: calc(100dvh - 64px) !important;
+  }
+
+  /* Safe area for input bar (iPhone home indicator) */
+  .chat-input-bar {
+    padding-bottom: calc(10px + env(safe-area-inset-bottom)) !important;
+  }
+
+  /* Wider bubbles on small phones */
+  .msg-bubble {
+    max-width: 88% !important;
+  }
+
+  /* Slightly smaller text in bubbles */
+  .msg-bubble {
+    font-size: .85rem;
+  }
+
+  /* Input field full width */
+  .chat-input-bar input,
+  #msgInput {
+    font-size: 16px !important;
+  }
+}
+
+@media (max-width: 380px) {
+  .chat-sidebar-header {
+    font-size: .9rem !important;
+    padding: 12px 14px !important;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   10. GIG DETAIL (gig-detail.html)
+       Only has @860px — add smaller phone rules
+══════════════════════════════════════════════════════════ */
+
+@media (max-width: 480px) {
+  .gig-header {
+    padding: 18px 16px !important;
+  }
+
+  .gig-header-top {
+    flex-direction: column !important;
+    gap: 10px !important;
+    align-items: flex-start !important;
+  }
+
+  .detail-sidebar {
+    position: static !important;
+  }
+
+  .apply-card,
+  .booking-card {
+    padding: 18px 16px !important;
+  }
+
+  /* Apply button full width */
+  .apply-card .btn,
+  .booking-card .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .gig-tags {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   11. BROWSE (browse.html)
+       Already has breakpoints — add polish at 375px
+══════════════════════════════════════════════════════════ */
+
+@media (max-width: 375px) {
+  .search-bar-wrap {
+    padding: 0 12px;
+  }
+
+  .gig-card {
+    padding: 12px !important;
+  }
+
+  .gig-card-title {
+    font-size: .9rem !important;
+  }
+
+  /* Filter chips horizontal scroll */
+  .filter-chips,
+  .cats-chips {
+    overflow-x: auto;
+    flex-wrap: nowrap !important;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 4px;
+  }
+  .filter-chips::-webkit-scrollbar,
+  .cats-chips::-webkit-scrollbar { display: none; }
+}
+
+/* ══════════════════════════════════════════════════════════
+   12. WALLET (wallet.html)
+       Already has breakpoints — add polish at 375px
+══════════════════════════════════════════════════════════ */
+
+@media (max-width: 375px) {
+  .wl-hero-inner {
+    gap: 16px !important;
+  }
+
+  .wl-bal-amount {
+    font-size: 2rem !important;
+  }
+
+  .wl-stats-grid {
+    grid-template-columns: 1fr 1fr !important;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   13. NOTIFICATIONS (notifications.html)
+       Already has breakpoints — safe area polish
+══════════════════════════════════════════════════════════ */
+
+@media (max-width: 480px) {
+  .notif-list {
+    padding: 0 12px;
+  }
+
+  .notif-item {
+    padding: 14px 12px !important;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   14. PROFILE (profile.html)
+       Only has @560px — add 375px rules
+══════════════════════════════════════════════════════════ */
+
+@media (max-width: 420px) {
+  .profile-header {
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center;
+  }
+
+  .profile-avatar {
+    width: 72px !important;
+    height: 72px !important;
+    font-size: 1.8rem !important;
+  }
+
+  .profile-actions {
+    flex-direction: column !important;
+    width: 100%;
+  }
+
+  .profile-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .stats-mini {
+    grid-template-columns: 1fr 1fr !important;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   15. LOGIN / SIGNUP
+══════════════════════════════════════════════════════════ */
+
+@media (max-width: 400px) {
+  .auth-card,
+  .login-card {
+    padding: 24px 16px !important;
+    border-radius: var(--radius);
+    margin: 0 12px;
+  }
+
+  .auth-title,
+  .login-title {
+    font-size: 1.3rem !important;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   16. POST GIG (post-gig.html)
+       Already has many breakpoints — add polish
+══════════════════════════════════════════════════════════ */
+
+@media (max-width: 380px) {
+  .step-indicators {
+    gap: 4px !important;
+  }
+
+  .step-dot {
+    width: 8px !important;
+    height: 8px !important;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   17. HELP CENTER (help-center.html)
+══════════════════════════════════════════════════════════ */
+
+@media (max-width: 420px) {
+  .hc-body {
+    gap: 16px !important;
+  }
+
+  .hc-cat-card {
+    padding: 16px 12px !important;
+  }
+
+  .hc-article-item {
+    padding: 14px 12px !important;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   18. ENTERPRISE (enterprise.html)
+       Already has 12 breakpoints — safe area + table fix
+══════════════════════════════════════════════════════════ */
+
+@media (max-width: 480px) {
+  .plans-grid {
+    gap: 16px !important;
+  }
+
+  .plan-card {
+    padding: 24px 16px !important;
+  }
+
+  /* Pricing table wrapper for horizontal scroll */
+  .compare-inner {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .compare-table {
+    min-width: 480px;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   19. TRUST & SAFETY (trust-safety.html)
+       Already responsive — add table scroll
+══════════════════════════════════════════════════════════ */
+
+@media (max-width: 480px) {
+  .report-form-wrap {
+    padding: 20px 16px !important;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   20. CONTACT (contact.html)
+══════════════════════════════════════════════════════════ */
+
+@media (max-width: 480px) {
+  .contact-methods {
+    gap: 10px !important;
+  }
+
+  .contact-method-card {
+    padding: 16px 12px !important;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   21. PRIVACY POLICY (privacy-policy.html)
+══════════════════════════════════════════════════════════ */
+
+@media (max-width: 480px) {
+  .pp-hero-chips {
+    flex-wrap: wrap !important;
+    justify-content: center;
+    gap: 6px !important;
+  }
+
+  /* Data table scroll wrapper */
+  .pp-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .pp-table {
+    min-width: 420px;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   22. REVIEWS (reviews.html)
+══════════════════════════════════════════════════════════ */
+
+@media (max-width: 540px) {
+  .reviews-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .review-card {
+    padding: 16px 14px !important;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   23. ABOUT PAGE
+══════════════════════════════════════════════════════════ */
+
+@media (max-width: 380px) {
+  .about-hero h1 {
+    font-size: 1.5rem !important;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   24. GLOBAL CARDS + SPACING at 375px
+══════════════════════════════════════════════════════════ */
+
+@media (max-width: 375px) {
+  /* Slight padding reduction on ultra-small */
+  .container,
+  .container-sm,
+  .container-md,
+  .container-lg {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+
+  .card {
+    padding: 14px !important;
+  }
+
+  .section-head {
+    margin-bottom: 32px !important;
+  }
+
+  /* Smaller hero text on tiny phones */
+  .hero h1 {
+    font-size: clamp(1.5rem, 7vw, 2rem) !important;
+  }
+
+  .page-hero h1 {
+    font-size: 1.2rem !important;
+  }
+
+  /* Stat strip */
+  .stat-strip-inner {
+    grid-template-columns: 1fr 1fr !important;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   25. DARK MODE — mobile-specific dark fixes
+══════════════════════════════════════════════════════════ */
+
+@media (max-width: 768px) {
+  [data-theme=dark] .tab-bar {
+    border-color: var(--gray-700);
+  }
+
+  [data-theme=dark] .tab-btn {
+    color: var(--gray-400);
+  }
+
+  [data-theme=dark] .tab-btn.active {
+    color: var(--primary);
+    border-color: var(--primary);
+  }
+
+  [data-theme=dark] .gig-item {
+    border-color: var(--gray-700);
+    background: var(--surface);
+  }
+
+  [data-theme=dark] .gig-card {
+    border-color: var(--gray-700);
+    background: var(--surface);
+  }
+
+  [data-theme=dark] .wallet-card {
+    border: none;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   26. PRINT — never show mobile-only elements in print
+══════════════════════════════════════════════════════════ */
+
+@media print {
+  .announce-bar,
+  .main-nav,
+  .sticky-cta-bar,
+  .nav-hamburger,
+  .nav-mobile-menu {
+    display: none !important;
+  }
+}
