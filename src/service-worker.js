@@ -1,4 +1,4 @@
-/* mobile-rollout: 20260411-0020 */
+/* mobile-rollout: 20260411-0025 */
 /* ════════════════════════════════════════════════════════════════
    GigLega Service WorkWorker v1.5.0
    Handles: Caching · Offline · Push Notifications · Background Sync
@@ -10,7 +10,7 @@
    CONFIG
 ══════════════════════════════════ */
 const APP_NAME    = 'GigLega';
-const VERSION     = '1.9.0';
+const VERSION     = '2.0.0';
 const CACHE_NAME  = `giglega-cache-v${VERSION}`;
 const SYNC_TAG    = 'giglega-bg-sync';
 const PUSH_ICON   = '/assets/icons/icon-192.png';
