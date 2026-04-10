@@ -62,7 +62,16 @@
         getDoc(doc(db,"users",otherUID)),
         getDoc(doc(db,"gigs",gigId))
       ]);
-      const other = otherSnap.exists() ? otherSnap.data() : { name:"User" };
+      // Build other user's name: user doc → gig workerName/posterName → "User"
+      const otherData = otherSnap.exists() ? otherSnap.data() : {};
+      const isOtherWorker = currentUser.uid === gig.posterId;
+      const gigFallbackName = isOtherWorker
+        ? (gig.workerName || gig.posterName || "Worker")
+        : (gig.posterName || gig.workerName || "Poster");
+      const other = {
+        ...otherData,
+        name: otherData.name || otherData.displayName || gigFallbackName
+      };
       const gig   = gigSnap.exists()   ? gigSnap.data()   : { title:"Gig"  };
 
       renderHeader(other, gig);
