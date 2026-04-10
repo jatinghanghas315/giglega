@@ -1000,7 +1000,7 @@
   }
 
   const TYPE_CSS = {
-    gig_booked:  "type-gig",
+    gig_booked:"type-gig",otp_requested:"type-alert",gig_completed:"type-payment",payment_incoming:"type-payment",
     new_message: "type-message",
     payment:     "type-payment",
     review:      "type-review",
@@ -1023,6 +1023,8 @@
     let ctaHtml = '';
     if(data.chatUrl){
       ctaHtml = `<button class="btn-notif-primary" onclick="event.stopPropagation();window.location.href='${escH(data.chatUrl)}'">💬 Chat Karo</button>`;
+    } else if(data.type === 'otp_requested' && data.gigId){
+      ctaHtml = `<button class="btn-notif-primary" style="background:#d97706;border-color:#d97706;" onclick="event.stopPropagation();window.location.href='active-gig.html?id=${escH(data.gigId)}'">🔑 OTP Dekho &rarr;</button>`;
     } else if(data.gigId){
       ctaHtml = `<button class="btn-notif-primary" onclick="event.stopPropagation();window.location.href='gig-detail.html?id=${escH(data.gigId)}'">🔍 Gig Dekho</button>`;
     }
