@@ -232,15 +232,24 @@
           let otherName = "User";
           let gigTitle  = data.gigTitle || "Gig";
           try {
-            const uSnap = await getDoc(doc(db,"users",otherUID));
-            if(uSnap.exists()) otherName = uSnap.data().name || uSnap.data().displayName || "User";
+            // Primary: use gig fields (posterName / workerName) — always available
+            const gigId2 = data.gigId;
+            if(gigId2){
+              const gSnap = await getDoc(doc(db,"gigs",gigId2));
+              if(gSnap.exists()){
+                const gd = gSnap.data();
+                gigTitle = gd.title || gigTitle;
+                // If otherUID is the worker, use workerName; else use posterName
+                if(gd.workerId === otherUID)  otherName = gd.workerName  || "Worker";
+                else if(gd.posterId === otherUID) otherName = gd.posterName || gd.postedByName || "Poster";
+              }
+            }
+            // Fallback: users collection
+            if(otherName === "User"){
+              const uSnap = await getDoc(doc(db,"users",otherUID));
+              if(uSnap.exists()) otherName = uSnap.data().name || uSnap.data().displayName || uSnap.data().fullName || "User";
+            }
           } catch(_){}
-          if(!data.gigTitle && data.gigId){
-            try {
-              const gSnap = await getDoc(doc(db,"gigs",data.gigId));
-              if(gSnap.exists()) gigTitle = gSnap.data().title || "Gig";
-            } catch(_){}
-          }
           return { id: convDoc.id, data, otherUID, otherName, gigTitle };
         }));
 
@@ -319,12 +328,21 @@
       let otherName = "User";
       let gigTitle  = "Gig";
       try {
-        const uSnap = await getDoc(doc(db,"users",otherUID));
-        if(uSnap.exists()) otherName = uSnap.data().name||uSnap.data().displayName||"User";
-      } catch(_){}
-      try {
-        const gSnap = await getDoc(doc(db,"gigs",gigId));
-        if(gSnap.exists()) gigTitle = gSnap.data().title||"Gig";
+        if(gigId){
+          const gSnap = await getDoc(doc(db,"gigs",gigId));
+          if(gSnap.exists()){
+            const gd = gSnap.data();
+            gigTitle = gd.title || "Gig";
+            // Resolve other person's name from gig fields
+            if(gd.workerId === otherUID)       otherName = gd.workerName  || "Worker";
+            else if(gd.posterId === otherUID)   otherName = gd.posterName  || gd.postedByName || "Poster";
+          }
+        }
+        // Fallback: users collection
+        if(otherName === "User"){
+          const uSnap = await getDoc(doc(db,"users",otherUID));
+          if(uSnap.exists()) otherName = uSnap.data().name||uSnap.data().displayName||uSnap.data().fullName||"User";
+        }
       } catch(_){}
 
       const initials = otherName.split(" ").map(w=>w[0]).join("").toUpperCase().slice(0,2);
@@ -521,3 +539,4 @@
     onchange="if(this.files[0]) uploadMedia(this.files[0])" />
 </body>
 </html>
+
