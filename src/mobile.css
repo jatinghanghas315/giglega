@@ -727,3 +727,195 @@ body {
     display: none !important;
   }
 }
+
+
+/* ══════════════════════════════════════════════════════════
+   BOTTOM NAV — app-grade 5-tab mobile navigation
+══════════════════════════════════════════════════════════ */
+
+.gl-bottom-nav {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  /* Push page content above the bottom nav */
+  body {
+    padding-bottom: calc(68px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .gl-bottom-nav {
+    display: flex;
+    align-items: stretch;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: calc(62px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    background: var(--surface);
+    border-top: 1px solid oklch(from var(--color-divider, #ddd) l c h / 0.15);
+    border-top-color: rgba(0,0,0,0.08);
+    box-shadow: 0 -4px 24px rgba(0,0,0,0.07);
+    z-index: 900;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  [data-theme="dark"] .gl-bottom-nav {
+    border-top-color: rgba(255,255,255,0.07);
+    box-shadow: 0 -4px 24px rgba(0,0,0,0.3);
+  }
+
+  .bn-tab {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    padding: 8px 4px 6px;
+    color: var(--gray-400);
+    text-decoration: none;
+    transition: color 0.15s ease, transform 0.15s ease;
+    -webkit-tap-highlight-color: transparent;
+    position: relative;
+    min-height: 44px;
+  }
+
+  .bn-tab:hover { text-decoration: none; }
+
+  .bn-tab:active {
+    transform: scale(0.92);
+    opacity: 0.7;
+  }
+
+  .bn-tab.bn-active {
+    color: var(--teal);
+  }
+
+  .bn-tab.bn-active .bn-icon svg {
+    stroke: var(--teal);
+  }
+
+  .bn-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  .bn-icon svg {
+    stroke: currentColor;
+    transition: stroke 0.15s ease;
+  }
+
+  .bn-label {
+    font-size: 10px;
+    font-family: var(--font-body, var(--font));
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: 0.2px;
+  }
+
+  /* ── Post FAB (center raised button) ── */
+  .bn-post {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    text-decoration: none;
+    color: var(--teal);
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .bn-post:hover { text-decoration: none; }
+
+  .bn-post-fab {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--teal);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 16px rgba(13,148,136,0.45);
+    margin-top: -20px;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .bn-post:active .bn-post-fab {
+    transform: scale(0.9);
+    box-shadow: 0 2px 8px rgba(13,148,136,0.3);
+  }
+
+  .bn-post .bn-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--teal);
+    margin-top: 4px;
+  }
+
+  /* ── Notification badge on profile tab ── */
+  .bn-badge {
+    position: absolute;
+    top: -4px;
+    right: -8px;
+    background: #ef4444;
+    color: #fff;
+    font-size: 9px;
+    font-weight: 800;
+    min-width: 16px;
+    height: 16px;
+    border-radius: 9999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 3px;
+    border: 1.5px solid var(--surface);
+  }
+
+  /* ── Active indicator dot ── */
+  .bn-tab.bn-active::after {
+    content: '';
+    position: absolute;
+    top: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--teal);
+  }
+
+  /* Keep hamburger nav hidden when bottom nav is active */
+  .nav-hamburger {
+    display: none !important;
+  }
+
+  .nav-mobile-menu {
+    display: none !important;
+  }
+
+  /* Nav link icons alignment */
+  .nav-link-icon {
+    display: inline-flex;
+    vertical-align: middle;
+    margin-right: 4px;
+  }
+
+  .nav-dd-icon {
+    display: inline-flex;
+    align-items: center;
+    width: 20px;
+    flex-shrink: 0;
+  }
+
+  .nav-dd-icon svg {
+    width: 15px;
+    height: 15px;
+    stroke: currentColor;
+  }
+}

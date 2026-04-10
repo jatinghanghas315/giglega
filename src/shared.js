@@ -28,6 +28,21 @@
   "use strict";
 
   /* ══════════════════════════════════════════════════════════
+     0. FONT INJECTION — Satoshi + General Sans via Fontshare
+  ══════════════════════════════════════════════════════════ */
+  (function injectFonts() {
+    if (document.querySelector('link[data-gl-fonts]')) return;
+    var pc = document.createElement('link');
+    pc.rel = 'preconnect'; pc.href = 'https://api.fontshare.com';
+    document.head.insertBefore(pc, document.head.firstChild);
+    var fl = document.createElement('link');
+    fl.rel = 'stylesheet';
+    fl.href = 'https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700,900&f[]=general-sans@300,400,500,600,700&display=swap';
+    fl.setAttribute('data-gl-fonts', '1');
+    document.head.appendChild(fl);
+  })();
+
+  /* ══════════════════════════════════════════════════════════
      1. CONFIG & STORAGE KEYS
   ══════════════════════════════════════════════════════════ */
   var GL = {
@@ -47,9 +62,9 @@
 
     // Nav links shown to everyone
     PUBLIC_NAV: [
-      { label: "Browse Gigs",  href: "browse.html",     icon: "🔍" },
-      { label: "How It Works", href: "about.html",      icon: "💡" },
-      { label: "Enterprise",   href: "enterprise.html", icon: "🏢" }
+      { label: "Browse Gigs",  href: "browse.html",     iconKey: "search" },
+      { label: "How It Works", href: "about.html",      iconKey: "info" },
+      { label: "Enterprise",   href: "enterprise.html", iconKey: "building" }
     ],
 
     // Pages that require login — redirect if not authed
@@ -267,6 +282,34 @@
      6. NAVBAR
   ══════════════════════════════════════════════════════════ */
 
+
+  /* ══════════════════════════════════════════════════════════
+     SVG ICON LIBRARY — inline Lucide-style icons
+  ══════════════════════════════════════════════════════════ */
+  var ICONS = {
+    search:      '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>',
+    info:        '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>',
+    building:    '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="16" height="20" x="4" y="2" rx="2"/><path d="M9 22v-4h6v4M8 6h.01M16 6h.01M8 10h.01M16 10h.01M8 14h.01M16 14h.01"/></svg>',
+    zap:         '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>',
+    clipboard:   '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="8" height="4" x="8" y="2" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg>',
+    user:        '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
+    message:     '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
+    wallet:      '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"/><path d="M4 6v12c0 1.1.9 2 2 2h14v-4"/><path d="M18 12a2 2 0 0 0 0 4h2v-4h-2z"/></svg>',
+    bell:        '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>',
+    star:        '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
+    help:        '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>',
+    logout:      '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>',
+    login:       '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>',
+    'user-plus': '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>',
+    refresh:     '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>',
+    plus:        '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>',
+    home:        '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
+    'search-lg': '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>',
+    'zap-lg':    '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>',
+    'user-lg':   '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
+    'plus-lg':   '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>'
+  };
+
   function renderNav() {
     var el = document.getElementById("main-nav");
     if (!el) return;
@@ -279,8 +322,9 @@
     // Build public nav links
     var pubLinks = GL.PUBLIC_NAV.map(function (link) {
       var active = (currentPage === link.href) ? " active" : "";
+      var ico = ICONS[link.iconKey] || '';
       return '<a href="' + link.href + '" class="nav-link' + active + '">' +
-               link.icon + ' ' + link.label +
+               '<span class="nav-link-icon">' + ico + '</span> ' + link.label +
              '</a>';
     }).join("");
 
@@ -288,8 +332,8 @@
     var authSection = "";
     if (!user) {
       authSection =
-        '<a href="login.html" class="btn btn-ghost nav-btn-login">Login</a>' +
-        '<a href="login.html#mode=register" class="btn btn-primary nav-btn-signup">Join Free →</a>';
+        '<a href="login.html" class="btn btn-ghost nav-btn-login">' + ICONS.login + ' Login</a>' +
+        '<a href="login.html#mode=register" class="btn btn-primary nav-btn-signup">' + ICONS['user-plus'] + ' Join Free</a>';
     } else {
       var initials = (user.name || "U").split(" ").map(function (w) { return w[0]; }).join("").slice(0,2).toUpperCase();
       var notifBadge = notifCount > 0
@@ -297,7 +341,7 @@
         : "";
 
       authSection =
-        '<a href="post-gig.html" class="btn btn-primary nav-post-btn">+ Post Gig</a>' +
+        '<a href="post-gig.html" class="btn btn-primary nav-post-btn">' + ICONS.plus + ' Post Gig</a>' +
 
         '<div class="nav-user-menu" id="navUserMenu">' +
           '<button class="nav-avatar-btn" id="navAvatarBtn" aria-expanded="false" aria-haspopup="true">' +
@@ -315,39 +359,39 @@
             '<div class="nav-dropdown-divider"></div>' +
 
             (user.mode === "worker"
-              ? dropdownItem("⚡", "Worker Dashboard", "dashboard-worker.html", currentPage)
-              : dropdownItem("📋", "Poster Dashboard",  "dashboard-client.html", currentPage)) +
-            dropdownItem("👤", "My Profile", "profile.html", currentPage) +
-            dropdownItem("💬", "My Chats",   "chat.html",    currentPage) +
-            dropdownItem("⚡", "Active Gig",  "active-gig.html", currentPage) +
+              ? dropdownItem("zap", "Worker Dashboard", "dashboard-worker.html", currentPage)
+              : dropdownItem("clipboard", "Poster Dashboard",  "dashboard-client.html", currentPage)) +
+            dropdownItem("user", "My Profile", "profile.html", currentPage) +
+            dropdownItem("message", "My Chats",   "chat.html",    currentPage) +
+            dropdownItem("zap", "Active Gig",  "active-gig.html", currentPage) +
 
             '<div class="nav-dropdown-divider"></div>' +
 
             '<button class="nav-dd-item nav-dd-switch" id="navSwitchModeBtn" role="menuitem">' +
-              '<span class="nav-dd-icon">' + (user.mode === "worker" ? "📋" : "⚡") + '</span>' +
+              '<span class="nav-dd-icon">' + ICONS.refresh + '</span>' +
               '<span>Switch to ' + (user.mode === "worker" ? "Poster" : "Worker") + ' Mode</span>' +
               '<span class="nav-dd-mode-badge">' + (user.mode === "worker" ? "Poster" : "Worker") + '</span>' +
             '</button>' +
 
             '<div class="nav-dropdown-divider"></div>' +
 
-            dropdownItem("🔍", "Browse Gigs",  "browse.html",    currentPage) +
-            dropdownItem("➕", "Post a Gig",   "post-gig.html",  currentPage) +
+            dropdownItem("search", "Browse Gigs",  "browse.html",    currentPage) +
+            dropdownItem("plus", "Post a Gig",   "post-gig.html",  currentPage) +
 
             '<div class="nav-dropdown-divider"></div>' +
 
-            dropdownItem("💰", "My Wallet", "wallet.html", currentPage) +
+            dropdownItem("wallet", "My Wallet", "wallet.html", currentPage) +
             '<a href="notifications.html" class="nav-dd-item" role="menuitem">' +
-              '<span class="nav-dd-icon">🔔</span>' +
+              '<span class="nav-dd-icon">' + ICONS.bell + '</span>' +
               '<span>Notifications</span>' +
               (notifCount > 0 ? '<span class="dd-badge">' + notifCount + '</span>' : '') +
             '</a>' +
-            dropdownItem("⭐", "My Reviews",  "reviews.html",     currentPage) +
-            dropdownItem("❓", "Help Center", "help-center.html", currentPage) +
+            dropdownItem("star", "My Reviews",  "reviews.html",     currentPage) +
+            dropdownItem("help", "Help Center", "help-center.html", currentPage) +
 
             '<div class="nav-dropdown-divider"></div>' +
             '<button class="nav-dd-item nav-dd-logout" id="navLogoutBtn" role="menuitem">' +
-              '<span class="nav-dd-icon">🚪</span><span>Logout</span>' +
+              '<span class="nav-dd-icon">' + ICONS.logout + '</span><span>Logout</span>' +
             '</button>' +
           '</div>' +
         '</div>';
@@ -405,10 +449,11 @@
     bindNavEvents();
   }
 
-  function dropdownItem(icon, label, href, currentPage) {
+  function dropdownItem(iconKey, label, href, currentPage) {
     var active = (currentPage === href) ? ' style="background:rgba(13,148,136,.07);color:var(--teal)"' : "";
+    var ico = ICONS[iconKey] || iconKey; // fallback to raw string
     return '<a href="' + href + '" class="nav-dd-item" role="menuitem"' + active + '>' +
-             '<span class="nav-dd-icon">' + icon + '</span>' +
+             '<span class="nav-dd-icon">' + ico + '</span>' +
              '<span>' + label + '</span>' +
            '</a>';
   }
@@ -499,6 +544,56 @@
   /* ══════════════════════════════════════════════════════════
      7. FOOTER
   ══════════════════════════════════════════════════════════ */
+
+
+  /* ══════════════════════════════════════════════════════════
+     7. BOTTOM MOBILE NAV
+  ══════════════════════════════════════════════════════════ */
+
+  function renderBottomNav() {
+    // Only render on mobile — desktop uses the top nav
+    if (window.innerWidth > 768) return;
+    if (document.getElementById('gl-bottom-nav')) return; // already rendered
+
+    var user = getCurrentUser();
+    var currentPage = window.location.pathname.split('/').pop() || 'index.html';
+
+    function bnTab(iconKey, label, href, extraClass) {
+      var active = (currentPage === href) ? ' bn-active' : '';
+      var cls = 'bn-tab' + active + (extraClass ? ' ' + extraClass : '');
+      return '<a href="' + href + '" class="' + cls + '" aria-label="' + label + '">' +
+               '<span class="bn-icon">' + (ICONS[iconKey] || '') + '</span>' +
+               '<span class="bn-label">' + label + '</span>' +
+             '</a>';
+    }
+
+    var notifCount = getUnreadNotifCount();
+    var notifBadge = notifCount > 0
+      ? '<span class="bn-badge">' + (notifCount > 9 ? '9+' : notifCount) + '</span>'
+      : '';
+
+    var nav = document.createElement('nav');
+    nav.id = 'gl-bottom-nav';
+    nav.className = 'gl-bottom-nav';
+    nav.setAttribute('aria-label', 'Main navigation');
+    nav.innerHTML =
+      bnTab('home',       'Home',   'index.html') +
+      bnTab('search-lg',  'Browse', 'browse.html') +
+      '<a href="' + (user ? 'post-gig.html' : 'login.html') + '" class="bn-tab bn-post" aria-label="Post Gig">' +
+        '<span class="bn-post-fab">' + ICONS['plus-lg'] + '</span>' +
+        '<span class="bn-label">Post</span>' +
+      '</a>' +
+      '<a href="' + (user ? 'active-gig.html' : 'login.html') + '" class="bn-tab' + (currentPage === 'active-gig.html' ? ' bn-active' : '') + '" aria-label="Active Gig">' +
+        '<span class="bn-icon">' + ICONS['zap-lg'] + '</span>' +
+        '<span class="bn-label">Active</span>' +
+      '</a>' +
+      '<a href="' + (user ? 'profile.html' : 'login.html') + '" class="bn-tab' + (currentPage === 'profile.html' ? ' bn-active' : '') + '" aria-label="Profile">' +
+        '<span class="bn-icon" style="position:relative">' + ICONS['user-lg'] + notifBadge + '</span>' +
+        '<span class="bn-label">Profile</span>' +
+      '</a>';
+
+    document.body.appendChild(nav);
+  }
 
   function renderFooter() {
     var el = document.getElementById("main-footer");
@@ -691,6 +786,7 @@
     renderAnnounceBar();
     renderNav();
     renderFooter();
+    renderBottomNav();
 
     // Hide page loader when page is ready
     hidePageLoader();
