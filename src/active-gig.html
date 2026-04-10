@@ -198,6 +198,44 @@
     .ag-skel { animation: ag-sk 1.4s ease-in-out infinite; background: var(--gray-100); border-radius: 10px; }
     @keyframes ag-sk { 0%,100%{opacity:1} 50%{opacity:.4} }
     [data-theme=dark] .ag-skel { background: var(--gray-700); }
+
+    /* ── List View ── */
+    #listView { display:none; max-width:640px; margin:0 auto; padding:16px 16px 80px; }
+    .lv-header { margin-bottom:20px; }
+    .lv-title  { font-size:1.3rem; font-weight:900; color:var(--text); }
+    .lv-sub    { font-size:.82rem; color:var(--gray-400); margin-top:3px; }
+    .lv-section-label {
+      font-size:.72rem; font-weight:800; text-transform:uppercase; letter-spacing:.4px;
+      color:var(--gray-400); margin:22px 0 10px; display:flex; align-items:center; gap:8px;
+    }
+    .lv-section-label::after { content:''; flex:1; height:1px; background:var(--gray-200); }
+    .gig-card-list {
+      background:var(--surface); border:1.5px solid var(--gray-200); border-radius:var(--radius);
+      padding:16px; margin-bottom:12px; display:flex; flex-direction:column; gap:10px;
+      transition:box-shadow .2s, border-color .2s; cursor:pointer; text-decoration:none;
+      position:relative; overflow:hidden;
+    }
+    .gig-card-list:hover { box-shadow:var(--shadow-md); border-color:var(--teal); }
+    .gig-card-list::before { content:''; position:absolute; left:0; top:0; bottom:0; width:4px; background:var(--teal); border-radius:3px 0 0 3px; }
+    .gig-card-list.urgent::before { background:#dc2626; }
+    .gcl-top { display:flex; align-items:flex-start; justify-content:space-between; gap:8px; }
+    .gcl-title { font-size:.95rem; font-weight:800; color:var(--text); line-height:1.3; flex:1; }
+    .gcl-budget { font-size:1.05rem; font-weight:900; color:var(--primary); white-space:nowrap; }
+    .gcl-meta { display:flex; flex-wrap:wrap; gap:8px; }
+    .gcl-chip { font-size:.74rem; color:var(--gray-500); display:flex; align-items:center; gap:4px; }
+    .gcl-bottom { display:flex; align-items:center; justify-content:space-between; }
+    .gcl-badge { font-size:.68rem; font-weight:800; text-transform:uppercase; letter-spacing:.3px;
+      padding:3px 10px; border-radius:12px; }
+    .gcl-badge-taken { background:rgba(245,158,11,.12); color:#b45309; }
+    .gcl-badge-otp   { background:rgba(220,38,38,.12); color:#dc2626; animation:pulse-badge 1.5s ease-in-out infinite; }
+    @keyframes pulse-badge { 0%,100%{opacity:1} 50%{opacity:.6} }
+    .gcl-manage { font-size:.8rem; font-weight:700; color:var(--teal);
+      padding:7px 14px; border:1.5px solid var(--teal); border-radius:20px;
+      background:transparent; cursor:pointer; text-decoration:none; }
+    .gcl-manage:hover { background:var(--teal); color:#fff; }
+    .lv-empty { text-align:center; padding:48px 16px; color:var(--gray-400); }
+    .lv-empty-icon { font-size:2.5rem; margin-bottom:12px; }
+    [data-theme=dark] .gig-card-list { background:var(--gray-800); border-color:var(--gray-600); }
   </style>
 </head>
 <body>
@@ -374,7 +412,30 @@
       </div><!-- end workerView -->
 
     </div><!-- mainWrap -->
-  </main>
+  
+  <!-- LIST VIEW — shown when no ?id param -->
+  <div id="listView">
+    <div class="lv-header">
+      <div class="lv-title">📋 Active Gigs</div>
+      <div class="lv-sub" id="lvSub">Tumhare saare active gigs ek jagah.</div>
+    </div>
+    <div id="lvPosterSection" style="display:none;">
+      <div class="lv-section-label">🏷️ Gigs You Posted</div>
+      <div id="lvPosterCards"></div>
+    </div>
+    <div id="lvWorkerSection" style="display:none;">
+      <div class="lv-section-label">🔧 Gigs You're Working On</div>
+      <div id="lvWorkerCards"></div>
+    </div>
+    <div class="lv-empty" id="lvEmpty" style="display:none;">
+      <div class="lv-empty-icon">📭</div>
+      <div style="font-size:1rem;font-weight:700;margin-bottom:6px;">Koi Active Gig Nahi</div>
+      <div style="font-size:.84rem;margin-bottom:20px;">Post karo ya gigs browse karo!</div>
+      <a href="browse.html" class="btn btn-primary">🔍 Browse Gigs</a>
+    </div>
+  </div>
+
+</main>
   <div id="main-footer" role="contentinfo"></div>
 
   <script type="module">
@@ -626,6 +687,54 @@
     });
 
     /* ══ INIT ══ */
+
+    function showListView(posterDocs, workerDocs){
+      // Hide skeleton + main content, show list view
+      var skel = el('skelWrap'); if(skel) skel.style.display='none';
+      var main = el('mainWrap'); if(main) main.style.display='none';
+      el('listView').style.display='block';
+
+      var total = posterDocs.length + workerDocs.length;
+      el('lvSub').textContent = total + ' active gig' + (total!==1?'s':'') + ' abhi chal rahi hain.';
+
+      function cardHTML(d, id, role){
+        var g = d.data ? d.data() : d;
+        var isOTP  = g.completionRequested && g.status==='taken';
+        var badge  = isOTP
+          ? '<span class="gcl-badge gcl-badge-otp">🔑 OTP Pending</span>'
+          : '<span class="gcl-badge gcl-badge-taken">🟡 In Progress</span>';
+        var person = role==='poster'
+          ? '👷 '+(g.workerName||'Worker assigned')
+          : '📌 '+(g.posterName||'Poster');
+        return '<a class="gig-card-list'+(g.urgency==='urgent'?' urgent':'')+'" href="active-gig.html?id='+id+'">'
+          +'<div class="gcl-top">'
+          +'<div class="gcl-title">'+escH(g.title||'Untitled Gig')+'</div>'
+          +'<div class="gcl-budget">₹'+(g.budget||g.payMax||'?')+'</div>'
+          +'</div>'
+          +'<div class="gcl-meta">'
+          +'<span class="gcl-chip">'+person+'</span>'
+          +'<span class="gcl-chip">📍 '+(g.area||g.location||'—')+'</span>'
+          +'<span class="gcl-chip">📅 '+(g.date||'—')+'</span>'
+          +'</div>'
+          +'<div class="gcl-bottom">'+badge
+          +'<span class="gcl-manage">Manage →</span>'
+          +'</div>'
+          +'</a>';
+      }
+
+      function escH(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+      if(posterDocs.length > 0){
+        el('lvPosterSection').style.display='block';
+        el('lvPosterCards').innerHTML = posterDocs.map(function(d){ return cardHTML(d, d.id, 'poster'); }).join('');
+      }
+      if(workerDocs.length > 0){
+        el('lvWorkerSection').style.display='block';
+        el('lvWorkerCards').innerHTML = workerDocs.map(function(d){ return cardHTML(d, d.id, 'worker'); }).join('');
+      }
+      if(total === 0) el('lvEmpty').style.display='block';
+    }
+
     onAuthStateChanged(auth, async function(user){
       if(!user){ window.location.replace('login.html?redirect=active-gig.html'); return; }
       currentUser=user;
@@ -674,41 +783,9 @@
             return;
           }
 
-          // If user has BOTH (posted some + working on others), prefer poster view
-          // but show a switcher if needed — for now pick the most relevant one
-          if(hasPoster){
-            mode='poster';
-            // If multiple poster gigs, prefer 'taken' (in-progress) over 'completed'
-            var takenDoc = posterSnap.docs.find(function(d){return d.data().status==='taken';});
-            gigDocId = takenDoc ? takenDoc.id : posterSnap.docs[0].id;
-          } else {
-            mode='worker';
-            var takenDocW = workerSnap.docs.find(function(d){return d.data().status==='taken';});
-            gigDocId = takenDocW ? takenDocW.id : workerSnap.docs[0].id;
-          }
-
-          // If user has BOTH roles active simultaneously, add a switcher pill
-          if(hasPoster && hasWorker){
-            var altMode  = 'worker';
-            var altDocId = workerSnap.docs.find(function(d){return d.data().status==='taken';});
-            altDocId = altDocId ? altDocId.id : workerSnap.docs[0].id;
-            var switcher = document.createElement('div');
-            switcher.style.cssText='margin-bottom:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;';
-            switcher.innerHTML='<span style="font-size:.78rem;color:var(--gray-400);font-weight:600;">You have gigs in both roles:</span>'+
-              '<button onclick="switchRole()" style="font-size:.78rem;padding:5px 14px;border-radius:20px;background:var(--teal);color:#fff;border:none;cursor:pointer;font-weight:700;" id="roleSwitchBtn">Switch to Worker View →</button>';
-            el('skelWrap').parentNode.insertBefore(switcher, el('skelWrap'));
-            window._altMode=altMode; window._altDocId=altDocId;
-            window.switchRole=function(){
-              if(unsubSnap) unsubSnap();
-              var tmp=mode; mode=window._altMode; window._altMode=tmp;
-              var tmpId=gigDocId; gigDocId=window._altDocId; window._altDocId=tmpId;
-              el('mainWrap').style.display='none';
-              el('posterView').style.display='none';
-              el('workerView').style.display='none';
-              document.getElementById('roleSwitchBtn').textContent='Switch to '+(mode==='poster'?'Worker':'Poster')+' View →';
-              listenGig(gigDocId, mode);
-            };
-          }
+          // Show ALL active gigs as a list — user clicks one to manage it
+          showListView(posterSnap.docs, workerSnap.docs);
+          return; // list view takes over, no single-gig listener needed
 
         }catch(e){
           el('skelWrap').style.display='none';
@@ -718,7 +795,7 @@
         }
       }
 
-      listenGig(gigDocId, mode);
+      if(gigDocId) listenGig(gigDocId, mode);
     });
 
     function listenGig(gigDocId, mode){
