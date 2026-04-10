@@ -60,8 +60,8 @@
       display:flex;flex-direction:column;align-items:center;gap:4px;-webkit-tap-highlight-color:transparent;}
     .cat-pill:hover{border-color:var(--primary);background:rgba(1,105,111,.04);}
     .cat-pill.sel{border-color:var(--primary);background:rgba(1,105,111,.07);color:var(--primary);}
-    .cat-pill .cat-emoji{font-size:1.4rem;line-height:1;}
-    .cat-pill .cat-name{font-size:.65rem;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.2px;}
+    .cat-pill .cat-emoji{font-size:1.4rem;line-height:1;pointer-events:none;}
+    .cat-pill .cat-name{font-size:.65rem;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.2px;pointer-events:none;}
     .cat-pill.sel .cat-name{color:var(--primary);}
     [data-theme=dark] .cat-pill{background:var(--gray-800);border-color:var(--gray-600);}
 
@@ -188,6 +188,46 @@
     .success-title{font-size:1.2rem;font-weight:800;margin-bottom:6px;}
     .success-sub{font-size:.85rem;color:var(--gray-400);margin-bottom:20px;}
     .success-btns{display:flex;gap:10px;flex-direction:column;}
+
+    /* ── Page background ── */
+    body{
+      background:
+        radial-gradient(ellipse 80% 50% at 10% -10%, rgba(1,105,111,.07) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 90% 110%, rgba(79,152,163,.06) 0%, transparent 55%),
+        var(--bg);
+    }
+    [data-theme=dark] body{
+      background:
+        radial-gradient(ellipse 80% 50% at 10% -10%, rgba(79,152,163,.06) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 90% 110%, rgba(1,105,111,.05) 0%, transparent 55%),
+        var(--bg);
+    }
+    /* Subtle dot grid */
+    .pg-wrap{
+      position:relative;
+    }
+    .pg-wrap::before{
+      content:'';
+      position:fixed;
+      inset:0;
+      background-image: radial-gradient(circle, rgba(1,105,111,.06) 1px, transparent 1px);
+      background-size: 28px 28px;
+      pointer-events:none;
+      z-index:0;
+    }
+    [data-theme=dark] .pg-wrap::before{
+      background-image: radial-gradient(circle, rgba(79,152,163,.05) 1px, transparent 1px);
+    }
+    .pg-wrap > *{position:relative;z-index:1;}
+
+    /* Decorative header accent bar */
+    main::before{
+      content:'';
+      display:block;
+      height:4px;
+      background:linear-gradient(90deg, var(--primary), var(--teal), rgba(79,152,163,0));
+      margin-bottom:0;
+    }
   </style>
 </head>
 <body>
@@ -471,7 +511,8 @@ window.charCount = function(inp,countId,max){
 };
 
 /* ── Category ── */
-window.pickCat = function(pill){
+window.pickCat = function(t){
+  var pill=t.closest('.cat-pill'); if(!pill) return;
   document.querySelectorAll('.cat-pill').forEach(function(p){p.classList.remove('sel');});
   pill.classList.add('sel');
   selCat = pill.dataset.cat;
@@ -481,7 +522,8 @@ window.pickCat = function(pill){
 };
 
 /* ── Duration ── */
-window.pickDur = function(pill){
+window.pickDur = function(t){
+  var pill=t.closest('.dur-pill'); if(!pill) return;
   document.querySelectorAll('.dur-pill').forEach(function(p){p.classList.remove('sel');});
   pill.classList.add('sel');
   selDur  = pill.dataset.dur;
