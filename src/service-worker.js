@@ -10,7 +10,7 @@
    CONFIG
 ══════════════════════════════════ */
 const APP_NAME    = 'GigLega';
-const VERSION     = '2.4.0';
+const VERSION     = '2.5.0';
 const CACHE_NAME  = `giglega-cache-v${VERSION}`;
 const SYNC_TAG    = 'giglega-bg-sync';
 const PUSH_ICON   = '/assets/icons/icon-192.png';
