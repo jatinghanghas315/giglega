@@ -293,8 +293,23 @@ function gigCardHtml(g) {
     '</div>' +
     (g.category ? '<div style="margin-bottom:8px"><span style="background:rgba(13,148,136,.08);border:1px solid rgba(13,148,136,.15);border-radius:5px;padding:2px 9px;font-size:.7rem;font-weight:700;color:var(--teal)">' + escHtml(g.category) + '</span></div>' : '') +
     '<div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">' +
-    '<a href="browse.html" class="btn btn-sm btn-outline">View →</a>' +
+    (g.status === 'taken' && g.workerId
+      ? ('<div class="worker-row" style="width:100%;margin-bottom:8px">' +
+           '<div class="worker-info">' +
+             '<div class="worker-avatar">' + escHtml((g.workerName||'W').split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2)) + '</div>' +
+             '<div><div class="worker-name">' + escHtml(g.workerName||'Worker') + '</div>' +
+             '<div class="worker-phone">🔧 Working on this gig</div></div>' +
+           '</div>' +
+           '<div class="worker-actions">' +
+             '<a href="chat.html?with=' + encodeURIComponent(g.workerId) + '&gig=' + encodeURIComponent(g.id) + '" class="btn btn-sm btn-primary">💬 Chat</a>' +
+             '<a href="gig-detail.html?id=' + encodeURIComponent(g.id) + '" class="btn btn-sm btn-outline">View Gig</a>' +
+           '</div>' +
+         '</div>')
+      : '<a href="gig-detail.html?id=' + encodeURIComponent(g.id) + '" class="btn btn-sm btn-outline">View →</a>') +
     (g.status === 'open' ? '<button class="btn btn-sm btn-danger" data-delete-id="' + g.id + '">🗑️ Delete</button>' : '') +
+    (g.status === 'completed' && g.workerId
+      ? '<a href="chat.html?with=' + encodeURIComponent(g.workerId) + '&gig=' + encodeURIComponent(g.id) + '" class="btn btn-sm btn-outline">💬 Worker</a>'
+      : '') +
     '</div>' +
     '</div>';
 }
@@ -326,3 +341,4 @@ document.getElementById('btnSwitchRole').addEventListener('click', function() {
 </script>
 </body>
 </html>
+
