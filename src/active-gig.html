@@ -236,6 +236,36 @@
     .lv-empty { text-align:center; padding:48px 16px; color:var(--gray-400); }
     .lv-empty-icon { font-size:2.5rem; margin-bottom:12px; }
     [data-theme=dark] .gig-card-list { background:var(--gray-800); border-color:var(--gray-600); }
+
+    /* ── Fixed OTP Alert Banner ── */
+    #otpFixedBanner {
+      display: none; position: fixed;
+      bottom: 72px; left: 50%; transform: translateX(-50%);
+      width: calc(100% - 28px); max-width: 540px;
+      background: #92400e; color: #fff;
+      border-radius: 16px; padding: 14px 16px;
+      z-index: 9999;
+      box-shadow: 0 8px 32px rgba(0,0,0,.45);
+      animation: otp-slide-in .35s cubic-bezier(.16,1,.3,1) both;
+    }
+    @keyframes otp-slide-in {
+      from { opacity:0; transform:translateX(-50%) translateY(16px); }
+      to   { opacity:1; transform:translateX(-50%) translateY(0); }
+    }
+    #otpFixedBanner.show { display:flex; align-items:center; gap:12px; }
+    .ofb-icon  { font-size:1.9rem; flex-shrink:0; }
+    .ofb-body  { flex:1; }
+    .ofb-title { font-size:.9rem; font-weight:800; margin-bottom:2px; }
+    .ofb-sub   { font-size:.75rem; opacity:.85; margin-bottom:8px; }
+    .ofb-digs  { display:flex; gap:5px; flex-wrap:wrap; }
+    .ofb-dig   {
+      width:34px; height:42px; border-radius:8px;
+      background:rgba(255,255,255,.18); border:1.5px solid rgba(255,255,255,.35);
+      display:flex; align-items:center; justify-content:center;
+      font-size:1.25rem; font-weight:900;
+    }
+    .ofb-close { font-size:1.1rem; opacity:.75; cursor:pointer; padding:4px; flex-shrink:0; align-self:flex-start; }
+    .ofb-close:hover { opacity:1; }
   </style>
 </head>
 <body>
@@ -518,19 +548,31 @@
       // Timeline booked time
       if(gig.bookedAt) el('tlt1').textContent=fmtDt(gig.bookedAt);
 
-      // OTP requested
-      if(gig.completionRequested && gig.completionOTP && gig.status==='taken'){
+      // OTP requested — no status restriction, fixed banner, toast, auto-scroll
+      var _otpStr = gig.completionOTP ? String(gig.completionOTP) : null;
+      if(gig.completionRequested && _otpStr){
+        // 1. Inline reveal card
         el('otpReveal').classList.add('show');
         el('otpRevealFor').textContent='"'+(gig.title||'')+'" ke liye OTP';
-        el('otpDigits').innerHTML=String(gig.completionOTP).split('').map(function(d){
-          return '<div class="otp-dig">'+d+'</div>';
-        }).join('');
+        el('otpDigits').innerHTML=_otpStr.split('').map(function(d){return '<div class="otp-dig">'+d+'</div>';}).join('');
         if(gig.completionOTPExpiry) startCd(gig.completionOTPExpiry,'otpRevealExp','otp-reveal-exp');
-        // Timeline OTP step
+        // 2. Fixed floating banner — visible regardless of scroll position
+        var _banner=el('otpFixedBanner');
+        if(_banner){
+          el('otpBannerDigits').innerHTML=_otpStr.split('').map(function(d){return '<div class="otp-banner-dig">'+d+'</div>';}).join('');
+          if(!_banner.classList.contains('show')){
+            _banner.classList.add('show');
+            toast('🔑 Worker ne OTP manga! Neeche code dekho.','warning',10000);
+            setTimeout(function(){el('otpReveal').scrollIntoView({behavior:'smooth',block:'center'});},500);
+          }
+        }
+        // 3. Timeline
         el('tld2').className='tl-dot done'; el('tld2').textContent='✓'; el('tll2').classList.add('done');
         el('tld3').className='tl-dot active';
         el('tls3').textContent='Worker ne OTP request kar diya — usse code batao.';
         if(gig.completionRequestedAt) el('tlt3').textContent=fmtDt(gig.completionRequestedAt);
+      } else {
+        var _b2=el('otpFixedBanner'); if(_b2) _b2.classList.remove('show');
       }
 
       // Completed
@@ -735,6 +777,47 @@
       if(total === 0) el('lvEmpty').style.display='block';
     }
 
+
+    // Polling fallback — catches edge cases where onSnapshot is slow (offline→online)
+    var _pollTimer = null;
+    var _lastOTPSeen = null;
+    function startOTPPolling(gigDocId){
+      if(_pollTimer) clearInterval(_pollTimer);
+      _pollTimer = setInterval(async function(){
+        try{
+          var snap = await getDoc(doc(db,'gigs',gigDocId));
+          if(!snap.exists()) return;
+          var d = snap.data();
+          var otpVal = d.completionOTP ? String(d.completionOTP) : null;
+          if(d.completionRequested && otpVal && otpVal !== _lastOTPSeen){
+            _lastOTPSeen = otpVal;
+            var banner = el('otpFixedBanner');
+            if(banner && !banner.classList.contains('show')){
+              el('otpBannerDigits').innerHTML = otpVal.split('').map(function(x){
+                return '<div class="ofb-dig">'+x+'</div>';
+              }).join('');
+              banner.classList.add('show');
+              el('otpReveal').classList.add('show');
+              el('otpRevealFor').textContent = '"'+(d.title||'')+'" ke liye OTP';
+              el('otpDigits').innerHTML = otpVal.split('').map(function(x){
+                return '<div class="otp-dig">'+x+'</div>';
+              }).join('');
+              toast('🔑 OTP aa gaya! Worker ko code batao.','warning',10000);
+            }
+          }
+        }catch(e){}
+      }, 7000);
+    }
+
+    // Banner dismiss + click-to-scroll
+    document.addEventListener('DOMContentLoaded', function(){
+      var closeBtn = document.getElementById('otpBannerClose');
+      if(closeBtn) closeBtn.addEventListener('click', function(e){
+        e.stopPropagation();
+        document.getElementById('otpFixedBanner').classList.remove('show');
+      });
+    });
+
     onAuthStateChanged(auth, async function(user){
       if(!user){ window.location.replace('login.html?redirect=active-gig.html'); return; }
       currentUser=user;
@@ -795,7 +878,7 @@
         }
       }
 
-      if(gigDocId) listenGig(gigDocId, mode);
+      if(gigDocId){ listenGig(gigDocId, mode); if(mode==='poster') startOTPPolling(gigDocId); }
     });
 
     function listenGig(gigDocId, mode){
@@ -812,5 +895,15 @@
       });
     }
   </script>
+  <!-- Fixed OTP Banner — poster sees this when worker requests OTP -->
+  <div id="otpFixedBanner" role="alert" aria-live="assertive">
+    <div class="ofb-icon">🔑</div>
+    <div class="ofb-body">
+      <div class="ofb-title">Worker ne OTP manga!</div>
+      <div class="ofb-sub">Yeh code worker ko batao:</div>
+      <div class="ofb-digs" id="otpBannerDigits"></div>
+    </div>
+    <span class="ofb-close" id="otpBannerClose" aria-label="Dismiss">✕</span>
+  </div>
 </body>
 </html>
