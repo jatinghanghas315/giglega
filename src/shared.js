@@ -256,7 +256,7 @@
     var el = document.getElementById("announce-bar");
     if (!el) return;
 
-    var msg = "🚀 GigLega v1.2 is live! Gurugram ke best gigs abhi browse karo.";
+    var msg = "GigLega v1.2 is live! Gurugram ke best gigs abhi browse karo.";
     var dismissed = sessionStorage.getItem("gl_announce_dismissed");
     if (dismissed) { el.style.display = "none"; return; }
 
@@ -426,23 +426,23 @@
         '<div class="nav-mobile-divider"></div>' +
         (user
           ? (user.mode === "worker"
-              ? '<a href="dashboard-worker.html" class="nav-mobile-link">⚡ Worker Dashboard</a>'
-              : '<a href="dashboard-client.html" class="nav-mobile-link">📋 Poster Dashboard</a>') +
-            '<a href="chat.html"             class="nav-mobile-link">💬 My Chats</a>' +
-            '<a href="active-gig.html"        class="nav-mobile-link">⚡ Active Gig</a>' +
+              ? '<a href="dashboard-worker.html" class="nav-mobile-link">Worker Dashboard</a>'
+              : '<a href="dashboard-client.html" class="nav-mobile-link">Poster Dashboard</a>') +
+            '<a href="chat.html"             class="nav-mobile-link">My Chats</a>' +
+            '<a href="active-gig.html"        class="nav-mobile-link">Active Gig</a>' +
             '<button class="nav-mobile-link nav-mobile-switch" id="mobileSwithModeBtn">'+
-              (user.mode === "worker" ? "📋 Switch to Poster Mode" : "⚡ Switch to Worker Mode") +
+              (user.mode === "worker" ? "Switch to Poster Mode" : "Switch to Worker Mode") +
             '</button>' +
-            '<a href="post-gig.html"         class="nav-mobile-link">➕ Post a Gig</a>' +
-            '<a href="profile.html"          class="nav-mobile-link">👤 My Profile</a>' +
-            '<a href="wallet.html"           class="nav-mobile-link">💰 My Wallet</a>' +
+            '<a href="post-gig.html"         class="nav-mobile-link">Post a Gig</a>' +
+            '<a href="profile.html"          class="nav-mobile-link">My Profile</a>' +
+            '<a href="wallet.html"           class="nav-mobile-link">My Wallet</a>' +
             '<a href="notifications.html"    class="nav-mobile-link">🔔 Notifications' +
               (notifCount > 0 ? ' <span class="dd-badge">' + notifCount + '</span>' : '') +
             '</a>' +
             '<div class="nav-mobile-divider"></div>' +
-            '<button class="nav-mobile-link nav-mobile-logout" id="mobileLogoutBtn">🚪 Logout</button>'
-          : '<a href="login.html"  class="nav-mobile-link">🔑 Login</a>' +
-            '<a href="login.html#mode=register" class="nav-mobile-link">✨ Register Free</a>'
+            '<button class="nav-mobile-link nav-mobile-logout" id="mobileLogoutBtn">Logout</button>'
+          : '<a href="login.html"  class="nav-mobile-link">Login</a>' +
+            '<a href="login.html#mode=register" class="nav-mobile-link">Register Free</a>'
         ) +
       '</div>';
 
