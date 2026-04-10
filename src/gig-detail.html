@@ -550,7 +550,7 @@
       var isOpen   = gig.status==="open";
       var isTaken  = gig.status==="taken";
       var isWorkerWhoBooked = currentUser && gig.workerId===currentUser.uid;
-      var posterName= poster?.name || gig.posterName || "User";
+      var posterName= (poster && poster.name) || gig.posterName || "User";
       var posterInits= getUserInitials(posterName);
       var convId = currentUser
         ? [currentUser.uid, gig.posterId].sort().join("_")+"_"+gig.id
@@ -594,7 +594,7 @@
         }
       } else if(isWorkerWhoBooked){
         /* WORKER who already booked this gig */
-        actionHtml = '<div style="background:#dcfce7;border-radius:10px;padding:14px;text-align:center;font-weight:700;color:#16a34a;margin-bottom:10px">✅ You've Booked This Gig!</div>';
+        actionHtml = '<div style="background:#dcfce7;border-radius:10px;padding:14px;text-align:center;font-weight:700;color:#16a34a;margin-bottom:10px">✅ You have Booked This Gig!</div>';
         posterCardCTA = '<a href="chat.html?with='+escH(gig.posterId)+'&gig='+escH(gig.id)+'" class="btn btn-primary" style="width:100%;display:block;text-align:center;margin-top:12px">💬 Message Poster</a>';
       } else if(isOpen){
         /* WORKER on open gig — show book button, no message */
@@ -614,7 +614,7 @@
             '<div class="poster-avatar-lg" style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--teal,#0d9488));display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-size:1rem;flex-shrink:0">'+escH(posterInits)+'</div>'+
             '<div>'+
               '<div class="poster-name">'+escH(posterName)+'</div>'+
-              '<div class="poster-since">📍 '+(poster?.city||gig.area||"Gurugram")+'</div>'+
+              '<div class="poster-since">📍 '+((poster && poster.city)||gig.area||"Gurugram")+'</div>'+
             '</div>'+
           '</div>'+
           posterCardCTA+
