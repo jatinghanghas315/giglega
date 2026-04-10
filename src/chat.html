@@ -416,40 +416,57 @@
       window._activeConv = { convId: knownConvId, otherUID, gigId };
     }
 
-    /* ── Profanity Filter ── */
-    const _BAD = [
-      // Hindi gaaliyan
-      "madarchod","madar chod","mc","m\\.c","maadar","bc","b\\.c","bhenchod","bhen chod",
+    /* ── Profanity Filter v2 — Roman + Devanagari + spacing bypass ── */
+
+    // Roman / transliterated Hindi + English
+    const _BAD_ROMAN = [
+      "madarchod","madar chod","madarchood","maadar","bhenchod","bhen chod",
       "behenchod","benchod","bsdk","chutiya","chutiye","choot","chut","lund","lavda","lavde",
       "gandu","gaand","gaandu","randi","harami","kamina","kamine","saala","saali","saale",
-      "haramzada","haramzadi","ullu ka pattha","bhosdike","bhosdika","bhosdiwala","bsdke",
-      "lodu","lode","jhatu","jhaant","jhaatu","maa ki aankh","maa ka",
-      "teri maa","teri behen","teri ma","teri ma ki","bakrichod","gadha","gadhe",
-      // English profanity
-      "fuck","f\\*ck","f.ck","fucker","fucking","fck","fuk","fuq",
-      "shit","sh!t","sh1t","shitt","bullshit",
-      "bitch","b!tch","b1tch","biatch",
-      "asshole","ass hole","a\\$\\$","arse",
-      "bastard","bastar","cunt","c.nt",
-      "dick","d!ck","cock","c0ck",
-      "pussy","whore","wh0re","slut","sl\\*t",
-      "motherfucker","mother fucker","mf","nigger","nigga"
+      "haramzada","haramzadi","bhosdike","bhosdika","bhosdiwala","bsdke",
+      "loda","lode","lodu","jhatu","jhaant","jhaatu",
+      "maa ki aankh","teri maa","teri behen","teri ma",
+      "bakrichod","bhadwa","bhadwe","rakhail",
+      "fuck","fucker","fucking","fck","fuk","fuq",
+      "shit","shitt","bullshit","bitch","biatch","asshole","ass hole","arse",
+      "bastard","cunt","dick","cock","pussy","whore","slut",
+      "motherfucker","mother fucker","nigger","nigga"
     ];
-    const _BAD_RX = new RegExp(
-      "(?:^|[\\s,\\.!?]|(?<=[^a-z]))(" + _BAD.join("|") + ")(?:[\\s,\\.!?]|(?=[^a-z])|$)",
-      "i"
-    );
-    // Simple fallback for environments without lookbehind
-    let _BAD_RX_SIMPLE;
-    try { _BAD_RX_SIMPLE = _BAD_RX; new RegExp("(?<=x)"); }
-    catch(_){ _BAD_RX_SIMPLE = new RegExp("(" + _BAD.join("|") + ")", "i"); }
 
-    function containsProfanity(text) {
-      const t = text.toLowerCase().replace(/[*@$!0]/g, c=>({
-        '*':'i','@':'a','$':'s','!':'i','0':'o'
-      }[c]||c));
-      return _BAD_RX_SIMPLE.test(t);
+    // Devanagari script gaaliyan (Unicode)
+    const _BAD_DEVA = [
+      "मादरचोद","मादर चोद",
+      "भेनचोद","बहनचोद","भड़वा","भडवा",
+      "चूतिया","चुतिया","चूत","चुत",
+      "लंड","लण्ड","रंडी","रांड",
+      "गांडू","गांड","हरामी",
+      "हरामज़ादा","हरामजादा",
+      "कमीना","कमीने","साला","साली",
+      "लोड़ा","लोडा",
+      "झाटू","झाट","बकरीचोद"
+    ];
+
+    function containsProfanity(rawText) {
+      const lowerRaw = rawText.toLowerCase();
+      // 1. Devanagari — direct substring
+      for(const w of _BAD_DEVA){
+        if(lowerRaw.includes(w)) return true;
+      }
+      // 2. Roman — normalize leet/symbol bypasses
+      const normalized = lowerRaw
+        .replace(/[*]/g,'i').replace(/[@]/g,'a').replace(/[$]/g,'s')
+        .replace(/[!]/g,'i').replace(/0/g,'o').replace(/3/g,'e')
+        .replace(/4/g,'a').replace(/1/g,'i').replace(/5/g,'s').replace(/8/g,'b');
+      // Collapse spaces to catch "m a d a r c h o d"
+      const collapsed = normalized.replace(/\s+/g,'');
+      for(const w of _BAD_ROMAN){
+        const wc = w.replace(/\s+/g,'');
+        if(collapsed.includes(wc)) return true;
+        if(normalized.includes(w)) return true;
+      }
+      return false;
     }
+
 
     /* ── Send message ── */
     window.sendMessage = async function(){
@@ -581,5 +598,6 @@
     onchange="if(this.files[0]) uploadMedia(this.files[0])" />
 </body>
 </html>
+
 
 
