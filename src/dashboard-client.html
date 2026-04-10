@@ -40,7 +40,7 @@
     .stats-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:16px;margin-bottom:24px}
     .stat-card{background:var(--surface);border:1.5px solid var(--gray-200);border-radius:var(--radius);padding:18px 20px;box-shadow:var(--shadow-sm)}
     .stat-label{font-size:.75rem;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
-    .stat-value{font-size:1.6rem;font-weight:800;color:var(--primary)}
+    .stat-value{font-size:1.65rem;font-weight:900;color:var(--primary);font-family:var(--font-display);letter-spacing:-.5px}
     .stat-sub{font-size:.75rem;color:var(--gray-400);margin-top:3px}
     .stat-card.teal .stat-value{color:var(--teal)}
     .stat-card.amber .stat-value{color:var(--accent)}
@@ -117,11 +117,11 @@
       <!-- Top bar -->
       <div class="dash-topbar">
         <div class="dash-greeting">
-          <h1 id="greetingText">Welcome back! 👋</h1>
+          <h1 id="greetingText">Welcome back!</h1>
           <p>Poster Dashboard — Manage your posted gigs</p>
         </div>
         <div class="topbar-actions">
-          <button class="btn-switch-role" id="btnSwitchRole">🔄 Switch to Worker Mode</button>
+          <button class="btn-switch-role" id="btnSwitchRole"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>Switch to Worker Mode</button>
           <button class="btn-post-new" onclick="window.location.href='post-gig.html'">+ Post a New Gig</button>
         </div>
       </div>

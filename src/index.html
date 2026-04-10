@@ -14,7 +14,43 @@
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="GigLega - Gurugram's #1 Gig Platform" />
   <meta name="twitter:description" content="Post gigs or find work near you in Gurugram NCR. Same-day gigs, 6% low fee." />
-  <link rel="stylesheet" href="styles.css" />   <!-- V1.2: Schema.org structured data -->   <script type="application/ld+json">   {     "@context": "https://schema.org",     "@type": "Organization",     "name": "GigLega",     "url": "https://giglega.vercel.app",     "description": "Gurugram's #1 hyperlocal gig platform connecting verified workers with customers for cleaning, delivery, tutoring, and more.",     "areaServed": {"@type": "City", "name": "Gurugram"},     "sameAs": ["https://instagram.com/giglega"]   }   </script>
+  <link rel="stylesheet" href="styles.css" />   <!-- V1.2: Schema.org structured data -->   <script type="application/ld+json">   {     "@context": "https://schema.org",     "@type": "Organization",     "name": "GigLega",     "url": "https://giglega.vercel.app",     "description": "Gurugram's #1 hyperlocal gig platform connecting verified workers with customers for cleaning, delivery, tutoring, and more.",     "areaServed": {"@type": "City", "name": "Gurugram"},     "sameAs": ["https://instagram.com/giglega"]   }   
+  /* Count-up animation for hero stats */
+  function countUp(el, target, duration, prefix, suffix) {
+    var start = 0;
+    var startTime = null;
+    var isFloat = target % 1 !== 0;
+    function step(timestamp) {
+      if (!startTime) startTime = timestamp;
+      var progress = Math.min((timestamp - startTime) / duration, 1);
+      var eased = 1 - Math.pow(1 - progress, 3);
+      var current = Math.round(eased * target * 10) / 10;
+      el.textContent = (prefix||'') + (isFloat ? current.toFixed(1) : Math.round(current)) + (suffix||'');
+      if (progress < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  /* Trigger on scroll into view */
+  var statsObserver = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e) {
+      if (e.isIntersecting) {
+        var nums = e.target.querySelectorAll('.hero-stat-num[data-target]');
+        nums.forEach(function(el) {
+          var t = parseFloat(el.dataset.target);
+          var pre = el.dataset.prefix || '';
+          var suf = el.dataset.suffix || '';
+          countUp(el, t, 1200, pre, suf);
+        });
+        statsObserver.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.3 });
+
+  var heroStats = document.querySelector('.hero-stats');
+  if (heroStats) statsObserver.observe(heroStats);
+
+  </script>
     <link rel="stylesheet" href="theme-dark.css" />
   
   <link rel="stylesheet" href="mobile.css?v=20260410-1828" />
@@ -62,12 +98,13 @@
     }
 
     .hero h1 {
-      font-size: clamp(1.9rem, 5vw, 3.2rem);
+      font-size: clamp(2rem, 5.5vw, 3.4rem);
       font-weight: 900;
       color: #fff;
-      line-height: 1.15;
+      line-height: 1.1;
       margin-bottom: 18px;
-      letter-spacing: -1px;
+      letter-spacing: -1.5px;
+      font-family: var(--font-display);
     }
     .hero h1 span { color: #fbbf24; }
 
@@ -109,8 +146,8 @@
       border-top: 1px solid rgba(255,255,255,.15);
     }
     .hero-stat-item { text-align: center; }
-    .hero-stat-num  { font-size: 1.6rem; font-weight: 900; color: #fff; line-height: 1; }
-    .hero-stat-lbl  { font-size: .75rem; color: rgba(255,255,255,.65); margin-top: 3px; font-weight: 600; letter-spacing: .3px; }
+    .hero-stat-num  { font-size: 1.6rem; font-weight: 900; color: #fff; line-height: 1; font-family: var(--font-display); font-variant-numeric: tabular-nums; }
+    .hero-stat-lbl  { font-size: .72rem; color: rgba(255,255,255,.6); margin-top: 3px; font-weight: 600; letter-spacing: .4px; text-transform: uppercase; }
 
     /* Floating chips */
     .hero-chips {
@@ -398,19 +435,19 @@
 
         <div class="hero-stats">
           <div class="hero-stat-item">
-            <div class="hero-stat-num" id="statGigs">0</div>
+            <div class="hero-stat-num" id="statGigs" data-target="12" data-suffix="+">0</div>
             <div class="hero-stat-lbl">Live Gigs</div>
           </div>
           <div class="hero-stat-item">
-            <div class="hero-stat-num" id="statWorkers">0</div>
+            <div class="hero-stat-num" id="statWorkers" data-target="38" data-suffix="+">0</div>
             <div class="hero-stat-lbl">Active Workers</div>
           </div>
           <div class="hero-stat-item">
-            <div class="hero-stat-num">₹0</div>
-            <div class="hero-stat-lbl">Platform Fee on First Gig</div>
+            <div class="hero-stat-num" data-target="0" data-prefix="₹" data-suffix=" Fee">₹0</div>
+            <div class="hero-stat-lbl">First Gig Free</div>
           </div>
           <div class="hero-stat-item">
-            <div class="hero-stat-num">6%</div>
+            <div class="hero-stat-num" data-target="6" data-suffix="%">6%</div>
             <div class="hero-stat-lbl">Low Platform Fee</div>
           </div>
         </div>
@@ -778,7 +815,7 @@
         var isHyper = gig.type === "hyperlocal";
         container.innerHTML += '<div class="gig-card card-hover">' +
           '<div class="gig-type-tag ' + (isHyper ? "tag-hyperlocal" : "tag-remote") + '">' +
-            (isHyper ? "📍 Hyperlocal" : "🌐 Remote") +
+            (isHyper ? "Hyperlocal" : "Remote") +
           '</div>' +
           '<div class="gig-card-title">' + escH(gig.title) + '</div>' +
           '<div class="gig-card-desc line-clamp-2">' + escH(gig.description||"") + '</div>' +
@@ -823,7 +860,7 @@
         var isHyper = gig.type === "hyperlocal";
         container.innerHTML += '<div class="gig-card card-hover">' +
           '<div class="gig-type-tag ' + (isHyper ? "tag-hyperlocal" : "tag-remote") + '">' +
-            (isHyper ? "📍 Hyperlocal" : "🌐 Remote") +
+            (isHyper ? "Hyperlocal" : "Remote") +
           '</div>' +
           '<div class="gig-card-title">' + escH(gig.title) + '</div>' +
           '<div class="gig-card-desc line-clamp-2">' + escH(gig.description) + '</div>' +

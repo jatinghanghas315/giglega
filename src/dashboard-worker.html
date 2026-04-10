@@ -34,26 +34,115 @@
     .btn-switch-role:hover{background:var(--teal);color:#fff}
 
     /* ── Stats row ── */
-    .stats-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px;margin-bottom:24px}
-    .stat-card{background:var(--surface);border:1.5px solid var(--gray-200);border-radius:var(--radius);padding:18px 20px;box-shadow:var(--shadow-sm)}
-    .stat-label{font-size:.75rem;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
-    .stat-value{font-size:1.6rem;font-weight:800;color:var(--primary)}
-    .stat-sub{font-size:.75rem;color:var(--gray-400);margin-top:3px}
+    .stats-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;margin-bottom:24px}
+    .stat-card{
+      background:var(--surface);
+      border:1px solid rgba(0,0,0,.07);
+      border-radius:var(--radius);
+      padding:16px 18px;
+      box-shadow: 0 1px 3px rgba(0,0,0,.05), 0 4px 12px rgba(0,0,0,.04);
+      position: relative;
+      overflow: hidden;
+      transition: transform .15s, box-shadow .15s;
+    }
+    .stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+    .stat-card-accent {
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 3px;
+      border-radius: var(--radius) var(--radius) 0 0;
+    }
+    .stat-card.teal .stat-card-accent { background: var(--teal); }
+    .stat-card.amber .stat-card-accent { background: var(--accent); }
+    .stat-card.green .stat-card-accent { background: var(--success); }
+    .stat-card .stat-card-accent { background: var(--primary); }
+    .stat-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+    .stat-label{font-size:.7rem;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:.6px}
+    .stat-icon { width: 28px; height: 28px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .stat-icon svg { width: 14px; height: 14px; stroke: currentColor; }
+    .stat-card.teal .stat-icon { background: rgba(13,148,136,.1); color: var(--teal); }
+    .stat-card.amber .stat-icon { background: rgba(245,158,11,.1); color: var(--accent); }
+    .stat-card.green .stat-icon { background: rgba(16,185,129,.1); color: var(--success); }
+    .stat-card .stat-icon { background: rgba(26,60,94,.08); color: var(--primary); }
+    .stat-value{font-size:1.65rem;font-weight:900;color:var(--primary);letter-spacing:-.5px;font-family:var(--font-display)}
     .stat-card.teal .stat-value{color:var(--teal)}
     .stat-card.amber .stat-value{color:var(--accent)}
+    .stat-card.green .stat-value{color:var(--success)}
+    .stat-sub{font-size:.7rem;color:var(--gray-400);margin-top:4px;display:flex;align-items:center;gap:4px}
+    .stat-trend { font-size: .68rem; font-weight: 700; display: inline-flex; align-items: center; gap: 2px; padding: 2px 6px; border-radius: 20px; }
+    .stat-trend.up { background: rgba(16,185,129,.1); color: #059669; }
+    .stat-trend.neutral { background: rgba(107,114,128,.1); color: var(--gray-500); }
 
     /* ── Wallet card ── */
-    .wallet-card{background:linear-gradient(135deg,var(--primary) 0%,var(--teal) 100%);border-radius:var(--radius);padding:24px;color:#fff;margin-bottom:24px;box-shadow:0 4px 18px rgba(13,148,136,.3)}
-    .wallet-top{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;margin-bottom:20px}
-    .wallet-label{font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;opacity:.75}
-    .wallet-amount{font-size:2.4rem;font-weight:800;margin-top:4px}
-    .wallet-sub{font-size:.8rem;opacity:.7;margin-top:2px}
-    .btn-withdraw{background:#fff;color:var(--primary);border:none;padding:10px 22px;border-radius:var(--radius-sm);font-weight:800;font-size:.88rem;cursor:pointer;transition:opacity .2s}
-    .btn-withdraw:hover{opacity:.88}
-    .wallet-breakdown{display:flex;gap:24px;flex-wrap:wrap}
-    .wallet-item{display:flex;flex-direction:column;gap:2px}
-    .wallet-item-label{font-size:.72rem;opacity:.7}
-    .wallet-item-value{font-size:1rem;font-weight:700}
+    .wallet-card{
+      background: linear-gradient(135deg, #0f3d5e 0%, #0d6a6a 60%, #0d9488 100%);
+      border-radius: var(--radius);
+      padding: 0;
+      color: #fff;
+      margin-bottom: 24px;
+      box-shadow: 0 6px 28px rgba(13,148,136,.35), 0 2px 8px rgba(0,0,0,.15);
+      overflow: hidden;
+      position: relative;
+    }
+    .wallet-card::before {
+      content: '';
+      position: absolute;
+      top: -40px; right: -40px;
+      width: 180px; height: 180px;
+      background: rgba(255,255,255,.05);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    .wallet-card::after {
+      content: '';
+      position: absolute;
+      bottom: -30px; left: -20px;
+      width: 120px; height: 120px;
+      background: rgba(255,255,255,.04);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    .wallet-body { padding: 24px 24px 20px; position: relative; z-index: 1; }
+    .wallet-top{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;margin-bottom:16px}
+    .wallet-label{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.8px;opacity:.65}
+    .wallet-amount{font-size:2.6rem;font-weight:900;margin-top:2px;letter-spacing:-1px;font-family:var(--font-display)}
+    .wallet-amount-sub{font-size:.78rem;opacity:.6;margin-top:3px}
+    .btn-withdraw{
+      background: rgba(255,255,255,.18);
+      border: 1.5px solid rgba(255,255,255,.3);
+      color: #fff;
+      padding: 9px 20px;
+      border-radius: var(--radius-full);
+      font-weight: 700;
+      font-size: .82rem;
+      cursor: pointer;
+      transition: background .2s;
+      backdrop-filter: blur(4px);
+    }
+    .btn-withdraw:hover { background: rgba(255,255,255,.28); }
+    .wallet-breakdown{display:flex;gap:0;border-top:1px solid rgba(255,255,255,.12);margin-top:16px}
+    .wallet-item{
+      flex:1;
+      display:flex;flex-direction:column;gap:2px;
+      padding: 14px 20px;
+      border-right: 1px solid rgba(255,255,255,.1);
+    }
+    .wallet-item:last-child { border-right: none; }
+    .wallet-item-label{font-size:.68rem;opacity:.6;text-transform:uppercase;letter-spacing:.5px;font-weight:600}
+    .wallet-item-value{font-size:1.05rem;font-weight:800}
+    /* Sparkline */
+    .wallet-sparkline { padding: 0 24px 16px; position: relative; z-index: 1; }
+    .sparkline-label { font-size: .68rem; opacity: .55; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 8px; font-weight: 600; }
+    .sparkline-bars { display: flex; align-items: flex-end; gap: 4px; height: 36px; }
+    .sp-bar {
+      flex: 1;
+      border-radius: 3px 3px 0 0;
+      background: rgba(255,255,255,.25);
+      min-height: 4px;
+      transition: background .2s;
+    }
+    .sp-bar.sp-today { background: rgba(255,255,255,.7); }
+    .sp-day-labels { display: flex; gap: 4px; margin-top: 4px; }
+    .sp-day-lbl { flex: 1; text-align: center; font-size: 9px; opacity: .45; font-weight: 600; }
 
     /* ── Section ── */
     .section{margin-bottom:28px}
@@ -119,7 +208,7 @@
   <div class="modal-overlay" id="withdrawModal">
     <div class="modal-box">
       <div id="withdrawForm">
-        <div class="modal-title">💸 Withdraw Earnings</div>
+        <div class="modal-title">Withdraw Earnings</div>
         <div class="modal-sub">Enter your UPI ID to withdraw your GigLega balance. Simulated — no real transfer.</div>
         <div class="modal-field">
           <label>UPI ID</label>
@@ -135,7 +224,7 @@
         </div>
       </div>
       <div class="withdraw-success" id="withdrawSuccess">
-        <div class="ws-icon">🎉</div>
+        <div class="ws-icon" style="font-size:3rem">✓</div>
         <h4>Withdrawal Initiated!</h4>
         <p>₹<span id="withdrawnAmt">0</span> will be credited to your UPI within 24 hours.<br>(Simulated — Firebase integration pending)</p>
         <button class="btn-confirm-withdraw" style="margin-top:16px" id="withdrawDone">Done</button>
@@ -151,11 +240,11 @@
       <!-- Top bar -->
       <div class="dash-topbar">
         <div class="dash-greeting">
-          <h1 id="greetingText">Welcome back! 👋</h1>
+          <h1 id="greetingText">Welcome back!</h1>
           <p>Worker Dashboard — Track your gigs and earnings</p>
         </div>
         <button class="btn-switch-role" id="btnSwitchRole">
-          🔄 Switch to Poster Mode
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:6px"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>Switch to Poster Mode
         </button>
       </div>
 
@@ -179,13 +268,36 @@
 
       <!-- Wallet card -->
       <div class="wallet-card">
-        <div class="wallet-top">
-          <div>
-            <div class="wallet-label">💰 GigLega Wallet Balance</div>
-            <div class="wallet-amount">₹<span id="walletBalance">0</span></div>
-            <div class="wallet-sub">Withdrawable anytime via UPI</div>
+        <div class="wallet-body">
+          <div class="wallet-top">
+            <div>
+              <div class="wallet-label">GigLega Wallet</div>
+              <div class="wallet-amount">₹<span id="walletBalance">0</span></div>
+              <div class="wallet-amount-sub">Available to withdraw via UPI</div>
+            </div>
+            <button class="btn-withdraw" id="btnWithdraw">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px"><path d="M12 2v20M17 7H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Withdraw
+            </button>
           </div>
-          <button class="btn-withdraw" id="btnWithdraw">Withdraw via UPI 💸</button>
+          <!-- Sparkline: 7-day earnings bars -->
+          <div class="wallet-sparkline">
+            <div class="sparkline-label">7-Day Earnings</div>
+            <div class="sparkline-bars" id="sparklineBars">
+              <div class="sp-bar" style="height:20%"></div>
+              <div class="sp-bar" style="height:0%"></div>
+              <div class="sp-bar" style="height:45%"></div>
+              <div class="sp-bar" style="height:30%"></div>
+              <div class="sp-bar" style="height:0%"></div>
+              <div class="sp-bar" style="height:70%"></div>
+              <div class="sp-bar sp-today" style="height:55%"></div>
+            </div>
+            <div class="sp-day-labels">
+              <span class="sp-day-lbl">S</span><span class="sp-day-lbl">M</span>
+              <span class="sp-day-lbl">T</span><span class="sp-day-lbl">W</span>
+              <span class="sp-day-lbl">T</span><span class="sp-day-lbl">F</span>
+              <span class="sp-day-lbl">S</span>
+            </div>
+          </div>
         </div>
         <div class="wallet-breakdown">
           <div class="wallet-item">
@@ -193,15 +305,15 @@
             <span class="wallet-item-value">₹<span id="totalEarned">0</span></span>
           </div>
           <div class="wallet-item">
-            <span class="wallet-item-label">Gigs Completed</span>
+            <span class="wallet-item-label">Completed</span>
             <span class="wallet-item-value" id="gigsCompleted">0</span>
           </div>
           <div class="wallet-item">
-            <span class="wallet-item-label">Avg per Gig</span>
+            <span class="wallet-item-label">Avg / Gig</span>
             <span class="wallet-item-value">₹<span id="avgEarn">0</span></span>
           </div>
           <div class="wallet-item">
-            <span class="wallet-item-label">Support Fees Paid</span>
+            <span class="wallet-item-label">Fees Paid</span>
             <span class="wallet-item-value">₹<span id="feePaid">0</span></span>
           </div>
         </div>
@@ -209,17 +321,17 @@
 
       <!-- Stats row -->
       <div class="stats-row">
-        <div class="stat-card teal">
+        <div class="stat-card teal"><div class="stat-card-accent"></div>
           <div class="stat-label">Active Gigs</div>
           <div class="stat-value" id="statActive">0</div>
           <div class="stat-sub">Currently in progress</div>
         </div>
-        <div class="stat-card amber">
+        <div class="stat-card amber"><div class="stat-card-accent"></div>
           <div class="stat-label">Completed</div>
           <div class="stat-value" id="statCompleted">0</div>
           <div class="stat-sub">All time</div>
         </div>
-        <div class="stat-card">
+        <div class="stat-card"><div class="stat-card-accent"></div>
           <div class="stat-label">Pending Payment</div>
           <div class="stat-value" id="statPending">₹0</div>
           <div class="stat-sub">From active gigs</div>

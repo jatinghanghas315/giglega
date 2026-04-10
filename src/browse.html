@@ -423,6 +423,99 @@
     }
 
     [data-theme=dark] .gig-card { border-color: var(--gray-700); }
+
+    /* ── Gig card: urgent variant ── */
+    .gig-card.urgent {
+      border-color: rgba(245,158,11,.3);
+    }
+    .gig-card.urgent:hover {
+      border-color: rgba(245,158,11,.5);
+    }
+    .gig-urgent-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      font-size: .68rem;
+      font-weight: 800;
+      background: rgba(245,158,11,.12);
+      color: #b45309;
+      padding: 2px 8px;
+      border-radius: var(--radius-full);
+      letter-spacing: .2px;
+      text-transform: uppercase;
+    }
+    [data-theme=dark] .gig-urgent-badge {
+      background: rgba(245,158,11,.18);
+      color: #fbbf24;
+    }
+
+    /* ── Status badges: clean text-only ── */
+    .gig-status-badge {
+      font-size: .68rem;
+      font-weight: 700;
+      padding: 2px 9px;
+      border-radius: var(--radius-full);
+    }
+    .status-open  { background: rgba(16,185,129,.1); color: #059669; }
+    .status-taken { background: rgba(245,158,11,.1);  color: #b45309; }
+    .status-done  { background: rgba(107,114,128,.1); color: #4b5563; }
+    [data-theme=dark] .status-open  { background: rgba(16,185,129,.15);  color: #34d399; }
+    [data-theme=dark] .status-taken { background: rgba(245,158,11,.15);  color: #fbbf24; }
+    [data-theme=dark] .status-done  { background: rgba(107,114,128,.15); color: #9ca3af; }
+
+    /* ── Earn strip: separated columns ── */
+    .gig-earn-strip {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      background: rgba(13,148,136,.05);
+      border-radius: var(--radius-sm);
+      margin-top: 12px;
+      border: 1px solid rgba(13,148,136,.1);
+    }
+    [data-theme=dark] .gig-earn-strip {
+      background: rgba(13,148,136,.08);
+      border-color: rgba(13,148,136,.15);
+    }
+    .gig-earn-col { display: flex; flex-direction: column; gap: 1px; }
+    .earn-primary .earn-val { color: var(--teal) !important; font-size: 1.05rem !important; }
+    .gig-earn-sep {
+      width: 1px;
+      height: 28px;
+      background: rgba(0,0,0,.1);
+      flex-shrink: 0;
+    }
+    [data-theme=dark] .gig-earn-sep { background: rgba(255,255,255,.1); }
+    .earn-label { font-size: .65rem; color: var(--gray-400); font-weight: 600; text-transform: uppercase; letter-spacing: .3px; }
+    .earn-val   { font-size: .95rem; font-weight: 800; color: var(--teal); font-variant-numeric: tabular-nums; }
+    .budget-val { font-size: .88rem; font-weight: 700; color: var(--text); font-variant-numeric: tabular-nums; }
+    .fee-val    { font-size: .82rem; font-weight: 600; color: var(--gray-400); font-variant-numeric: tabular-nums; }
+
+    /* ── Poster info: name + role ── */
+    .poster-info { display: flex; align-items: center; gap: 8px; }
+    .poster-info-text { display: flex; flex-direction: column; gap: 0; }
+    .poster-name { font-size: .8rem; font-weight: 700; color: var(--text); line-height: 1.2; }
+    .poster-role { font-size: .67rem; color: var(--gray-400); font-weight: 500; }
+
+    /* ── Meta chips: SVG icon alignment ── */
+    .meta-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .meta-chip svg { flex-shrink: 0; opacity: .6; }
+
+    /* ── CTA button ── */
+    .gig-cta-btn {
+      white-space: nowrap;
+      font-size: .8rem !important;
+      padding: 8px 14px !important;
+    }
+
+    /* ── Browse heading: remove emoji ── */
+    .browse-title { font-family: var(--font-display); }
+
     [data-theme=dark] .gig-earn-strip { background: rgba(13,148,136,.1); border-color: rgba(13,148,136,.2); }
 
     /* ══════════════════════════════════
@@ -548,10 +641,10 @@
       <!-- Top -->
       <div class="browse-top">
         <div>
-          <div class="browse-title">Browse Gigs 🔍</div>
+          <div class="browse-title">Browse Gigs</div>
           <div class="browse-subtitle" id="browseSubtitle">Gurugram NCR ke sabse latest gigs</div>
         </div>
-        <a href="post-gig.html" class="btn btn-primary btn-sm">➕ Post a Gig</a>
+        <a href="post-gig.html" class="btn btn-primary btn-sm">Post a Gig</a>
       </div>
 
       <!-- Post Gig Promo (logged-in only) -->
@@ -561,7 +654,7 @@
           <p>Verified workers ko directly reach karo — ek gig post karo aaj hi.</p>
         </div>
         <a href="post-gig.html" class="btn" style="background:#fff;color:var(--primary);font-weight:800;border:none;padding:10px 20px;border-radius:var(--radius-sm);white-space:nowrap;text-decoration:none">
-          ➕ Post a Gig
+          Post a Gig
         </a>
       </div>
 
@@ -646,7 +739,7 @@
         </div>
         <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
           <button class="btn btn-secondary btn-sm" id="btnResetSearch">✕ Clear Search</button>
-          <a href="post-gig.html" class="btn btn-primary btn-sm">➕ Post a Gig</a>
+          <a href="post-gig.html" class="btn btn-primary btn-sm">Post a Gig</a>
         </div>
       </div>
 
@@ -847,11 +940,11 @@
       var container = document.getElementById("activeFilters");
       container.innerHTML = "";
       var tags = [];
-      if (state.category) tags.push({ key:"category", label:"📂 " + state.category });
-      if (state.type) tags.push({ key:"type", label: state.type === "hyperlocal" ? "📍 Hyperlocal" : "🌐 Remote" });
-      if (state.minBudget) tags.push({ key:"minBudget", label:"₹" + state.minBudget + " min" });
-      if (state.maxBudget) tags.push({ key:"maxBudget", label:"₹" + state.maxBudget + " max" });
-      if (state.search) tags.push({ key:"search", label:'🔍 "' + state.search + '"' });
+      if (state.category) tags.push({ key:"category", label:state.category });
+      if (state.type) tags.push({ key:"type", label: state.type === "hyperlocal" ? "Hyperlocal" : "Remote" });
+      if (state.minBudget) tags.push({ key:"minBudget", label:"From ₹" + state.minBudget });
+      if (state.maxBudget) tags.push({ key:"maxBudget", label:"Up to ₹" + state.maxBudget });
+      if (state.search) tags.push({ key:"search", label:"Search: " + state.search });
       tags.forEach(function(t) {
         var el = document.createElement("span");
         el.className = "af-tag";
@@ -901,41 +994,64 @@
     }
 
     /* ── Card ── */
+    var IC_PIN   = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>';
+    var IC_CLOCK = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>';
+    var IC_TAG   = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>';
+    var IC_GLOBE = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>';
+    var IC_ZAP   = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>';
+
     function makeCard(gig) {
       var fee = Math.round((gig.budget||0) * FEE_RATE);
       var earn = (gig.budget||0) - fee;
       var isHyper = gig.type === "hyperlocal" || gig.workType === "on-site";
       var isTaken = gig.status === "taken";
-      return '<div class="gig-card' + (isTaken ? " taken" : "") + '" ' +
-        'onclick="window.location.href=\'gig-detail.html?id=' + escH(gig.id) + '\'">' +
+      var isUrgent = gig.urgency === "urgent" || gig.isUrgent === true;
+      var posterName = escH(gig.posterName || getUserName(gig.posterId) || 'User');
+      var posterInitials = escH(getUserInitials(gig.posterId));
+
+      var statusHtml = gig.status === 'open'
+        ? '<span class="gig-status-badge status-open">Open</span>'
+        : gig.status === 'taken'
+          ? '<span class="gig-status-badge status-taken">Taken</span>'
+          : '<span class="gig-status-badge status-done">Done</span>';
+
+      var urgentBadge = isUrgent
+        ? '<span class="gig-urgent-badge">' + IC_ZAP + ' Urgent</span>'
+        : '';
+
+      var typeTag = isHyper
+        ? '<span class="gig-type-tag tag-hyperlocal">' + IC_PIN + ' Hyperlocal</span>'
+        : '<span class="gig-type-tag tag-remote">' + IC_GLOBE + ' Remote</span>';
+
+      return '<div class="gig-card' + (isTaken ? " taken" : "") + (isUrgent ? " urgent" : "") + '" ' +
+        'onclick="window.location.href='gig-detail.html?id=' + escH(gig.id) + ''">' +
         '<div class="gig-card-left">' +
-        '<div class="gig-top-row">' +
-        '<span class="gig-type-tag ' + (isHyper ? "tag-hyperlocal" : "tag-remote") + '">' + (isHyper ? "📍 Hyperlocal" : "🌐 Remote") + '</span>' +
-        '<span class="gig-status-badge status-' + (gig.status||"open") + '">' + (gig.status === "open" ? "✅ Open" : gig.status === "taken" ? "🔴 Taken" : "✔️ Done") + '</span>' +
-        '</div>' +
-        '<div class="gig-card-title">' + escH(gig.title) + '</div>' +
-        '<div class="gig-card-desc">' + escH((gig.description||"").slice(0,120)) + (gig.description && gig.description.length > 120 ? "…" : "") + '</div>' +
-        '<div class="gig-card-meta">' +
-        '<span class="meta-chip">📍 ' + escH(gig.location||gig.area||"Gurugram") + '</span>' +
-        '<span class="meta-chip">🕐 ' + timeAgo(gig.createdAt) + '</span>' +
-        (gig.category ? '<span class="meta-chip">🏷️ ' + escH(gig.category) + '</span>' : '') +
-        '</div>' +
-        '<div class="gig-earn-strip">' +
-        '<div><div class="earn-label">You Earn</div><div class="earn-val">₹' + earn.toLocaleString("en-IN") + '</div></div>' +
-        '<div style="text-align:right"><div class="earn-label">Budget</div><div class="budget-val">₹' + (gig.budget||0).toLocaleString("en-IN") + '</div></div>' +
-        '</div>' +
+          '<div class="gig-top-row">' + typeTag + urgentBadge + '<div style="margin-left:auto">' + statusHtml + '</div></div>' +
+          '<div class="gig-card-title">' + escH(gig.title) + '</div>' +
+          '<div class="gig-card-desc">' + escH((gig.description||"").slice(0,110)) + (gig.description && gig.description.length > 110 ? "…" : "") + '</div>' +
+          '<div class="gig-card-meta">' +
+            '<span class="meta-chip">' + IC_PIN + ' ' + escH(gig.location||gig.area||"Gurugram") + '</span>' +
+            '<span class="meta-chip">' + IC_CLOCK + ' ' + timeAgo(gig.createdAt) + '</span>' +
+            (gig.category ? '<span class="meta-chip">' + IC_TAG + ' ' + escH(gig.category) + '</span>' : '') +
+          '</div>' +
+          '<div class="gig-earn-strip">' +
+            '<div class="gig-earn-col earn-primary"><div class="earn-label">You Earn</div><div class="earn-val">₹' + earn.toLocaleString("en-IN") + '</div></div>' +
+            '<div class="gig-earn-sep"></div>' +
+            '<div class="gig-earn-col"><div class="earn-label">Budget</div><div class="budget-val">₹' + (gig.budget||0).toLocaleString("en-IN") + '</div></div>' +
+            '<div class="gig-earn-col" style="text-align:right;margin-left:auto"><div class="earn-label">Fee (6%)</div><div class="fee-val">₹' + fee.toLocaleString("en-IN") + '</div></div>' +
+          '</div>' +
         '</div>' +
         '<div class="gig-card-right">' +
-        '<div class="gig-footer">' +
-        '<div class="poster-info">' +
-        '<div class="poster-av">' + escH(getUserInitials(gig.posterId)) + '</div>' +
-        '<span>' + escH(gig.posterName || getUserName(gig.posterId) || 'User') + '</span>' +
+          '<div class="gig-footer">' +
+            '<div class="poster-info">' +
+              '<div class="poster-av">' + posterInitials + '</div>' +
+              '<div class="poster-info-text"><span class="poster-name">' + posterName + '</span><span class="poster-role">Poster</span></div>' +
+            '</div>' +
+            '<a href="gig-detail.html?id=' + escH(gig.id) + '" class="btn btn-primary btn-sm gig-cta-btn" onclick="event.stopPropagation()">' +
+              (isTaken ? 'View' : 'Book Gig') + '</a>' +
+          '</div>' +
         '</div>' +
-        '<a href="gig-detail.html?id=' + escH(gig.id) + '" class="btn btn-primary btn-sm" onclick="event.stopPropagation()" style="white-space:nowrap">' +
-        (isTaken ? "View" : "Book This Gig →") + '</a>' +
-        '</div>' +
-        '</div>' +
-        '</div>';
+      '</div>';
     }
 
     /* ── Pagination ── */
