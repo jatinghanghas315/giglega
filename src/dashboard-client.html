@@ -127,7 +127,34 @@
       </div>
 
       <!-- Stats -->
-      <div class="stats-row">
+      
+    <!-- 🔑 OTP Card — appears when worker requests completion -->
+    <div id="otpCard" style="display:none;margin-bottom:24px;">
+      <div style="background:var(--surface);border:2px solid rgba(245,158,11,.4);border-radius:var(--radius);
+        padding:20px 22px;box-shadow:0 4px 16px rgba(245,158,11,.15);">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+          <span style="font-size:1.5rem;">🔑</span>
+          <div>
+            <div style="font-size:.95rem;font-weight:800;color:var(--text);">Worker ne OTP manga!</div>
+            <div style="font-size:.78rem;color:var(--gray-400);" id="otpGigTitle">—</div>
+          </div>
+          <span style="margin-left:auto;width:10px;height:10px;background:#f59e0b;border-radius:50%;
+            animation:pulse-otp 1.2s ease-in-out infinite;flex-shrink:0;"></span>
+        </div>
+        <div style="font-size:.82rem;color:var(--gray-500);margin-bottom:12px;">
+          Yeh OTP worker ko batao. Jab worker complete kare tab OTP enter karega.
+        </div>
+        <div style="display:flex;gap:8px;justify-content:center;margin-bottom:8px;" id="otpDisplay">
+          <!-- digits filled by JS -->
+        </div>
+        <div style="text-align:center;font-size:.72rem;color:var(--gray-400);" id="otpExpiry"></div>
+      </div>
+    </div>
+    <style>
+      @keyframes pulse-otp{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.5);opacity:.5}}
+    </style>
+
+    <div class="stats-row">
         <div class="stat-card">
           <div class="stat-label">Total Posted</div>
           <div class="stat-value" id="statTotal">0</div>
@@ -190,6 +217,7 @@ onAuthStateChanged(auth, function(user) {
     return;
   }
   currentUser = user;
+      loadOTPCard(user.uid);
   /* Greeting */
   var hour = new Date().getHours();
   var greet = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
@@ -340,6 +368,51 @@ document.getElementById('btnSwitchRole').addEventListener('click', function() {
   window.location.href = 'dashboard-worker.html';
 });
 
+
+
+    /* ── OTP Card (onSnapshot) ── */
+    var _otpUnsub = null;
+    function listenOTPCard(posterId){
+      if(typeof firebase !== 'undefined' || !window._fsOnSnapshot) return;
+      // Import required Firestore functions via module scope — handled below
+    }
+    async function loadOTPCard(posterId){
+      try {
+        // query for gigs with completionRequested == true
+        var q = window._fsQuery(
+          window._fsCollection(window._db, 'gigs'),
+          window._fsWhere('posterId', '==', posterId),
+          window._fsWhere('completionRequested', '==', true),
+          window._fsWhere('status', '==', 'taken'),
+          window._fsLimit(1)
+        );
+        var snap = await window._fsGetDocs(q);
+        if (!snap.empty) {
+          var g = snap.docs[0].data();
+          showOTPCard(g);
+        }
+      } catch(e) {}
+    }
+    function showOTPCard(gig){
+      var card = document.getElementById('otpCard');
+      if(!card) return;
+      card.style.display = 'block';
+      var titleEl = document.getElementById('otpGigTitle');
+      if(titleEl) titleEl.textContent = '"' + (gig.title||'') + '" ke liye OTP';
+      var dispEl = document.getElementById('otpDisplay');
+      if(dispEl && gig.completionOTP){
+        dispEl.innerHTML = String(gig.completionOTP).split('').map(function(d){
+          return '<div style="width:44px;height:52px;background:rgba(245,158,11,.1);border:2px solid rgba(245,158,11,.3);' +
+            'border-radius:8px;display:flex;align-items:center;justify-content:center;' +
+            'font-size:1.6rem;font-weight:800;color:#b45309;">'+d+'</div>';
+        }).join('');
+      }
+      var expEl = document.getElementById('otpExpiry');
+      if(expEl && gig.completionOTPExpiry){
+        var exp = new Date(gig.completionOTPExpiry);
+        expEl.textContent = 'Valid until: ' + exp.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+      }
+    }
 </script>
 </body>
 </html>
