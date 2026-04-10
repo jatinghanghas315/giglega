@@ -9,7 +9,7 @@
    CONFIG
 ══════════════════════════════════ */
 const APP_NAME    = 'GigLega';
-const VERSION     = '1.6.0';
+const VERSION     = '1.7.0';
 const CACHE_NAME  = `giglega-cache-v${VERSION}`;
 const SYNC_TAG    = 'giglega-bg-sync';
 const PUSH_ICON   = '/assets/icons/icon-192.png';
@@ -21,28 +21,10 @@ const PUSH_BADGE  = '/assets/icons/icon-72.png';
 
 /** Core shell — always cache on install */
 const PRECACHE_SHELL = [
-  '/',
-  '/index.html',
+  /* HTML pages intentionally excluded — always fetched fresh from network */
+  /* Only static assets that rarely change are precached */
   '/styles.css',
-  '/shared.js',
   '/manifest.json',
-
-  /* All app pages */
-  '/browse.html',
-  '/chat.html',
-  '/dashboard-worker.html',
-  '/dashboard-client.html',
-  '/notifications.html',
-  '/post-gig.html',
-  '/profile.html',
-  '/reviews.html',
-  '/wallet.html',
-  '/404.html',
-
-  /* Icons & assets */
-  '/assets/icons/icon-72.png',
-  '/assets/icons/icon-96.png',
-  '/assets/icons/icon-144.png',
   '/assets/icons/icon-192.png',
   '/assets/icons/icon-512.png',
 ];
