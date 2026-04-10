@@ -416,11 +416,53 @@
       window._activeConv = { convId: knownConvId, otherUID, gigId };
     }
 
+    /* ── Profanity Filter ── */
+    const _BAD = [
+      // Hindi gaaliyan
+      "madarchod","madar chod","mc","m\\.c","maadar","bc","b\\.c","bhenchod","bhen chod",
+      "behenchod","benchod","bsdk","chutiya","chutiye","choot","chut","lund","lavda","lavde",
+      "gandu","gaand","gaandu","randi","harami","kamina","kamine","saala","saali","saale",
+      "haramzada","haramzadi","ullu ka pattha","bhosdike","bhosdika","bhosdiwala","bsdke",
+      "lodu","lode","jhatu","jhaant","jhaatu","maa ki aankh","maa ka",
+      "teri maa","teri behen","teri ma","teri ma ki","bakrichod","gadha","gadhe",
+      // English profanity
+      "fuck","f\\*ck","f.ck","fucker","fucking","fck","fuk","fuq",
+      "shit","sh!t","sh1t","shitt","bullshit",
+      "bitch","b!tch","b1tch","biatch",
+      "asshole","ass hole","a\\$\\$","arse",
+      "bastard","bastar","cunt","c.nt",
+      "dick","d!ck","cock","c0ck",
+      "pussy","whore","wh0re","slut","sl\\*t",
+      "motherfucker","mother fucker","mf","nigger","nigga"
+    ];
+    const _BAD_RX = new RegExp(
+      "(?:^|[\\s,\\.!?]|(?<=[^a-z]))(" + _BAD.join("|") + ")(?:[\\s,\\.!?]|(?=[^a-z])|$)",
+      "i"
+    );
+    // Simple fallback for environments without lookbehind
+    let _BAD_RX_SIMPLE;
+    try { _BAD_RX_SIMPLE = _BAD_RX; new RegExp("(?<=x)"); }
+    catch(_){ _BAD_RX_SIMPLE = new RegExp("(" + _BAD.join("|") + ")", "i"); }
+
+    function containsProfanity(text) {
+      const t = text.toLowerCase().replace(/[*@$!0]/g, c=>({
+        '*':'i','@':'a','$':'s','!':'i','0':'o'
+      }[c]||c));
+      return _BAD_RX_SIMPLE.test(t);
+    }
+
     /* ── Send message ── */
     window.sendMessage = async function(){
       const input = document.getElementById("msgInput");
       const text  = (input.value||"").trim();
       if(!text || !window._activeConv) return;
+      if(containsProfanity(text)){
+        input.style.border = "1.5px solid #dc2626";
+        setTimeout(()=>{ input.style.border = ""; }, 2000);
+        if(typeof showToast==="function")
+          showToast("🚫 Abusive language allowed nahi hai. Respectful raho!", "error", 3500);
+        return;
+      }
       input.value="";
       const { convId } = window._activeConv;
       try {
@@ -539,4 +581,5 @@
     onchange="if(this.files[0]) uploadMedia(this.files[0])" />
 </body>
 </html>
+
 
