@@ -378,24 +378,11 @@
   <div id="main-footer" role="contentinfo"></div>
 
   <script type="module">
-    import { getApps, initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
-    import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
-    import { getFirestore, collection, query, where, limit,
+        import { auth, db } from './firebase-config.js';
+    import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+    import { collection, query, where, limit,
              getDocs, doc, getDoc, onSnapshot, updateDoc, addDoc, serverTimestamp }
       from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
-
-    /* ── Safe Firebase init (avoids duplicate app error) ── */
-    var FB_CFG = {
-      apiKey:"AIzaSyDTLKfbQc3HuF5mPxfyVJtMwI7DEkPi_7g",
-      authDomain:"giglega-v2.firebaseapp.com",
-      projectId:"giglega-v2",
-      storageBucket:"giglega-v2.appspot.com",
-      messagingSenderId:"726280449452",
-      appId:"1:726280449452:web:7c2a47d23c41f4a67e8c5d"
-    };
-    var app  = getApps().length ? getApps()[0] : initializeApp(FB_CFG);
-    var auth = getAuth(app);
-    var db   = getFirestore(app);
 
     /* ── State ── */
     var currentUser = null;
