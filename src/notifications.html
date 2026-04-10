@@ -581,8 +581,8 @@
       padding: 11px 14px; margin-bottom: 16px;
       font-size: .85rem; line-height: 1.65;
     }
-    .ni-box.teal   { background: rgba(13,148,136,.07); border-left: 3px solid var(--teal); }
-    .ni-box.warn   { background: rgba(245,158,11,.07); border-left: 3px solid #f59e0b; }
+    .ni-box.teal   { background: rgba(13,148,136,.07); }
+    .ni-box.warn   { background: rgba(245,158,11,.07); }
 
     /* ══════════════════════════════════
        SWIPE HINT (mobile)
@@ -596,6 +596,17 @@
     @media(max-width:500px) { .swipe-hint { display: block; } }
 
   </style>
+  <link rel="canonical" href="https://giglega.vercel.app/notifications.html">
+  <meta property="og:type"        content="website">
+  <meta property="og:title"       content="Notifications — GigLega">
+  <meta property="og:description" content="Stay updated on your gig bookings, completions, and account activity on GigLega.">
+  <meta property="og:image"       content="https://giglega.vercel.app/assets/og-banner.png">
+  <meta property="og:url"         content="https://giglega.vercel.app/notifications.html">
+  <meta property="og:site_name"   content="GigLega">
+  <meta name="twitter:card"       content="summary_large_image">
+  <meta name="twitter:title"      content="Notifications — GigLega">
+  <meta name="twitter:description" content="Stay updated on your gig bookings, completions, and account activity on GigLega.">
+  <meta name="twitter:image"      content="https://giglega.vercel.app/assets/og-banner.png">
 </head>
 <body>
 
@@ -605,7 +616,7 @@
 
   <div class="notif-toast" id="notifToast"></div>
 
-  <main class="notif-wrapper">
+  <main id="main-content" class="notif-wrapper">
 
     <!-- ══════════════════════════════════
          HERO
@@ -1085,8 +1096,15 @@
     if(!list) return;
     list.innerHTML = '<div style="text-align:center;padding:48px;color:var(--gray-400)">⏳ Loading...</div>';
 
-    const q = query(collection(db,"notifications",uid,"items"), orderBy("timestamp","desc"), limit(50));
+    // No orderBy — avoid missing-index errors; sort in JS by timestamp
+    const q = query(collection(db,"notifications",uid,"items"), limit(50));
     onSnapshot(q, snap => {
+      // Sort by timestamp DESC in JS (avoids Firestore composite index requirement)
+      const sortedDocs = snap.docs.slice().sort(function(a,b){
+        const ta = a.data().timestamp ? (a.data().timestamp.seconds||0) : 0;
+        const tb = b.data().timestamp ? (b.data().timestamp.seconds||0) : 0;
+        return tb - ta;
+      });
       const unread = snap.docs.filter(d=>!d.data().read).length;
       if(unreadEl) unreadEl.textContent = unread;
 

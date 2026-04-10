@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
+  <meta name="description" content="Post a hyperlocal gig on GigLega — connect with verified workers near you in Gurugram for cleaning, delivery, tutoring and more.">
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
   <title>Post a Gig — GigLega</title>
     <meta name="description" content="Post a gig on GigLega — Gurugram's #1 hyperlocal platform. Kaam post karo free mein, workers same-day apply karte hain. 6% low fee."/>
@@ -72,7 +73,7 @@
     .field-label{font-size:.76rem;font-weight:700;color:var(--gray-500);text-transform:uppercase;
       letter-spacing:.3px;margin-bottom:7px;display:flex;align-items:center;gap:5px;}
     .req{color:var(--primary);font-size:.9rem;}
-    .field-input{width:100%;padding:11px 14px;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);
+    .field-input{width:100%;padding:11px 14px;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);font-size:1rem;
       background:var(--bg);color:var(--text);font-size:.9rem;font-family:inherit;
       transition:border-color .2s,box-shadow .2s;outline:none;}
     .field-input:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(1,105,111,.09);}
@@ -207,11 +208,22 @@
     .success-box{background:var(--surface);border-radius:var(--radius);padding:32px 28px;
       text-align:center;max-width:360px;width:100%;box-shadow:var(--shadow-lg);}
   </style>
+  <link rel="canonical" href="https://giglega.vercel.app/post-gig.html">
+  <meta property="og:type"        content="website">
+  <meta property="og:title"       content="Post a Gig — GigLega">
+  <meta property="og:description" content="Post your hyperlocal gig on GigLega and connect with verified workers nearby in minutes.">
+  <meta property="og:image"       content="https://giglega.vercel.app/assets/og-banner.png">
+  <meta property="og:url"         content="https://giglega.vercel.app/post-gig.html">
+  <meta property="og:site_name"   content="GigLega">
+  <meta name="twitter:card"       content="summary_large_image">
+  <meta name="twitter:title"      content="Post a Gig — GigLega">
+  <meta name="twitter:description" content="Post your hyperlocal gig on GigLega and connect with verified workers nearby in minutes.">
+  <meta name="twitter:image"      content="https://giglega.vercel.app/assets/og-banner.png">
 </head>
 <body>
 <div class="pg-bg-dots"></div>
 <div id="main-nav" role="navigation"></div>
-<main>
+<main id="main-content">
 <div class="pg-wrap">
 
   <div style="margin-bottom:24px;">
@@ -648,7 +660,7 @@ function submitGig(){
     duration:selDur==='custom'?(hrs+' hours'):selDur, durationHrs:hrs,
     hoursNote:'', additionalNotes:$('fNotes').value||'',
     status:'open', lat:posterLat, lng:posterLng,
-    posterId:currentUser.uid, posterName:currentUser.displayName||'User',
+    posterId:currentUser.uid, posterName:(function(){ try{ var u=JSON.parse(localStorage.getItem('gl_user')||'{}'); return u.name||currentUser.displayName||'User'; }catch(e){ return currentUser.displayName||'User'; } })(),
     type:'hyperlocal', createdAt:serverTimestamp(), createdAtISO:new Date().toISOString(),
     applications:0, views:0, images:[]
   };

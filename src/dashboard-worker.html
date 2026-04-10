@@ -199,6 +199,17 @@
     [data-theme=dark] .modal-field input{border-color:var(--gray-600);background:var(--gray-800)}
     [data-theme=dark] .btn-cancel-modal{border-color:var(--gray-600);color:var(--gray-300)}
   </style>
+  <link rel="canonical" href="https://giglega.vercel.app/dashboard-worker.html">
+  <meta property="og:type"        content="website">
+  <meta property="og:title"       content="Worker Dashboard — GigLega">
+  <meta property="og:description" content="Track your active gigs, earnings, and ratings on GigLega.">
+  <meta property="og:image"       content="https://giglega.vercel.app/assets/og-banner.png">
+  <meta property="og:url"         content="https://giglega.vercel.app/dashboard-worker.html">
+  <meta property="og:site_name"   content="GigLega">
+  <meta name="twitter:card"       content="summary_large_image">
+  <meta name="twitter:title"      content="Worker Dashboard — GigLega">
+  <meta name="twitter:description" content="Track your active gigs, earnings, and ratings on GigLega.">
+  <meta name="twitter:image"      content="https://giglega.vercel.app/assets/og-banner.png">
 </head>
 <body>
   <div id="announce-bar"></div>
@@ -232,7 +243,7 @@
     </div>
   </div>
 
-  <main class="page-wrapper">
+  <main id="main-content" class="page-wrapper">
     <div class="dash-wrap">
 
       <nav id="breadcrumb" aria-label="breadcrumb"></nav>
@@ -399,13 +410,24 @@ if (!user) {
     });
 
     /* ── Data helpers ── */
-    function getGigs() { return JSON.parse(localStorage.getItem(GIG_KEY) || "[]"); }
+    /* ── Load worker's gigs from Firestore (worker = gig.workerId) ── */
+    var workerGigs = [];
+    var _gigUnSub  = null;
 
-    function getMyGigs() {
-      var all = getGigs();
-      return all.filter(function (g) {
-        return g.takenBy === user.id || g.takenBy === user.name;
-      });
+    function getMyGigs()  { return workerGigs.filter(function(g){ return g.status==="taken"; }); }
+    function getCompletedGigs() { return workerGigs.filter(function(g){ return g.status==="completed" || g.status==="done"; }); }
+
+    async function loadWorkerGigs(){
+      try{
+        var fs    = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js');
+        var fbApp = await import('./firebase-config.js');
+        var q = fs.query(fs.collection(fbApp.db,'gigs'), fs.where('workerId','==',user.uid||user.id));
+        if(_gigUnSub) _gigUnSub();
+        _gigUnSub = fs.onSnapshot(q, function(snap){
+          workerGigs = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
+          render();
+        }, function(err){ console.warn('[GigLega] worker gigs:', err.message); });
+      }catch(e){ console.warn('[GigLega] loadWorkerGigs:', e.message); }
     }
 
     /* ── Time ago ── */
@@ -427,7 +449,7 @@ if (!user) {
     function render() {
       var myGigs   = getMyGigs();
       var active   = myGigs.filter(function (g) { return g.status === "taken"; });
-      var completed= myGigs.filter(function (g) { return g.status === "completed"; });
+      var completed = getCompletedGigs();
 
       /* Wallet calc */
       var totalEarned = 0;
@@ -575,34 +597,38 @@ if (!user) {
 
     /* ── Storage sync ── */
     window.addEventListener("storage", function (e) {
-      if (e.key === GIG_KEY) render(); if (e.key === USER_KEY && e.newValue) { try { user = JSON.parse(e.newValue); } catch(ex){} if(user&&user.id){var h=new Date().getHours();var g2=h<12?'Good morning':h<17?'Good afternoon':'Good evening';var el=document.getElementById('greetingText');if(el)el.textContent=g2+', '+(user.name||'Worker')+'! 👋';render();} }
+      if (e.key === USER_KEY && e.newValue) { try { user = JSON.parse(e.newValue); } catch(ex){} if(user&&user.id){var h=new Date().getHours();var g2=h<12?'Good morning':h<17?'Good afternoon':'Good evening';var el=document.getElementById('greetingText');if(el)el.textContent=g2+', '+(user.name||'Worker')+'! 👋';render();} }
     });
 
-    render();
+    loadWorkerGigs(); // loads from Firestore, calls render() on each snapshot
 
   })();
   
 
-    /* ── Active Gig Banner ── */
+    /* ── Active Gig Banner — via Firestore ── */
     async function loadActiveBanner(uid){
       try{
-        var q=window._fsQuery(window._fsCollection(window._db,'gigs'),
-          window._fsWhere('workerId','==',uid),
-          window._fsWhere('status','==','taken'),
-          window._fsLimit(1));
-        var snap=await window._fsGetDocs(q);
+        var fs = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js');
+        var fbApp = await import('./firebase-config.js');
+        var q = fs.query(
+          fs.collection(fbApp.db, 'gigs'),
+          fs.where('workerId', '==', uid),
+          fs.where('status',   '==', 'taken'),
+          fs.limit(1)
+        );
+        var snap = await fs.getDocs(q);
         if(!snap.empty){
-          var g=snap.docs[0].data();
-          var banner=document.getElementById('activeGigBanner');
+          var g      = snap.docs[0].data();
+          var banner = document.getElementById('activeGigBanner');
           if(banner){
-            banner.style.display='block';
-            var t=document.getElementById('activeBannerTitle');
-            var l=document.getElementById('activeBannerLoc');
-            if(t) t.textContent=g.title||'Active Gig';
-            if(l) l.textContent=g.location||'';
+            banner.style.display = 'block';
+            var t = document.getElementById('activeBannerTitle');
+            var l = document.getElementById('activeBannerLoc');
+            if(t) t.textContent = g.title    || 'Active Gig';
+            if(l) l.textContent = g.location || '';
           }
         }
-      }catch(e){}
+      }catch(e){ console.warn('[GigLega] banner load:', e.message); }
     }
     loadActiveBanner(user.uid);
 </script>

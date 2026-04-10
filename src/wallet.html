@@ -880,6 +880,17 @@
     }
 
   </style>
+  <link rel="canonical" href="https://giglega.vercel.app/wallet.html">
+  <meta property="og:type"        content="website">
+  <meta property="og:title"       content="My Wallet — GigLega">
+  <meta property="og:description" content="Manage your GigLega earnings, withdraw to UPI, and view transaction history.">
+  <meta property="og:image"       content="https://giglega.vercel.app/assets/og-banner.png">
+  <meta property="og:url"         content="https://giglega.vercel.app/wallet.html">
+  <meta property="og:site_name"   content="GigLega">
+  <meta name="twitter:card"       content="summary_large_image">
+  <meta name="twitter:title"      content="My Wallet — GigLega">
+  <meta name="twitter:description" content="Manage your GigLega earnings, withdraw to UPI, and view transaction history.">
+  <meta name="twitter:image"      content="https://giglega.vercel.app/assets/og-banner.png">
 </head>
 <body>
 
@@ -896,7 +907,7 @@
       <div class="wl-modal-title">Withdrawal Successful!</div>
       <div class="wl-modal-body">
         <strong id="modalAmount">₹2,000</strong> ka withdrawal request bhej diya gaya hai.<br>
-        UPI ID <strong>arjunsingh@okaxis</strong> pe<br>
+        aapke registered UPI ID pe<br>
         <strong>30 minutes</strong> mein credit ho jayega.
       </div>
       <div class="wl-modal-ref" id="modalRef">Ref: GL-WD-2026031401</div>
@@ -904,7 +915,7 @@
     </div>
   </div>
 
-  <main class="wl-wrapper">
+  <main id="main-content" class="wl-wrapper">
 
     <!-- ══════════════════════════════════
          HERO
@@ -1130,7 +1141,7 @@
                 <div class="upi-selector" style="margin-bottom:12px" onclick="openTab('upi')">
                   <div class="upi-app-icon">G</div>
                   <div class="upi-info">
-                    <div class="upi-id">arjunsingh@okaxis</div>
+                    <div class="upi-id" id="primaryUpiDisplay">—</div>
                     <div class="upi-name">Google Pay · Primary</div>
                   </div>
                   <div class="upi-arrow">›</div>
@@ -1208,7 +1219,7 @@
                   class="amount-input"
                   id="withdrawAmount"
                   placeholder="0"
-                  min="100" max="8240"
+                  min="100" id="withdrawAmtInput"
                   oninput="handleAmountInput(this)"
                 />
                 <div class="amount-avail">
@@ -1221,14 +1232,14 @@
                 <button class="qa-chip" onclick="setAmount(1000)">₹1,000</button>
                 <button class="qa-chip" onclick="setAmount(2000)">₹2,000</button>
                 <button class="qa-chip" onclick="setAmount(5000)">₹5,000</button>
-                <button class="qa-chip" onclick="setAmount(8240)">All ₹8,240</button>
+                <button class="qa-chip" id="chipAll" onclick="setAmount(window.currentBalance||0)">All Balance</button>
               </div>
 
               <label style="font-size:.8rem;font-weight:700;color:rgba(255,255,255,.7);display:block;margin-bottom:8px">Withdraw To</label>
               <div class="upi-selector" id="upiSelectorWithdraw" onclick="openTab('upi')">
                 <div class="upi-app-icon">G</div>
                 <div class="upi-info">
-                  <div class="upi-id">arjunsingh@okaxis</div>
+                  <div class="upi-id" id="withdrawUpiDisplay">—</div>
                   <div class="upi-name">Google Pay · Primary · ✅ Verified</div>
                 </div>
                 <div class="upi-arrow">✏️</div>
@@ -1309,7 +1320,7 @@
                 </div>
                 <div class="stat-row">
                   <span class="sr-lbl">Last Login</span>
-                  <span class="sr-val">Today 5:10 PM</span>
+                  <span class="sr-val" id="lastLoginDisplay">—</span>
                 </div>
               </div>
             </div>
@@ -1338,7 +1349,7 @@
                   <div class="upi-card-item default">
                     <div class="uci-app-wrap" style="background:linear-gradient(135deg,#1a73e8,#4285f4)">G</div>
                     <div class="uci-info">
-                      <div class="uci-id">arjunsingh@okaxis</div>
+                      <div class="uci-id">—</div>
                       <div class="uci-meta">
                         Google Pay · Linked Mar 2026
                         <span class="uci-default-badge">✓ Default</span>
@@ -1353,15 +1364,15 @@
                   <div class="upi-card-item">
                     <div class="uci-app-wrap" style="background:linear-gradient(135deg,#5f259f,#7b2ff7)">P</div>
                     <div class="uci-info">
-                      <div class="uci-id">9876543210@ybl</div>
+                      <div class="uci-id">—</div>
                       <div class="uci-meta">
                         PhonePe · Linked Feb 2026
                         <span class="uci-default-badge" style="background:rgba(16,185,129,.1);color:#059669">✓ Verified</span>
                       </div>
                     </div>
                     <div class="uci-actions">
-                      <button class="btn-uci btn-uci-default" onclick="setDefaultUPI(this,'9876543210@ybl')">Set Default</button>
-                      <button class="btn-uci btn-uci-remove" onclick="removeUPI(this,'9876543210@ybl')">Remove</button>
+                      <button class="btn-uci btn-uci-default" onclick="setDefaultUPI(this,'')">Set Default</button>
+                      <button class="btn-uci btn-uci-remove" onclick="removeUPI(this,'')">Remove</button>
                     </div>
                   </div>
 
@@ -1420,7 +1431,7 @@
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
                   <div>
                     <label class="ff-label-sm">Account Holder Name</label>
-                    <input class="ff-input-sm" type="text" placeholder="Arjun Singh" />
+                    <input class="ff-input-sm" type="text" id="bankAccountName" placeholder="Account holder name" />
                   </div>
                   <div>
                     <label class="ff-label-sm">Account Number</label>
@@ -1499,7 +1510,7 @@
               tumhe <strong>₹100 bonus</strong> milega aur unhe bhi <strong>₹50 welcome bonus</strong>!
             </div>
             <div class="rh-code-box">
-              <div class="rh-code">ARJUN100</div>
+              <div class="rh-code" id="referralCodeDisplay">Loading...</div>
               <button class="btn-rh-copy" onclick="copyCode()">📋 Copy Code</button>
               <button class="btn-rh-copy" onclick="showToast('WhatsApp share opened!')">📱 Share on WhatsApp</button>
             </div>
@@ -1563,7 +1574,7 @@
                         <div style="display:flex;align-items:center;gap:9px">
                           <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#a78bfa);display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:800;color:#fff;flex-shrink:0">SK</div>
                           <div>
-                            <div style="font-size:.86rem;font-weight:800">Sunil Kumar</div>
+                            <div style="font-size:.86rem;font-weight:800">—</div>
                             <div style="font-size:.72rem;color:var(--gray-400)">+91 97xx xxxx 44</div>
                           </div>
                         </div>
@@ -1577,7 +1588,7 @@
                         <div style="display:flex;align-items:center;gap:9px">
                           <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#d97706,#fbbf24);display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:800;color:#fff;flex-shrink:0">PD</div>
                           <div>
-                            <div style="font-size:.86rem;font-weight:800">Pankaj Das</div>
+                            <div style="font-size:.86rem;font-weight:800">—</div>
                             <div style="font-size:.72rem;color:var(--gray-400)">+91 99xx xxxx 77</div>
                           </div>
                         </div>
@@ -1645,41 +1656,131 @@
     </div><!-- /wl-body -->
   </main>
 
+  <!-- ══ Firestore wallet integration ══ -->
+  <script type="module">
+    import { auth, db } from './firebase-config.js';
+    import {
+      doc, getDoc, setDoc, collection, onSnapshot,
+      addDoc, serverTimestamp, query, orderBy, limit, getDocs
+    } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+    import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+
+    function fmt(n){ return Number(n||0).toLocaleString('en-IN'); }
+
+    onAuthStateChanged(auth, async function(user){
+      if(!user){ window.location.replace('login.html?redirect=wallet.html'); return; }
+
+      const uid = user.uid;
+      // Populate referral code
+      (function(){
+        const refEl = document.getElementById('referralCodeDisplay');
+        if(refEl){ refEl.textContent = 'GL' + uid.substring(0,6).toUpperCase(); }
+      })();
+      // Populate last login display
+      (function(){
+        const llEl = document.getElementById('lastLoginDisplay');
+        if(llEl){
+          const now = new Date();
+          llEl.textContent = 'Today ' + now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+        }
+      })();
+
+      /* ── Watch wallet doc for live balance ── */
+      onSnapshot(doc(db,'wallets',uid), function(snap){
+        const data = snap.exists() ? snap.data() : {};
+        const bal  = data.balance || 0;
+
+        // Update all balance displays
+        const heroEl  = document.getElementById('heroBalance');
+        const availEl = document.getElementById('availBal');
+        if(heroEl)  heroEl.textContent  = fmt(bal);
+        if(availEl) availEl.textContent = '₹' + fmt(bal);
+
+        // Sync the global currentBalance used by the withdraw logic
+        window.currentBalance = bal;
+        // Sync withdraw input max + chip
+        const wInput = document.getElementById('withdrawAmtInput');
+        if(wInput){ wInput.max = bal; wInput.placeholder = 'Max ₹' + bal.toLocaleString('en-IN'); }
+        const chipAll = document.getElementById('chipAll');
+        if(chipAll) chipAll.textContent = 'All ₹' + bal.toLocaleString('en-IN');
+
+        // Update stats if present
+        const earnEl    = document.getElementById('statTotalEarned');
+        const withdrawEl= document.getElementById('statTotalWithdrawn');
+        if(earnEl)     earnEl.textContent     = '₹' + fmt(data.totalEarned || 0);
+        if(withdrawEl) withdrawEl.textContent = '₹' + fmt(data.totalWithdrawn || 0);
+      });
+
+      /* ── Load real transactions ── */
+      try {
+        const txSnap = await getDocs(
+          query(collection(db,'wallets',uid,'transactions'), limit(50))
+        );
+        if(!txSnap.empty){
+          // Group by date for the existing renderTxns format
+          const grouped = {};
+          txSnap.docs.forEach(function(d){
+            const tx   = d.data();
+            const ts   = tx.createdAt ? (tx.createdAt.toDate ? tx.createdAt.toDate() : new Date(tx.createdAt)) : new Date();
+            const label= ts.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+            if(!grouped[label]) grouped[label] = [];
+            grouped[label].push({
+              type:   tx.type||'credit',
+              icon:   tx.type==='debit'?'📤':tx.type==='pending'?'⏳':'💰',
+              title:  tx.title  || tx.description || 'Transaction',
+              meta:   tx.meta   || tx.ref || '',
+              amount: (tx.type==='credit'?'+':'−')+'₹'+fmt(tx.amount||0),
+              time:   ts.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})
+            });
+          });
+          const txData = Object.keys(grouped).map(function(d){ return {date:d, items:grouped[d]}; });
+          // Replace TRANSACTIONS used by renderTxns if that function exists
+          if(typeof window.renderTxns === 'function'){
+            window._REAL_TXN_DATA = txData;
+            window.renderTxns('txnListRecent', txData, 5);
+            window.renderTxns('txnListAll',    txData);
+          }
+        }
+      } catch(e){ console.warn('[GigLega] wallet txns:', e.message); }
+
+      /* ── Expose Firestore withdraw for initiateWithdraw ── */
+      window._saveWithdrawToFirestore = async function(amount, upiId){
+        try {
+          const ref = await addDoc(collection(db,'wallets',uid,'transactions'),{
+            type:       'debit',
+            amount:     amount,
+            title:      'Withdrawal to '+(upiId||'UPI'),
+            meta:       'UPI Withdrawal · GigLega Wallet',
+            createdAt:  serverTimestamp(),
+            status:     'pending'
+          });
+          // Decrement balance in wallet doc
+          const walSnap = await getDoc(doc(db,'wallets',uid));
+          const cur = walSnap.exists() ? (walSnap.data().balance||0) : 0;
+          await setDoc(doc(db,'wallets',uid), {
+            balance:        Math.max(0, cur - amount),
+            totalWithdrawn: (walSnap.data()?.totalWithdrawn||0) + amount,
+            updatedAt:      serverTimestamp()
+          }, { merge: true });
+          return ref.id;
+        } catch(e){
+          console.error('[GigLega] withdraw save:', e.message);
+          return null;
+        }
+      };
+    });
+  </script>
+
   <script>
 
     /* ══════════════════════════════════
        TRANSACTION DATA
     ══════════════════════════════════ */
-    const TRANSACTIONS = [
-      { date:"Today, Mar 14", items:[
-        { type:"credit",  icon:"📦", title:"Warehouse Packing Gig Payment", meta:"#GL-2026-0314 · Auto-released", amount:"+₹1,128", time:"5:14 PM" },
-        { type:"debit",   icon:"📤", title:"Withdrawal to arjunsingh@okaxis", meta:"UPI · Google Pay · Ref: GL-WD-031401", amount:"−₹2,000", time:"11:30 AM" },
-        { type:"credit",  icon:"🎁", title:"Referral Bonus — Pankaj Das", meta:"First gig completed · Code: ARJUN100", amount:"+₹100", time:"9:15 AM" },
-      ]},
-      { date:"Yesterday, Mar 13", items:[
-        { type:"pending", icon:"⏳", title:"Grocery Delivery Payment — Pending Release", meta:"#GL-2026-0316 · Awaiting completion", amount:"₹1,504", time:"7:00 PM" },
-        { type:"credit",  icon:"🎁", title:"Referral Bonus — Sunil Kumar", meta:"First gig completed · Code: ARJUN100", amount:"+₹100", time:"3:40 PM" },
-      ]},
-      { date:"Mar 5, 2026", items:[
-        { type:"credit",  icon:"🚛", title:"Office Relocation Gig Payment", meta:"#GL-2026-0305 · Gurugram", amount:"+₹3,290", time:"9:00 PM" },
-        { type:"debit",   icon:"📤", title:"Withdrawal to arjunsingh@okaxis", meta:"UPI · Ref: GL-WD-030501", amount:"−₹3,000", time:"9:15 PM" },
-      ]},
-      { date:"Feb 28, 2026", items:[
-        { type:"credit",  icon:"🛵", title:"Grocery Delivery Gig Payment", meta:"#GL-2026-0228 · Sector 29", amount:"+₹1,504", time:"6:30 PM" },
-        { type:"refund",  icon:"↩️", title:"Cancelled Gig Refund", meta:"Event Setup cancelled by client · Auto-refund", amount:"+₹200", time:"2:15 PM" },
-      ]},
-      { date:"Feb 20, 2026", items:[
-        { type:"credit",  icon:"🎪", title:"Corporate Event Setup Payment", meta:"#GL-2026-0220 · DLF Cyber Hub", amount:"+₹1,410", time:"11:00 PM" },
-        { type:"debit",   icon:"📤", title:"Withdrawal to 9876543210@ybl", meta:"PhonePe · Ref: GL-WD-022001", amount:"−₹1,400", time:"11:05 PM" },
-      ]},
-    ];
+    /* TRANSACTIONS now loaded live from Firestore wallets/{uid}/transactions
+       via the module <script type="module"> above — this array is empty fallback */
+    const TRANSACTIONS = []; // loaded from Firestore via module above
 
-    const WITHDRAW_HISTORY = [
-      { icon:"📤", title:"Withdrawal to arjunsingh@okaxis", meta:"Google Pay · Today 11:30 AM · Ref: GL-WD-031401", amount:"−₹2,000", time:"Today", status:"credit" },
-      { icon:"📤", title:"Withdrawal to arjunsingh@okaxis", meta:"Google Pay · Mar 5 · Ref: GL-WD-030501", amount:"−₹3,000", time:"Mar 5", status:"credit" },
-      { icon:"📤", title:"Withdrawal to 9876543210@ybl", meta:"PhonePe · Feb 20 · Ref: GL-WD-022001", amount:"−₹1,400", time:"Feb 20", status:"credit" },
-      { icon:"📤", title:"Withdrawal to arjunsingh@okaxis", meta:"Google Pay · Feb 12 · Ref: GL-WD-021201", amount:"−₹2,800", time:"Feb 12", status:"credit" },
-    ];
+    const WITHDRAW_HISTORY = []; // loaded from Firestore via module above
 
     /* ══════════════════════════════════
        RENDER TRANSACTIONS
@@ -1833,7 +1934,7 @@
     /* ══════════════════════════════════
        WITHDRAW LOGIC
     ══════════════════════════════════ */
-    let currentBalance = 8240;
+    let currentBalance = window.currentBalance || 0; // synced by Firestore module above
 
     function handleAmountInput(el) {
       const val = parseInt(el.value) || 0;
@@ -1874,6 +1975,12 @@
         currentBalance -= amount;
         document.getElementById("heroBalance").textContent = currentBalance.toLocaleString("en-IN");
         document.getElementById("availBal").textContent = "₹" + currentBalance.toLocaleString("en-IN");
+        // Also save to Firestore if available
+        const upiEl = document.getElementById("upiSelectorWithdraw");
+        const upiId = upiEl ? (upiEl.dataset.selected || "") : "";
+        if(typeof window._saveWithdrawToFirestore === 'function'){
+          window._saveWithdrawToFirestore(amount, upiId);
+        }
 
         document.getElementById("modalAmount").textContent = "₹" + amount.toLocaleString("en-IN");
         document.getElementById("modalRef").textContent = "Ref: GL-WD-2026031401";
@@ -1951,7 +2058,7 @@
        REFER CODE COPY
     ══════════════════════════════════ */
     function copyCode() {
-      navigator.clipboard?.writeText("ARJUN100").catch(() => {});
+      navigator.clipboard?.writeText(document.getElementById("referralCodeDisplay")?.textContent||"").catch(() => {});
       showToast("✅ Referral code copied!");
     }
 
@@ -1972,6 +2079,7 @@
   </script>
 
   <footer id="main-footer"></footer>
+  <h1 class="sr-only">My Wallet — GigLega</h1>
   <div id="toast-container"></div>
 </body>
 </html>

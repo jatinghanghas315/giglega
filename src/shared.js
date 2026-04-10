@@ -115,6 +115,12 @@
     localStorage.removeItem(GL.STORAGE_KEY_USER);
     sessionStorage.removeItem(GL.STORAGE_KEY_USER);
     showToast("👋 Logged out successfully.", "success");
+    // Also sign out of Firebase Auth so onAuthStateChanged fires correctly
+    try {
+      import('https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js')
+        .then(function(m){ return m.signOut(m.getAuth()); })
+        .catch(function(){});
+    } catch(_e) {}
     setTimeout(function () { window.location.href = "index.html"; }, 900);
   }
 
@@ -313,6 +319,16 @@
   function renderNav() {
     var el = document.getElementById("main-nav");
     if (!el) return;
+
+    // ── Skip-to-content link (accessibility) ──
+    if (!document.getElementById("gl-skip-link")) {
+      var skip = document.createElement("a");
+      skip.id        = "gl-skip-link";
+      skip.href      = "#main-content";
+      skip.className = "sr-only-focusable";
+      skip.textContent = "Skip to content";
+      document.body.insertBefore(skip, document.body.firstChild);
+    }
 
     var user      = getCurrentUser();
     var theme     = getTheme();

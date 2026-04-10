@@ -185,7 +185,7 @@
     }
     .poster-avatar-lg {
       width: 52px; height: 52px; border-radius: 50%;
-      background: linear-gradient(135deg, var(--primary), var(--teal));
+      background: var(--primary);
       display: flex; align-items: center; justify-content: center;
       font-size: .95rem; font-weight: 800; color: #fff;
       flex-shrink: 0;
@@ -216,7 +216,7 @@
     .similar-card:hover .similar-title { color: var(--teal); }
     .similar-icon {
       width: 40px; height: 40px; border-radius: 10px;
-      background: linear-gradient(135deg, rgba(26,60,94,.08), rgba(13,148,136,.08));
+      background: rgba(13,148,136,.06);
       display: flex; align-items: center; justify-content: center;
       font-size: 1.1rem; flex-shrink: 0;
     }
@@ -262,7 +262,7 @@
     .btn-accept {
       width: 100%;
       padding: 14px;
-      background: linear-gradient(135deg, var(--primary) 0%, var(--teal) 100%);
+      background: var(--primary);
       color: #fff; border: none; border-radius: var(--radius-sm);
       font-weight: 800; font-size: 1rem; cursor: pointer;
       font-family: var(--font);
@@ -502,13 +502,14 @@
     }
 
   </style>
+  <link rel="canonical" href="https://giglega.vercel.app/gig-detail.html">
 </head>
 <body>
   <div id="page-loader"></div>
   <div id="announce-bar"></div>
   <nav id="main-nav"></nav>
 
-  <main>
+  <main id="main-content">
     <div class="detail-page">
 
       <!-- Breadcrumb -->
@@ -672,7 +673,7 @@
       var posterCardHtml = isOwner ? "" :
         '<div class="poster-card" style="margin-top:16px">'+
           '<div class="poster-row" style="display:flex;align-items:center;gap:12px">'+
-            '<div class="poster-avatar-lg" style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--teal,#0d9488));display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-size:1rem;flex-shrink:0">'+escH(posterInits)+'</div>'+
+            '<div class="poster-avatar-lg" style="width:48px;height:48px;border-radius:50%;background:var(--primary),var(--teal,#0d9488));display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-size:1rem;flex-shrink:0">'+escH(posterInits)+'</div>'+
             '<div>'+
               '<div class="poster-name">'+escH(posterName)+'</div>'+
               '<div class="poster-since">'+((poster && poster.city)||gig.area||"Gurugram")+'</div>'+
@@ -801,7 +802,7 @@
           '</div>'+
           '<div style="display:flex;gap:10px">'+
             '<button id="modalCancelBtn" style="flex:1;padding:12px;border:1.5px solid #d1d5db;border-radius:10px;font-weight:700;cursor:pointer;background:#fff">Cancel</button>'+
-            '<button id="modalConfirmBtn" style="flex:2;padding:12px;background:linear-gradient(135deg,#1a3c5e,#0d9488);color:#fff;border:none;border-radius:10px;font-weight:800;cursor:pointer;font-size:.95rem">Confirm Booking ✅</button>'+
+            '<button id="modalConfirmBtn" style="flex:2;padding:12px;background:var(--primary);color:#fff;border:none;border-radius:10px;font-weight:800;cursor:pointer;font-size:.95rem">Confirm Booking ✅</button>'+
           '</div>'+
         '</div>';
       document.body.appendChild(modal);
@@ -892,8 +893,11 @@
 
         var similar = [];
         try{
-          var simSnap = await getDocs(query(collection(db,"gigs"),where("category","==",gig.category),where("status","==","open"),limit(5)));
-          similar = simSnap.docs.filter(function(d){return d.id!==gigId;}).slice(0,3).map(function(d){return Object.assign({id:d.id},d.data());});
+          var simSnap = await getDocs(query(collection(db,"gigs"),where("category","==",gig.category),limit(8)));
+          similar = simSnap.docs
+            .filter(function(d){ return d.id!==gigId && d.data().status==="open"; })
+            .slice(0,3)
+            .map(function(d){ return Object.assign({id:d.id},d.data()); });
         }catch(e){}
 
         var isOwner = currentUser && currentUser.uid===gig.posterId;

@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="description" content="Real-time chat on GigLega — message workers and posters directly for your active gigs in Gurugram.">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Messages — GigLega</title>
   <link rel="stylesheet" href="styles.css" />
@@ -51,7 +52,7 @@
       color: var(--text);
     }
     .conv-item:hover { background: var(--surface-offset, #f3f0ec); }
-    .conv-item.active { background: rgba(13,148,136,.10); border-left: 3px solid var(--teal, #0d9488); }
+    .conv-item.active { background: rgba(13,148,136,.10); box-shadow: inset 3px 0 0 var(--teal, #0d9488); }
     .conv-avatar {
       width: 44px; height: 44px;
       border-radius: 50%;
@@ -548,6 +549,17 @@
       await loadInbox(user.uid);
     });
   </script>
+  <link rel="canonical" href="https://giglega.vercel.app/chat.html">
+  <meta property="og:type"        content="website">
+  <meta property="og:title"       content="Chat — GigLega">
+  <meta property="og:description" content="Message workers and posters directly for your active gigs on GigLega.">
+  <meta property="og:image"       content="https://giglega.vercel.app/assets/og-banner.png">
+  <meta property="og:url"         content="https://giglega.vercel.app/chat.html">
+  <meta property="og:site_name"   content="GigLega">
+  <meta name="twitter:card"       content="summary_large_image">
+  <meta name="twitter:title"      content="Chat — GigLega">
+  <meta name="twitter:description" content="Message workers and posters directly for your active gigs on GigLega.">
+  <meta name="twitter:image"      content="https://giglega.vercel.app/assets/og-banner.png">
 </head>
 <body>
   <div id="announce-bar"></div>

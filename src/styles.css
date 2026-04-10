@@ -1858,3 +1858,39 @@ textarea:focus-visible {
   background-size: 800px 100%;
 }
 
+
+/* ── Skip-to-content accessibility link ── */
+.sr-only-focusable {
+  position: fixed;
+  top: 8px;
+  left: 8px;
+  padding: 8px 18px;
+  background: var(--primary, #01696f);
+  color: #fff;
+  border-radius: 8px;
+  z-index: 99999;
+  font-weight: 700;
+  font-size: 0.9rem;
+  text-decoration: none;
+  transform: translateY(-140%);
+  transition: transform 0.18s cubic-bezier(0.16,1,0.3,1);
+  outline: 2px solid transparent;
+}
+.sr-only-focusable:focus {
+  transform: translateY(0) !important;
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+/* ── Screen-reader only utility ── */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}

@@ -11,6 +11,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,800&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://api.fontshare.com">
+  <link rel="dns-prefetch" href="https://api.fontshare.com">
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="theme-dark.css" />
   <link rel="stylesheet" href="mobile.css?v=20260411-0215">
@@ -447,8 +449,20 @@
       background-image: radial-gradient(ellipse 70% 50% at 50% -10%, rgba(79,195,200,.07) 0%, transparent 60%);
     }
   </style>
+  <link rel="canonical" href="https://giglega.vercel.app/login.html">
+  <meta property="og:type"        content="website">
+  <meta property="og:title"       content="Login or Register — GigLega">
+  <meta property="og:description" content="Join GigLega to post gigs or find local work in Gurugram.">
+  <meta property="og:image"       content="https://giglega.vercel.app/assets/og-banner.png">
+  <meta property="og:url"         content="https://giglega.vercel.app/login.html">
+  <meta property="og:site_name"   content="GigLega">
+  <meta name="twitter:card"       content="summary_large_image">
+  <meta name="twitter:title"      content="Login or Register — GigLega">
+  <meta name="twitter:description" content="Join GigLega to post gigs or find local work in Gurugram.">
+  <meta name="twitter:image"      content="https://giglega.vercel.app/assets/og-banner.png">
 </head>
 <body>
+  <h1 class="sr-only">Login or Register — GigLega</h1>
 
 <!-- ══ PAGE ══════════════════════════════════════════════════ -->
 <div class="auth-page">
@@ -820,8 +834,8 @@
     try {
       const cred = await signInWithEmailAndPassword(auth, id, pw);
       const snap = await getDoc(doc(db, 'users', cred.user.uid));
-      let userData = { id: cred.user.uid, email: id, name: cred.user.displayName || 'User' };
-      if (snap.exists()) userData = { ...userData, ...snap.data() };
+      let userData = { id: cred.user.uid, uid: cred.user.uid, email: id, name: cred.user.displayName || 'User' };
+      if (snap.exists()) userData = { ...userData, uid: cred.user.uid, ...snap.data(), id: cred.user.uid };
       localStorage.setItem(USER_KEY, JSON.stringify(userData));
       showToast('✅ Welcome back, ' + (userData.name || 'User') + '!', 'success');
       const dest = redirectTo !== 'index.html' ? redirectTo
@@ -869,11 +883,13 @@
 
       const userData = {
         id:        cred.user.uid,
+        uid:       cred.user.uid,
         name:      name,
         email:     id,
         phone:     null,
         city:      city,
         role:      prefRole === 'poster' ? 'poster' : 'worker',
+        mode:      prefRole === 'poster' ? 'poster' : 'worker',
         createdAt: new Date().toISOString(),
         skills:    [],
         avatar:    null,
@@ -915,15 +931,17 @@
       let userData;
 
       if (snap.exists()) {
-        userData = { id: user.uid, ...snap.data() };
+        userData = { id: user.uid, uid: user.uid, ...snap.data() };
       } else {
         userData = {
           id:        user.uid,
+          uid:       user.uid,
           name:      user.displayName || 'GigLega User',
           email:     user.email,
           phone:     null,
           city:      'Gurugram',
           role:      prefRole === 'poster' ? 'poster' : 'worker',
+          mode:      prefRole === 'poster' ? 'poster' : 'worker',
           createdAt: new Date().toISOString(),
           skills:    [],
           avatar:    user.photoURL || null,

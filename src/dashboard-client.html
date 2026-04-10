@@ -104,12 +104,23 @@
     [data-theme=dark] .complete-bar-text{color:var(--gray-300)}
     [data-theme=dark] .cash-fee-desc{color:var(--gray-400)}
   </style>
+  <link rel="canonical" href="https://giglega.vercel.app/dashboard-client.html">
+  <meta property="og:type"        content="website">
+  <meta property="og:title"       content="Poster Dashboard — GigLega">
+  <meta property="og:description" content="Manage your posted gigs, review worker applications, and track completions on GigLega.">
+  <meta property="og:image"       content="https://giglega.vercel.app/assets/og-banner.png">
+  <meta property="og:url"         content="https://giglega.vercel.app/dashboard-client.html">
+  <meta property="og:site_name"   content="GigLega">
+  <meta name="twitter:card"       content="summary_large_image">
+  <meta name="twitter:title"      content="Poster Dashboard — GigLega">
+  <meta name="twitter:description" content="Manage your posted gigs, review worker applications, and track completions on GigLega.">
+  <meta name="twitter:image"      content="https://giglega.vercel.app/assets/og-banner.png">
 </head>
 <body>
   <div id="announce-bar"></div>
   <nav id="main-nav"></nav>
 
-  <main class="page-wrapper">
+  <main id="main-content" class="page-wrapper">
     <div class="dash-wrap">
 
       <nav id="breadcrumb" aria-label="breadcrumb"></nav>
@@ -227,7 +238,7 @@
 
 <script type="module">
 import { auth, db } from './firebase-config.js';
-import { collection, query, where, onSnapshot, doc, updateDoc, deleteDoc } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+import { collection, query, where, onSnapshot, doc, updateDoc, deleteDoc, getDocs, limit } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
 import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
 
 var FEE_RATE = 0.06;
@@ -283,7 +294,7 @@ function loadMyGigs(uid) {
 function renderAll(mine) {
   var open = mine.filter(function(g){ return g.status === 'open'; });
   var progress = mine.filter(function(g){ return g.status === 'taken'; });
-  var completed = mine.filter(function(g){ return g.status === 'completed'; });
+  var completed = mine.filter(function(g){ return g.status === 'completed' || g.status === 'done'; });
   /* Stats */
   document.getElementById('statTotal').textContent = mine.length;
   document.getElementById('statOpen').textContent = open.length;
@@ -362,7 +373,7 @@ function gigCardHtml(g) {
          '</div>')
       : '<a href="gig-detail.html?id=' + encodeURIComponent(g.id) + '" class="btn btn-sm btn-outline">View →</a>') +
     (g.status === 'open' ? '<button class="btn btn-sm btn-danger" data-delete-id="' + g.id + '">🗑️ Delete</button>' : '') +
-    (g.status === 'completed' && g.workerId
+    ((g.status === 'completed' || g.status === 'done') && g.workerId
       ? '<a href="chat.html?with=' + encodeURIComponent(g.workerId) + '&gig=' + encodeURIComponent(g.id) + '" class="btn btn-sm btn-outline">💬 Worker</a>'
       : '') +
     '</div>' +
@@ -398,25 +409,38 @@ document.getElementById('btnSwitchRole').addEventListener('click', function() {
     /* ── OTP Card (onSnapshot) ── */
     var _otpUnsub = null;
     function listenOTPCard(posterId){
-      if(typeof firebase !== 'undefined' || !window._fsOnSnapshot) return;
-      // Import required Firestore functions via module scope — handled below
+      if(_otpUnsub){ try{ _otpUnsub(); }catch(e){} }
+      _otpUnsub = onSnapshot(
+        query(
+          collection(db,'gigs'),
+          where('posterId',            '==', posterId),
+          where('completionRequested', '==', true),
+          where('status',              '==', 'taken'),
+          limit(1)
+        ),
+        function(snap){
+          if(!snap.empty){ showOTPCard(snap.docs[0].data()); }
+          else{ var c=document.getElementById('otpCard'); if(c) c.style.display='none'; }
+        },
+        function(err){ console.warn('[GigLega] listenOTPCard:',err.message); }
+      );
     }
+    
     async function loadOTPCard(posterId){
       try {
-        // query for gigs with completionRequested == true
-        var q = window._fsQuery(
-          window._fsCollection(window._db, 'gigs'),
-          window._fsWhere('posterId', '==', posterId),
-          window._fsWhere('completionRequested', '==', true),
-          window._fsWhere('status', '==', 'taken'),
-          window._fsLimit(1)
-        );
-        var snap = await window._fsGetDocs(q);
+        // Real Firestore query — no broken globals
+        var snap = await getDocs(query(
+          collection(db, 'gigs'),
+          where('posterId',            '==', posterId),
+          where('completionRequested', '==', true),
+          where('status',              '==', 'taken'),
+          limit(1)
+        ));
         if (!snap.empty) {
           var g = snap.docs[0].data();
           showOTPCard(g);
         }
-      } catch(e) {}
+      } catch(e){ console.warn('[GigLega] loadOTPCard:', e.message); }
     }
     function showOTPCard(gig){
       var card = document.getElementById('otpCard');
