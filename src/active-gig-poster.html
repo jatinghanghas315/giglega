@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Track Your Gig — GigLega</title>
+  <meta name="description" content="Track your active gig on GigLega. See worker progress, view OTP when requested, and confirm completion." />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="theme-dark.css" />
+  <link rel="stylesheet" href="mobile.css?v=20260410-1828" />
+  <script src="shared.js" defer></script>
+  <style>
+    .pt-wrap { max-width: 700px; margin: 0 auto; padding: 24px 16px 100px; }
+
+    /* Page header badge */
+    .pt-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(245,158,11,.1); color: #b45309;
+      font-size: .74rem; font-weight: 800; text-transform: uppercase; letter-spacing: .5px;
+      padding: 4px 12px; border-radius: 20px; margin-bottom: 12px;
+    }
+    .pt-badge .dot { width: 8px; height: 8px; background: #f59e0b; border-radius: 50%;
+      animation: pdot 1.4s ease-in-out infinite; }
+    @keyframes pdot { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.5);opacity:.5} }
+
+    /* Info card */
+    .pt-card {
+      background: var(--surface); border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius); padding: 22px; margin-bottom: 18px;
+      box-shadow: var(--shadow-sm);
+    }
+    .pt-card-title { font-size: 1rem; font-weight: 800; color: var(--primary); margin-bottom: 14px;
+      display: flex; align-items: center; gap: 8px; }
+    .info-row { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
+    .info-icon { font-size: 1rem; width: 20px; text-align: center; flex-shrink: 0; margin-top: 2px; }
+    .info-label { font-size: .72rem; font-weight: 700; color: var(--gray-400); text-transform: uppercase; letter-spacing: .3px; }
+    .info-value { font-size: .9rem; color: var(--text); font-weight: 600; }
+
+    /* Worker card */
+    .worker-card {
+      display: flex; align-items: center; gap: 14px;
+      background: var(--surface); border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius); padding: 18px 20px; margin-bottom: 18px;
+      box-shadow: var(--shadow-sm);
+    }
+    .w-avatar {
+      width: 52px; height: 52px; border-radius: 50%; flex-shrink: 0;
+      background: linear-gradient(135deg, var(--primary), var(--teal));
+      color: #fff; display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem; font-weight: 800;
+    }
+    .w-name { font-size: .97rem; font-weight: 800; color: var(--text); margin-bottom: 2px; }
+    .w-sub { font-size: .78rem; color: var(--gray-400); }
+    .w-chat-btn {
+      margin-left: auto; flex-shrink: 0;
+      display: inline-flex; align-items: center; gap: 6px; padding: 9px 16px;
+      background: var(--teal); color: #fff; border-radius: var(--radius-sm);
+      font-size: .82rem; font-weight: 700; text-decoration: none; border: none; cursor: pointer;
+      transition: background .2s;
+    }
+    .w-chat-btn:hover { background: var(--primary); color: #fff; text-decoration: none; }
+
+    /* Timeline */
+    .timeline { margin-bottom: 18px; }
+    .tl-step {
+      display: flex; gap: 16px; align-items: flex-start;
+      padding: 14px 0;
+    }
+    .tl-left { display: flex; flex-direction: column; align-items: center; width: 36px; flex-shrink: 0; }
+    .tl-dot {
+      width: 36px; height: 36px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; font-weight: 800; flex-shrink: 0;
+      border: 2px solid var(--gray-200); background: var(--surface); color: var(--gray-400);
+      transition: all .3s;
+    }
+    .tl-dot.done { background: rgba(16,185,129,.12); color: #059669; border-color: #059669; }
+    .tl-dot.active { background: rgba(245,158,11,.12); color: #b45309; border-color: #f59e0b;
+      animation: tl-pulse 1.6s ease-in-out infinite; }
+    .tl-dot.complete { background: rgba(13,148,136,.12); color: var(--teal); border-color: var(--teal); }
+    @keyframes tl-pulse { 0%,100%{box-shadow:0 0 0 0 rgba(245,158,11,.3)} 50%{box-shadow:0 0 0 6px rgba(245,158,11,0)} }
+    .tl-line { width: 2px; flex: 1; min-height: 24px; background: var(--gray-200); margin-top: 4px; }
+    .tl-line.done { background: #059669; }
+    .tl-body { flex: 1; padding-top: 6px; min-width: 0; }
+    .tl-title { font-size: .9rem; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+    .tl-sub { font-size: .78rem; color: var(--gray-400); line-height: 1.5; }
+    .tl-time { font-size: .72rem; color: var(--gray-400); margin-top: 3px; }
+
+    /* OTP display card — BIG, amber, pulsing */
+    .otp-reveal-card {
+      display: none;
+      background: var(--surface);
+      border: 2px solid rgba(245,158,11,.45);
+      border-radius: var(--radius);
+      padding: 24px 20px;
+      margin-bottom: 18px;
+      box-shadow: 0 4px 20px rgba(245,158,11,.15);
+      text-align: center;
+    }
+    .otp-reveal-card.show { display: block; }
+    .otp-reveal-header { font-size: .82rem; font-weight: 800; color: #b45309; text-transform: uppercase;
+      letter-spacing: .5px; margin-bottom: 6px; display: flex; align-items: center; justify-content: center; gap: 6px; }
+    .otp-reveal-gig { font-size: .8rem; color: var(--gray-500); margin-bottom: 18px; }
+    .otp-digits { display: flex; gap: 8px; justify-content: center; margin-bottom: 12px; flex-wrap: wrap; }
+    .otp-digit {
+      width: 52px; height: 64px;
+      background: rgba(245,158,11,.08); border: 2px solid rgba(245,158,11,.35);
+      border-radius: 10px; display: flex; align-items: center; justify-content: center;
+      font-size: 2rem; font-weight: 900; color: #92400e;
+      font-variant-numeric: tabular-nums;
+    }
+    [data-theme=dark] .otp-digit { background: rgba(245,158,11,.1); color: #fbbf24; border-color: rgba(245,158,11,.3); }
+    .otp-instruction {
+      font-size: .82rem; color: var(--gray-500); margin-bottom: 8px; line-height: 1.5;
+    }
+    .otp-expiry { font-size: .72rem; color: var(--gray-400); }
+    .otp-expiry.urgent { color: #dc2626; font-weight: 700; }
+
+    /* Completion card */
+    .pt-done-card {
+      display: none; text-align: center; padding: 48px 24px;
+      background: var(--surface); border: 1.5px solid var(--gray-200); border-radius: var(--radius);
+    }
+    .pt-done-card.show { display: block; }
+
+    /* Refresh hint */
+    .refresh-hint {
+      font-size: .72rem; color: var(--gray-400); text-align: center; margin-top: -8px; margin-bottom: 16px;
+    }
+
+    /* No active gig */
+    .pt-empty { text-align: center; padding: 64px 24px; }
+
+    /* Skeleton */
+    .pt-skel { animation: pt-skel 1.4s ease-in-out infinite; }
+    @keyframes pt-skel { 0%,100%{opacity:1}50%{opacity:.4} }
+  </style>
+</head>
+<body>
+  <div id="main-nav" role="navigation"></div>
+
+  <main>
+    <!-- Loading -->
+    <div class="pt-wrap" id="skelWrap">
+      <div style="height:24px;background:var(--gray-100);border-radius:20px;width:160px;margin-bottom:16px;" class="pt-skel"></div>
+      <div style="height:140px;background:var(--gray-100);border-radius:12px;margin-bottom:14px;" class="pt-skel"></div>
+      <div style="height:80px;background:var(--gray-100);border-radius:12px;margin-bottom:14px;" class="pt-skel"></div>
+      <div style="height:200px;background:var(--gray-100);border-radius:12px;" class="pt-skel"></div>
+    </div>
+
+    <!-- No active gig -->
+    <div class="pt-wrap" id="emptyWrap" style="display:none;">
+      <div class="pt-empty">
+        <div style="font-size:3.5rem;margin-bottom:16px;">📋</div>
+        <h2 style="font-size:1.2rem;font-weight:800;color:var(--text);margin-bottom:8px;">Koi Active Gig Nahi</h2>
+        <p style="color:var(--gray-400);font-size:.9rem;margin-bottom:24px;">
+          Jab koi worker aapki gig accept karega, yahan progress track kar paoge.
+        </p>
+        <a href="post-gig.html" class="btn btn-primary">➕ Gig Post Karo</a>
+        <a href="dashboard-client.html" style="margin-left:10px;" class="btn btn-secondary">📊 Dashboard</a>
+      </div>
+    </div>
+
+    <!-- Main content -->
+    <div class="pt-wrap" id="mainWrap" style="display:none;">
+
+      <div class="pt-badge"><span class="dot"></span> <span id="ptBadgeText">Gig In Progress</span></div>
+      <h1 style="font-size:1.35rem;font-weight:800;color:var(--text);margin-bottom:20px;" id="ptHeading">Apni Active Gig Track Karo</h1>
+
+      <!-- Gig info -->
+      <div class="pt-card" id="gigInfoCard">
+        <div class="pt-card-title">📋 Gig Details</div>
+        <div class="info-row">
+          <span class="info-icon">📝</span>
+          <div><div class="info-label">Title</div><div class="info-value" id="infoTitle">—</div></div>
+        </div>
+        <div class="info-row">
+          <span class="info-icon">📍</span>
+          <div><div class="info-label">Location</div><div class="info-value" id="infoLocation">—</div></div>
+        </div>
+        <div class="info-row">
+          <span class="info-icon">📅</span>
+          <div><div class="info-label">Date & Time</div><div class="info-value" id="infoDateTime">—</div></div>
+        </div>
+        <div class="info-row">
+          <span class="info-icon">💰</span>
+          <div><div class="info-label">Budget</div><div class="info-value" id="infoBudget">—</div></div>
+        </div>
+      </div>
+
+      <!-- Worker info -->
+      <div class="worker-card" id="workerCard">
+        <div class="w-avatar" id="wAvatar">?</div>
+        <div>
+          <div class="w-name" id="wName">—</div>
+          <div class="w-sub">⚡ Is gig pe kaam kar raha hai</div>
+        </div>
+        <a href="#" class="w-chat-btn" id="wChatBtn">💬 Chat</a>
+      </div>
+
+      <!-- OTP reveal card (appears when worker requests OTP) -->
+      <div class="otp-reveal-card" id="otpRevealCard">
+        <div class="otp-reveal-header">
+          <span>🔑</span> Worker ne OTP manga hai!
+        </div>
+        <div class="otp-reveal-gig" id="otpForGig"></div>
+        <div style="font-size:.82rem;color:var(--gray-500);margin-bottom:16px;">
+          Yeh code worker ko batao — woh ise enter karke gig complete karega.
+        </div>
+        <div class="otp-digits" id="otpDigits"></div>
+        <div class="otp-instruction">
+          Sirf worker ko batao — kisi aur ko mat batana.
+        </div>
+        <div class="otp-expiry" id="otpExpiryText"></div>
+      </div>
+
+      <!-- Refresh hint -->
+      <div class="refresh-hint" id="refreshHint">
+        🔄 Page auto-refreshes every 20s for live OTP updates
+      </div>
+
+      <!-- Progress Timeline -->
+      <div class="pt-card">
+        <div class="pt-card-title">📊 Progress Timeline</div>
+        <div class="timeline" id="timeline">
+
+          <!-- Step 1: Gig Booked -->
+          <div class="tl-step" id="tlBooked">
+            <div class="tl-left">
+              <div class="tl-dot done" id="tlDot1">✓</div>
+              <div class="tl-line done" id="tlLine1"></div>
+            </div>
+            <div class="tl-body">
+              <div class="tl-title">Gig Booked</div>
+              <div class="tl-sub">Worker ne aapki gig accept kar li hai.</div>
+              <div class="tl-time" id="tlBookedTime"></div>
+            </div>
+          </div>
+
+          <!-- Step 2: Worker Working -->
+          <div class="tl-step" id="tlWorking">
+            <div class="tl-left">
+              <div class="tl-dot active" id="tlDot2">⚡</div>
+              <div class="tl-line" id="tlLine2"></div>
+            </div>
+            <div class="tl-body">
+              <div class="tl-title">Worker Kaam Kar Raha Hai</div>
+              <div class="tl-sub">Worker location pe kaam kar raha hai.</div>
+            </div>
+          </div>
+
+          <!-- Step 3: OTP Requested -->
+          <div class="tl-step" id="tlOtpStep">
+            <div class="tl-left">
+              <div class="tl-dot" id="tlDot3">🔑</div>
+              <div class="tl-line" id="tlLine3"></div>
+            </div>
+            <div class="tl-body">
+              <div class="tl-title">OTP Request</div>
+              <div class="tl-sub" id="tlOtpSub">Worker ne abhi OTP nahi manga.</div>
+              <div class="tl-time" id="tlOtpTime"></div>
+            </div>
+          </div>
+
+          <!-- Step 4: Completed -->
+          <div class="tl-step" id="tlComplete">
+            <div class="tl-left">
+              <div class="tl-dot" id="tlDot4">✅</div>
+            </div>
+            <div class="tl-body">
+              <div class="tl-title">Gig Complete</div>
+              <div class="tl-sub" id="tlCompleteSub">OTP verify hone ke baad gig complete ho jayegi.</div>
+              <div class="tl-time" id="tlCompleteTime"></div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Completed state (replaces timeline on done) -->
+      <div class="pt-done-card" id="doneCard">
+        <div style="font-size:4rem;margin-bottom:16px;">🎉</div>
+        <h2 style="font-size:1.4rem;font-weight:800;color:var(--text);margin-bottom:8px;">Gig Complete Ho Gai!</h2>
+        <p style="color:var(--gray-400);font-size:.9rem;margin-bottom:8px;">
+          Worker ne kaam poora kar diya. Payment process ho rahi hai.
+        </p>
+        <div style="font-size:1.8rem;font-weight:800;color:#dc2626;margin:12px 0;" id="doneDeducted"></div>
+        <div style="font-size:.8rem;color:var(--gray-400);margin-bottom:24px;">Aapke wallet se deducted (6% platform fee included)</div>
+        <a href="dashboard-client.html" class="btn btn-primary">📊 Dashboard Dekho</a>
+        <a href="browse.html" style="margin-left:10px;" class="btn btn-secondary">🔍 New Gig Post Karo</a>
+      </div>
+
+    </div><!-- end mainWrap -->
+  </main>
+
+  <div id="main-footer" role="contentinfo"></div>
+
+  <script type="module">
+    import { initializeApp }    from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
+    import { getAuth, onAuthStateChanged }
+                                from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+    import { getFirestore, collection, query, where, limit,
+             getDocs, doc, onSnapshot }
+                                from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+
+    var app = initializeApp(window.GL ? window.GL.FIREBASE_CONFIG : {
+      apiKey:"AIzaSyDTLKfbQc3HuF5mPxfyVJtMwI7DEkPi_7g",
+      authDomain:"giglega-v2.firebaseapp.com",
+      projectId:"giglega-v2",
+      storageBucket:"giglega-v2.appspot.com",
+      messagingSenderId:"726280449452",
+      appId:"1:726280449452:web:7c2a47d23c41f4a67e8c5d"
+    });
+    var auth = getAuth(app);
+    var db   = getFirestore(app);
+
+    var currentUser = null;
+    var unsubSnap   = null;
+    var countdownTimer = null;
+
+    function el(id){ return document.getElementById(id); }
+    function fmtDate(iso){
+      if(!iso) return '';
+      var d = new Date(iso);
+      return d.toLocaleDateString('en-IN',{day:'numeric',month:'short'}) + ' • ' +
+             d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+    }
+
+    /* ── OTP countdown ── */
+    function startCountdown(expiry){
+      if(countdownTimer) clearInterval(countdownTimer);
+      function tick(){
+        var ms = new Date(expiry) - Date.now();
+        if(ms <= 0){
+          el('otpExpiryText').textContent = '⚠️ OTP expire ho gaya — worker se naya OTP request karwao';
+          el('otpExpiryText').className = 'otp-expiry urgent';
+          clearInterval(countdownTimer); return;
+        }
+        var m = Math.floor(ms/60000), s = Math.floor((ms%60000)/1000);
+        el('otpExpiryText').textContent = '⏳ Valid: ' + m + 'm ' + String(s).padStart(2,'0') + 's';
+        el('otpExpiryText').className = ms < 300000 ? 'otp-expiry urgent' : 'otp-expiry';
+      }
+      tick(); countdownTimer = setInterval(tick, 1000);
+    }
+
+    /* ── Render live gig data ── */
+    function renderGig(gig, id){
+      el('skelWrap').style.display = 'none';
+      el('mainWrap').style.display = 'block';
+
+      // Gig info
+      el('infoTitle').textContent    = gig.title || '—';
+      el('infoLocation').textContent = [gig.location, gig.area, gig.pincode].filter(Boolean).join(', ') || '—';
+      el('infoDateTime').textContent = [(gig.date||''), (gig.time||'')].filter(Boolean).join(' • ') || '—';
+      el('infoBudget').textContent   = '₹' + (gig.budget||0).toLocaleString('en-IN');
+
+      // Worker
+      var wInit = (gig.workerName||'W').split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);
+      el('wAvatar').textContent = wInit;
+      el('wName').textContent   = gig.workerName || 'Worker';
+      el('wChatBtn').href       = 'chat.html?with=' + encodeURIComponent(gig.workerId||'') + '&gig=' + encodeURIComponent(id);
+
+      // Booked time
+      if(gig.bookedAt) el('tlBookedTime').textContent = fmtDate(gig.bookedAt);
+
+      /* ── OTP card ── */
+      if(gig.completionRequested && gig.completionOTP && gig.status === 'taken'){
+        // Show OTP
+        el('otpRevealCard').classList.add('show');
+        el('otpForGig').textContent = '"' + (gig.title||'') + '"';
+        var digits = String(gig.completionOTP).split('');
+        el('otpDigits').innerHTML = digits.map(function(d){
+          return '<div class="otp-digit">' + d + '</div>';
+        }).join('');
+        if(gig.completionOTPExpiry) startCountdown(gig.completionOTPExpiry);
+
+        // Timeline — OTP step active
+        el('tlDot2').className = 'tl-dot done'; el('tlDot2').textContent = '✓';
+        el('tlLine2').classList.add('done');
+        el('tlDot3').className = 'tl-dot active';
+        if(gig.completionRequestedAt) el('tlOtpTime').textContent = fmtDate(gig.completionRequestedAt);
+        el('tlOtpSub').textContent = 'Worker ne OTP request kar diya — usse code batao.';
+      } else if(gig.status === 'taken') {
+        // Working, no OTP yet
+        el('otpRevealCard').classList.remove('show');
+      }
+
+      /* ── Completed ── */
+      if(gig.status === 'completed'){
+        if(countdownTimer) clearInterval(countdownTimer);
+        el('otpRevealCard').classList.remove('show');
+        el('refreshHint').style.display = 'none';
+
+        // Timeline all done
+        ['tlDot1','tlDot2','tlDot3','tlDot4'].forEach(function(id){ el(id).className='tl-dot done'; el(id).textContent='✓'; });
+        ['tlLine1','tlLine2','tlLine3'].forEach(function(id){ el(id) && el(id).classList.add('done'); });
+        if(gig.completedAt) el('tlCompleteTime').textContent = fmtDate(gig.completedAt);
+        el('tlCompleteSub').textContent = 'Gig successfully complete ho gai!';
+
+        // Show done card
+        el('doneCard').classList.add('show');
+        el('doneDeducted').textContent = '₹' + (gig.budget||0).toLocaleString('en-IN') + ' Deducted';
+
+        // Update badge
+        el('ptBadgeText').textContent = 'Gig Completed ✅';
+        el('ptHeading').textContent   = 'Gig Complete Ho Gayi!';
+      }
+    }
+
+    /* ── Init: subscribe to real-time updates ── */
+    onAuthStateChanged(auth, async function(user){
+      if(!user){ window.location.replace('login.html?redirect=active-gig-poster.html'); return; }
+      currentUser = user;
+
+      // Check URL param first (direct link from dashboard banner)
+      var params = new URLSearchParams(window.location.search);
+      var paramGigId = params.get('id');
+
+      var gigDocId = null;
+
+      if(paramGigId){
+        gigDocId = paramGigId;
+      } else {
+        // Find poster's most recent taken/completed gig
+        try{
+          var q = query(
+            collection(db,'gigs'),
+            where('posterId','==',user.uid),
+            where('status','in',['taken','completed']),
+            limit(1)
+          );
+          var snap = await getDocs(q);
+          if(snap.empty){
+            el('skelWrap').style.display = 'none';
+            el('emptyWrap').style.display = 'block';
+            return;
+          }
+          gigDocId = snap.docs[0].id;
+        }catch(e){
+          el('skelWrap').style.display = 'none';
+          el('emptyWrap').style.display = 'block';
+          return;
+        }
+      }
+
+      // Real-time listener on this gig doc
+      unsubSnap = onSnapshot(doc(db,'gigs',gigDocId), function(snap){
+        if(!snap.exists()){
+          el('skelWrap').style.display = 'none';
+          el('emptyWrap').style.display = 'block';
+          return;
+        }
+        renderGig(snap.data(), snap.id);
+      }, function(err){
+        console.error('Snapshot error:', err);
+        // Fallback: poll every 20s
+        setInterval(async function(){
+          var d = await getDocs(query(collection(db,'gigs'),where('posterId','==',user.uid),where('status','in',['taken','completed']),limit(1)));
+          if(!d.empty) renderGig(d.docs[0].data(), d.docs[0].id);
+        }, 20000);
+      });
+    });
+  </script>
+</body>
+</html>
