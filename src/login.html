@@ -685,7 +685,7 @@
   const googleProvider = new GoogleAuthProvider();
 
   /* ── Constants ── */
-  const USER_KEY = 'giglega_user';
+  const USER_KEY = 'gl_user';  // matches GL.STORAGE_KEY_USER in shared.js
   const params   = new URLSearchParams(window.location.search);
   const hash     = new URLSearchParams((window.location.hash || '').replace(/^#/, ''));
   const redirectTo = params.get('redirect') || hash.get('redirect') || 'index.html';
@@ -824,7 +824,9 @@
       if (snap.exists()) userData = { ...userData, ...snap.data() };
       localStorage.setItem(USER_KEY, JSON.stringify(userData));
       showToast('✅ Welcome back, ' + (userData.name || 'User') + '!', 'success');
-      setTimeout(() => window.location.replace(redirectTo), 900);
+      const dest = redirectTo !== 'index.html' ? redirectTo
+        : (userData.role === 'poster' ? 'dashboard-client.html' : 'dashboard-worker.html');
+      setTimeout(() => window.location.replace(dest), 900);
     } catch (err) {
       setLoading('btnLogin', false);
       const code = err.code || '';
@@ -933,7 +935,9 @@
 
       localStorage.setItem(USER_KEY, JSON.stringify(userData));
       showToast('✅ Welcome, ' + (userData.name || 'User') + '!', 'success');
-      setTimeout(() => window.location.replace(redirectTo), 900);
+      const dest = redirectTo !== 'index.html' ? redirectTo
+        : (userData.role === 'poster' ? 'dashboard-client.html' : 'dashboard-worker.html');
+      setTimeout(() => window.location.replace(dest), 900);
     } catch (err) {
       if (err.code !== 'auth/popup-closed-by-user' && err.code !== 'auth/cancelled-popup-request') {
         showToast('Google login failed. Please try again.', 'error');
