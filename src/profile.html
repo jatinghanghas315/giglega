@@ -209,7 +209,7 @@
       </div>
 
       <div class="save-row">
-        <button class="btn-save" id="btnSave">💾 Save Profile</button>
+        <button class="btn-save" id="btnSave">Save Profile</button>
         <span class="save-status" id="saveStatus">✅ Profile saved!</span>
       </div>
 
@@ -439,7 +439,7 @@ if (!user) {
     document.getElementById("btnSave").addEventListener("click", function () {
       var btn = this;
       btn.disabled    = true;
-      btn.textContent = "⏳ Saving...";
+      btn.setAttribute('aria-busy', 'true'); btn.textContent = "Saving…";
 
       user.name     = document.getElementById("fieldName").value.trim();
       user.phone    = document.getElementById("fieldPhone").value.trim();
@@ -461,7 +461,7 @@ if (!user) {
 
       setTimeout(function () {
         btn.disabled    = false;
-        btn.textContent = "💾 Save Profile";
+        btn.removeAttribute('aria-busy'); btn.textContent = "Save Profile";
         var statusEl = document.getElementById("saveStatus");
         statusEl.classList.add("show");
         setTimeout(function () { statusEl.classList.remove("show"); }, 3000);
