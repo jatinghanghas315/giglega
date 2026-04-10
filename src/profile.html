@@ -261,6 +261,41 @@ if (!user) {
   return;
 }
 
+  /* ── Firestore merge: refresh user data from server, fallback to localStorage ── */
+  (async function syncProfileFromFirestore() {
+    try {
+      var app = window._fbApp || (typeof initializeApp === "function" && initializeApp);
+      if (!app) return;
+      var auth = (typeof getAuth === "function") ? getAuth() : null;
+      if (!auth) return;
+      var db2  = (typeof getFirestore === "function") ? getFirestore() : null;
+      if (!db2) return;
+      var uid  = user.id;
+      var snap = await (typeof getDoc === "function" ? getDoc(doc(db2, "users", uid)) : null);
+      if (snap && snap.exists()) {
+        var fsData = snap.data();
+        // Merge: Firestore is source of truth for name, bio, skills
+        user = Object.assign({}, user, {
+          name:        fsData.name        || user.name,
+          email:       fsData.email       || user.email,
+          bio:         fsData.bio         || user.bio         || "",
+          skills:      fsData.skills      || user.skills      || [],
+          location:    fsData.location    || user.location    || "",
+          phone:       fsData.phone       || user.phone       || "",
+          photoURL:    fsData.photoURL    || user.photoURL    || "",
+          completedGigs: fsData.completedGigs || user.completedGigs || 0,
+          rating:      fsData.rating      || user.rating      || 0
+        });
+        // Update localStorage with fresh data
+        try { localStorage.setItem("gl_user", JSON.stringify(user)); } catch(e){}
+        // Re-render profile fields with fresh data
+        if (typeof renderProfile === "function") renderProfile(user);
+      }
+    } catch (fsErr) {
+      console.warn("[GigLega] Profile Firestore sync failed — using localStorage:", fsErr.message);
+    }
+  })();
+
     /* ── Breadcrumb ── */
     if (typeof buildBreadcrumb === "function") {
       buildBreadcrumb("breadcrumb", [

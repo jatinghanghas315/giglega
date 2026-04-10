@@ -567,7 +567,7 @@
     import { auth, db } from './firebase-config.js';
     import {
       doc, getDoc, collection, getDocs, query, where, limit,
-      updateDoc, deleteDoc, setDoc, addDoc, serverTimestamp
+      updateDoc, deleteDoc, setDoc, addDoc, serverTimestamp, runTransaction
     } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
     import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
 
@@ -815,12 +815,20 @@
           var workerName = currentUser.displayName || "Worker";
           var uid = currentUser.uid;
 
-          /* 1. Update gig status */
-          await updateDoc(doc(db,"gigs",gig.id),{
-            status:     "taken",
-            workerId:   uid,
-            workerName: workerName,
-            bookedAt:   new Date().toISOString()
+          /* 1. Update gig status — with race-condition guard via transaction */
+          await runTransaction(db, async function(txn) {
+            var gigRef  = doc(db,"gigs",gig.id);
+            var gigSnap = await txn.get(gigRef);
+            if (!gigSnap.exists()) throw new Error("Gig not found.");
+            if (gigSnap.data().status !== "open") {
+              throw new Error("Yeh gig already book ho gayi. Browse karo aur doosra dhundo.");
+            }
+            txn.update(gigRef, {
+              status:     "taken",
+              workerId:   uid,
+              workerName: workerName,
+              bookedAt:   new Date().toISOString()
+            });
           });
 
           /* 2. Create conversation + system message */
@@ -861,7 +869,8 @@
           },1000);
 
         }catch(e){
-          showToast("Booking failed: "+e.message,"error");
+          var msg = e.message && e.message.includes("already book") ? e.message : "Booking failed. Please try again.";
+          showToast(msg,"error");
           btn.disabled=false; btn.textContent="Confirm Booking ✅";
         }
       };

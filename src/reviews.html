@@ -890,7 +890,8 @@
 
             <!-- Pending review requests -->
             <div id="pendingReviews">
-              <div class="pending-review-card">
+              <!-- Pending review cards are rendered dynamically from Firestore only -->
+              <div class="pending-review-card" style="display:none" data-static-placeholder="true">
                 <div class="prc-icon">⏳</div>
                 <div class="prc-info">
                   <div class="prc-title">Sanjay Traders se review ka wait hai</div>
@@ -1463,7 +1464,7 @@
           <div style="font-size:.8rem;font-weight:800;text-transform:uppercase;letter-spacing:.4px;color:var(--gray-400);margin-bottom:10px">
             ⏳ Pending Reviews (2)
           </div>
-          <div class="pending-review-card">
+          <div class="pending-review-card" style="display:none" data-static-placeholder="true">
             <div class="prc-icon">📦</div>
             <div class="prc-info">
               <div class="prc-title">Rahul Kumar ko rate karo — Warehouse Packing</div>
@@ -1473,7 +1474,7 @@
               <button class="btn-prc-rate" onclick="prefillReview('Rahul Kumar','Warehouse Packing')">⭐ Rate Now</button>
             </div>
           </div>
-          <div class="pending-review-card">
+          <div class="pending-review-card" style="display:none" data-static-placeholder="true">
             <div class="prc-icon">🛵</div>
             <div class="prc-info">
               <div class="prc-title">Sanjay Traders ko rate karo — Grocery Delivery</div>

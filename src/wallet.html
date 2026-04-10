@@ -926,26 +926,26 @@
           <div class="wlb-tag">💳 GigLega Wallet</div>
           <div class="wlb-label">Available Balance</div>
           <div class="wlb-amount">
-            <span>₹</span><span id="heroBalance">8,240</span>
+            <span>₹</span><span id="heroBalance">0</span>
           </div>
           <div class="wlb-sub">
-            Last updated: <strong>Today, 5:14 PM</strong> · Auto-refreshes every 60s
+            Last updated: <strong id="lastUpdatedTime">Loading…</strong> · Auto-refreshes every 60s
           </div>
           <div class="wlb-chips">
             <div class="wlb-chip">
-              <div class="wlb-chip-val">₹1,128</div>
+              <div class="wlb-chip-val" id="chipPending">₹0</div>
               <div class="wlb-chip-label">⏳ Pending</div>
             </div>
             <div class="wlb-chip">
-              <div class="wlb-chip-val">₹41,200</div>
+              <div class="wlb-chip-val" id="chipAllTime">₹0</div>
               <div class="wlb-chip-label">📈 All-time</div>
             </div>
             <div class="wlb-chip">
-              <div class="wlb-chip-val">₹8,400</div>
+              <div class="wlb-chip-val" id="chipThisMonth">₹0</div>
               <div class="wlb-chip-label">📅 This Month</div>
             </div>
             <div class="wlb-chip">
-              <div class="wlb-chip-val">14</div>
+              <div class="wlb-chip-val" id="chipGigsDone">0</div>
               <div class="wlb-chip-label">✅ Gigs Done</div>
             </div>
           </div>
@@ -1025,14 +1025,14 @@
         <div class="wl-two-col">
           <div>
 
-            <!-- Pending payout alert -->
-            <div class="pending-payout">
+            <!-- Pending payout alert (hidden until real pending balance exists) -->
+            <div class="pending-payout" id="pendingPayoutCard" style="display:none">
               <div class="pp-icon">⏰</div>
               <div class="pp-info">
-                <div class="pp-title">₹1,128 ka payment pending hai</div>
-                <div class="pp-sub">Warehouse Packing Gig (#GL-2026-0314) — gig complete hone ke baad auto-release hoga</div>
+                <div class="pp-title" id="pendingCardTitle">Payment processing…</div>
+                <div class="pp-sub" id="pendingCardSub">Your completed gig payment will be released soon.</div>
               </div>
-              <div class="pp-amount">₹1,128</div>
+              <div class="pp-amount" id="pendingCardAmt">₹0</div>
             </div>
 
             <!-- Monthly earnings chart -->
@@ -1086,11 +1086,11 @@
               <div class="wsc-body">
                 <div class="stat-row">
                   <span class="sr-lbl">Available</span>
-                  <span class="sr-val green">₹8,240</span>
+                  <span class="sr-val green" id="srBalance">₹0</span>
                 </div>
                 <div class="stat-row">
                   <span class="sr-lbl">Pending Release</span>
-                  <span class="sr-val" style="color:#d97706">₹1,128</span>
+                  <span class="sr-val" style="color:#d97706" id="srPending">₹0</span>
                 </div>
                 <div class="stat-row">
                   <span class="sr-lbl">On Hold</span>
@@ -1113,7 +1113,7 @@
                 <div class="tax-note">
                   <div class="tn-row">
                     <span class="tn-lbl">Gross Earnings</span>
-                    <span class="tn-val">₹41,200</span>
+                    <span class="tn-val" id="srAllTime">₹0</span>
                   </div>
                   <div class="tn-row">
                     <span class="tn-lbl">Platform Fee (2%)</span>
@@ -1223,7 +1223,7 @@
                   oninput="handleAmountInput(this)"
                 />
                 <div class="amount-avail">
-                  Available: <strong id="availBal">₹8,240</strong>
+                  Available: <strong id="availBal">₹0</strong>
                 </div>
               </div>
 
@@ -1974,6 +1974,54 @@
         document.getElementById("withdrawAmount").value = "";
         currentBalance -= amount;
         document.getElementById("heroBalance").textContent = currentBalance.toLocaleString("en-IN");
+        // Show/hide pending payout card based on actual in-progress gigs
+        (async function checkPendingPayouts() {
+          try {
+            const { query, collection: col, where: whr, getDocs: gds } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
+            const pQ = query(col(db, "gigs"), whr("workerId","==",uid), whr("status","==","taken"));
+            const pSnap = await gds(pQ);
+            const pendingAmt = pSnap.docs.reduce((s,d) => {
+              const b = d.data().budget || 0;
+              return s + Math.round(b - b*0.06);
+            }, 0);
+            const ppCard = document.getElementById("pendingPayoutCard");
+            if (ppCard && pendingAmt > 0) {
+              ppCard.style.display = "";
+              const ppAmt = document.getElementById("pendingCardAmt");
+              if (ppAmt) ppAmt.textContent = "₹" + pendingAmt.toLocaleString("en-IN");
+              const ppSub = document.getElementById("pendingCardSub");
+              if (ppSub) ppSub.textContent = pSnap.size + " active gig" + (pSnap.size > 1 ? "s" : "") + " — payment releases on completion.";
+            }
+          } catch(pErr) { console.warn("[GigLega] pending check:", pErr.message); }
+        })();
+        // Update timestamp
+        const ltEl = document.getElementById('lastUpdatedTime');
+        if(ltEl) ltEl.textContent = new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+        // Update chips from wallet doc
+        try {
+          const wSnap2 = await getDoc(doc(db,'wallets',uid));
+          const wd = wSnap2.exists() ? wSnap2.data() : {};
+          const allTime   = wd.totalEarned || 0;
+          const gigsDone  = wd.gigsCompleted || 0;
+          const chipP     = document.getElementById('chipPending');
+          const chipA     = document.getElementById('chipAllTime');
+          const chipM     = document.getElementById('chipThisMonth');
+          const chipG     = document.getElementById('chipGigsDone');
+          const srBal     = document.getElementById('srBalance');
+          const srPend    = document.getElementById('srPending');
+          const srAll     = document.getElementById('srAllTime');
+          const avail     = document.getElementById('availBal');
+          if(chipP) chipP.textContent  = '₹0';
+          if(chipA) chipA.textContent  = '₹' + allTime.toLocaleString('en-IN');
+          if(chipG) chipG.textContent  = gigsDone;
+          if(srBal) srBal.textContent  = '₹' + currentBalance.toLocaleString('en-IN');
+          if(srPend) srPend.textContent = '₹0';
+          if(srAll) srAll.textContent  = '₹' + allTime.toLocaleString('en-IN');
+          if(avail) avail.textContent  = '₹' + currentBalance.toLocaleString('en-IN');
+          // Calculate this-month earnings from transactions
+          const now2 = new Date(); const mStart = new Date(now2.getFullYear(), now2.getMonth(), 1);
+          // chipThisMonth populated by txn loop below
+        } catch(chipErr){ console.warn('[GigLega] chip stats:', chipErr.message); }
         document.getElementById("availBal").textContent = "₹" + currentBalance.toLocaleString("en-IN");
         // Also save to Firestore if available
         const upiEl = document.getElementById("upiSelectorWithdraw");

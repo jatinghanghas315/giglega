@@ -661,36 +661,36 @@
 
           <div class="testi-card">
             <div class="testi-stars">⭐⭐⭐⭐⭐</div>
-            <div class="testi-body">"GigLega ne meri zindagi badal di. College ke baad part-time gigs milne lage — ₹8000 monthly extra earn kar raha hoon!"</div>
+            <div class="testi-body">"Finally a platform built for Gurugram. Easy to use, clean UI, aur real nearby gigs dikhte hain — worth trying!"</div>
             <div class="testi-user">
               <div class="testi-avatar">RS</div>
               <div>
-                <div class="testi-name">Rahul Sharma</div>
-                <div class="testi-role">⚡ Worker — DLF Phase 2</div>
+                <div class="testi-name">Early Access User</div>
+                <div class="testi-role">Worker · Gurugram</div>
               </div>
             </div>
           </div>
 
           <div class="testi-card">
             <div class="testi-stars">⭐⭐⭐⭐⭐</div>
-            <div class="testi-body">"Mujhe ek reliable house helper chahiye tha ek din ke liye. GigLega pe post kiya aur 2 ghante mein verified worker aa gaya!"</div>
+            <div class="testi-body">"Gig posting bahut simple hai — 2 minute mein post ho gayi. Aur nearby workers ka option bahut helpful lagta hai."</div>
             <div class="testi-user">
               <div class="testi-avatar">PG</div>
               <div>
-                <div class="testi-name">Priya Gupta</div>
-                <div class="testi-role">📋 Poster — Sector 56</div>
+                <div class="testi-name">Early Access User</div>
+                <div class="testi-role">Poster · Gurugram</div>
               </div>
             </div>
           </div>
 
           <div class="testi-card">
             <div class="testi-stars">⭐⭐⭐⭐⭐</div>
-            <div class="testi-body">"I picked up 6 delivery gigs in Gurugram last month and earned ₹12,000 extra — GigLega made it simple. Best platform NCR mein!"</div>
+            <div class="testi-body">"Platform ka idea bilkul sahi hai — students aur part-timers ke liye exactly yahi chahiye tha NCR mein."</div>
             <div class="testi-user">
               <div class="testi-avatar">AK</div>
               <div>
-                <div class="testi-name">Amit Kumar</div>
-                <div class="testi-role">⚡ Worker — Sohna Road</div>
+                <div class="testi-name">Early Access User</div>
+                <div class="testi-role">Worker · NCR</div>
               </div>
             </div>
           </div>
@@ -773,8 +773,8 @@
         if (start >= target) clearInterval(timer);
       }, duration / 40);
     }
-        animCount("statGigs",    liveGigs.length > 0 ? liveGigs.length : 9);
-    animCount("statWorkers", allUsers.filter(function(u){ return u.role==="worker"; }).length > 0 ? allUsers.filter(function(u){ return u.role==="worker"; }).length : 47);
+        if(liveGigs.length > 0) animCount("statGigs", liveGigs.length); else document.getElementById("statGigs").textContent = liveGigs.length;
+    var workerCount = allUsers.filter(function(u){ return u.role==="worker"; }).length; if(workerCount > 0) animCount("statWorkers", workerCount); else document.getElementById("statWorkers").textContent = workerCount;
 
     /* ── Categories ── */
     var CATS = [
@@ -840,55 +840,22 @@
       });
     }
 
-    /* ── Seed demo gigs if none exist ── */
+    /* ── Empty state when no real gigs exist ── */
     if (!allGigs.length) {
-      var demoGigs = [
-        { id:"gig_demo1", title:"House Cleaning — 3BHK", description:"Mujhe ek reliable cleaner chahiye full 3BHK ke liye Saturday ko. All supplies provided.", budget:800, category:"House Help", type:"hyperlocal", location:"Sector 56, Gurugram", status:"open", createdAt: new Date(Date.now()-3600000).toISOString(), posterId:"demo" },
-        { id:"gig_demo2", title:"Grocery Pickup & Delivery", description:"BigBazaar se saman lana hai ghar pe. Light items only. 1-2 ghante max.", budget:300, category:"Errands", type:"hyperlocal", location:"DLF Phase 3", status:"open", createdAt: new Date(Date.now()-7200000).toISOString(), posterId:"demo" },
-        { id:"gig_demo3", title:"Logo Design — Startup", description:"Need a clean, minimal logo for a food delivery startup. 2 concepts chahiye.", budget:1500, category:"Design", type:"remote", location:"Remote", status:"open", createdAt: new Date(Date.now()-10800000).toISOString(), posterId:"demo" },
-        { id:"gig_demo4", title:"Math Tutor — Class 10", description:"Meri beti ko maths weak hai. Weekend 2 hours daily. Nearby preferred.", budget:600, category:"Tutoring", type:"hyperlocal", location:"Sohna Road", status:"open", createdAt: new Date(Date.now()-14400000).toISOString(), posterId:"demo" },
-        { id:"gig_demo5", title:"WordPress Bug Fix", description:"Simple blog site ka contact form kaam nahi kar raha. Quick fix needed.", budget:500, category:"Tech Help", type:"remote", location:"Remote", status:"open", createdAt: new Date(Date.now()-18000000).toISOString(), posterId:"demo" },
-        { id:"gig_demo6", title:"Furniture Assembly — IKEA", description:"2 wardrobes + 1 bed assemble karna hai. Tools apne laana please.", budget:700, category:"Handyman", type:"hyperlocal", location:"Sector 45, Gurugram", status:"open", createdAt: new Date(Date.now()-21600000).toISOString(), posterId:"demo" }
-      ];
-      try { localStorage.setItem(GIGS_KEY, JSON.stringify(demoGigs)); } catch(e){}
-      /* Refresh the gig grid */
-      container.innerHTML = "";
-      emptyEl.classList.add("hidden");
-      container.classList.remove("hidden");
-      demoGigs.forEach(function(gig){
-        var fee  = Math.round(gig.budget * 0.06);
-        var earn = gig.budget - fee;
-        var isHyper = gig.type === "hyperlocal";
-        container.innerHTML += '<div class="gig-card card-hover">' +
-          '<div class="gig-type-tag ' + (isHyper ? "tag-hyperlocal" : "tag-remote") + '">' +
-            (isHyper ? "Hyperlocal" : "Remote") +
-          '</div>' +
-          '<div class="gig-card-title">' + escH(gig.title) + '</div>' +
-          '<div class="gig-card-desc line-clamp-2">' + escH(gig.description) + '</div>' +
-          '<div class="gig-card-meta">' +
-            '<span class="gig-meta-chip">📍 ' + escH(gig.location) + '</span>' +
-            '<span class="gig-meta-chip">🕐 ' + timeAgo(gig.createdAt) + '</span>' +
-            '<span class="gig-meta-chip">🏷️ ' + escH(gig.category) + '</span>' +
-          '</div>' +
-          '<div class="gig-earn-strip">' +
-            '<div>' +
-              '<div class="gig-earn-label">You Earn</div>' +
-              '<div class="gig-earn-val">₹' + earn.toLocaleString("en-IN") + '</div>' +
-            '</div>' +
-            '<div style="text-align:right">' +
-              '<div class="gig-earn-label">Posted Budget</div>' +
-              '<div class="gig-price">₹' + gig.budget.toLocaleString("en-IN") + '</div>' +
-            '</div>' +
-          '</div>' +
-          '<a href="gig-detail.html?id=' + escH(gig.id) + '" class="btn btn-primary btn-sm btn-block" style="margin-top:auto">Book This Gig →</a>' +
+      container.innerHTML =
+        '<div style="grid-column:1/-1;text-align:center;padding:48px 24px;">' +
+          '<div style="font-size:2.5rem;margin-bottom:12px">📋</div>' +
+          '<div style="font-weight:700;font-size:1.1rem;margin-bottom:8px;color:var(--text)">No gigs near you yet</div>' +
+          '<div style="color:var(--gray-500);font-size:.9rem;margin-bottom:20px;max-width:320px;margin-left:auto;margin-right:auto">GigLega is just launching in Gurugram. Be the first to post a gig!</div>' +
+          '<a href="post-gig.html" style="display:inline-block;padding:11px 24px;background:var(--primary);color:#fff;border-radius:10px;font-weight:700;text-decoration:none;font-size:.95rem">Post the First Gig →</a>' +
         '</div>';
-      });
-      animCount("statGigs", demoGigs.length);
+      container.classList.remove("hidden");
+      emptyEl.classList.add("hidden");
+      animCount("statGigs", 0);
     }
 
     /* ── Hero search ── */
     function doSearch() {
-          animCount("statWorkers", 47);
       var q = document.getElementById("heroSearch").value.trim();
       if (!q) { window.location.href = "browse.html"; return; }
       window.location.href = "browse.html?q=" + encodeURIComponent(q);

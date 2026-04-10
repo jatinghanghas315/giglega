@@ -533,8 +533,8 @@
     };
 
     window.sendLocation = async function(){
-      if(!window._activeConv){ alert("Select a conversation first."); return; }
-      if(!navigator.geolocation){ alert("Geolocation not supported."); return; }
+      if(!window._activeConv){ showToast("Select a conversation to share location.","info"); return; return; }
+      if(!navigator.geolocation){ showToast("Location sharing is not supported on this device.","error"); return; return; }
       navigator.geolocation.getCurrentPosition(async pos=>{
         const {latitude:lat,longitude:lng} = pos.coords;
         const url=`https://maps.google.com/?q=${lat},${lng}`;
@@ -543,14 +543,14 @@
           senderId:currentUser.uid, type:"location", url, timestamp:serverTimestamp()
         });
         await setDoc(doc(db,"conversations",convId),{lastMessageAt:serverTimestamp(),lastMessage:"📍 Location"},{merge:true});
-      },()=>alert("Location access denied."));
+      },()=>showToast("Location access was denied. Please allow it in browser settings.","error"));
     };
 
     window.triggerMedia  = ()=>{ document.getElementById("mediaInput").click(); };
     window.handleKeydown = e=>{ if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendMessage();} };
 
     window.uploadMedia = async function(file){
-      if(!window._activeConv){ alert("Select a conversation first."); return; }
+      if(!window._activeConv){ showToast("Select a conversation to share location.","info"); return; return; }
       const { convId } = window._activeConv;
       document.getElementById("uploadBar").style.display="block";
       try{
@@ -568,7 +568,7 @@
           lastMessageAt:serverTimestamp(),
           lastMessage:isImage?"📷 Photo":"🎥 Video"
         },{merge:true});
-      }catch(e){ alert("Upload failed: "+e.message); }
+      }catch(e){ showToast("File upload failed. Please try a smaller file.","error"); }
       document.getElementById("uploadBar").style.display="none";
     };
 
@@ -688,7 +688,7 @@
     }
 
     async function submitReport(){
-      if(!_selectedReason){ alert('Please select a reason.'); return; }
+      if(!_selectedReason){ showToast('Please select a reason.','error'); return; return; }
       var reporter = (typeof currentUser !== 'undefined') ? currentUser : null;
       if(!reporter){ closeReportModal(); return; }
       try {

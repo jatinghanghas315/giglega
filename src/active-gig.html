@@ -686,7 +686,7 @@
         el('otpBoxes').querySelectorAll('.otp-box')[0].focus();
         toast('OTP request bhej di! Poster se code lo.','success');
         btn.style.display='none';
-      }catch(e){ toast('Error: '+e.message,'error'); btn.disabled=false; btn.textContent='🔑 OTP Request Karo'; }
+      }catch(e){ console.error('[GigLega] OTP request:',e); toast('OTP request failed. Please try again.','error'); btn.disabled=false; btn.textContent='Request OTP'; }
     });
 
     /* ══ OTP boxes (worker) ══ */
@@ -725,7 +725,11 @@
           status:'completed',
           completedAt:new Date().toISOString(),
           workerEarnings:earn,
-          platformFee:fee
+          platformFee:fee,
+          completionOTP:       null,
+          completionOTPExpiry: null,
+          completionRequested: false,
+          completionRequestedAt: null
         });
 
         // ── 2. Credit worker wallet (atomic read-then-write) ──
@@ -785,7 +789,7 @@
         el('workerDoneAmt').textContent='₹'+earn.toLocaleString('en-IN');
         el('workerDone').classList.add('show');
         toast('Gig complete! ₹'+earn+' wallet mein credit ho gaya.','success');
-      }catch(e){ toast('Error: '+e.message,'error'); btn.disabled=false; btn.textContent='✅ Gig Complete Karo'; }
+      }catch(e){ console.error('[GigLega] completion:',e); toast('Completion failed. Please try again.','error'); btn.disabled=false; btn.textContent='Complete Gig'; }
     });
 
     /* ══ INIT ══ */
@@ -933,7 +937,7 @@
         }catch(e){
           el('skelWrap').style.display='none';
           el('emptyWrap').style.display='block';
-          el('emptyBody').textContent='Error loading gig: '+e.message;
+          el('emptyBody').textContent='Unable to load gig details. Please refresh the page.';
           return;
         }
       }
@@ -951,7 +955,7 @@
       },function(err){
         el('skelWrap').style.display='none';
         el('emptyWrap').style.display='block';
-        el('emptyBody').textContent='Real-time update error: '+err.message;
+        el('emptyBody').textContent='Connection issue. Please check your internet and refresh.';
       });
     }
   </script>
