@@ -1053,7 +1053,7 @@
         : '<span class="gig-type-tag tag-remote">' + IC_GLOBE + ' Remote</span>';
 
       return '<div class="gig-card' + (isTaken ? " taken" : "") + (isUrgent ? " urgent" : "") + '" ' +
-        'onclick="window.location.href='gig-detail.html?id=' + escH(gig.id) + ''">' +
+        'onclick="window.location.href=\'gig-detail.html?id=' + escH(gig.id) + '\'">' +
         '<div class="gig-card-left">' +
           '<div class="gig-top-row">' + typeTag + urgentBadge + '<div style="margin-left:auto">' + statusHtml + '</div></div>' +
           '<div class="gig-card-title">' + escH(gig.title) + '</div>' +
