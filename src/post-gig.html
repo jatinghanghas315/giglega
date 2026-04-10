@@ -9,16 +9,39 @@
   <link rel="stylesheet" href="mobile.css?v=20260410-1828"/>
   <script src="shared.js?v=20260411" defer></script>
   <style>
-    /* ── Layout ── */
-    .pg-wrap{max-width:560px;margin:0 auto;padding:24px 16px 120px;}
+    body{
+      background:
+        radial-gradient(ellipse 80% 50% at 10% -10%, rgba(1,105,111,.08) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 90% 110%, rgba(79,152,163,.07) 0%, transparent 55%),
+        var(--bg);
+    }
+    [data-theme=dark] body{
+      background:
+        radial-gradient(ellipse 80% 50% at 10% -10%, rgba(79,152,163,.07) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 90% 110%, rgba(1,105,111,.05) 0%, transparent 55%),
+        var(--bg);
+    }
+    main::before{
+      content:'';display:block;height:4px;
+      background:linear-gradient(90deg, var(--primary), var(--teal), transparent);
+    }
+    .pg-bg-dots{
+      position:fixed;inset:0;pointer-events:none;z-index:0;
+      background-image:radial-gradient(circle, rgba(1,105,111,.055) 1px, transparent 1px);
+      background-size:28px 28px;
+    }
+    [data-theme=dark] .pg-bg-dots{
+      background-image:radial-gradient(circle, rgba(79,152,163,.045) 1px, transparent 1px);
+    }
+    .pg-wrap{max-width:560px;margin:0 auto;padding:24px 16px 120px;position:relative;z-index:1;}
 
-    /* ── Progress bar ── */
-    .pg-progress{display:flex;align-items:center;gap:0;margin-bottom:32px;}
-    .pg-step{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;cursor:pointer;}
+    /* Progress */
+    .pg-progress{display:flex;align-items:center;margin-bottom:32px;}
+    .pg-step{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;}
     .pg-step-dot{width:34px;height:34px;border-radius:50%;border:2px solid var(--gray-200);
       background:var(--surface);color:var(--gray-400);
       display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:800;
-      transition:all .3s;}
+      transition:all .3s;cursor:default;}
     .pg-step.done   .pg-step-dot{background:var(--teal);border-color:var(--teal);color:#fff;}
     .pg-step.active .pg-step-dot{background:var(--primary);border-color:var(--primary);color:#fff;
       box-shadow:0 0 0 4px rgba(1,105,111,.12);}
@@ -27,267 +50,202 @@
     .pg-line{flex:1;height:2px;background:var(--gray-200);margin-bottom:18px;transition:background .4s;}
     .pg-line.done{background:var(--teal);}
 
-    /* ── Step cards ── */
+    /* Cards */
     .pg-card{background:var(--surface);border:1.5px solid var(--gray-200);border-radius:var(--radius);
-      padding:24px;box-shadow:var(--shadow-sm);display:none;
-      animation:slide-in .28s cubic-bezier(.16,1,.3,1);}
-    .pg-card.active{display:block;}
-    @keyframes slide-in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-    .pg-card-title{font-size:1.05rem;font-weight:800;color:var(--text);margin-bottom:6px;}
+      padding:24px;box-shadow:var(--shadow-sm);display:none;}
+    .pg-card.active{display:block;animation:slide-in .28s cubic-bezier(.16,1,.3,1);}
+    @keyframes slide-in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+    .pg-card-title{font-size:1.05rem;font-weight:800;color:var(--text);margin-bottom:4px;}
     .pg-card-sub{font-size:.8rem;color:var(--gray-400);margin-bottom:22px;}
 
-    /* ── Field ── */
+    /* Fields */
     .field{margin-bottom:20px;}
     .field-label{font-size:.76rem;font-weight:700;color:var(--gray-500);text-transform:uppercase;
-      letter-spacing:.3px;margin-bottom:7px;display:flex;align-items:center;gap:6px;}
-    .field-label .req{color:var(--primary);font-size:.9rem;}
+      letter-spacing:.3px;margin-bottom:7px;display:flex;align-items:center;gap:5px;}
+    .req{color:var(--primary);font-size:.9rem;}
     .field-input{width:100%;padding:11px 14px;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);
       background:var(--bg);color:var(--text);font-size:.9rem;font-family:inherit;
       transition:border-color .2s,box-shadow .2s;outline:none;}
     .field-input:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(1,105,111,.09);}
-    .field-input.error{border-color:#e53e3e;box-shadow:0 0 0 3px rgba(229,62,62,.08);}
+    .field-input.err{border-color:#e53e3e;}
     textarea.field-input{resize:none;line-height:1.6;}
     .field-hint{font-size:.72rem;color:var(--gray-400);margin-top:5px;}
     .field-err{font-size:.72rem;color:#e53e3e;margin-top:4px;display:none;}
     .field-err.show{display:block;}
     [data-theme=dark] .field-input{background:var(--gray-800);border-color:var(--gray-600);}
 
-    /* ── Category pills ── */
+    /* Category grid */
     .cat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
     @media(max-width:420px){.cat-grid{grid-template-columns:repeat(3,1fr);}}
     .cat-pill{border:1.5px solid var(--gray-200);border-radius:10px;padding:10px 6px;
       text-align:center;cursor:pointer;background:var(--bg);transition:all .18s;
-      display:flex;flex-direction:column;align-items:center;gap:4px;-webkit-tap-highlight-color:transparent;}
-    .cat-pill:hover{border-color:var(--primary);background:rgba(1,105,111,.04);}
-    .cat-pill.sel{border-color:var(--primary);background:rgba(1,105,111,.07);color:var(--primary);}
-    .cat-pill .cat-emoji{font-size:1.4rem;line-height:1;pointer-events:none;}
-    .cat-pill .cat-name{font-size:.65rem;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.2px;pointer-events:none;}
+      display:flex;flex-direction:column;align-items:center;gap:4px;user-select:none;}
+    .cat-pill:active{transform:scale(.95);}
+    .cat-pill.sel{border-color:var(--primary);background:rgba(1,105,111,.07);}
+    .cat-emoji{font-size:1.4rem;line-height:1;}
+    .cat-name{font-size:.65rem;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.2px;}
     .cat-pill.sel .cat-name{color:var(--primary);}
     [data-theme=dark] .cat-pill{background:var(--gray-800);border-color:var(--gray-600);}
 
-    /* ── Duration pills ── */
+    /* Duration pills */
     .dur-pills{display:flex;flex-wrap:wrap;gap:8px;}
     .dur-pill{padding:9px 16px;border:1.5px solid var(--gray-200);border-radius:20px;
       font-size:.82rem;font-weight:700;color:var(--gray-500);cursor:pointer;
-      background:var(--bg);transition:all .18s;-webkit-tap-highlight-color:transparent;}
-    .dur-pill:hover{border-color:var(--primary);}
+      background:var(--bg);transition:all .18s;user-select:none;}
+    .dur-pill:active{transform:scale(.95);}
     .dur-pill.sel{border-color:var(--primary);background:rgba(1,105,111,.07);color:var(--primary);}
     [data-theme=dark] .dur-pill{background:var(--gray-800);border-color:var(--gray-600);}
 
-    /* ── Row layout ── */
     .row-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
     @media(max-width:380px){.row-2{grid-template-columns:1fr;}}
 
-    /* ── GPS button ── */
-    .gps-row{display:flex;gap:8px;align-items:flex-start;}
+    /* GPS */
+    .gps-row{display:flex;gap:8px;}
     .gps-row .field-input{flex:1;}
-    .btn-gps{flex-shrink:0;padding:11px 13px;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);
-      background:var(--bg);cursor:pointer;font-size:.9rem;transition:all .2s;white-space:nowrap;color:var(--text);}
-    .btn-gps:hover{border-color:var(--primary);color:var(--primary);}
-    .btn-gps.loading{border-color:var(--teal);color:var(--teal);animation:gps-spin .8s linear infinite;}
-    @keyframes gps-spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+    .btn-gps{flex-shrink:0;width:44px;height:44px;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);
+      background:var(--bg);cursor:pointer;font-size:1.1rem;transition:all .2s;color:var(--text);
+      display:flex;align-items:center;justify-content:center;}
+    .btn-gps:hover{border-color:var(--primary);}
     [data-theme=dark] .btn-gps{background:var(--gray-800);border-color:var(--gray-600);}
+    .gps-status{font-size:.74rem;margin-top:6px;display:none;align-items:center;gap:6px;}
+    .gps-status.show{display:flex;}
+    .gps-ok{color:#059669;}.gps-err{color:#e53e3e;}.gps-load{color:#b45309;}
 
-    /* ── Budget meter ── */
+    /* Budget */
     .budget-wrap{position:relative;}
-    .budget-prefix{position:absolute;left:13px;top:50%;transform:translateY(-50%);
+    .budget-pfx{position:absolute;left:13px;top:50%;transform:translateY(-50%);
       font-weight:800;color:var(--primary);font-size:1rem;pointer-events:none;}
-    .budget-input{padding-left:28px !important;}
-    .budget-meter{margin-top:10px;border-radius:10px;padding:10px 13px;
-      font-size:.8rem;font-weight:600;display:flex;align-items:center;gap:8px;
-      transition:all .3s;background:var(--gray-100);}
-    .budget-meter.low  {background:rgba(229,62,62,.08);color:#c53030;}
-    .budget-meter.warn {background:rgba(245,158,11,.08);color:#b45309;}
-    .budget-meter.fair {background:rgba(16,185,129,.08);color:#059669;}
-    .budget-meter.high {background:rgba(59,130,246,.08);color:#1d4ed8;}
-    .budget-meter.idle {background:var(--gray-100);color:var(--gray-400);}
-    [data-theme=dark] .budget-meter.idle{background:var(--gray-700);color:var(--gray-400);}
-    [data-theme=dark] .budget-meter.low {background:rgba(229,62,62,.12);}
-    [data-theme=dark] .budget-meter.warn{background:rgba(245,158,11,.1);}
-    [data-theme=dark] .budget-meter.fair{background:rgba(16,185,129,.1);}
-    [data-theme=dark] .budget-meter.high{background:rgba(59,130,246,.1);}
-    .budget-slider-row{margin-top:8px;display:flex;align-items:center;gap:10px;}
-    .budget-slider{flex:1;accent-color:var(--primary);}
-    .budget-quickbtn{padding:4px 10px;border:1.5px solid var(--gray-200);border-radius:12px;
-      font-size:.72rem;font-weight:700;color:var(--gray-500);cursor:pointer;background:var(--bg);
-      transition:all .18s;white-space:nowrap;}
-    .budget-quickbtn:hover{border-color:var(--primary);color:var(--primary);}
-    [data-theme=dark] .budget-quickbtn{background:var(--gray-800);border-color:var(--gray-600);}
+    .budget-inp{padding-left:28px !important;}
+    .budget-quick{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;}
+    .qbtn{padding:4px 10px;border:1.5px solid var(--gray-200);border-radius:12px;
+      font-size:.72rem;font-weight:700;color:var(--gray-500);cursor:pointer;background:var(--bg);transition:all .18s;}
+    .qbtn:hover{border-color:var(--primary);color:var(--primary);}
+    [data-theme=dark] .qbtn{background:var(--gray-800);border-color:var(--gray-600);}
+    .budget-meter{margin-top:8px;border-radius:10px;padding:10px 13px;
+      font-size:.8rem;font-weight:600;display:flex;align-items:center;gap:8px;transition:all .3s;}
+    .bm-idle{background:var(--gray-100);color:var(--gray-400);}
+    .bm-low {background:rgba(229,62,62,.08);color:#c53030;}
+    .bm-warn{background:rgba(245,158,11,.08);color:#b45309;}
+    .bm-fair{background:rgba(16,185,129,.08);color:#059669;}
+    .bm-high{background:rgba(59,130,246,.08);color:#1d4ed8;}
+    [data-theme=dark] .bm-idle{background:var(--gray-700);color:var(--gray-400);}
+    [data-theme=dark] .bm-low {background:rgba(229,62,62,.12);}
+    [data-theme=dark] .bm-warn{background:rgba(245,158,11,.1);}
+    [data-theme=dark] .bm-fair{background:rgba(16,185,129,.1);}
+    [data-theme=dark] .bm-high{background:rgba(59,130,246,.1);}
 
-    /* ── Urgency toggle ── */
-    .urgency-wrap{display:flex;gap:10px;}
+    /* Urgency */
+    .urg-wrap{display:flex;gap:10px;}
     .urg-opt{flex:1;padding:12px;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);
-      text-align:center;cursor:pointer;transition:all .2s;-webkit-tap-highlight-color:transparent;}
-    .urg-opt .urg-icon{font-size:1.5rem;display:block;margin-bottom:4px;}
-    .urg-opt .urg-label{font-size:.78rem;font-weight:700;color:var(--gray-500);}
-    .urg-opt .urg-sub{font-size:.68rem;color:var(--gray-400);margin-top:2px;}
-    .urg-opt:hover{border-color:var(--primary);}
-    .urg-opt.sel-normal{border-color:var(--primary);background:rgba(1,105,111,.06);}
-    .urg-opt.sel-normal .urg-label{color:var(--primary);}
-    .urg-opt.sel-urgent{border-color:#e53e3e;background:rgba(229,62,62,.06);}
-    .urg-opt.sel-urgent .urg-label{color:#c53030;}
+      text-align:center;cursor:pointer;transition:all .2s;user-select:none;}
+    .urg-opt:active{transform:scale(.97);}
+    .urg-icon{font-size:1.5rem;display:block;margin-bottom:4px;}
+    .urg-lbl{font-size:.78rem;font-weight:700;color:var(--gray-500);}
+    .urg-sub{font-size:.68rem;color:var(--gray-400);margin-top:2px;}
+    .urg-normal{border-color:var(--primary);background:rgba(1,105,111,.06);}
+    .urg-normal .urg-lbl{color:var(--primary);}
+    .urg-urgent{border-color:#e53e3e;background:rgba(229,62,62,.06);}
+    .urg-urgent .urg-lbl{color:#c53030;}
     [data-theme=dark] .urg-opt{background:var(--gray-800);}
 
-    /* ── Preview card (step 3) ── */
+    /* Preview */
     .preview-card{border:1.5px solid var(--gray-200);border-radius:var(--radius);
-      padding:18px;background:var(--bg);margin-top:20px;margin-bottom:16px;}
-    .preview-badge{display:inline-flex;align-items:center;gap:5px;font-size:.7rem;font-weight:800;
+      padding:18px;background:var(--bg);margin:12px 0 16px;}
+    .pv-badge{display:inline-flex;align-items:center;gap:5px;font-size:.7rem;font-weight:800;
       text-transform:uppercase;letter-spacing:.3px;padding:3px 10px;border-radius:12px;margin-bottom:10px;}
-    .preview-badge.normal{background:rgba(1,105,111,.1);color:var(--primary);}
-    .preview-badge.urgent{background:rgba(229,62,62,.1);color:#c53030;}
-    .preview-title{font-size:1rem;font-weight:800;color:var(--text);margin-bottom:6px;line-height:1.3;}
-    .preview-meta{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;}
-    .preview-chip{font-size:.74rem;color:var(--gray-500);display:flex;align-items:center;gap:4px;}
-    .preview-budget{font-size:1.25rem;font-weight:900;color:var(--primary);margin-top:8px;}
-    .preview-desc{font-size:.82rem;color:var(--gray-500);line-height:1.6;margin-top:8px;
+    .pv-normal{background:rgba(1,105,111,.1);color:var(--primary);}
+    .pv-urgent{background:rgba(229,62,62,.1);color:#c53030;}
+    .pv-title{font-size:1rem;font-weight:800;color:var(--text);margin-bottom:8px;line-height:1.3;}
+    .pv-meta{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px;}
+    .pv-chip{font-size:.74rem;color:var(--gray-500);}
+    .pv-budget{font-size:1.25rem;font-weight:900;color:var(--primary);}
+    .pv-desc{font-size:.82rem;color:var(--gray-500);line-height:1.6;margin-top:6px;
       display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
 
-    /* ── Advanced accordion ── */
+    /* Advanced */
     .adv-toggle{display:flex;align-items:center;gap:8px;width:100%;padding:12px 16px;
       border:1.5px dashed var(--gray-200);border-radius:var(--radius-sm);
       background:transparent;cursor:pointer;font-size:.82rem;font-weight:700;color:var(--gray-400);
-      transition:all .2s;margin-bottom:0;}
+      transition:all .2s;margin-top:4px;}
     .adv-toggle:hover{border-color:var(--primary);color:var(--primary);}
-    .adv-arrow{margin-left:auto;transition:transform .25s;}
+    .adv-arrow{margin-left:auto;transition:transform .25s;display:inline-block;}
     .adv-toggle.open .adv-arrow{transform:rotate(180deg);}
-    .adv-body{display:none;padding:16px 0 0;}
+    .adv-body{display:none;padding-top:16px;}
     .adv-body.open{display:block;}
 
-    /* ── Nav buttons ── */
+    /* Custom duration */
+    .custom-dur{display:none;margin-top:10px;}
+    .custom-dur.show{display:block;}
+
+    /* Buttons */
     .pg-nav{display:flex;gap:10px;margin-top:20px;}
-    .btn-back{flex:0;padding:12px 18px;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);
+    .btn-back{padding:12px 18px;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);
       font-size:.88rem;font-weight:700;color:var(--gray-500);background:transparent;cursor:pointer;transition:all .2s;}
     .btn-back:hover{border-color:var(--primary);color:var(--primary);}
     .btn-next{flex:1;padding:13px;background:var(--primary);color:#fff;border:none;border-radius:var(--radius-sm);
-      font-size:.95rem;font-weight:800;cursor:pointer;transition:all .2s;
-      box-shadow:0 4px 14px rgba(1,105,111,.25);}
-    .btn-next:hover{background:var(--primary-dark);transform:translateY(-1px);}
-    .btn-next:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+      font-size:.95rem;font-weight:800;cursor:pointer;transition:all .2s;box-shadow:0 4px 14px rgba(1,105,111,.25);}
+    .btn-next:hover{background:var(--primary-dark,#0c4e54);transform:translateY(-1px);}
     .btn-post{flex:1;padding:14px;background:linear-gradient(135deg,var(--primary),var(--teal));
       color:#fff;border:none;border-radius:var(--radius-sm);font-size:1rem;font-weight:800;
       cursor:pointer;box-shadow:0 4px 16px rgba(1,105,111,.3);transition:all .2s;}
     .btn-post:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 6px 22px rgba(1,105,111,.4);}
     .btn-post:disabled{opacity:.5;cursor:not-allowed;transform:none;}
 
-    /* ── Custom duration input ── */
-    .custom-dur{margin-top:10px;display:none;}
-    .custom-dur.show{display:block;}
-
-    /* ── GPS status strip ── */
-    .gps-status{font-size:.74rem;margin-top:6px;display:flex;align-items:center;gap:6px;display:none;}
-    .gps-status.show{display:flex;}
-    .gps-status.ok{color:#059669;} .gps-status.err{color:#e53e3e;} .gps-status.load{color:#b45309;}
-
-    /* ── Success overlay ── */
-    .success-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:999;
+    /* Success */
+    .success-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:999;
       align-items:center;justify-content:center;padding:24px;}
     .success-overlay.show{display:flex;}
     .success-box{background:var(--surface);border-radius:var(--radius);padding:32px 28px;
       text-align:center;max-width:360px;width:100%;box-shadow:var(--shadow-lg);}
-    .success-icon{font-size:3.5rem;margin-bottom:12px;}
-    .success-title{font-size:1.2rem;font-weight:800;margin-bottom:6px;}
-    .success-sub{font-size:.85rem;color:var(--gray-400);margin-bottom:20px;}
-    .success-btns{display:flex;gap:10px;flex-direction:column;}
-
-    /* ── Page background ── */
-    body{
-      background:
-        radial-gradient(ellipse 80% 50% at 10% -10%, rgba(1,105,111,.07) 0%, transparent 60%),
-        radial-gradient(ellipse 60% 40% at 90% 110%, rgba(79,152,163,.06) 0%, transparent 55%),
-        var(--bg);
-    }
-    [data-theme=dark] body{
-      background:
-        radial-gradient(ellipse 80% 50% at 10% -10%, rgba(79,152,163,.06) 0%, transparent 60%),
-        radial-gradient(ellipse 60% 40% at 90% 110%, rgba(1,105,111,.05) 0%, transparent 55%),
-        var(--bg);
-    }
-    /* Subtle dot grid */
-    .pg-wrap{
-      position:relative;
-    }
-    .pg-wrap::before{
-      content:'';
-      position:fixed;
-      inset:0;
-      background-image: radial-gradient(circle, rgba(1,105,111,.06) 1px, transparent 1px);
-      background-size: 28px 28px;
-      pointer-events:none;
-      z-index:0;
-    }
-    [data-theme=dark] .pg-wrap::before{
-      background-image: radial-gradient(circle, rgba(79,152,163,.05) 1px, transparent 1px);
-    }
-    .pg-wrap > *{position:relative;z-index:1;}
-
-    /* Decorative header accent bar */
-    main::before{
-      content:'';
-      display:block;
-      height:4px;
-      background:linear-gradient(90deg, var(--primary), var(--teal), rgba(79,152,163,0));
-      margin-bottom:0;
-    }
   </style>
 </head>
 <body>
+<div class="pg-bg-dots"></div>
 <div id="main-nav" role="navigation"></div>
 <main>
 <div class="pg-wrap">
 
-  <!-- Header -->
   <div style="margin-bottom:24px;">
     <h1 style="font-size:1.4rem;font-weight:900;color:var(--text);margin-bottom:4px;">📋 Post a Gig</h1>
-    <p style="font-size:.82rem;color:var(--gray-400);">60 seconds se kam mein gig post karo — bilkul free.</p>
+    <p style="font-size:.82rem;color:var(--gray-400);">60 seconds mein gig post karo — bilkul free.</p>
   </div>
 
   <!-- Progress -->
   <div class="pg-progress" id="pgProgress">
-    <div class="pg-step active" id="pstep1" onclick="goStep(1)">
-      <div class="pg-step-dot" id="pdot1">1</div>
-      <div class="pg-step-label">Kya?</div>
-    </div>
+    <div class="pg-step active" id="pstep1"><div class="pg-step-dot" id="pdot1">1</div><div class="pg-step-label">Kya?</div></div>
     <div class="pg-line" id="pline1"></div>
-    <div class="pg-step" id="pstep2" onclick="goStep(2)">
-      <div class="pg-step-dot" id="pdot2">2</div>
-      <div class="pg-step-label">Kab & Kahan?</div>
-    </div>
+    <div class="pg-step" id="pstep2"><div class="pg-step-dot" id="pdot2">2</div><div class="pg-step-label">Kab & Kahan?</div></div>
     <div class="pg-line" id="pline2"></div>
-    <div class="pg-step" id="pstep3" onclick="goStep(3)">
-      <div class="pg-step-dot" id="pdot3">3</div>
-      <div class="pg-step-label">Review</div>
-    </div>
+    <div class="pg-step" id="pstep3"><div class="pg-step-dot" id="pdot3">3</div><div class="pg-step-label">Review</div></div>
   </div>
 
-  <!-- ══ STEP 1 — What? ══ -->
+  <!-- STEP 1 -->
   <div class="pg-card active" id="card1">
     <div class="pg-card-title">Kya kaam chahiye?</div>
     <div class="pg-card-sub">Title, category aur thodi si detail — bas itna kaafi hai.</div>
 
     <div class="field">
       <div class="field-label">Gig Title <span class="req">*</span></div>
-      <input class="field-input" id="fTitle" type="text" maxlength="80"
-        placeholder="e.g. Packing Helper — Sector 37 Warehouse"
-        oninput="charCount(this,'titleCount',80);updatePreview()"/>
-      <div class="field-hint"><span id="titleCount">0</span>/80 characters</div>
+      <input class="field-input" id="fTitle" type="text" maxlength="80" placeholder="e.g. Packing Helper — Sector 37 Warehouse"/>
+      <div class="field-hint"><span id="titleCount">0</span>/80</div>
       <div class="field-err" id="errTitle">Title daalo (min 8 characters)</div>
     </div>
 
     <div class="field">
       <div class="field-label">Category <span class="req">*</span></div>
       <div class="cat-grid" id="catGrid">
-        <div class="cat-pill" data-cat="cleaning"  onclick="pickCat(this)"><span class="cat-emoji">🧹</span><span class="cat-name">Cleaning</span></div>
-        <div class="cat-pill" data-cat="delivery"  onclick="pickCat(this)"><span class="cat-emoji">📦</span><span class="cat-name">Delivery</span></div>
-        <div class="cat-pill" data-cat="moving"    onclick="pickCat(this)"><span class="cat-emoji">🚚</span><span class="cat-name">Moving</span></div>
-        <div class="cat-pill" data-cat="cooking"   onclick="pickCat(this)"><span class="cat-emoji">🍳</span><span class="cat-name">Cooking</span></div>
-        <div class="cat-pill" data-cat="teaching"  onclick="pickCat(this)"><span class="cat-emoji">📚</span><span class="cat-name">Teaching</span></div>
-        <div class="cat-pill" data-cat="repair"    onclick="pickCat(this)"><span class="cat-emoji">🔧</span><span class="cat-name">Repair</span></div>
-        <div class="cat-pill" data-cat="gardening" onclick="pickCat(this)"><span class="cat-emoji">🌿</span><span class="cat-name">Garden</span></div>
-        <div class="cat-pill" data-cat="security"  onclick="pickCat(this)"><span class="cat-emoji">🔒</span><span class="cat-name">Security</span></div>
-        <div class="cat-pill" data-cat="driving"   onclick="pickCat(this)"><span class="cat-emoji">🚗</span><span class="cat-name">Driving</span></div>
-        <div class="cat-pill" data-cat="errands"   onclick="pickCat(this)"><span class="cat-emoji">🛒</span><span class="cat-name">Errands</span></div>
-        <div class="cat-pill" data-cat="event"     onclick="pickCat(this)"><span class="cat-emoji">🎪</span><span class="cat-name">Event</span></div>
-        <div class="cat-pill" data-cat="other"     onclick="pickCat(this)"><span class="cat-emoji">⚡</span><span class="cat-name">Other</span></div>
+        <div class="cat-pill" data-cat="cleaning" ><span class="cat-emoji">🧹</span><span class="cat-name">Cleaning</span></div>
+        <div class="cat-pill" data-cat="delivery" ><span class="cat-emoji">📦</span><span class="cat-name">Delivery</span></div>
+        <div class="cat-pill" data-cat="moving"   ><span class="cat-emoji">🚚</span><span class="cat-name">Moving</span></div>
+        <div class="cat-pill" data-cat="cooking"  ><span class="cat-emoji">🍳</span><span class="cat-name">Cooking</span></div>
+        <div class="cat-pill" data-cat="teaching" ><span class="cat-emoji">📚</span><span class="cat-name">Teaching</span></div>
+        <div class="cat-pill" data-cat="repair"   ><span class="cat-emoji">🔧</span><span class="cat-name">Repair</span></div>
+        <div class="cat-pill" data-cat="gardening"><span class="cat-emoji">🌿</span><span class="cat-name">Garden</span></div>
+        <div class="cat-pill" data-cat="security" ><span class="cat-emoji">🔒</span><span class="cat-name">Security</span></div>
+        <div class="cat-pill" data-cat="driving"  ><span class="cat-emoji">🚗</span><span class="cat-name">Driving</span></div>
+        <div class="cat-pill" data-cat="errands"  ><span class="cat-emoji">🛒</span><span class="cat-name">Errands</span></div>
+        <div class="cat-pill" data-cat="event"    ><span class="cat-emoji">🎪</span><span class="cat-name">Event</span></div>
+        <div class="cat-pill" data-cat="other"    ><span class="cat-emoji">⚡</span><span class="cat-name">Other</span></div>
       </div>
       <div class="field-err" id="errCat">Category choose karo</div>
     </div>
@@ -295,42 +253,41 @@
     <div class="field">
       <div class="field-label">Kya kaam karna hoga? <span class="req">*</span></div>
       <textarea class="field-input" id="fDesc" rows="4" maxlength="500"
-        placeholder="Kya kaam hai? Kab se kab tak? Koi special skill chahiye? Tools milenge ya khud laane honge?&#10;&#10;Jitna clear, utna better — workers jaldi apply karte hain."
-        oninput="charCount(this,'descCount',500);updatePreview()"></textarea>
-      <div class="field-hint"><span id="descCount">0</span>/500 characters</div>
+        placeholder="Kya kaam hai? Kab se kab tak? Special skill chahiye? Tools milenge?&#10;&#10;Jitna clear, utna better."></textarea>
+      <div class="field-hint"><span id="descCount">0</span>/500</div>
       <div class="field-err" id="errDesc">Thodi description daalo (min 20 characters)</div>
     </div>
 
     <div class="pg-nav">
-      <button class="btn-next" onclick="nextStep(1)">Aage → Kab & Kahan?</button>
+      <button class="btn-next" id="btnNext1">Aage → Kab &amp; Kahan?</button>
     </div>
   </div>
 
-  <!-- ══ STEP 2 — When & Where? ══ -->
+  <!-- STEP 2 -->
   <div class="pg-card" id="card2">
     <div class="pg-card-title">Kab aur kahan?</div>
     <div class="pg-card-sub">Schedule, location aur payment set karo.</div>
 
     <div class="field">
-      <div class="field-label">Date & Time <span class="req">*</span></div>
+      <div class="field-label">Date &amp; Time <span class="req">*</span></div>
       <div class="row-2">
-        <input class="field-input" type="date" id="fDate" oninput="updatePreview()"/>
-        <input class="field-input" type="time" id="fTime" value="09:00" oninput="updatePreview()"/>
+        <input class="field-input" type="date" id="fDate"/>
+        <input class="field-input" type="time" id="fTime" value="09:00"/>
       </div>
       <div class="field-err" id="errDate">Date select karo</div>
     </div>
 
     <div class="field">
       <div class="field-label">Duration <span class="req">*</span></div>
-      <div class="dur-pills">
-        <div class="dur-pill" data-dur="1 hour"    data-hrs="1" onclick="pickDur(this)">1 Hour</div>
-        <div class="dur-pill" data-dur="2 hours"   data-hrs="2" onclick="pickDur(this)">2 Hours</div>
-        <div class="dur-pill" data-dur="Half day"  data-hrs="4" onclick="pickDur(this)">Half Day</div>
-        <div class="dur-pill" data-dur="Full day"  data-hrs="8" onclick="pickDur(this)">Full Day</div>
-        <div class="dur-pill" data-dur="custom"    data-hrs="0" onclick="pickDur(this)">✏️ Custom</div>
+      <div class="dur-pills" id="durPills">
+        <div class="dur-pill" data-dur="1 hour"   data-hrs="1">1 Hour</div>
+        <div class="dur-pill" data-dur="2 hours"  data-hrs="2">2 Hours</div>
+        <div class="dur-pill" data-dur="Half day" data-hrs="4">Half Day</div>
+        <div class="dur-pill" data-dur="Full day" data-hrs="8">Full Day</div>
+        <div class="dur-pill" data-dur="custom"   data-hrs="0">✏️ Custom</div>
       </div>
       <div class="custom-dur" id="customDurWrap">
-        <input class="field-input" type="number" id="fCustomHrs" min="1" max="24" placeholder="e.g. 3 (hours)" oninput="updateBudgetMeter();updatePreview()"/>
+        <input class="field-input" type="number" id="fCustomHrs" min="1" max="24" placeholder="e.g. 3 (hours)"/>
       </div>
       <div class="field-err" id="errDur">Duration select karo</div>
     </div>
@@ -338,12 +295,8 @@
     <div class="field">
       <div class="field-label">Location / Area <span class="req">*</span></div>
       <div class="gps-row">
-        <input class="field-input" id="fArea" type="text"
-          placeholder="e.g. Sector 37, Gurugram"
-          oninput="updatePreview()"/>
-        <button class="btn-gps" id="btnGps" onclick="detectGPS()" title="Apni current location use karo">
-          📍
-        </button>
+        <input class="field-input" id="fArea" type="text" placeholder="e.g. Sector 37, Gurugram"/>
+        <button class="btn-gps" id="btnGps" title="GPS se location detect karo">📍</button>
       </div>
       <div class="gps-status" id="gpsStatus"></div>
       <div class="field-err" id="errArea">Area / location daalo</div>
@@ -351,120 +304,92 @@
 
     <div class="field">
       <div class="field-label">Budget <span class="req">*</span>
-        <span style="font-size:.68rem;color:var(--gray-400);font-weight:500;text-transform:none;letter-spacing:0;">— fair pay for fair work</span>
+        <span style="font-size:.68rem;color:var(--gray-400);font-weight:400;text-transform:none;letter-spacing:0;">fair pay for fair work</span>
       </div>
       <div class="budget-wrap">
-        <span class="budget-prefix">₹</span>
-        <input class="field-input budget-input" type="number" id="fBudget" min="50" max="10000"
-          placeholder="e.g. 500" oninput="updateBudgetMeter();updatePreview()"/>
+        <span class="budget-pfx">₹</span>
+        <input class="field-input budget-inp" type="number" id="fBudget" min="50" max="10000" placeholder="500"/>
       </div>
-      <!-- Quick-set suggested amounts -->
-      <div class="budget-slider-row">
-        <input type="range" class="budget-slider" id="budgetSlider" min="50" max="5000" step="50" value="500"
-          oninput="document.getElementById('fBudget').value=this.value;updateBudgetMeter();updatePreview()"/>
+      <input type="range" id="budgetSlider" min="50" max="5000" step="50" value="500"
+        style="width:100%;margin-top:8px;accent-color:var(--primary);"/>
+      <div class="budget-quick" id="quickAmts"></div>
+      <div class="budget-meter bm-idle" id="budgetMeter">
+        <span id="bmIcon">💡</span><span id="bmText">Category aur duration select karo — suggested amount dikhayenge.</span>
       </div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:7px;" id="quickAmts"></div>
-      <div class="budget-meter idle" id="budgetMeter">
-        <span id="budgetMeterIcon">💡</span>
-        <span id="budgetMeterText">Category aur duration select karo — suggested amount dikhayenge.</span>
-      </div>
-      <div class="field-hint">Min ₹50 · Max ₹10,000 · Platform 6% fee worker se nahi, aapki side se hogi</div>
-      <div class="field-err" id="errBudget">Valid amount daalo (₹50 – ₹10,000)</div>
+      <div class="field-hint">Min ₹50 · Max ₹10,000 · 6% platform fee poster se deducted</div>
+      <div class="field-err" id="errBudget">Valid amount daalo (₹50–₹10,000)</div>
     </div>
 
     <div class="pg-nav">
-      <button class="btn-back" onclick="goStep(1)">← Back</button>
-      <button class="btn-next" onclick="nextStep(2)">Aage → Review karo</button>
+      <button class="btn-back" id="btnBack2">← Back</button>
+      <button class="btn-next" id="btnNext2">Aage → Review</button>
     </div>
   </div>
 
-  <!-- ══ STEP 3 — Review & Post ══ -->
+  <!-- STEP 3 -->
   <div class="pg-card" id="card3">
     <div class="pg-card-title">Review karke post karo ✅</div>
     <div class="pg-card-sub">Ek baar dekho — phir ek tap mein live!</div>
 
-    <!-- Urgency -->
     <div class="field">
       <div class="field-label">Urgency</div>
-      <div class="urgency-wrap">
-        <div class="urg-opt sel-normal" id="urgNormal" onclick="pickUrg('normal')">
-          <span class="urg-icon">🟢</span>
-          <div class="urg-label">Normal</div>
-          <div class="urg-sub">24h+ mein karna hai</div>
+      <div class="urg-wrap">
+        <div class="urg-opt urg-normal" id="urgNormal" data-urg="normal">
+          <span class="urg-icon">🟢</span><div class="urg-lbl">Normal</div><div class="urg-sub">24h+ mein hoga</div>
         </div>
-        <div class="urg-opt" id="urgUrgent" onclick="pickUrg('urgent')">
-          <span class="urg-icon">🔥</span>
-          <div class="urg-label">Urgent!</div>
-          <div class="urg-sub">Aaj ya abhi chahiye</div>
+        <div class="urg-opt" id="urgUrgent" data-urg="urgent">
+          <span class="urg-icon">🔥</span><div class="urg-lbl">Urgent!</div><div class="urg-sub">Aaj ya abhi chahiye</div>
         </div>
       </div>
     </div>
 
-    <!-- Live Preview -->
-    <div class="field-label" style="margin-bottom:8px;">Preview — workers isko dekhenge</div>
-    <div class="preview-card" id="previewCard">
-      <div class="preview-badge normal" id="pvBadge">🟢 Normal</div>
-      <div class="preview-title" id="pvTitle">—</div>
-      <div class="preview-meta">
-        <span class="preview-chip">📂 <span id="pvCat">—</span></span>
-        <span class="preview-chip">📍 <span id="pvArea">—</span></span>
-        <span class="preview-chip">⏱ <span id="pvDur">—</span></span>
-        <span class="preview-chip">📅 <span id="pvDate">—</span></span>
+    <div class="field-label">Live Preview</div>
+    <div class="preview-card">
+      <div class="pv-badge pv-normal" id="pvBadge">🟢 Normal</div>
+      <div class="pv-title" id="pvTitle">—</div>
+      <div class="pv-meta">
+        <span class="pv-chip">📂 <span id="pvCat">—</span></span>
+        <span class="pv-chip">📍 <span id="pvArea">—</span></span>
+        <span class="pv-chip">⏱ <span id="pvDur">—</span></span>
+        <span class="pv-chip">📅 <span id="pvDate">—</span></span>
       </div>
-      <div class="preview-desc" id="pvDesc">—</div>
-      <div class="preview-budget">₹<span id="pvBudget">—</span></div>
+      <div class="pv-desc" id="pvDesc">—</div>
+      <div class="pv-budget">₹<span id="pvBudget">—</span></div>
     </div>
 
-    <!-- Advanced Options -->
-    <button class="adv-toggle" id="advToggle" onclick="toggleAdv()">
-      ⚙️ Advanced Options (optional)
-      <span class="adv-arrow">▼</span>
-    </button>
+    <button class="adv-toggle" id="advToggle">⚙️ Advanced Options (optional) <span class="adv-arrow">▼</span></button>
     <div class="adv-body" id="advBody">
-      <div class="field">
-        <div class="field-label">Skills / Tags</div>
-        <input class="field-input" id="fSkills" type="text" placeholder="e.g. Driving licence, Physical strength, Cooking"/>
-        <div class="field-hint">Comma se alag karo</div>
-      </div>
-      <div class="field">
-        <div class="field-label">Kitne Workers Chahiye?</div>
-        <input class="field-input" id="fWorkers" type="number" min="1" max="50" placeholder="1" value="1"/>
-      </div>
-      <div class="field">
-        <div class="field-label">Perks / Benefits</div>
-        <input class="field-input" id="fPerks" type="text" placeholder="e.g. Khana milega, Travel allowance"/>
-      </div>
-      <div class="field">
-        <div class="field-label">Pincode</div>
-        <input class="field-input" id="fPincode" type="text" maxlength="6" placeholder="e.g. 122001"/>
-      </div>
-      <div class="field">
-        <div class="field-label">Additional Notes</div>
-        <textarea class="field-input" id="fNotes" rows="3"
-          placeholder="ID proof, entry details, specific instructions..."></textarea>
-      </div>
+      <div class="field"><div class="field-label">Skills / Tags</div>
+        <input class="field-input" id="fSkills" type="text" placeholder="e.g. Driving licence, Cooking, Physical strength"/></div>
+      <div class="field"><div class="field-label">Kitne Workers?</div>
+        <input class="field-input" id="fWorkers" type="number" min="1" max="50" value="1"/></div>
+      <div class="field"><div class="field-label">Perks</div>
+        <input class="field-input" id="fPerks" type="text" placeholder="e.g. Khana milega, Travel allowance"/></div>
+      <div class="field"><div class="field-label">Pincode</div>
+        <input class="field-input" id="fPincode" type="text" maxlength="6" placeholder="122001"/></div>
+      <div class="field"><div class="field-label">Additional Notes</div>
+        <textarea class="field-input" id="fNotes" rows="3" placeholder="ID proof, entry details, instructions..."></textarea></div>
     </div>
 
     <div class="pg-nav" style="margin-top:20px;">
-      <button class="btn-back" onclick="goStep(2)">← Back</button>
-      <button class="btn-post" id="btnPost" onclick="submitGig()">🚀 Post Gig — Free!</button>
+      <button class="btn-back" id="btnBack3">← Back</button>
+      <button class="btn-post" id="btnPost">🚀 Post Gig — Free!</button>
     </div>
   </div>
 
-</div><!-- pg-wrap -->
+</div>
 </main>
 <div id="main-footer" role="contentinfo"></div>
 
 <!-- Success Modal -->
 <div class="success-overlay" id="successOverlay">
   <div class="success-box">
-    <div class="success-icon">🎉</div>
-    <div class="success-title">Gig Live Ho Gayi!</div>
-    <div class="success-sub" id="successSub">Workers ko notifications ja rahi hain — applications jald aayenge!</div>
-    <div class="success-btns">
-      <button class="btn-post" onclick="window.location.href='dashboard-client.html'">📊 Dashboard Dekho</button>
-      <button class="btn-back" style="border:1.5px solid var(--gray-200);padding:11px;"
-        onclick="window.location.href='browse.html'">🔍 Browse Gigs</button>
+    <div style="font-size:3.5rem;margin-bottom:12px;">🎉</div>
+    <div style="font-size:1.2rem;font-weight:800;margin-bottom:6px;">Gig Live Ho Gayi!</div>
+    <div style="font-size:.85rem;color:var(--gray-400);margin-bottom:20px;" id="successSub">Workers ko notify kar diya gaya!</div>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <button class="btn-post" id="btnSuccessDash">📊 Dashboard Dekho</button>
+      <button class="btn-back" id="btnSuccessBrowse" style="border:1.5px solid var(--gray-200);padding:11px;">🔍 Browse Gigs</button>
     </div>
   </div>
 </div>
@@ -476,323 +401,267 @@ import { collection, addDoc, serverTimestamp }
   from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
 
 /* ── State ── */
-var currentUser   = null;
-var currentStep   = 1;
-var selCat        = '';
-var selDur        = '';
-var selDurHrs     = 0;
-var selUrg        = 'normal';
-var posterLat     = null;
-var posterLng     = null;
+var currentUser = null;
+var currentStep = 1;
+var selCat      = '';
+var selDur      = '';
+var selDurHrs   = 0;
+var selUrg      = 'normal';
+var posterLat   = null;
+var posterLng   = null;
 
-/* ── Market rate table (₹/hour, Gurugram 2026) ── */
+/* ── Market rates (₹/hr, Gurugram 2026) ── */
 var RATES = {
-  cleaning:  {perHour:100,minHour:80,  name:'🧹 Cleaning'},
-  delivery:  {perHour:90, minHour:60,  name:'📦 Delivery'},
-  moving:    {perHour:160,minHour:130, name:'🚚 Moving'},
-  cooking:   {perHour:130,minHour:100, name:'🍳 Cooking'},
-  teaching:  {perHour:280,minHour:200, name:'📚 Teaching'},
-  repair:    {perHour:200,minHour:150, name:'🔧 Repair'},
-  gardening: {perHour:100,minHour:80,  name:'🌿 Gardening'},
-  security:  {perHour:80, minHour:60,  name:'🔒 Security'},
-  driving:   {perHour:160,minHour:120, name:'🚗 Driving'},
-  errands:   {perHour:80, minHour:60,  name:'🛒 Errands'},
-  event:     {perHour:120,minHour:80,  name:'🎪 Event'},
-  other:     {perHour:100,minHour:70,  name:'⚡ Other'}
+  cleaning:{ph:100,mn:80},delivery:{ph:90,mn:60},moving:{ph:160,mn:130},
+  cooking:{ph:130,mn:100},teaching:{ph:280,mn:200},repair:{ph:200,mn:150},
+  gardening:{ph:100,mn:80},security:{ph:80,mn:60},driving:{ph:160,mn:120},
+  errands:{ph:80,mn:60},event:{ph:120,mn:80},other:{ph:100,mn:70}
+};
+var CAT_NAMES = {
+  cleaning:'🧹 Cleaning',delivery:'📦 Delivery',moving:'🚚 Moving',cooking:'🍳 Cooking',
+  teaching:'📚 Teaching',repair:'🔧 Repair',gardening:'🌿 Gardening',security:'🔒 Security',
+  driving:'🚗 Driving',errands:'🛒 Errands',event:'🎪 Event',other:'⚡ Other'
 };
 
-/* ── Helpers ── */
-function el(id){return document.getElementById(id);}
-function show(id){el(id).classList.add('show');}
-function hide(id){el(id).classList.remove('show');}
+var $ = function(id){ return document.getElementById(id); };
 
-window.charCount = function(inp,countId,max){
-  el(countId).textContent = inp.value.length;
-};
+/* ── SET UP ALL EVENT LISTENERS (no inline onclick) ── */
 
-/* ── Category ── */
-window.pickCat = function(t){
-  var pill=t.closest('.cat-pill'); if(!pill) return;
-  document.querySelectorAll('.cat-pill').forEach(function(p){p.classList.remove('sel');});
-  pill.classList.add('sel');
-  selCat = pill.dataset.cat;
-  hide('errCat');
-  updateBudgetMeter();
+// Title char count
+$('fTitle').addEventListener('input', function(){
+  $('titleCount').textContent = this.value.length;
   updatePreview();
-};
+});
 
-/* ── Duration ── */
-window.pickDur = function(t){
-  var pill=t.closest('.dur-pill'); if(!pill) return;
-  document.querySelectorAll('.dur-pill').forEach(function(p){p.classList.remove('sel');});
-  pill.classList.add('sel');
-  selDur  = pill.dataset.dur;
-  selDurHrs = parseFloat(pill.dataset.hrs)||0;
-  hide('errDur');
-  var cdw = el('customDurWrap');
-  if(selDur==='custom'){cdw.classList.add('show');}else{cdw.classList.remove('show');}
-  updateBudgetMeter();
+// Desc char count
+$('fDesc').addEventListener('input', function(){
+  $('descCount').textContent = this.value.length;
   updatePreview();
-};
+});
 
-/* ── Budget meter ── */
-window.updateBudgetMeter = function(){
-  var budget = Number(el('fBudget').value)||0;
-  var hrs    = selDurHrs;
-  if(selDur==='custom') hrs = Number(el('fCustomHrs').value)||0;
-  var meter  = el('budgetMeter');
+// Category pills
+document.querySelectorAll('.cat-pill').forEach(function(pill){
+  pill.addEventListener('click', function(){
+    document.querySelectorAll('.cat-pill').forEach(function(p){ p.classList.remove('sel'); });
+    this.classList.add('sel');
+    selCat = this.dataset.cat;
+    $('errCat').classList.remove('show');
+    updateBudgetMeter();
+    updatePreview();
+  });
+});
+
+// Duration pills
+document.querySelectorAll('.dur-pill').forEach(function(pill){
+  pill.addEventListener('click', function(){
+    document.querySelectorAll('.dur-pill').forEach(function(p){ p.classList.remove('sel'); });
+    this.classList.add('sel');
+    selDur    = this.dataset.dur;
+    selDurHrs = parseFloat(this.dataset.hrs) || 0;
+    $('errDur').classList.remove('show');
+    $('customDurWrap').classList.toggle('show', selDur === 'custom');
+    updateBudgetMeter();
+    updatePreview();
+  });
+});
+
+$('fCustomHrs').addEventListener('input', function(){ updateBudgetMeter(); updatePreview(); });
+
+// GPS
+$('btnGps').addEventListener('click', function(){
+  var btn = this, stat = $('gpsStatus');
+  btn.textContent = '🔄'; stat.className = 'gps-status show'; stat.style.color='#b45309';
+  stat.textContent = '📡 Location detect ho rahi hai...';
+  if(!navigator.geolocation){
+    stat.style.color='#e53e3e'; stat.textContent='❌ Browser GPS support nahi karta.';
+    btn.textContent='📍'; return;
+  }
+  navigator.geolocation.getCurrentPosition(async function(pos){
+    posterLat = pos.coords.latitude; posterLng = pos.coords.longitude;
+    try{
+      var r = await fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat='+posterLat+'&lon='+posterLng,
+        {headers:{'User-Agent':'GigLega/1.0'}});
+      var d = await r.json(), addr = d.address || {};
+      var sector = addr.suburb||addr.neighbourhood||addr.quarter||'';
+      var city   = addr.city||addr.town||'Gurugram';
+      var pin    = addr.postcode||'';
+      $('fArea').value = sector ? sector+', '+city : city;
+      if(pin && $('fPincode')) $('fPincode').value = pin;
+      stat.style.color='#059669'; stat.textContent = '✅ '+$('fArea').value;
+      updatePreview();
+    }catch(e){
+      $('fArea').value='Gurugram';
+      stat.style.color='#059669'; stat.textContent='✅ Approximate location set.';
+    }
+    btn.textContent='✅';
+  }, function(err){
+    var msgs={1:'GPS permission deny.',2:'Signal nahi.',3:'Timeout — try again.'};
+    stat.style.color='#e53e3e'; stat.textContent='❌ '+(msgs[err.code]||'GPS error');
+    btn.textContent='📍';
+  },{enableHighAccuracy:true,timeout:12000,maximumAge:0});
+});
+
+// Budget
+$('fBudget').addEventListener('input', function(){ $('budgetSlider').value=this.value||500; updateBudgetMeter(); updatePreview(); });
+$('budgetSlider').addEventListener('input', function(){ $('fBudget').value=this.value; updateBudgetMeter(); updatePreview(); });
+$('fDate').addEventListener('change', updatePreview);
+$('fTime').addEventListener('change', updatePreview);
+$('fArea').addEventListener('input', updatePreview);
+
+// Urgency
+[$('urgNormal'),$('urgUrgent')].forEach(function(btn){
+  btn.addEventListener('click', function(){
+    selUrg = this.dataset.urg;
+    $('urgNormal').className = 'urg-opt' + (selUrg==='normal'?' urg-normal':'');
+    $('urgUrgent').className = 'urg-opt' + (selUrg==='urgent'?' urg-urgent':'');
+    updatePreview();
+  });
+});
+
+// Advanced
+$('advToggle').addEventListener('click', function(){
+  this.classList.toggle('open');
+  $('advBody').classList.toggle('open');
+});
+
+// Step nav buttons
+$('btnNext1').addEventListener('click', function(){ if(validateStep1()) setStep(2); });
+$('btnBack2').addEventListener('click', function(){ setStep(1); });
+$('btnNext2').addEventListener('click', function(){ if(validateStep2()) setStep(3); });
+$('btnBack3').addEventListener('click', function(){ setStep(2); });
+$('btnPost').addEventListener('click', submitGig);
+$('btnSuccessDash').addEventListener('click', function(){ window.location.href='dashboard-client.html'; });
+$('btnSuccessBrowse').addEventListener('click', function(){ window.location.href='browse.html'; });
+
+/* ── Budget Meter ── */
+function updateBudgetMeter(){
+  var budget = Number($('fBudget').value)||0;
+  var hrs    = selDur==='custom' ? (Number($('fCustomHrs').value)||0) : selDurHrs;
   var rate   = selCat ? RATES[selCat] : null;
+  var qa     = $('quickAmts'); qa.innerHTML='';
 
-  // Quick suggest buttons
-  var qa = el('quickAmts'); qa.innerHTML='';
   if(rate && hrs>0){
-    var suggested = Math.round(rate.perHour * hrs / 50)*50;
-    var minOk     = Math.round(rate.minHour * hrs / 50)*50;
-    var opts = [minOk, suggested, Math.round(suggested*1.3/50)*50];
-    opts.forEach(function(amt){
-      var btn=document.createElement('button');
-      btn.className='budget-quickbtn';
-      btn.textContent='₹'+amt;
-      btn.onclick=function(){el('fBudget').value=amt;el('budgetSlider').value=amt;updateBudgetMeter();updatePreview();};
-      qa.appendChild(btn);
+    var sug = Math.round(rate.ph*hrs/50)*50;
+    var mn  = Math.round(rate.mn*hrs/50)*50;
+    var hi  = Math.round(rate.ph*hrs*1.3/50)*50;
+    [mn,sug,hi].forEach(function(amt){
+      var b=document.createElement('button');
+      b.className='qbtn'; b.textContent='₹'+amt;
+      b.addEventListener('click',function(){ $('fBudget').value=amt; $('budgetSlider').value=amt; updateBudgetMeter(); updatePreview(); });
+      qa.appendChild(b);
     });
   }
 
-  if(!budget){
-    meter.className='budget-meter idle';
-    el('budgetMeterIcon').textContent='💡';
-    el('budgetMeterText').textContent = rate&&hrs>0
-      ? 'Suggested: ₹'+Math.round(rate.perHour*hrs/50)*50+' (₹'+rate.perHour+'/hr)'
-      : 'Amount daalo ya category + duration select karo.';
-    return;
-  }
-  if(budget<50){
-    meter.className='budget-meter low';
-    el('budgetMeterIcon').textContent='❌';
-    el('budgetMeterText').textContent='Minimum ₹50 chahiye — is se post nahi ho sakta.';
-    return;
-  }
-  if(!rate||!hrs){
-    meter.className='budget-meter idle';
-    el('budgetMeterIcon').textContent='💡';
-    el('budgetMeterText').textContent='₹'+budget+' — category aur duration select karo for guidance.';
-    return;
-  }
-  var fairMin = rate.minHour  * hrs;
-  var fairMid = rate.perHour  * hrs;
-  var fairMax = rate.perHour  * hrs * 1.4;
-  if(budget < fairMin*0.6){
-    meter.className='budget-meter low';
-    el('budgetMeterIcon').textContent='⚠️';
-    el('budgetMeterText').textContent='Bahut kam — worker accept nahi karega. Min ₹'+Math.round(fairMin)+' hona chahiye.';
-  } else if(budget < fairMin){
-    meter.className='budget-meter warn';
-    el('budgetMeterIcon').textContent='📉';
-    el('budgetMeterText').textContent='Market rate se thoda kam. Fair pay: ₹'+Math.round(fairMin)+'–₹'+Math.round(fairMid)+'.';
-  } else if(budget <= fairMax){
-    meter.className='budget-meter fair';
-    el('budgetMeterIcon').textContent='✅';
-    el('budgetMeterText').textContent='Fair pay! ₹'+Math.round(fairMin)+'–₹'+Math.round(fairMid)+' is range ka hona chahiye.';
-  } else {
-    meter.className='budget-meter high';
-    el('budgetMeterIcon').textContent='⬆️';
-    el('budgetMeterText').textContent='Market rate se upar — workers zaroor apply karenge!';
-  }
-};
+  var m=$('budgetMeter'), ic=$('bmIcon'), tx=$('bmText');
+  if(!budget){ m.className='budget-meter bm-idle'; ic.textContent='💡'; tx.textContent=rate&&hrs>0?'Suggested: ₹'+Math.round(rate.ph*hrs/50)*50:'Amount daalo ya category+duration select karo.'; return; }
+  if(budget<50){ m.className='budget-meter bm-low'; ic.textContent='❌'; tx.textContent='Min ₹50 required — post nahi hogi.'; return; }
+  if(!rate||!hrs){ m.className='budget-meter bm-idle'; ic.textContent='💡'; tx.textContent='₹'+budget+' — category aur duration select karo for guidance.'; return; }
+  var fairMin=rate.mn*hrs, fairMid=rate.ph*hrs, fairMax=rate.ph*hrs*1.4;
+  if(budget<fairMin*0.6){ m.className='budget-meter bm-low'; ic.textContent='⚠️'; tx.textContent='Bahut kam — worker accept nahi karega. Min ₹'+Math.round(fairMin)+' hona chahiye.'; }
+  else if(budget<fairMin){ m.className='budget-meter bm-warn'; ic.textContent='📉'; tx.textContent='Market rate se thoda kam. Fair range: ₹'+Math.round(fairMin)+'–₹'+Math.round(fairMid)+'.'; }
+  else if(budget<=fairMax){ m.className='budget-meter bm-fair'; ic.textContent='✅'; tx.textContent='Fair pay! Market rate ₹'+Math.round(fairMin)+'–₹'+Math.round(fairMid)+' ke andar hai.'; }
+  else { m.className='budget-meter bm-high'; ic.textContent='⬆️'; tx.textContent='Market rate se upar — workers zaroor apply karenge!'; }
+}
 
-/* ── Urgency ── */
-window.pickUrg = function(urg){
-  selUrg=urg;
-  el('urgNormal').className='urg-opt'+(urg==='normal'?' sel-normal':'');
-  el('urgUrgent').className='urg-opt'+(urg==='urgent'?' sel-urgent':'');
-  updatePreview();
-};
-
-/* ── GPS ── */
-window.detectGPS = function(){
-  var btn=el('btnGps'), stat=el('gpsStatus');
-  btn.classList.add('loading'); btn.textContent='🔄';
-  stat.className='gps-status show load'; stat.textContent='📡 Location detect ho rahi hai...';
-  if(!navigator.geolocation){
-    stat.className='gps-status show err'; stat.textContent='GPS browser mein support nahi.';
-    btn.classList.remove('loading'); btn.textContent='📍'; return;
-  }
-  navigator.geolocation.getCurrentPosition(async function(pos){
-    posterLat=pos.coords.latitude; posterLng=pos.coords.longitude;
-    try{
-      var r=await fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat='+posterLat+'&lon='+posterLng,
-        {headers:{'User-Agent':'GigLega/1.0'}});
-      var d=await r.json();
-      var addr=d.address||{};
-      var sector=addr.suburb||addr.neighbourhood||addr.quarter||'';
-      var city  =addr.city||addr.town||addr.county||'Gurugram';
-      var pin   =addr.postcode||'';
-      if(sector) el('fArea').value=sector+(city?', '+city:'');
-      else el('fArea').value=city;
-      if(pin) el('fPincode') && (el('fPincode').value=pin);
-      stat.className='gps-status show ok'; stat.textContent='✅ Location detect hui: '+el('fArea').value;
-      updatePreview();
-    }catch(e){
-      el('fArea').value='Gurugram';
-      stat.className='gps-status show ok'; stat.textContent='✅ Approximate location set ki.';
-    }
-    btn.classList.remove('loading'); btn.textContent='✅';
-  },function(err){
-    var m={1:'GPS permission deny.',2:'Signal nahi mila.',3:'Timeout — try again.'};
-    stat.className='gps-status show err'; stat.textContent='❌ '+(m[err.code]||'GPS error');
-    btn.classList.remove('loading'); btn.textContent='📍';
-  },{enableHighAccuracy:true,timeout=12000,maximumAge:0});
-};
-
-/* ── Live preview ── */
-window.updatePreview = function(){
-  var title=el('fTitle').value.trim()||'Gig Title';
-  var cat  =selCat?(RATES[selCat]?RATES[selCat].name:selCat):'—';
-  var area =el('fArea')?el('fArea').value.trim()||'—':'—';
-  var dur  =selDur==='custom'?((el('fCustomHrs').value||'?')+' hours'):selDur||'—';
-  var budget=el('fBudget').value||'—';
-  var desc =el('fDesc').value.trim()||'—';
-  var dateVal=el('fDate').value;
-  var dateStr=dateVal?new Date(dateVal).toLocaleDateString('en-IN',{day:'numeric',month:'short'}):'—';
-  var isUrg=selUrg==='urgent';
-  el('pvTitle').textContent=title;
-  el('pvCat').textContent=cat;
-  el('pvArea').textContent=area;
-  el('pvDur').textContent=dur;
-  el('pvDate').textContent=dateStr;
-  el('pvBudget').textContent=budget;
-  el('pvDesc').textContent=desc;
-  var badge=el('pvBadge');
-  badge.className='preview-badge '+(isUrg?'urgent':'normal');
+/* ── Preview ── */
+function updatePreview(){
+  var title  = $('fTitle').value.trim()||'Gig Title';
+  var cat    = selCat?(CAT_NAMES[selCat]||selCat):'—';
+  var area   = $('fArea').value.trim()||'—';
+  var dur    = selDur==='custom'?(($('fCustomHrs').value||'?')+' hours'):selDur||'—';
+  var budget = $('fBudget').value||'—';
+  var desc   = $('fDesc').value.trim()||'—';
+  var dv     = $('fDate').value;
+  var ds     = dv?new Date(dv).toLocaleDateString('en-IN',{day:'numeric',month:'short'}):'—';
+  var isUrg  = selUrg==='urgent';
+  $('pvTitle').textContent=title; $('pvCat').textContent=cat;
+  $('pvArea').textContent=area; $('pvDur').textContent=dur;
+  $('pvDate').textContent=ds; $('pvBudget').textContent=budget; $('pvDesc').textContent=desc;
+  var badge=$('pvBadge');
+  badge.className='pv-badge '+(isUrg?'pv-urgent':'pv-normal');
   badge.textContent=isUrg?'🔥 Urgent':'🟢 Normal';
-};
-
-/* ── Advanced toggle ── */
-window.toggleAdv = function(){
-  var t=el('advToggle'),b=el('advBody');
-  t.classList.toggle('open'); b.classList.toggle('open');
-};
+}
 
 /* ── Step navigation ── */
-window.goStep = function(n){
-  if(n>currentStep) return; // only go back
-  setStep(n);
-};
-
 function setStep(n){
   currentStep=n;
   [1,2,3].forEach(function(i){
-    el('card'+i).classList.toggle('active', i===n);
-    var dot=el('pstep'+i);
-    if(i<n) dot.className='pg-step done';
-    else if(i===n) dot.className='pg-step active';
-    else dot.className='pg-step';
-    el('pdot'+i).textContent=i<n?'✓':i;
+    $('card'+i).classList.toggle('active', i===n);
+    var s=$('pstep'+i);
+    if(i<n){ s.className='pg-step done'; $('pdot'+i).textContent='✓'; }
+    else if(i===n){ s.className='pg-step active'; $('pdot'+i).textContent=i; }
+    else{ s.className='pg-step'; $('pdot'+i).textContent=i; }
   });
-  if(el('pline1')) el('pline1').classList.toggle('done',n>1);
-  if(el('pline2')) el('pline2').classList.toggle('done',n>2);
+  $('pline1').classList.toggle('done',n>1);
+  $('pline2').classList.toggle('done',n>2);
   window.scrollTo({top:0,behavior:'smooth'});
   if(n===3) updatePreview();
 }
 
-window.nextStep = function(from){
-  if(from===1&&!validateStep1()) return;
-  if(from===2&&!validateStep2()) return;
-  setStep(from+1);
-};
-
 /* ── Validation ── */
 function validateStep1(){
   var ok=true;
-  var title=el('fTitle').value.trim();
-  if(title.length<8){el('errTitle').classList.add('show');el('fTitle').classList.add('error');ok=false;}
-  else{el('errTitle').classList.remove('show');el('fTitle').classList.remove('error');}
-  if(!selCat){el('errCat').classList.add('show');ok=false;}
-  var desc=el('fDesc').value.trim();
-  if(desc.length<20){el('errDesc').classList.add('show');el('fDesc').classList.add('error');ok=false;}
-  else{el('errDesc').classList.remove('show');el('fDesc').classList.remove('error');}
+  var title=$('fTitle').value.trim();
+  if(title.length<8){ $('errTitle').classList.add('show'); $('fTitle').classList.add('err'); ok=false; }
+  else{ $('errTitle').classList.remove('show'); $('fTitle').classList.remove('err'); }
+  if(!selCat){ $('errCat').classList.add('show'); ok=false; }
+  else $('errCat').classList.remove('show');
+  var desc=$('fDesc').value.trim();
+  if(desc.length<20){ $('errDesc').classList.add('show'); $('fDesc').classList.add('err'); ok=false; }
+  else{ $('errDesc').classList.remove('show'); $('fDesc').classList.remove('err'); }
   return ok;
 }
 function validateStep2(){
   var ok=true;
-  if(!el('fDate').value){el('errDate').classList.add('show');ok=false;}
-  else el('errDate').classList.remove('show');
-  if(!selDur){el('errDur').classList.add('show');ok=false;}
-  else el('errDur').classList.remove('show');
-  if(!el('fArea').value.trim()){el('errArea').classList.add('show');ok=false;}
-  else el('errArea').classList.remove('show');
-  var b=Number(el('fBudget').value)||0;
-  if(b<50||b>10000){el('errBudget').classList.add('show');ok=false;}
-  else el('errBudget').classList.remove('show');
+  if(!$('fDate').value){ $('errDate').classList.add('show'); ok=false; } else $('errDate').classList.remove('show');
+  if(!selDur){ $('errDur').classList.add('show'); ok=false; } else $('errDur').classList.remove('show');
+  if(!$('fArea').value.trim()){ $('errArea').classList.add('show'); ok=false; } else $('errArea').classList.remove('show');
+  var b=Number($('fBudget').value)||0;
+  if(b<50||b>10000){ $('errBudget').classList.add('show'); ok=false; } else $('errBudget').classList.remove('show');
   return ok;
 }
 
 /* ── Submit ── */
-window.submitGig = function(){
+function submitGig(){
   if(!validateStep1()||!validateStep2()) return;
-  if(!currentUser){window.location.href='login.html?redirect=post-gig.html';return;}
-  var btn=el('btnPost');
-  btn.disabled=true; btn.textContent='⏳ Post ho raha hai...';
-
-  var hrs = selDurHrs;
-  if(selDur==='custom') hrs=Number(el('fCustomHrs').value)||0;
-  var skillsRaw=el('fSkills').value||'';
-  var skills=skillsRaw?skillsRaw.split(',').map(function(s){return s.trim();}).filter(Boolean):[];
-
-  var gigData={
-    title:       el('fTitle').value.trim(),
-    description: el('fDesc').value.trim(),
-    category:    selCat,
-    budget:      Number(el('fBudget').value)||0,
-    payMax:      Number(el('fBudget').value)||0,
-    payType:     'fixed',
-    location:    el('fArea').value.trim(),
-    area:        el('fArea').value.trim(),
-    pincode:     el('fPincode') ? (el('fPincode').value||'') : '',
-    urgency:     selUrg,
-    workType:    'on-site',
-    workers:     parseInt(el('fWorkers').value)||1,
-    skills:      skills,
-    perks:       el('fPerks').value ? el('fPerks').value.split(',').map(function(s){return s.trim();}) : [],
-    date:        el('fDate').value,
-    time:        el('fTime').value||'09:00',
-    duration:    selDur==='custom'?(hrs+' hours'):selDur,
-    durationHrs: hrs,
-    hoursNote:   '',
-    additionalNotes: el('fNotes').value||'',
-    status:      'open',
-    lat:         posterLat,
-    lng:         posterLng,
-    posterId:    currentUser.uid,
-    posterName:  currentUser.displayName||'User',
-    type:        'hyperlocal',
-    createdAt:   new Date().toISOString(),
-    applications:0,
-    views:       0,
-    images:      []
+  if(!currentUser){ window.location.href='login.html?redirect=post-gig.html'; return; }
+  var btn=$('btnPost'); btn.disabled=true; btn.textContent='⏳ Post ho raha hai...';
+  var hrs=selDur==='custom'?(Number($('fCustomHrs').value)||0):selDurHrs;
+  var skills=($('fSkills').value||'').split(',').map(function(s){return s.trim();}).filter(Boolean);
+  var perks =($('fPerks').value||'').split(',').map(function(s){return s.trim();}).filter(Boolean);
+  var gig={
+    title:$('fTitle').value.trim(), description:$('fDesc').value.trim(),
+    category:selCat, budget:Number($('fBudget').value)||0, payMax:Number($('fBudget').value)||0,
+    payType:'fixed', location:$('fArea').value.trim(), area:$('fArea').value.trim(),
+    pincode:$('fPincode').value||'', urgency:selUrg, workType:'on-site',
+    workers:parseInt($('fWorkers').value)||1, skills:skills, perks:perks,
+    date:$('fDate').value, time:$('fTime').value||'09:00',
+    duration:selDur==='custom'?(hrs+' hours'):selDur, durationHrs:hrs,
+    hoursNote:'', additionalNotes:$('fNotes').value||'',
+    status:'open', lat:posterLat, lng:posterLng,
+    posterId:currentUser.uid, posterName:currentUser.displayName||'User',
+    type:'hyperlocal', createdAt:new Date().toISOString(),
+    applications:0, views:0, images:[]
   };
-
-  addDoc(collection(db,'gigs'),gigData)
+  addDoc(collection(db,'gigs'),gig)
     .then(function(ref){
-      el('successSub').textContent='Gig ID: '+ref.id.slice(0,8).toUpperCase()+' — Workers ko notify kar diya gaya!';
-      el('successOverlay').classList.add('show');
+      $('successSub').textContent='Gig ID: '+ref.id.slice(0,8).toUpperCase()+' — Workers ko notify kar diya!';
+      $('successOverlay').classList.add('show');
     })
     .catch(function(err){
-      window.GL&&window.GL.showToast('❌ Error: '+err.message,'error');
+      window.GL&&window.GL.showToast('❌ '+err.message,'error');
       btn.disabled=false; btn.textContent='🚀 Post Gig — Free!';
     });
-};
+}
 
-/* ── Set today as min date ── */
+/* ── Init ── */
 (function(){
-  var d=new Date(),y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0');
-  el('fDate').min=y+'-'+m+'-'+day;
-  el('fDate').value=y+'-'+m+'-'+day;
+  var d=new Date(), y=d.getFullYear(), mo=String(d.getMonth()+1).padStart(2,'0'), dy=String(d.getDate()).padStart(2,'0');
+  $('fDate').min=y+'-'+mo+'-'+dy; $('fDate').value=y+'-'+mo+'-'+dy;
 })();
 
-/* ── Auth guard ── */
-onAuthStateChanged(auth,function(user){
-  if(!user){window.location.replace('login.html?redirect=post-gig.html');return;}
+onAuthStateChanged(auth, function(user){
+  if(!user){ window.location.replace('login.html?redirect=post-gig.html'); return; }
   currentUser=user;
 });
 </script>
