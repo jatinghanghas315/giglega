@@ -320,6 +320,7 @@
             dropdownItem("👤", "My Profile", "profile.html", currentPage) +
             dropdownItem("💬", "My Chats",   "chat.html",    currentPage) +
             dropdownItem("⚡", "Active Gig",  "active-gig.html", currentPage) +
+            dropdownItem("📍", "Track Gig",   "active-gig-poster.html", currentPage) +
 
             '<div class="nav-dropdown-divider"></div>' +
 
@@ -386,6 +387,7 @@
               : '<a href="dashboard-client.html" class="nav-mobile-link">📋 Poster Dashboard</a>') +
             '<a href="chat.html"             class="nav-mobile-link">💬 My Chats</a>' +
             '<a href="active-gig.html"        class="nav-mobile-link">⚡ Active Gig</a>' +
+            '<a href="active-gig-poster.html"  class="nav-mobile-link">📍 Track Gig</a>' +
             '<button class="nav-mobile-link nav-mobile-switch" id="mobileSwithModeBtn">'+
               (user.mode === "worker" ? "📋 Switch to Poster Mode" : "⚡ Switch to Worker Mode") +
             '</button>' +
