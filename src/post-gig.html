@@ -1503,6 +1503,16 @@
 
     /* ── Auth guard auth, db, storage 
       import { ref as storageRef, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js';
+    
+    /* ── Silent GPS capture when posting ── */
+    var _posterLat = null, _posterLng = null;
+    if(navigator.geolocation){
+      navigator.geolocation.getCurrentPosition(function(p){
+        _posterLat = p.coords.latitude;
+        _posterLng = p.coords.longitude;
+      }, function(){}, {enableHighAccuracy:true, timeout:8000, maximumAge:60000});
+    }
+
     onAuthStateChanged(auth, function(user) {
       if (!user) {
         window.location.replace('login.html?redirect=post-gig.html&mode=login');
@@ -1784,6 +1794,8 @@
           hoursNote:   document.getElementById('hoursNote').value || '',
           additionalNotes:  document.getElementById('additionalNotes') ? document.getElementById('additionalNotes').value : '',
           status:      'open',
+          lat:         _posterLat,
+          lng:         _posterLng,
           posterId:    user.uid,
           posterName:  user.displayName || 'User',
           type:        (selectedWorkType === 'remote') ? 'remote' : 'hyperlocal',
