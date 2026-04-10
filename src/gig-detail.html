@@ -779,6 +779,7 @@
           });
 
           /* 3. Create notification for poster */
+          var chatUrl = "chat.html?with="+encodeURIComponent(uid)+"&gig="+encodeURIComponent(gig.id);
           await addDoc(collection(db,"notifications",gig.posterId,"items"),{
             type:     "gig_booked",
             title:    "Gig Booked!",
@@ -786,6 +787,7 @@
             gigId:    gig.id,
             workerId: uid,
             workerName: workerName,
+            chatUrl:  chatUrl,
             read:     false,
             createdAt: serverTimestamp()
           });
