@@ -261,3 +261,101 @@ body {
 [data-theme="dark"] .gig-card-desc {
   color: #94a3b8;
 }
+
+
+/* ════════════════════════════════════════════════════════════════
+   DM-FIX v2 — gray-800/gray-900 as backgrounds = white in dark
+   Root cause: --gray-800:#f1f5f9 in dark mode (inverted scale)
+   Fix: override ALL background:var(--gray-800) with correct surface tokens
+   Affects: FAQ (all pages), compare table, pp-table, badge-item,
+            help-center cards, enterprise form inputs
+   ════════════════════════════════════════════════════════════════ */
+
+/* ── FAQ accordions (index, enterprise, trust-safety, help-center) ── */
+[data-theme=dark] .faq-q,
+[data-theme=dark] .faq-q:hover {
+  background: var(--surface) !important;
+  color: var(--text) !important;
+}
+[data-theme=dark] .faq-a {
+  background: var(--surface) !important;
+  color: var(--gray-400) !important;
+}
+[data-theme=dark] .faq-item {
+  border-color: var(--gray-700) !important;
+  background: var(--surface) !important;
+}
+
+/* ── Enterprise compare/pricing table rows ── */
+[data-theme=dark] .compare-table tbody tr {
+  background: var(--surface) !important;
+}
+[data-theme=dark] .compare-table tbody tr:nth-child(even) {
+  background: rgba(255,255,255,.025) !important;
+}
+[data-theme=dark] .compare-table td {
+  border-color: var(--gray-700) !important;
+  color: var(--gray-300) !important;
+}
+[data-theme=dark] .compare-table .ct-cross {
+  color: var(--gray-600) !important;
+}
+[data-theme=dark] .ct-group td {
+  background: rgba(13,148,136,.06) !important;
+  color: var(--text) !important;
+}
+
+/* ── Privacy Policy data tables ── */
+[data-theme=dark] .pp-table tbody tr {
+  background: var(--surface) !important;
+}
+[data-theme=dark] .pp-table tbody tr:nth-child(even) {
+  background: rgba(255,255,255,.025) !important;
+}
+[data-theme=dark] .pp-table td {
+  border-color: var(--gray-700) !important;
+  color: var(--gray-400) !important;
+}
+
+/* ── Trust & Safety — badge items ── */
+[data-theme=dark] .badge-item {
+  background: var(--surface) !important;
+  border-color: var(--gray-700) !important;
+}
+[data-theme=dark] .badge-showcase {
+  background: rgba(13,148,136,.04) !important;
+  border-color: var(--gray-700) !important;
+}
+
+/* ── Help Center — cards and article items ── */
+[data-theme=dark] .hc-cat-card,
+[data-theme=dark] .hc-article-item,
+[data-theme=dark] .had-helpful,
+[data-theme=dark] .had-related-item {
+  background: var(--surface) !important;
+  border-color: var(--gray-700) !important;
+}
+
+/* ── Enterprise lead form inputs ── */
+[data-theme=dark] .lf-field input,
+[data-theme=dark] .lf-field select,
+[data-theme=dark] .lf-field textarea {
+  background: var(--bg) !important;
+  color: var(--text) !important;
+  border-color: var(--gray-600) !important;
+}
+[data-theme=dark] .lf-field input:focus,
+[data-theme=dark] .lf-field select:focus,
+[data-theme=dark] .lf-field textarea:focus {
+  border-color: var(--teal) !important;
+  background: var(--surface) !important;
+}
+[data-theme=dark] .lead-form-card {
+  background: var(--surface) !important;
+  border-color: var(--gray-700) !important;
+}
+
+/* ── Ent-faq-section background ── */
+[data-theme=dark] .ent-faq-section {
+  background: rgba(13,148,136,.025) !important;
+}
