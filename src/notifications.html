@@ -1348,397 +1348,148 @@
     </div><!-- /notif-body -->
   </main>
 
-  <script>
+  <script type="module">
+  import { auth, db } from './firebase-config.js';
+  import {
+    collection, query, orderBy, onSnapshot, limit,
+    doc, updateDoc, deleteDoc, writeBatch, getDocs
+  } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+  import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
 
-    /* ══════════════════════════════════
-       FILTER SYSTEM
-    ══════════════════════════════════ */
-    let activeFilter = "all";
-    let unreadOnly   = false;
+  let currentUser = null;
 
-    document.querySelectorAll(".nfb-tab").forEach(tab => {
-      tab.addEventListener("click", function() {
-        const f = this.dataset.filter;
+  function escH(s){ return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 
-        // Settings tab is special
-        if (f === "settings") {
-          openSettings();
-          return;
-        }
+  function timeAgo(ts){
+    if(!ts) return "";
+    const ms = ts.seconds ? ts.seconds*1000 : new Date(ts).getTime();
+    const d  = Math.floor((Date.now() - ms) / 1000);
+    if(d < 60)    return d+"s ago";
+    if(d < 3600)  return Math.floor(d/60)+"m ago";
+    if(d < 86400) return Math.floor(d/3600)+"h ago";
+    return Math.floor(d/86400)+"d ago";
+  }
 
-        document.querySelectorAll(".nfb-tab").forEach(t => t.classList.remove("active"));
-        this.classList.add("active");
-        activeFilter = f;
-        applyFilter();
-        hideSettings();
-      });
+  const TYPE_CSS = {
+    gig_booked:  "type-gig",
+    new_message: "type-message",
+    payment:     "type-payment",
+    review:      "type-review",
+    default:     "type-gig"
+  };
+  const TYPE_ICON = {
+    gig_booked:  "🎉",
+    new_message: "💬",
+    payment:     "💰",
+    review:      "⭐",
+    default:     "🔔"
+  };
+
+  function buildCard(id, data){
+    const unread   = !data.read;
+    const typeClass= TYPE_CSS[data.type] || TYPE_CSS.default;
+    const icon     = TYPE_ICON[data.type] || TYPE_ICON.default;
+    const unreadDot= unread ? '<div class="notif-unread-dot"></div>' : '';
+
+    let ctaHtml = '';
+    if(data.chatUrl){
+      ctaHtml = `<button class="btn-notif-primary" onclick="event.stopPropagation();window.location.href='${escH(data.chatUrl)}'">💬 Chat Karo</button>`;
+    } else if(data.gigId){
+      ctaHtml = `<button class="btn-notif-primary" onclick="event.stopPropagation();window.location.href='gig-detail.html?id=${escH(data.gigId)}'">🔍 Gig Dekho</button>`;
+    }
+
+    return `<div class="notif-card ${unread?'unread':''} ${typeClass}" id="nc-${id}"
+         onclick="handleCardClick('${id}')">
+      <div class="notif-icon-wrap ${typeClass}">
+        ${icon}${unreadDot}
+      </div>
+      <div class="notif-content">
+        <div class="notif-title">${escH(data.title||"Notification")}</div>
+        <div class="notif-body-text">${escH(data.body||"")}</div>
+        <div class="notif-footer">
+          <div class="notif-time">⏰ ${timeAgo(data.timestamp)}</div>
+          ${unread?'<span class="notif-badge" style="background:var(--teal,#0d9488);color:#fff;font-size:.7rem;padding:2px 8px;border-radius:99px;font-weight:700">NEW</span>':''}
+        </div>
+        <div class="notif-ctas">${ctaHtml}
+          <button class="btn-notif-dismiss" onclick="event.stopPropagation();deleteNotif('${id}')" title="Delete">🗑️</button>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  window.handleCardClick = async function(id){
+    await markRead(id);
+  };
+
+  async function markRead(id){
+    if(!currentUser) return;
+    try{ await updateDoc(doc(db,"notifications",currentUser.uid,"items",id),{read:true}); }catch(e){}
+  }
+
+  window.deleteNotif = async function(id){
+    if(!currentUser) return;
+    try{ await deleteDoc(doc(db,"notifications",currentUser.uid,"items",id)); }catch(e){}
+  };
+
+  window.markAllRead = async function(){
+    if(!currentUser) return;
+    const snap = await getDocs(collection(db,"notifications",currentUser.uid,"items"));
+    const batch = writeBatch(db);
+    snap.docs.filter(d=>!d.data().read).forEach(d=>batch.update(d.ref,{read:true}));
+    await batch.commit();
+  };
+
+  window.clearAllNotifs = async function(){
+    if(!currentUser || !confirm("Saari notifications delete karni hain?")) return;
+    const snap = await getDocs(collection(db,"notifications",currentUser.uid,"items"));
+    const batch = writeBatch(db);
+    snap.docs.forEach(d=>batch.delete(d.ref));
+    await batch.commit();
+  };
+
+  function loadNotifications(uid){
+    const list = document.getElementById("notifMainList");
+    const emptyEl = document.getElementById("notifEmpty");
+    const unreadEl= document.getElementById("statUnread");
+    if(!list) return;
+    list.innerHTML = '<div style="text-align:center;padding:48px;color:var(--gray-400)">⏳ Loading...</div>';
+
+    const q = query(collection(db,"notifications",uid,"items"), orderBy("timestamp","desc"), limit(50));
+    onSnapshot(q, snap => {
+      const unread = snap.docs.filter(d=>!d.data().read).length;
+      if(unreadEl) unreadEl.textContent = unread;
+
+      // Update page title badge
+      document.title = unread > 0 ? `(${unread}) Notifications — GigLega` : "Notifications — GigLega";
+
+      if(snap.empty){
+        list.innerHTML = '';
+        if(emptyEl) emptyEl.classList.add("visible");
+        return;
+      }
+      if(emptyEl) emptyEl.classList.remove("visible");
+      list.innerHTML = snap.docs.map(d=>buildCard(d.id, d.data())).join("");
+    }, err=>{
+      list.innerHTML = `<div style="padding:24px;text-align:center;color:red">⚠️ ${escH(err.message)}</div>`;
     });
+  }
 
-    function applyFilter() {
-      const cards = document.querySelectorAll(".notif-card");
-      let visible = 0;
-      cards.forEach(card => {
-        const type    = card.dataset.type;
-        const isUnread = card.dataset.unread === "true";
-        let show = true;
-        if (activeFilter !== "all" && type !== activeFilter) show = false;
-        if (unreadOnly && !isUnread) show = false;
-        card.style.display = show ? "" : "none";
-        if (show) visible++;
-      });
-      // Date dividers: hide if no visible cards after them
-      updateDividerVisibility();
-      document.getElementById("notifEmpty").classList.toggle("visible", visible === 0);
-      document.getElementById("loadMoreSection").style.display = visible > 0 ? "" : "none";
-    }
+  // Wire up Mark All Read / Clear All buttons
+  document.querySelectorAll('[onclick*="markAllRead"]').forEach(btn => {
+    btn.removeAttribute('onclick');
+    btn.addEventListener('click', markAllRead);
+  });
+  document.querySelectorAll('[onclick*="clearAll"]').forEach(btn => {
+    btn.removeAttribute('onclick');
+    btn.addEventListener('click', clearAllNotifs);
+  });
 
-    function updateDividerVisibility() {
-      const dividers = document.querySelectorAll(".notif-date-divider");
-      dividers.forEach(div => {
-        let sibling = div.nextElementSibling;
-        let hasVisible = false;
-        while (sibling && !sibling.classList.contains("notif-date-divider")) {
-          if (sibling.classList.contains("notif-card") && sibling.style.display !== "none") {
-            hasVisible = true; break;
-          }
-          sibling = sibling.nextElementSibling;
-        }
-        div.style.display = hasVisible ? "" : "none";
-      });
-    }
-
-    /* ══════════════════════════════════
-       UNREAD ONLY TOGGLE
-    ══════════════════════════════════ */
-    function toggleUnreadOnly(btn) {
-      unreadOnly = !unreadOnly;
-      btn.style.background = unreadOnly ? "rgba(239,68,68,.1)" : "";
-      btn.style.borderColor = unreadOnly ? "rgba(239,68,68,.35)" : "";
-      btn.style.color = unreadOnly ? "var(--danger)" : "";
-      applyFilter();
-    }
-
-    /* ══════════════════════════════════
-       MARK AS READ
-    ══════════════════════════════════ */
-    function readCard(card) {
-      if (card.dataset.unread === "true") {
-        card.dataset.unread = "false";
-        card.classList.remove("unread");
-        const dot = card.querySelector(".notif-unread-dot");
-        if (dot) dot.remove();
-        updateUnreadCount();
-      }
-    }
-
-    function markAllRead() {
-      document.querySelectorAll(".notif-card.unread").forEach(card => {
-        card.dataset.unread = "false";
-        card.classList.remove("unread");
-        const dot = card.querySelector(".notif-unread-dot");
-        if (dot) dot.remove();
-      });
-      updateUnreadCount();
-      showToast("✅ Sab notifications read mark ho gaye!");
-    }
-
-    function updateUnreadCount() {
-      const count = document.querySelectorAll(".notif-card[data-unread='true']").length;
-      document.getElementById("statUnread").textContent = count;
-
-      // Update tab badges
-      const types = { payment: 0, gig: 0, message: 0, rating: 0, system: 0 };
-      document.querySelectorAll(".notif-card[data-unread='true']").forEach(c => {
-        const t = c.dataset.type;
-        if (types[t] !== undefined) types[t]++;
-      });
-
-      const badgeAll = document.getElementById("badgeAll");
-      if (badgeAll) {
-        badgeAll.textContent = count;
-        badgeAll.className = count > 0 ? "nfb-count" : "nfb-count gray";
-      }
-      Object.keys(types).forEach(t => {
-        const el = document.getElementById("badge" + t.charAt(0).toUpperCase() + t.slice(1));
-        if (el) {
-          el.textContent = types[t];
-          el.className = types[t] > 0 ? "nfb-count" : "nfb-count gray";
-        }
-      });
-    }
-
-    /* ══════════════════════════════════
-       DISMISS CARD
-    ══════════════════════════════════ */
-    function dismissCard(btn) {
-      const card = btn.closest(".notif-card");
-      card.style.transition = "opacity .3s, transform .3s, max-height .3s, padding .3s, margin .3s";
-      card.style.opacity = "0";
-      card.style.transform = "translateX(30px)";
-      card.style.maxHeight = card.offsetHeight + "px";
-      setTimeout(() => {
-        card.style.maxHeight = "0";
-        card.style.padding   = "0";
-        card.style.margin    = "0";
-        card.style.border    = "none";
-      }, 260);
-      setTimeout(() => {
-        card.remove();
-        updateUnreadCount();
-        updateDividerVisibility();
-      }, 550);
-    }
-
-    /* ══════════════════════════════════
-       CLEAR ALL
-    ══════════════════════════════════ */
-    function clearAll() {
-      if (!confirm("Saari notifications delete karna chahte ho?")) return;
-      document.querySelectorAll(".notif-card").forEach(card => {
-        card.style.opacity = "0";
-        card.style.transform = "scale(.95)";
-        card.style.transition = "all .2s";
-      });
-      setTimeout(() => {
-        document.querySelectorAll(".notif-card").forEach(c => c.remove());
-        updateUnreadCount();
-        updateDividerVisibility();
-        document.getElementById("notifEmpty").classList.add("visible");
-        document.getElementById("loadMoreSection").style.display = "none";
-        showToast("🗑️ Sab notifications clear ho gaye!");
-      }, 300);
-    }
-
-    /* ══════════════════════════════════
-       SORT
-    ══════════════════════════════════ */
-    function sortByDate() {
-      showToast("🕐 Latest first order — already sorted!");
-    }
-
-    /* ══════════════════════════════════
-       GIG ACTION BUTTONS
-    ══════════════════════════════════ */
-    function acceptGig(btn) {
-      const card = btn.closest(".notif-card");
-      readCard(card);
-      const ctas = card.querySelector(".notif-ctas");
-      ctas.innerHTML = `
-        <div style="display:flex;align-items:center;gap:8px;font-size:.82rem;font-weight:800;color:#059669">
-          ✅ Gig Accept Ho Gaya! Client ko message karo.
-        </div>
-        <button class="btn-notif-outline" onclick="goTo('chat.html')">💬 Client se baat karo</button>`;
-      showToast("✅ Gig accept kar li — badhai ho!");
-    }
-
-    function declineGig(btn) {
-      const card = btn.closest(".notif-card");
-      readCard(card);
-      const ctas = card.querySelector(".notif-ctas");
-      ctas.innerHTML = `
-        <div style="font-size:.82rem;font-weight:700;color:var(--gray-400)">
-          ❌ Gig decline kar di. Aur gigs browse karo.
-        </div>`;
-      showToast("Gig decline kar di.");
-    }
-
-    function markGigDone(btn) {
-      const card = btn.closest(".notif-card");
-      readCard(card);
-      const ctas = card.querySelector(".notif-ctas");
-      ctas.innerHTML = `
-        <div style="font-size:.82rem;font-weight:800;color:#059669">
-          ✅ Gig complete mark ho gayi! Payment 30 min mein wallet mein.
-        </div>`;
-      showToast("✅ Gig complete! Payment aa rahi hai…");
-
-      // Simulate payment notification
-      setTimeout(() => {
-        prependNewNotif({
-          type: "payment",
-          icon: "💰",
-          title: "Payment Released — ₹1,128!",
-          body:  "Warehouse Packing Gig complete — payment tumhare wallet mein aa gayi!",
-          time:  "Abhi",
-          amount: "+₹1,128",
-          unread: true,
-        });
-        showToast("💰 ₹1,128 wallet mein aa gaya!");
-      }, 5000);
-    }
-
-    /* ══════════════════════════════════
-       PREPEND NEW NOTIFICATION (live)
-    ══════════════════════════════════ */
-    function prependNewNotif({ type, icon, title, body, time, amount, unread }) {
-      const list = document.getElementById("notifMainList");
-      const firstDivider = list.querySelector(".notif-date-divider");
-
-      const card = document.createElement("div");
-      card.className = `notif-card ${unread ? "unread" : ""} type-${type}`;
-      card.dataset.type   = type;
-      card.dataset.unread = unread ? "true" : "false";
-      card.style.opacity  = "0";
-      card.style.transform = "translateY(-12px)";
-      card.onclick = function() { readCard(this); };
-
-      card.innerHTML = `
-        <div class="notif-icon-wrap type-${type}">
-          ${icon}
-          ${unread ? '<div class="notif-unread-dot"></div>' : ""}
-        </div>
-        <div class="notif-content">
-          <div class="notif-title">${title}</div>
-          <div class="notif-body-text">${body}</div>
-          <div class="notif-footer">
-            <div class="notif-time">⏰ ${time}</div>
-            <span class="notif-category-tag type-${type}">${type.charAt(0).toUpperCase()+type.slice(1)}</span>
-          </div>
-        </div>
-        <div class="notif-right">
-          ${amount ? `<div class="notif-amount">${amount}</div>` : ""}
-          <button class="btn-notif-dismiss" onclick="event.stopPropagation();dismissCard(this)" title="Dismiss">✕</button>
-        </div>`;
-
-      list.insertBefore(card, firstDivider);
-      requestAnimationFrame(() => {
-        card.style.transition = "opacity .4s, transform .4s";
-        card.style.opacity = "1";
-        card.style.transform = "translateY(0)";
-      });
-      updateUnreadCount();
-    }
-
-    /* ══════════════════════════════════
-       SETTINGS PANEL
-    ══════════════════════════════════ */
-    function openSettings() {
-      document.querySelectorAll(".nfb-tab").forEach(t => t.classList.remove("active"));
-      document.getElementById("settingsTab").classList.add("active");
-      document.getElementById("settingsPanel").classList.add("active");
-      document.getElementById("notifMainList").style.display = "none";
-    }
-
-    function hideSettings() {
-      document.getElementById("settingsPanel").classList.remove("active");
-      document.getElementById("notifMainList").style.display = "";
-    }
-
-    function toggleQuietHours(input) {
-      const row = document.getElementById("quietHoursRow");
-      row.style.opacity = input.checked ? "1" : ".4";
-      row.style.pointerEvents = input.checked ? "auto" : "none";
-    }
-
-    function setFreq(btn, val) {
-      btn.closest(".ns-freq").querySelectorAll(".ns-freq-btn").forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-      saveSettingsDebounce();
-    }
-
-    let saveTimer;
-    function saveSettingsDebounce() {
-      clearTimeout(saveTimer);
-      saveTimer = setTimeout(saveSettings, 1200);
-    }
-
-    function saveSettings() {
-      ["nsSaveStatus","nsSaveStatus2"].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) {
-          el.classList.add("visible");
-          setTimeout(() => el.classList.remove("visible"), 2500);
-        }
-      });
-      showToast("✅ Notification settings save ho gayi!");
-    }
-
-    /* ══════════════════════════════════
-       LOAD MORE
-    ══════════════════════════════════ */
-    function loadMore() {
-      showToast("📋 Loading older notifications…");
-      setTimeout(() => {
-        const list = document.getElementById("notifMainList");
-        const loadBtn = document.getElementById("loadMoreSection");
-
-        const older = [
-          { type:"payment", icon:"💰", title:"₹1,504 Wallet Mein Aaya", body:"Grocery Delivery Gig Feb 28 — payment received!", time:"Feb 28", amount:"+₹1,504", unread:false },
-          { type:"gig",     icon:"📩", title:"Apply Ki — Home Shifting Helper", body:"Sector 62 Noida Home Shifting gig — application submitted.", time:"Feb 12", amount:"", unread:false },
-          { type:"system",  icon:"🏆", title:"Badge Mila — '10+ Gigs Done' 🏆", body:"Badhai ho! Tumne 10 gigs successfully complete kar liye hain. Naya badge tumhare profile pe add ho gaya.", time:"Feb 10", amount:"", unread:false },
-        ];
-
-        const div = document.createElement("div");
-        div.className = "notif-date-divider";
-        div.textContent = "📅 February 2026";
-        list.insertBefore(div, loadBtn);
-
-        older.forEach(n => {
-          const card = document.createElement("div");
-          card.className = `notif-card type-${n.type}`;
-          card.dataset.type   = n.type;
-          card.dataset.unread = "false";
-          card.onclick = function() { readCard(this); };
-          card.innerHTML = `
-            <div class="notif-icon-wrap type-${n.type}">${n.icon}</div>
-            <div class="notif-content">
-              <div class="notif-title">${n.title}</div>
-              <div class="notif-body-text">${n.body}</div>
-              <div class="notif-footer">
-                <div class="notif-time">📅 ${n.time}</div>
-                <span class="notif-category-tag type-${n.type}">${n.type.charAt(0).toUpperCase()+n.type.slice(1)}</span>
-              </div>
-            </div>
-            <div class="notif-right">
-              ${n.amount ? `<div class="notif-amount">${n.amount}</div>` : ""}
-              <button class="btn-notif-dismiss" onclick="event.stopPropagation();dismissCard(this)" title="Dismiss">✕</button>
-            </div>`;
-          list.insertBefore(card, loadBtn);
-        });
-
-        loadBtn.innerHTML = `<span style="font-size:.82rem;color:var(--gray-400);font-weight:700">✅ Sab notifications load ho gaye!</span>`;
-        applyFilter();
-      }, 900);
-    }
-
-    /* ══════════════════════════════════
-       SIMULATED LIVE NOTIFICATION
-    ══════════════════════════════════ */
-    setTimeout(() => {
-      prependNewNotif({
-        type:   "gig",
-        icon:   "🎯",
-        title:  "Naya Gig Match — Packing Helper, Sector 44",
-        body:   "Aaj ki posting — ₹1,200/day · 9 AM se 6 PM · Sector 44 Gurugram. Sirf 3 spots baaki hain!",
-        time:   "Abhi",
-        amount: "₹1,200",
-        unread: true,
-      });
-      showToast("🎯 Naya gig match mila — dekho!");
-    }, 12000);
-
-    /* ══════════════════════════════════
-       HELPERS
-    ══════════════════════════════════ */
-    function goTo(url) {
-      window.location.href = url;
-    }
-
-    let toastTimer;
-    function showToast(msg) {
-      const t = document.getElementById("notifToast");
-      t.textContent = msg;
-      t.classList.add("show");
-      clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => t.classList.remove("show"), 2800);
-    }
-
-    /* ══════════════════════════════════
-       INIT
-    ══════════════════════════════════ */
-    updateUnreadCount();
-
-  </script>
+  onAuthStateChanged(auth, user => {
+    if(!user){ window.location.href = "login.html?redirect=notifications.html"; return; }
+    currentUser = user;
+    loadNotifications(user.uid);
+  });
+</script>
 
 </body>
 </html>
