@@ -53,6 +53,39 @@
     }
     .conv-item:hover { background: var(--surface-offset, #f3f0ec); }
     .conv-item.active { background: rgba(13,148,136,.10); box-shadow: inset 3px 0 0 var(--teal, #0d9488); }
+    .btn-report-user {
+      background: none; border: 1.5px solid rgba(239,68,68,.3);
+      color: #dc2626; border-radius: 8px; padding: 6px 12px;
+      font-size: .78rem; font-weight: 700; cursor: pointer;
+      display: flex; align-items: center; gap: 5px; white-space: nowrap;
+      transition: background .15s;
+    }
+    .btn-report-user:hover { background: rgba(239,68,68,.07); }
+    .report-modal-overlay {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5);
+      z-index: 9998; align-items: center; justify-content: center;
+    }
+    .report-modal-overlay.show { display: flex; }
+    .report-modal {
+      background: var(--surface, #fff); border-radius: 16px; padding: 28px 24px;
+      max-width: 400px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,.2);
+    }
+    .report-modal h3 { font-size: 1.1rem; margin-bottom: 8px; }
+    .report-modal p  { font-size: .88rem; color: var(--gray-500,#6b7280); margin-bottom: 18px; }
+    .report-reason-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+    .report-reason-item {
+      padding: 10px 14px; border: 1.5px solid var(--gray-200,#e5e7eb);
+      border-radius: 8px; cursor: pointer; font-size: .9rem;
+      transition: border-color .15s, background .15s;
+    }
+    .report-reason-item:hover, .report-reason-item.selected {
+      border-color: var(--teal,#0d9488); background: rgba(13,148,136,.06);
+    }
+    .report-modal-actions { display: flex; gap: 10px; }
+    .report-modal-actions button { flex: 1; padding: 11px; border-radius: 8px;
+      font-weight: 700; font-size: .9rem; cursor: pointer; border: none; }
+    .btn-report-cancel { background: var(--gray-100,#f3f4f6); color: var(--text,#111); }
+    .btn-report-submit { background: #dc2626; color: #fff; }
     .conv-avatar {
       width: 44px; height: 44px;
       border-radius: 50%;
@@ -611,6 +644,78 @@
 
   <input type="file" id="mediaInput" accept="image/*,video/*" style="display:none"
     onchange="if(this.files[0]) uploadMedia(this.files[0])" />
+
+  <!-- Report / Block User Modal -->
+  <div class="report-modal-overlay" id="reportModalOverlay">
+    <div class="report-modal" role="dialog" aria-modal="true" aria-labelledby="reportModalTitle">
+      <h3 id="reportModalTitle">Report User</h3>
+      <p>Is there a problem? Tell us what happened and we'll review it.</p>
+      <div class="report-reason-list" id="reportReasonList">
+        <div class="report-reason-item" data-reason="spam">Spam or fake gig</div>
+        <div class="report-reason-item" data-reason="harassment">Harassment or abusive language</div>
+        <div class="report-reason-item" data-reason="fraud">Fraud or payment issue</div>
+        <div class="report-reason-item" data-reason="no_show">Didn't show up for the gig</div>
+        <div class="report-reason-item" data-reason="other">Other</div>
+      </div>
+      <div class="report-modal-actions">
+        <button class="btn-report-cancel" onclick="closeReportModal()">Cancel</button>
+        <button class="btn-report-submit" onclick="submitReport()">Submit Report</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    var _reportTargetUID = null;
+    var _selectedReason  = null;
+
+    function openReportModal(uid){
+      _reportTargetUID = uid;
+      _selectedReason  = null;
+      document.querySelectorAll('.report-reason-item').forEach(function(el){
+        el.classList.remove('selected');
+        el.onclick = function(){
+          document.querySelectorAll('.report-reason-item').forEach(function(e){ e.classList.remove('selected'); });
+          el.classList.add('selected');
+          _selectedReason = el.dataset.reason;
+        };
+      });
+      document.getElementById('reportModalOverlay').classList.add('show');
+    }
+
+    function closeReportModal(){
+      document.getElementById('reportModalOverlay').classList.remove('show');
+      _reportTargetUID = null; _selectedReason = null;
+    }
+
+    async function submitReport(){
+      if(!_selectedReason){ alert('Please select a reason.'); return; }
+      var reporter = (typeof currentUser !== 'undefined') ? currentUser : null;
+      if(!reporter){ closeReportModal(); return; }
+      try {
+        const { db }        = await import('./firebase-config.js');
+        const { addDoc, collection, serverTimestamp } =
+          await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js');
+        await addDoc(collection(db,'reports'),{
+          reporterId:  reporter.uid,
+          reportedUID: _reportTargetUID,
+          reason:      _selectedReason,
+          createdAt:   serverTimestamp(),
+          status:      'pending'
+        });
+        closeReportModal();
+        if(typeof showToast==='function') showToast('Report submitted. We will review it.','success');
+      } catch(e){
+        closeReportModal();
+        if(typeof showToast==='function') showToast('Report failed. Try again.','error');
+      }
+    }
+
+    // Close on overlay click
+    document.getElementById('reportModalOverlay').addEventListener('click', function(e){
+      if(e.target === this) closeReportModal();
+    });
+  </script>
+
 </body>
 </html>
 

@@ -473,7 +473,7 @@
         import { auth, db } from './firebase-config.js';
     import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
     import { collection, query, where, limit,
-             getDocs, doc, getDoc, onSnapshot, updateDoc, addDoc, serverTimestamp }
+             getDocs, doc, getDoc, onSnapshot, updateDoc, addDoc, serverTimestamp, setDoc }
       from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
 
     /* ── State ── */
@@ -719,13 +719,72 @@
         var entered=boxes.map(function(b){return b.value;}).join('');
         if(entered!==String(g.completionOTP)){ toast('❌ Galat OTP — poster se dobara pucho','error'); boxes.forEach(function(b){b.value='';b.classList.remove('filled');}); boxes[0].focus(); btn.disabled=false; btn.textContent='✅ Gig Complete Karo'; return; }
         var pay=Number(g.budget||0), fee=Math.round(pay*0.06), earn=pay-fee;
-        await updateDoc(doc(db,'gigs',gigId),{status:'completed',completedAt:new Date().toISOString(),workerEarnings:earn,platformFee:fee});
-        await addDoc(collection(db,'notifications',g.posterId,'items'),{type:'gig_completed',title:'✅ Gig Complete!',body:'"'+g.title+'" gig complete ho gai.',gigId:gigId,read:false,createdAt:serverTimestamp()});
-        await addDoc(collection(db,'notifications',currentUser.uid,'items'),{type:'payment_incoming',title:'💰 Payment!',body:'Badhai! ₹'+earn+' wallet mein credit ho rahi hai.',gigId:gigId,read:false,createdAt:serverTimestamp()});
+
+        // ── 1. Mark gig completed ──
+        await updateDoc(doc(db,'gigs',gigId),{
+          status:'completed',
+          completedAt:new Date().toISOString(),
+          workerEarnings:earn,
+          platformFee:fee
+        });
+
+        // ── 2. Credit worker wallet (atomic read-then-write) ──
+        try {
+          var wRef    = doc(db,'wallets',currentUser.uid);
+          var wSnap   = await getDoc(wRef);
+          var curBal  = wSnap.exists() ? (wSnap.data().balance||0) : 0;
+          var newBal  = curBal + earn;
+          await setDoc(wRef, {
+            balance:     newBal,
+            totalEarned: (wSnap.exists() ? (wSnap.data().totalEarned||0) : 0) + earn,
+            updatedAt:   serverTimestamp(),
+            uid:         currentUser.uid
+          }, { merge: true });
+          // Write credit transaction record
+          await addDoc(collection(db,'wallets',currentUser.uid,'transactions'),{
+            type:      'credit',
+            amount:    earn,
+            title:     'Gig Payment — '+  (g.title||'Gig'),
+            meta:      'Gig #'+gigId+' · Platform fee ₹'+fee+' deducted',
+            gigId:     gigId,
+            createdAt: serverTimestamp(),
+            status:    'completed'
+          });
+        } catch(walletErr){
+          console.error('[GigLega] wallet credit failed:', walletErr.message);
+          toast('⚠️ Wallet credit failed — contact support.','error');
+        }
+
+        // ── 3. Deduct platform commission to platform wallet ──
+        try {
+          var platRef   = doc(db,'wallets','__platform__');
+          var platSnap  = await getDoc(platRef);
+          var platBal   = platSnap.exists() ? (platSnap.data().balance||0) : 0;
+          await setDoc(platRef, {
+            balance:    platBal + fee,
+            totalFees:  (platSnap.exists() ? (platSnap.data().totalFees||0) : 0) + fee,
+            updatedAt:  serverTimestamp()
+          }, { merge: true });
+        } catch(feeErr){
+          console.warn('[GigLega] platform fee write failed:', feeErr.message);
+        }
+
+        // ── 4. Notify both parties ──
+        await addDoc(collection(db,'notifications',g.posterId,'items'),{
+          type:'gig_completed', title:'Gig Complete!',
+          body:'"'+g.title+'" complete ho gai. Worker ne kaam khatam kiya.',
+          gigId:gigId, read:false, createdAt:serverTimestamp()
+        });
+        await addDoc(collection(db,'notifications',currentUser.uid,'items'),{
+          type:'payment_incoming', title:'Payment Credit!',
+          body:'₹'+earn+' aapke GigLega wallet mein credit ho gaya.',
+          gigId:gigId, read:false, createdAt:serverTimestamp()
+        });
+
         el('workerSteps').style.display='none';
         el('workerDoneAmt').textContent='₹'+earn.toLocaleString('en-IN');
         el('workerDone').classList.add('show');
-        toast('🎉 Gig complete! ₹'+earn+' credit hogi.','success');
+        toast('Gig complete! ₹'+earn+' wallet mein credit ho gaya.','success');
       }catch(e){ toast('Error: '+e.message,'error'); btn.disabled=false; btn.textContent='✅ Gig Complete Karo'; }
     });
 

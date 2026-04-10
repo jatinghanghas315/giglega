@@ -644,6 +644,19 @@ function validateStep2(){
 
 /* ── Submit ── */
 function submitGig(){
+  // ── Rate limit: max 3 gigs posted per hour ──
+  var NOW       = Date.now();
+  var HOUR      = 60 * 60 * 1000;
+  var LIMIT     = 3;
+  try {
+    var postLog = JSON.parse(localStorage.getItem('gl_post_log') || '[]');
+    var recent  = postLog.filter(function(t){ return (NOW - t) < HOUR; });
+    if(recent.length >= LIMIT){
+      var wait = Math.ceil((HOUR - (NOW - recent[0])) / 60000);
+      if(typeof showToast==='function') showToast('Too many gigs posted. Wait '+wait+' min before posting again.','error');
+      return;
+    }
+  } catch(e){}
   if(!validateStep1()||!validateStep2()) return;
   if(!currentUser){ window.location.href='login.html?redirect=post-gig.html'; return; }
   var btn=$('btnPost'); btn.disabled=true; btn.textContent='⏳ Post ho raha hai...';
@@ -664,6 +677,14 @@ function submitGig(){
     type:'hyperlocal', createdAt:serverTimestamp(), createdAtISO:new Date().toISOString(),
     applications:0, views:0, images:[]
   };
+  // Save post timestamp for rate limiting
+  try {
+    var _log = JSON.parse(localStorage.getItem('gl_post_log') || '[]');
+    _log.push(Date.now());
+    // keep only last 24h entries
+    _log = _log.filter(function(t){ return (Date.now()-t) < 86400000; });
+    localStorage.setItem('gl_post_log', JSON.stringify(_log));
+  } catch(e){}
   addDoc(collection(db,'gigs'),gig)
     .then(function(ref){
       $('successSub').textContent='Gig ID: '+ref.id.slice(0,8).toUpperCase()+' — Workers ko notify kar diya!';

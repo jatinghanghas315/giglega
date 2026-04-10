@@ -618,7 +618,11 @@
           </div>
 
           <div class="field-hint" style="margin-bottom:16px;font-size:.75rem;color:var(--gray-500)">
-            By registering you agree to GigLega's <a href="terms.html" style="color:var(--teal)">Terms</a> &amp; <a href="privacy-policy.html" style="color:var(--teal)">Privacy Policy</a>.
+            <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-weight:400">
+              <input type="checkbox" id="termsCheck" style="margin-top:3px;width:16px;height:16px;accent-color:var(--teal);flex-shrink:0">
+              <span>I agree to GigLega's <a href="terms.html" target="_blank" style="color:var(--teal);font-weight:600">Terms</a> &amp; <a href="privacy-policy.html" target="_blank" style="color:var(--teal);font-weight:600">Privacy Policy</a></span>
+            </label>
+            <div class="field-err" id="termsErr">Please accept the terms to continue.</div>
           </div>
 
           <button class="btn-auth" id="btnRegister">Create Free Account</button>
@@ -681,6 +685,7 @@
            signInWithEmailAndPassword,
            createUserWithEmailAndPassword,
            updateProfile,
+           sendEmailVerification,
            sendPasswordResetEmail }                     from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
   import { getFirestore, doc, getDoc, setDoc }          from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
 
@@ -869,11 +874,13 @@
     const pwConf = document.getElementById('regPwConf').value;
 
     let ok = true;
+    const termsChecked = document.getElementById('termsCheck')?.checked;
     if (!name || name.length < 2)  { showErr('regNameErr'); ok = false; }
     if (!id || !isEmail(id))       { showErr('regIdErr','Enter a valid email address.'); ok = false; }
     if (!city)                     { showErr('regCityErr'); ok = false; }
     if (!pw || pw.length < 6)      { showErr('regPwErr'); ok = false; }
     if (pw !== pwConf)             { showErr('regPwConfErr','Passwords do not match.'); ok = false; }
+    if (!termsChecked)             { showErr('termsErr','Please accept the terms to continue.'); ok = false; }
     if (!ok) return;
 
     setLoading('btnRegister', true);
@@ -899,6 +906,11 @@
 
       await setDoc(doc(db, 'users', cred.user.uid), userData);
       localStorage.setItem(USER_KEY, JSON.stringify(userData));
+
+      // Send email verification (non-blocking — don't crash if it fails)
+      try { await sendEmailVerification(cred.user); } catch(evErr) {
+        console.warn('[GigLega] email verification send failed:', evErr.message);
+      }
 
       document.getElementById('panelRegister').style.display = 'none';
       document.getElementById('authTabs').style.display = 'none';
