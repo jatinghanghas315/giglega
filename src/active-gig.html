@@ -628,52 +628,104 @@
       if(!user){ window.location.replace('login.html?redirect=active-gig.html'); return; }
       currentUser=user;
 
-      // Determine mode from GL session or Firestore user doc
-      var mode = (window.GL && window.GL.getCurrentUser && window.GL.getCurrentUser()) 
-                 ? (window.GL.getCurrentUser().mode || 'worker') 
-                 : 'worker';
-
-      var params=new URLSearchParams(window.location.search);
-      var paramId=params.get('id');
-      var gigDocId=null;
+      var params  = new URLSearchParams(window.location.search);
+      var paramId = params.get('id');
+      var gigDocId= null;
+      var mode    = null; // will be 'poster' or 'worker' — determined from Firestore
 
       if(paramId){
-        gigDocId=paramId;
-      } else {
+        // If gig ID passed in URL, load it and detect role from data
+        gigDocId = paramId;
         try{
-          var q, snap;
-          if(mode==='poster'){
-            q=query(collection(db,'gigs'),where('posterId','==',user.uid),where('status','in',['taken','completed']),limit(1));
-          } else {
-            q=query(collection(db,'gigs'),where('workerId','==',user.uid),where('status','in',['taken','completed']),limit(1));
+          var snap0 = await getDoc(doc(db,'gigs',gigDocId));
+          if(snap0.exists()){
+            var d0=snap0.data();
+            mode = (d0.posterId===user.uid) ? 'poster' : 'worker';
           }
-          snap=await getDocs(q);
-          if(snap.empty){
+        }catch(e){}
+        if(!mode) mode='worker';
+      } else {
+        // Run poster + worker queries in parallel — Firestore tells us the role
+        try{
+          var STATUSES = ['taken','completed'];
+          var [posterSnap, workerSnap] = await Promise.all([
+            getDocs(query(collection(db,'gigs'), where('posterId','==',user.uid), where('status','in',STATUSES), limit(3))),
+            getDocs(query(collection(db,'gigs'), where('workerId','==',user.uid), where('status','in',STATUSES), limit(3)))
+          ]);
+
+          var hasPoster = !posterSnap.empty;
+          var hasWorker = !workerSnap.empty;
+
+          if(!hasPoster && !hasWorker){
+            // Truly no active gigs for this user in either role
             el('skelWrap').style.display='none';
             el('emptyWrap').style.display='block';
-            if(mode==='poster'){
-              el('emptyTitle').textContent='Koi Active Gig Nahi';
-              el('emptyBody').textContent='Jab koi worker aapki gig accept karega, yahan track kar paoge.';
-              el('emptyBtn').textContent='➕ Gig Post Karo'; el('emptyBtn').href='post-gig.html';
-            }
+            el('emptyTitle').textContent='Koi Active Gig Nahi';
+            el('emptyBody').textContent='Na koi gig posted & accepted, na koi gig kaam pe hai abhi.';
+            el('emptyBtn').textContent='🔍 Gigs Browse Karo'; el('emptyBtn').href='browse.html';
             return;
           }
-          gigDocId=snap.docs[0].id;
+
+          // If user has BOTH (posted some + working on others), prefer poster view
+          // but show a switcher if needed — for now pick the most relevant one
+          if(hasPoster){
+            mode='poster';
+            // If multiple poster gigs, prefer 'taken' (in-progress) over 'completed'
+            var takenDoc = posterSnap.docs.find(function(d){return d.data().status==='taken';});
+            gigDocId = takenDoc ? takenDoc.id : posterSnap.docs[0].id;
+          } else {
+            mode='worker';
+            var takenDocW = workerSnap.docs.find(function(d){return d.data().status==='taken';});
+            gigDocId = takenDocW ? takenDocW.id : workerSnap.docs[0].id;
+          }
+
+          // If user has BOTH roles active simultaneously, add a switcher pill
+          if(hasPoster && hasWorker){
+            var altMode  = 'worker';
+            var altDocId = workerSnap.docs.find(function(d){return d.data().status==='taken';});
+            altDocId = altDocId ? altDocId.id : workerSnap.docs[0].id;
+            var switcher = document.createElement('div');
+            switcher.style.cssText='margin-bottom:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;';
+            switcher.innerHTML='<span style="font-size:.78rem;color:var(--gray-400);font-weight:600;">You have gigs in both roles:</span>'+
+              '<button onclick="switchRole()" style="font-size:.78rem;padding:5px 14px;border-radius:20px;background:var(--teal);color:#fff;border:none;cursor:pointer;font-weight:700;" id="roleSwitchBtn">Switch to Worker View →</button>';
+            el('skelWrap').parentNode.insertBefore(switcher, el('skelWrap'));
+            window._altMode=altMode; window._altDocId=altDocId;
+            window.switchRole=function(){
+              if(unsubSnap) unsubSnap();
+              var tmp=mode; mode=window._altMode; window._altMode=tmp;
+              var tmpId=gigDocId; gigDocId=window._altDocId; window._altDocId=tmpId;
+              el('mainWrap').style.display='none';
+              el('posterView').style.display='none';
+              el('workerView').style.display='none';
+              document.getElementById('roleSwitchBtn').textContent='Switch to '+(mode==='poster'?'Worker':'Poster')+' View →';
+              listenGig(gigDocId, mode);
+            };
+          }
+
         }catch(e){
           el('skelWrap').style.display='none';
           el('emptyWrap').style.display='block';
+          el('emptyBody').textContent='Error loading gig: '+e.message;
           return;
         }
       }
 
-      // Real-time listener
+      listenGig(gigDocId, mode);
+    });
+
+    function listenGig(gigDocId, mode){
+      if(unsubSnap) unsubSnap();
       unsubSnap=onSnapshot(doc(db,'gigs',gigDocId),function(snap){
         if(!snap.exists()){el('skelWrap').style.display='none';el('emptyWrap').style.display='block';return;}
         activeGig=snap.data(); gigId=snap.id;
         if(mode==='poster') renderPoster(activeGig,gigDocId);
         else renderWorker(activeGig,gigDocId);
-      },function(){ /* fallback already shown */ });
-    });
+      },function(err){
+        el('skelWrap').style.display='none';
+        el('emptyWrap').style.display='block';
+        el('emptyBody').textContent='Real-time update error: '+err.message;
+      });
+    }
   </script>
 </body>
 </html>
