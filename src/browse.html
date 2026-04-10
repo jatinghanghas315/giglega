@@ -754,7 +754,7 @@
 
   <script type="module">
     import { auth, db } from './firebase-config.js';
-    import { collection, getDocs, query, orderBy, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+    import { collection, getDocs, onSnapshot, query, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
     import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
 
     var FEE_RATE = 0.06;
@@ -797,43 +797,47 @@
     }
 
     /* ── Load gigs from Firestore ── */
-    async function loadGigs() {
+    var _unsubGigs = null;
+    function loadGigs() {
       showSkeletons();
-      try {
-        // Simple collection fetch — NO orderBy (avoids missing-index errors)
-        // Sorting is handled in JS by getSorted()
-        var snap = await getDocs(collection(db, 'gigs'));
-        allGigs = snap.docs.map(function(d){ return Object.assign({ id: d.id }, d.data()); });
-        console.log('[GigLega] Firestore returned', allGigs.length, 'gigs');
+      if (_unsubGigs) { _unsubGigs(); _unsubGigs = null; }
 
-        // Load poster display names
-        var uids = [...new Set(allGigs.map(function(g){ return g.posterId; }).filter(function(u){ return u && u !== 'demo'; }))];
-        await Promise.all(uids.map(async function(uid) {
-          try {
-            var usnap = await getDoc(doc(db, 'users', uid));
-            if (usnap.exists()) usersCache[uid] = usnap.data();
-          } catch(e) {}
-        }));
-      } catch(e) {
-        console.error('[GigLega] Firestore error:', e.code, e.message);
-        // Fall back to demo gigs so page is never empty
-        allGigs = [
-          { id:"gig_d1", title:"House Cleaning — 3BHK", description:"Reliable cleaner chahiye full 3BHK ke liye Saturday ko. All supplies provided.", budget:800, category:"House Help", type:"hyperlocal", location:"Sector 56, Gurugram", status:"open", createdAt: new Date(Date.now()-3600000).toISOString(), posterId:"demo" },
-          { id:"gig_d2", title:"Grocery Pickup & Delivery", description:"BigBazaar se saman lana hai ghar pe. Light items only.", budget:300, category:"Errands", type:"hyperlocal", location:"DLF Phase 3", status:"open", createdAt: new Date(Date.now()-7200000).toISOString(), posterId:"demo" },
-          { id:"gig_d3", title:"Logo Design — Startup", description:"Clean minimal logo chahiye food delivery startup ke liye. 2 concepts.", budget:1500, category:"Design", type:"remote", location:"Remote", status:"open", createdAt: new Date(Date.now()-10800000).toISOString(), posterId:"demo" },
-          { id:"gig_d4", title:"React Developer — Landing Page", description:"Startup ka landing page banana hai React mein. 1 week deadline.", budget:4000, category:"Web Dev", type:"remote", location:"Remote", status:"open", createdAt: new Date(Date.now()-28800000).toISOString(), posterId:"demo" }
-        ];
-      }
+      _unsubGigs = onSnapshot(
+        collection(db, 'gigs'),
+        function(snap) {
+          console.log('[GigLega] onSnapshot OK — docs:', snap.size);
+          allGigs = snap.docs.map(function(d){ return Object.assign({ id: d.id }, d.data()); });
 
-      var urlParams = new URLSearchParams(window.location.search);
-      state.search = urlParams.get("q") || "";
-      state.category = urlParams.get("cat") || "";
-      if (state.search) document.getElementById("searchInput").value = state.search;
-
-      buildCategoryChips();
-      buildCategoryDropdown();
-      syncChips();
-      render();
+          var uids = [...new Set(allGigs.map(function(g){ return g.posterId; }).filter(function(u){ return u && u !== 'demo'; }))];
+          Promise.all(uids.map(function(uid) {
+            return getDoc(doc(db, 'users', uid)).then(function(usnap){
+              if (usnap.exists()) usersCache[uid] = usnap.data();
+            }).catch(function(){});
+          })).then(function(){
+            var urlParams = new URLSearchParams(window.location.search);
+            state.search = urlParams.get("q") || "";
+            state.category = urlParams.get("cat") || "";
+            if (state.search) document.getElementById("searchInput").value = state.search;
+            buildCategoryChips();
+            buildCategoryDropdown();
+            syncChips();
+            render();
+          });
+        },
+        function(err) {
+          console.error('[GigLega] onSnapshot error — code:', err.code, 'msg:', err.message);
+          allGigs = [
+            { id:"gig_d1", title:"House Cleaning — 3BHK", description:"Reliable cleaner chahiye full 3BHK ke liye Saturday ko. All supplies provided.", budget:800, category:"House Help", type:"hyperlocal", location:"Sector 56, Gurugram", status:"open", createdAt: new Date(Date.now()-3600000).toISOString(), posterId:"demo" },
+            { id:"gig_d2", title:"Grocery Pickup & Delivery", description:"BigBazaar se saman lana hai ghar pe. Light items only.", budget:300, category:"Errands", type:"hyperlocal", location:"DLF Phase 3", status:"open", createdAt: new Date(Date.now()-7200000).toISOString(), posterId:"demo" },
+            { id:"gig_d3", title:"Logo Design — Startup", description:"Clean minimal logo chahiye food delivery startup ke liye. 2 concepts.", budget:1500, category:"Design", type:"remote", location:"Remote", status:"open", createdAt: new Date(Date.now()-10800000).toISOString(), posterId:"demo" },
+            { id:"gig_d4", title:"React Developer — Landing Page", description:"Startup ka landing page banana hai React mein. 1 week deadline.", budget:4000, category:"Web Dev", type:"remote", location:"Remote", status:"open", createdAt: new Date(Date.now()-28800000).toISOString(), posterId:"demo" }
+          ];
+          var urlParams = new URLSearchParams(window.location.search);
+          state.search = urlParams.get("q") || "";
+          state.category = urlParams.get("cat") || "";
+          buildCategoryChips(); buildCategoryDropdown(); syncChips(); render();
+        }
+      );
     }
 
     /* ── Auth check ── */
