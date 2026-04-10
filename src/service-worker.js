@@ -1,3 +1,4 @@
+/* mobile-rollout: 20260410-1828 */
 /* ════════════════════════════════════════════════════════════════
    GigLega Service WorkWorker v1.5.0
    Handles: Caching · Offline · Push Notifications · Background Sync
