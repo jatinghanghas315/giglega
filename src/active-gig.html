@@ -281,6 +281,24 @@
     .tracking-badge { display:none; align-items:center; gap:6px; background:rgba(13,148,136,.1); color:#0d9488; border-radius:20px; padding:5px 12px; font-size:.76rem; font-weight:700; margin-top:10px; width:fit-content; }
     .tracking-badge .tb-dot { width:7px; height:7px; border-radius:50%; background:#0d9488; animation:tbpulse 1.5s ease-in-out infinite; }
     @keyframes tbpulse { 0%,100%{opacity:1;transform:scale(1);} 50%{opacity:.4;transform:scale(.7);} }
+
+    /* Sprint 2: Review Modal */
+    #glReviewOverlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:10000;display:none;align-items:center;justify-content:center;padding:20px;}
+    #glReviewOverlay.show{display:flex;}
+    .rev-box{background:var(--surface,#fff);border-radius:20px;padding:28px 24px;max-width:400px;width:100%;box-shadow:0 24px 60px rgba(0,0,0,.3);}
+    .rev-stars{display:flex;gap:8px;justify-content:center;margin:16px 0;font-size:2.1rem;cursor:pointer;}
+    .rev-star{opacity:.25;transition:opacity .13s,transform .13s;user-select:none;}
+    .rev-star.lit{opacity:1;transform:scale(1.12);}
+    .rev-ta{width:100%;border:1.5px solid var(--gray-200,#e5e7eb);border-radius:10px;padding:10px 12px;font-size:.88rem;resize:vertical;min-height:72px;font-family:inherit;outline:none;margin-top:4px;color:var(--text);}
+    .rev-ta:focus{border-color:var(--teal,#0d9488);}
+    /* Sprint 2: Cancel Modal */
+    #glCancelOverlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:10000;display:none;align-items:center;justify-content:center;padding:20px;}
+    #glCancelOverlay.show{display:flex;}
+    .cancel-box{background:var(--surface,#fff);border-radius:20px;padding:28px 24px;max-width:400px;width:100%;box-shadow:0 24px 60px rgba(0,0,0,.3);}
+    .cancel-sel{width:100%;border:1.5px solid #e5e7eb;border-radius:10px;padding:10px 12px;font-size:.88rem;margin:12px 0;font-family:inherit;outline:none;background:var(--surface,#fff);color:var(--text);}
+    .cancel-sel:focus{border-color:#dc2626;}
+    .btn-cancel-gig{display:none;width:100%;background:none;border:1.5px solid #dc2626;color:#dc2626;border-radius:10px;padding:10px 16px;font-size:.85rem;font-weight:700;cursor:pointer;margin-bottom:10px;transition:all .18s;}
+    .btn-cancel-gig:hover{background:#dc2626;color:#fff;}
   </style>
   <link rel="canonical" href="https://giglega.vercel.app/active-gig.html">
   <!-- Leaflet.js — real-time worker tracking map -->
@@ -399,7 +417,9 @@
           <div style="font-size:1.7rem;font-weight:800;color:#dc2626;margin:12px 0;" id="posterDoneAmt"></div>
           <div style="font-size:.78rem;color:var(--gray-400);margin-bottom:22px;">Wallet se deducted (6% platform fee included)</div>
           <a href="dashboard-client.html" class="btn btn-primary">📊 Dashboard Dekho</a>
+          <button id="btnRateWorker" style="margin-top:10px;width:100%;padding:11px;border:1.5px solid var(--teal,#0d9488);border-radius:10px;font-weight:700;color:var(--teal,#0d9488);background:none;cursor:pointer;font-size:.9rem;">⭐ Worker ko Rate Karo</button>
         </div>
+        <button class="btn-cancel-gig" id="btnCancelPoster">✕ Gig Cancel Karo</button>
 
       </div><!-- end posterView -->
 
@@ -408,6 +428,7 @@
       ═══════════════════════════════════ -->
       <div id="workerView" style="display:none;">
 
+        <button class="btn-cancel-gig" id="btnCancelWorker">✕ Gig Cancel Karo (Meri taraf se)</button>
         <!-- Chat quick link -->
         <a href="#" class="chat-quick" id="chatLink">
           <span style="font-size:1.4rem;">💬</span>
@@ -423,6 +444,7 @@
           <div style="font-size:1.7rem;font-weight:800;color:#059669;margin:12px 0;" id="workerDoneAmt"></div>
           <div style="font-size:.78rem;color:var(--gray-400);margin-bottom:22px;">Aapke wallet mein credit hogi.</div>
           <a href="dashboard-worker.html" class="btn btn-primary">📊 Dashboard Dekho</a>
+          <button id="btnRatePoster" style="margin-top:10px;width:100%;padding:11px;border:1.5px solid var(--teal,#0d9488);border-radius:10px;font-weight:700;color:var(--teal,#0d9488);background:none;cursor:pointer;font-size:.9rem;">⭐ Poster ko Rate Karo</button>
         </div>
 
         <!-- Steps -->
@@ -616,6 +638,7 @@
       initTrackingMap(gig);
 
       // Completed
+      var _bcp2=el('btnCancelPoster'); if(_bcp2) _bcp2.style.display=(gig.status==='taken')?'block':'none';
       if(gig.status==='completed'){
         if(cdTimer) clearInterval(cdTimer);
         var tc = el('trackCard'); if(tc) tc.style.display='none';
@@ -665,6 +688,8 @@
         el('posterDoneAmt').textContent='₹'+(gig.budget||0).toLocaleString('en-IN')+' Deducted';
         el('posterDone').classList.add('show');
         el('agBadgeText').textContent='Completed ✅'; el('agHeading').textContent='Gig Complete Ho Gayi!';
+        var _bcp=el('btnCancelPoster'); if(_bcp) _bcp.style.display='none';
+        var _brw=el('btnRateWorker'); if(_brw && !_brw._bound){ _brw._bound=true; _brw.addEventListener('click',function(){ window.openReviewModal('worker'); }); } if(_brw) _brw.style.display=gig.reviewedByPoster?'none':'block';
       }
     }
 
@@ -694,9 +719,12 @@
         el('workerDoneAmt').textContent='₹'+(gig.workerEarnings||0).toLocaleString('en-IN');
         el('workerDone').classList.add('show');
         el('agBadgeText').textContent='Completed ✅'; el('agHeading').textContent='Gig Complete!';
+        var _bcw=el('btnCancelWorker'); if(_bcw) _bcw.style.display='none';
+        var _brp=el('btnRatePoster'); if(_brp && !_brp._bound){ _brp._bound=true; _brp.addEventListener('click',function(){ window.openReviewModal('poster'); }); } if(_brp) _brp.style.display=gig.reviewedByWorker?'none':'block';
         return;
       }
 
+      var _bcw2=el('btnCancelWorker'); if(_bcw2) _bcw2.style.display=(gig.status==='taken')?'block':'none';
       // Start live GPS tracking for poster to see
       if(gig.status==='taken') startLocationTracking(id);
 
@@ -1229,6 +1257,132 @@
         el('emptyBody').textContent='Connection issue. Please check your internet and refresh.';
       });
     }
+
+    /* ══════════════════════════════════════════════════════
+       SPRINT 2 — Review + Cancel Logic
+    ══════════════════════════════════════════════════════ */
+    var _revTarget = null;
+    var _revRating = 0;
+    var _cancelRole = null;
+
+    window.openReviewModal = function(target){
+      _revTarget = target;
+      _revRating = 0;
+      var isWorker = target === 'worker';
+      var name = isWorker
+        ? (activeGig && activeGig.workerName  || 'Worker')
+        : (activeGig && activeGig.posterName  || 'Poster');
+      el('revTitle').textContent    = '⭐ ' + name + ' ko Rate Karo';
+      el('revSubtitle').textContent = (isWorker ? 'Worker' : 'Poster') + ' ka review do';
+      el('revComment').value = '';
+      document.querySelectorAll('.rev-star').forEach(function(s){ s.classList.remove('lit'); });
+      el('glReviewOverlay').classList.add('show');
+    };
+
+    // Star hover + click
+    (function(){
+      var stars = [].slice.call(document.querySelectorAll('.rev-star'));
+      stars.forEach(function(star){
+        star.addEventListener('mouseover', function(){
+          var v = parseInt(this.dataset.v);
+          stars.forEach(function(s){ s.classList.toggle('lit', parseInt(s.dataset.v) <= v); });
+        });
+        star.addEventListener('mouseout', function(){
+          stars.forEach(function(s){ s.classList.toggle('lit', parseInt(s.dataset.v) <= _revRating); });
+        });
+        star.addEventListener('click', function(){
+          _revRating = parseInt(this.dataset.v);
+          stars.forEach(function(s){ s.classList.toggle('lit', parseInt(s.dataset.v) <= _revRating); });
+        });
+      });
+    })();
+
+    // Review submit
+    el('revSubmitBtn').addEventListener('click', async function(){
+      if(!_revRating){ toast('Pehle stars select karo!','error'); return; }
+      var btn=this; btn.disabled=true; btn.textContent='⏳ Saving...';
+      try{
+        var isWorker  = _revTarget === 'worker';
+        var reveeId   = isWorker ? (activeGig.workerId||'')  : (activeGig.posterId||'');
+        var reveeName = isWorker ? (activeGig.workerName||'Worker') : (activeGig.posterName||'Poster');
+        var comment   = el('revComment').value.trim();
+        // Write review doc
+        await addDoc(collection(db,'reviews'),{
+          gigId:        gigId,
+          gigTitle:     activeGig.title||'',
+          reviewerId:   currentUser.uid,
+          reviewerName: currentUser.displayName||'User',
+          revieweeId:   reveeId,
+          revieweeName: reveeName,
+          rating:       _revRating,
+          comment:      comment,
+          role:         _revTarget,
+          createdAt:    serverTimestamp()
+        });
+        // Update reviewee avgRating on users/{uid}
+        var uRef  = doc(db,'users',reveeId);
+        var uSnap = await getDoc(uRef);
+        var prev  = uSnap.exists() ? uSnap.data() : {};
+        var cnt   = prev.ratingCount || 0;
+        var newAvg= parseFloat(((( prev.avgRating||0)*cnt + _revRating)/(cnt+1)).toFixed(1));
+        await setDoc(uRef,{ avgRating:newAvg, ratingCount:cnt+1, updatedAt:serverTimestamp() },{ merge:true });
+        // Mark gig so same side can't review twice
+        var flag = isWorker ? 'reviewedByPoster' : 'reviewedByWorker';
+        await updateDoc(doc(db,'gigs',gigId),{ [flag]: true });
+        el('glReviewOverlay').classList.remove('show');
+        toast('⭐ Review submit ho gaya! ('+ _revRating +'/5)','success');
+        var btnHide = el(isWorker ? 'btnRateWorker' : 'btnRatePoster');
+        if(btnHide) btnHide.style.display='none';
+      }catch(e){
+        console.error('[GigLega] review:',e.message);
+        toast('Review submit nahi hua. Try again.','error');
+      }
+      btn.disabled=false; btn.textContent='Submit ✅';
+    });
+
+    // Cancel gig — confirm
+    el('cancelConfirmBtn').addEventListener('click', async function(){
+      var reason = el('cancelReasonSel').value;
+      if(!reason){ toast('Reason select karo!','error'); return; }
+      var btn=this; btn.disabled=true; btn.textContent='⏳...';
+      try{
+        var otherPartyId  = _cancelRole==='poster' ? (activeGig.workerId||'')  : (activeGig.posterId||'');
+        var cancellerName = currentUser.displayName || (_cancelRole==='poster'?'Poster':'Worker');
+        await updateDoc(doc(db,'gigs',gigId),{
+          status:       'cancelled',
+          cancelledBy:  _cancelRole,
+          cancelReason: reason,
+          cancelledAt:  new Date().toISOString()
+        });
+        if(otherPartyId){
+          await addDoc(collection(db,'notifications',otherPartyId,'items'),{
+            type:      'gig_cancelled',
+            title:     'Gig Cancel Ho Gayi! ⚠️',
+            body:      '"'+(activeGig.title||'Gig')+'" '+cancellerName+' ne cancel kar di. Reason: '+reason,
+            gigId:     gigId,
+            read:      false,
+            createdAt: serverTimestamp()
+          });
+        }
+        el('glCancelOverlay').classList.remove('show');
+        toast('Gig cancel ho gayi.','info');
+        setTimeout(function(){
+          window.location.href = _cancelRole==='poster' ? 'dashboard-client.html' : 'dashboard-worker.html';
+        },1500);
+      }catch(e){
+        console.error('[GigLega] cancel:',e.message);
+        toast('Cancel nahi hua. Try again.','error');
+      }
+      btn.disabled=false; btn.textContent='Confirm Cancel';
+    });
+
+    // Bind cancel buttons
+    (function(){
+      var bp = el('btnCancelPoster');
+      if(bp) bp.addEventListener('click',function(){ _cancelRole='poster'; el('cancelReasonSel').value=''; el('glCancelOverlay').classList.add('show'); });
+      var bw = el('btnCancelWorker');
+      if(bw) bw.addEventListener('click',function(){ _cancelRole='worker'; el('cancelReasonSel').value=''; el('glCancelOverlay').classList.add('show'); });
+    })();
   </script>
   <!-- Fixed OTP Banner — poster sees this when worker requests OTP -->
   <div id="otpFixedBanner" role="alert" aria-live="assertive">
@@ -1239,6 +1393,47 @@
       <div class="ofb-digs" id="otpBannerDigits"></div>
     </div>
     <span class="ofb-close" id="otpBannerClose" aria-label="Dismiss">✕</span>
+  </div>
+
+  <!-- Sprint 2: Review Modal -->
+  <div id="glReviewOverlay">
+    <div class="rev-box">
+      <h3 id="revTitle" style="font-size:1.05rem;font-weight:800;margin-bottom:4px;">⭐ Rate Your Experience</h3>
+      <p id="revSubtitle" style="font-size:.82rem;color:#6b7280;margin-bottom:2px;">Apna honest review do</p>
+      <div class="rev-stars" id="revStars">
+        <span class="rev-star" data-v="1">⭐</span><span class="rev-star" data-v="2">⭐</span>
+        <span class="rev-star" data-v="3">⭐</span><span class="rev-star" data-v="4">⭐</span>
+        <span class="rev-star" data-v="5">⭐</span>
+      </div>
+      <textarea class="rev-ta" id="revComment" placeholder="Optional: kuch likhna chahte ho?"></textarea>
+      <div style="display:flex;gap:10px;margin-top:14px;">
+        <button onclick="document.getElementById('glReviewOverlay').classList.remove('show')"
+          style="flex:1;padding:11px;border:1.5px solid #e5e7eb;border-radius:10px;font-weight:700;cursor:pointer;background:none;font-size:.88rem;">Skip</button>
+        <button id="revSubmitBtn"
+          style="flex:2;padding:11px;background:var(--teal,#0d9488);color:#fff;border:none;border-radius:10px;font-weight:800;cursor:pointer;font-size:.9rem;">Submit ✅</button>
+      </div>
+    </div>
+  </div>
+  <!-- Sprint 2: Cancel Modal -->
+  <div id="glCancelOverlay">
+    <div class="cancel-box">
+      <h3 style="font-size:1.05rem;font-weight:800;color:#dc2626;margin-bottom:6px;">⚠️ Gig Cancel Karo</h3>
+      <p style="font-size:.82rem;color:#6b7280;">Cancel karne ka reason batao:</p>
+      <select class="cancel-sel" id="cancelReasonSel">
+        <option value="">— Reason chuno —</option>
+        <option value="emergency">Emergency aa gayi</option>
+        <option value="not_available">Abhi available nahi hoon</option>
+        <option value="work_issue">Kaam shuru karne mein problem</option>
+        <option value="mutual_agreement">Mutual agreement</option>
+        <option value="other">Koi aur reason</option>
+      </select>
+      <div style="display:flex;gap:10px;margin-top:6px;">
+        <button onclick="document.getElementById('glCancelOverlay').classList.remove('show')"
+          style="flex:1;padding:11px;border:1.5px solid #e5e7eb;border-radius:10px;font-weight:700;cursor:pointer;background:none;font-size:.88rem;">Back</button>
+        <button id="cancelConfirmBtn"
+          style="flex:2;padding:11px;background:#dc2626;color:#fff;border:none;border-radius:10px;font-weight:800;cursor:pointer;font-size:.9rem;">Confirm Cancel</button>
+      </div>
+    </div>
   </div>
 </body>
 </html>
