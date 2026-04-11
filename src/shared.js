@@ -1196,5 +1196,64 @@
      END ONBOARDING TOUR
   ══════════════════════════════════════════════════════════ */
 
+
+  /* ══════════════════════════════════════════════════════════
+     16. NOTIFICATION SOUNDS — Web Audio API (no external files)
+  ══════════════════════════════════════════════════════════ */
+
+  function _glPlaySound(type) {
+    try {
+      var AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      var ctx = new AudioCtx();
+
+      function tone(freq, startTime, duration, volume) {
+        var o = ctx.createOscillator();
+        var g = ctx.createGain();
+        o.type = 'sine';
+        o.connect(g);
+        g.connect(ctx.destination);
+        o.frequency.setValueAtTime(freq, ctx.currentTime + startTime);
+        g.gain.setValueAtTime(volume || 0.22, ctx.currentTime + startTime);
+        g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + startTime + duration);
+        o.start(ctx.currentTime + startTime);
+        o.stop(ctx.currentTime + startTime + duration);
+      }
+
+      if (type === 'message') {
+        // Soft two-note pop — incoming chat message
+        tone(880, 0,    0.08, 0.18);
+        tone(1100, 0.07, 0.12, 0.14);
+
+      } else if (type === 'notification') {
+        // Double ding — new notification
+        tone(660, 0,    0.18, 0.20);
+        tone(880, 0.18, 0.18, 0.18);
+
+      } else if (type === 'payment') {
+        // Ascending three-note chime — payment received
+        tone(523, 0,    0.22, 0.20);
+        tone(659, 0.15, 0.22, 0.20);
+        tone(784, 0.30, 0.30, 0.22);
+
+      } else if (type === 'gig_booked') {
+        // Upbeat confirm tone
+        tone(440, 0,    0.15, 0.18);
+        tone(660, 0.15, 0.15, 0.18);
+        tone(880, 0.30, 0.25, 0.20);
+
+      } else if (type === 'send') {
+        // Very subtle whoosh — message sent
+        tone(660, 0, 0.06, 0.10);
+      }
+    } catch (e) {}
+  }
+
+  global._glPlaySound = _glPlaySound;
+
+  /* ══════════════════════════════════════════════════════════
+     END NOTIFICATION SOUNDS
+  ══════════════════════════════════════════════════════════ */
+
 })(window);
 
