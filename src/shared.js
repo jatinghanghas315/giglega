@@ -726,6 +726,35 @@
   global.getUnreadNotifCount = getUnreadNotifCount;
   global.pushNotif           = pushNotif;
 
+  /* ══ SPRINT 4: Live Firestore unread notification badge ══ */
+  (function(){
+    var _unsub = null;
+    function _setBadge(count) {
+      document.querySelectorAll('.nav-notif-badge,.dd-badge,.bn-badge').forEach(function(el){
+        el.textContent = count > 9 ? '9+' : String(count);
+        el.style.display = count > 0 ? '' : 'none';
+      });
+    }
+    global.startNotifBadgeListener = function(uid, db) {
+      if (_unsub) { try{_unsub();}catch(_){} _unsub = null; }
+      import('https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js')
+        .then(function(fs){
+          var q = fs.query(
+            fs.collection(db,'notifications',uid,'items'),
+            fs.where('read','==',false), fs.limit(50)
+          );
+          _unsub = fs.onSnapshot(q,
+            function(snap){ _setBadge(snap.size); },
+            function(e){ console.warn('[GigLega] badge:',e.message); }
+          );
+        }).catch(function(){});
+    };
+    global.stopNotifBadgeListener = function(){
+      if(_unsub){ try{_unsub();}catch(_){} _unsub=null; }
+    };
+  })();
+
+
 
   /* ══════════════════════════════════════════════════════════
      10. UTILITY HELPERS
@@ -809,6 +838,13 @@
 
     // Add toast styles if not already in CSS
     injectToastStyles();
+    /* Sprint 4: live Firestore bell badge */
+    var _glU = getCurrentUser();
+    if (_glU && typeof global.startNotifBadgeListener === 'function') {
+      import('./firebase-config.js')
+        .then(function(fb){ global.startNotifBadgeListener(_glU.uid||_glU.id, fb.db); })
+        .catch(function(){});
+    }
   }
 
   // Run as soon as DOM is ready
