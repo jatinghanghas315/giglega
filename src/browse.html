@@ -774,7 +774,7 @@
       return Math.floor(d/86400) + "d ago";
     }
     function getUserName(uid) {
-      if (!uid || uid === "demo") return "Demo Poster";
+      if (!uid) return "Unknown Poster";
       return usersCache[uid]?.name || null;
     }
     function getUserInitials(uid, fallbackName) {
@@ -810,7 +810,7 @@
           console.log('[GigLega] onSnapshot OK — docs:', snap.size);
           allGigs = snap.docs.map(function(d){ return Object.assign({ id: d.id }, d.data()); });
 
-          var uids = [...new Set(allGigs.map(function(g){ return g.posterId; }).filter(function(u){ return u && u !== 'demo'; }))];
+          var uids = [...new Set(allGigs.map(function(g){ return g.posterId; }).filter(Boolean))];
           Promise.all(uids.map(function(uid) {
             return getDoc(doc(db, 'users', uid)).then(function(usnap){
               if (usnap.exists()) usersCache[uid] = usnap.data();

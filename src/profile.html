@@ -361,27 +361,45 @@ if (!user) {
     /* ═══════════════════════════════════════
        STATS MINI
     ═══════════════════════════════════════ */
-    function renderStats() {
-      var gigs = JSON.parse(localStorage.getItem(GIG_KEY) || "[]");
-
-      var posted    = gigs.filter(function (g) { return g.posterId === user.id; }).length;
-      var completed = gigs.filter(function (g) {
-        return (g.takenBy === user.id || g.takenBy === user.name) && g.status === "completed";
+    async function renderStats() {
+      // Set placeholders while loading
+      ["smGigsPosted","smGigsDone","smEarned","smSpent"].forEach(function(id){
+        var el = document.getElementById(id); if(el) el.textContent = "—";
       });
-      var postedCompleted = gigs.filter(function (g) {
-        return g.posterId === user.id && g.status === "completed";
-      });
+      try {
+        var cfg = await import('./firebase-config.js');
+        var { collection, query, where, getDocs } = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js');
+        var uid = user.id || user.uid;
+        if (!uid) return;
 
-      var earned = 0;
-      completed.forEach(function (g) { earned += g.pricePerHr - Math.round(g.pricePerHr * FEE_RATE); });
+        // Gigs posted by user
+        var postedSnap = await getDocs(query(collection(cfg.db,"gigs"), where("posterId","==",uid)));
+        var posted = postedSnap.size;
+        var postedCompleted = postedSnap.docs.filter(function(d){ return d.data().status === "completed"; });
 
-      var spent = 0;
-      postedCompleted.forEach(function (g) { spent += g.pricePerHr || 0; });
+        // Gigs worked by user (bookedBy)
+        var workedSnap = await getDocs(query(collection(cfg.db,"gigs"), where("bookedBy","==",uid), where("status","==","completed")));
+        var worked = workedSnap.size;
 
-      document.getElementById("smGigsPosted").textContent = posted;
-      document.getElementById("smGigsDone").textContent   = completed.length;
-      document.getElementById("smEarned").textContent     = "₹" + earned;
-      document.getElementById("smSpent").textContent      = "₹" + spent;
+        // Earnings: sum of budget * (1 - FEE_RATE) for completed worked gigs
+        var earned = 0;
+        workedSnap.docs.forEach(function(d){ earned += Math.round((d.data().budget||0) * (1 - FEE_RATE)); });
+
+        // Spent: sum of budget for completed posted gigs
+        var spent = 0;
+        postedCompleted.forEach(function(d){ spent += (d.data().budget||0); });
+
+        var set = function(id, val){ var el=document.getElementById(id); if(el) el.textContent=val; };
+        set("smGigsPosted", posted);
+        set("smGigsDone",   worked);
+        set("smEarned",     "₹" + earned);
+        set("smSpent",      "₹" + spent);
+      } catch(e) {
+        console.warn("[GigLega] Stats Firestore load failed:", e.message);
+        ["smGigsPosted","smGigsDone","smEarned","smSpent"].forEach(function(id){
+          var el = document.getElementById(id); if(el) el.textContent = "0";
+        });
+      }
     }
 
     /* ═══════════════════════════════════════
