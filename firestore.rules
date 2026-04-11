@@ -1,0 +1,97 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAuth()         { return request.auth != null; }
+    function uid()            { return request.auth.uid; }
+    function isOwner(ownerId) { return isAuth() && uid() == ownerId; }
+
+    // ── GIGS ─────────────────────────────────────────────
+    match /gigs/{gigId} {
+      // Anyone can read gig listings (public browse)
+      allow read: if true;
+
+      // Only authenticated poster can create
+      allow create: if isAuth()
+        && request.resource.data.posterId == uid();
+
+      // Update allowed for 3 roles:
+      allow update: if isAuth() && (
+
+        // 1. Poster: full control over their own gig
+        isOwner(resource.data.posterId)
+
+        // 2. Worker: book an OPEN gig (open → taken transition only)
+        || (
+          resource.data.status == "open"
+          && request.resource.data.status == "taken"
+          && request.resource.data.workerId == uid()
+          && request.resource.data.posterId == resource.data.posterId
+        )
+
+        // 3. Assigned worker: update live GPS location on their taken gig
+        || (
+          resource.data.status == "taken"
+          && resource.data.workerId == uid()
+          && request.resource.data.diff(resource.data).affectedKeys()
+               .hasOnly(["workerLat","workerLng","workerLocUpdatedAt"])
+        )
+      );
+
+      // Only poster can delete their gig
+      allow delete: if isOwner(resource.data.posterId);
+    }
+
+    // ── CONVERSATIONS ─────────────────────────────────────
+    match /conversations/{convId} {
+      allow read:   if isAuth() && uid() in resource.data.participants;
+      allow create: if isAuth();
+      allow update: if isAuth() && uid() in resource.data.participants;
+      allow delete: if false;
+
+      match /messages/{msgId} {
+        allow read:   if isAuth();
+        allow create: if isAuth();
+        allow update, delete: if false;
+      }
+    }
+
+    // ── USERS ─────────────────────────────────────────────
+    match /users/{userId} {
+      allow read:   if isAuth();
+      allow create: if isAuth() && uid() == userId;
+      allow update: if isOwner(userId);
+      allow delete: if false;
+    }
+
+    // ── NOTIFICATIONS ─────────────────────────────────────
+    match /notifications/{userId}/items/{notifId} {
+      allow read, update, delete: if isOwner(userId);
+      // Any auth user can create a notification for someone else
+      allow create: if isAuth();
+    }
+
+    // ── WALLET ────────────────────────────────────────────
+    match /wallets/{userId} {
+      allow read, write: if isOwner(userId);
+    }
+
+    // ── TRANSACTIONS ──────────────────────────────────────
+    match /transactions/{txnId} {
+      allow read: if isAuth() && (
+        resource.data.userId     == uid()
+        || resource.data.senderId   == uid()
+        || resource.data.receiverId == uid()
+      );
+      allow create: if isAuth();
+      allow update, delete: if false;
+    }
+
+    // ── REVIEWS ───────────────────────────────────────────
+    match /reviews/{reviewId} {
+      allow read: if true;
+      allow create: if isAuth();
+      allow update, delete: if isOwner(resource.data.authorId);
+    }
+  }
+}
