@@ -1120,8 +1120,8 @@
 
       var workerLat = parseFloat(gig.workerLat);
       var workerLng = parseFloat(gig.workerLng);
-      var gigLat    = parseFloat(gig.lat || gig.workerLastLat);
-      var gigLng    = parseFloat(gig.lng || gig.workerLastLng);
+      var gigLat    = parseFloat(gig.gigLat || gig.lat || gig.workerLastLat);
+      var gigLng    = parseFloat(gig.gigLng || gig.lng || gig.workerLastLng);
 
       if (!workerLat || !workerLng) return;
 
