@@ -1749,8 +1749,8 @@
           // Replace TRANSACTIONS used by renderTxns if that function exists
           if(typeof window.renderTxns === 'function'){
             window._REAL_TXN_DATA = txData;
-            window.renderTxns('txnListRecent', txData, 5);
-            window.renderTxns('txnListAll',    txData);
+            window.renderTxns('recentTxns', txData, 5);
+            window.renderTxns('allTxns',    txData);
           }
         }
       } catch(e){ console.warn('[GigLega] wallet txns:', e.message); }
