@@ -642,8 +642,22 @@ function validateStep2(){
   return ok;
 }
 
+/* ── Geocode typed gig address → gigLat/gigLng for tracking map ── */
+async function geocodeAddress(area, pincode) {
+  var q = [area, pincode, 'Gurugram', 'India'].filter(Boolean).join(', ');
+  try {
+    var r = await fetch(
+      'https://nominatim.openstreetmap.org/search?format=json&limit=1&q=' + encodeURIComponent(q),
+      { headers: { 'User-Agent': 'GigLega/1.0' } }
+    );
+    var d = await r.json();
+    if (d && d.length) return { lat: parseFloat(d[0].lat), lng: parseFloat(d[0].lon) };
+  } catch(e) {}
+  return null;
+}
+
 /* ── Submit ── */
-function submitGig(){
+async function submitGig(){
   // ── Rate limit: max 3 gigs posted per hour ──
   var NOW       = Date.now();
   var HOUR      = 60 * 60 * 1000;
@@ -685,6 +699,12 @@ function submitGig(){
     _log = _log.filter(function(t){ return (Date.now()-t) < 86400000; });
     localStorage.setItem('gl_post_log', JSON.stringify(_log));
   } catch(e){}
+  // Geocode typed address and store as gigLat/gigLng for tracking map
+  try {
+    var _coords = await geocodeAddress($('fArea').value.trim(), $('fPincode').value.trim());
+    if (_coords) { gig.gigLat = _coords.lat; gig.gigLng = _coords.lng; }
+  } catch(_ge) { console.warn('[GigLega] address geocode:', _ge.message); }
+
   addDoc(collection(db,'gigs'),gig)
     .then(function(ref){
       $('successSub').textContent='Gig ID: '+ref.id.slice(0,8).toUpperCase()+' — Workers ko notify kar diya!';
