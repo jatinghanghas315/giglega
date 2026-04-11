@@ -2096,10 +2096,28 @@
     }
 
     function removeUPI(btn, id) {
-      if (confirm(`${id} remove karna chahte ho?`)) {
-        btn.closest(".upi-card-item").remove();
-        showToast(`${id} removed!`);
-      }
+      var existing = document.getElementById("gl-confirm-modal");
+      if (existing) existing.remove();
+      var modal = document.createElement("div");
+      modal.id = "gl-confirm-modal";
+      modal.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px;";
+      modal.innerHTML =
+        '<div style="background:var(--surface,#fff);border-radius:12px;padding:28px 24px;max-width:340px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.25);">' +
+          '<h3 style="font-size:1rem;font-weight:800;color:var(--primary,#1a3c5e);margin-bottom:8px">UPI Remove karna chahte ho?</h3>' +
+          '<p style="font-size:.85rem;color:var(--gray-500,#6b7280);line-height:1.6;margin-bottom:20px">' + id + ' ko remove kar doge?</p>' +
+          '<div style="display:flex;gap:10px;justify-content:flex-end;">' +
+            '<button onclick="document.getElementById('gl-confirm-modal').remove()" style="padding:9px 20px;border-radius:8px;border:1.5px solid #e5e7eb;background:none;font-weight:600;font-size:.875rem;cursor:pointer;">Cancel</button>' +
+            '<button id="upi-confirm-ok" style="padding:9px 20px;border-radius:8px;border:none;background:#dc2626;color:#fff;font-weight:700;font-size:.875rem;cursor:pointer;">Remove</button>' +
+          '</div>' +
+        '</div>';
+      document.body.appendChild(modal);
+      var targetBtn = btn, targetId = id;
+      document.getElementById("upi-confirm-ok").onclick = function() {
+        modal.remove();
+        targetBtn.closest(".upi-card-item").remove();
+        showToast(targetId + " removed!");
+      };
+      modal.addEventListener("click", function(e){ if(e.target===modal) modal.remove(); });
     }
 
     /* ══════════════════════════════════

@@ -828,18 +828,22 @@
         },
         function(err) {
           console.error('[GigLega] onSnapshot error — code:', err.code, 'msg:', err.message);
-          allGigs = [
-            { id:"gig_d1", title:"House Cleaning — 3BHK", description:"Reliable cleaner chahiye full 3BHK ke liye Saturday ko. All supplies provided.", budget:800, category:"House Help", type:"hyperlocal", location:"Sector 56, Gurugram", status:"open", createdAt: new Date(Date.now()-3600000).toISOString(), posterId:"demo" },
-            { id:"gig_d2", title:"Grocery Pickup & Delivery", description:"BigBazaar se saman lana hai ghar pe. Light items only.", budget:300, category:"Errands", type:"hyperlocal", location:"DLF Phase 3", status:"open", createdAt: new Date(Date.now()-7200000).toISOString(), posterId:"demo" },
-            { id:"gig_d3", title:"Logo Design — Startup", description:"Clean minimal logo chahiye food delivery startup ke liye. 2 concepts.", budget:1500, category:"Design", type:"remote", location:"Remote", status:"open", createdAt: new Date(Date.now()-10800000).toISOString(), posterId:"demo" },
-            { id:"gig_d4", title:"React Developer — Landing Page", description:"Startup ka landing page banana hai React mein. 1 week deadline.", budget:4000, category:"Web Dev", type:"remote", location:"Remote", status:"open", createdAt: new Date(Date.now()-28800000).toISOString(), posterId:"demo" }
-          ];
+          allGigs = [];
           var urlParams = new URLSearchParams(window.location.search);
           state.search = urlParams.get("q") || "";
           state.category = urlParams.get("cat") || "";
-          buildCategoryChips(); buildCategoryDropdown(); syncChips(); render();
-        }
-      );
+          buildCategoryChips(); buildCategoryDropdown(); syncChips();
+          // Show error empty state instead of fake gigs
+          var grid = document.getElementById("gigsGrid");
+          if (grid) {
+            grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px 24px;">' +
+              '<div style="font-size:2.5rem;margin-bottom:12px">⚠️</div>' +
+              '<h3 style="font-weight:800;color:var(--primary);margin-bottom:8px">Gigs load nahi ho sake</h3>' +
+              '<p style="font-size:.88rem;color:var(--gray-500);margin-bottom:20px">Internet check karo ya thodi der mein dobara try karo.</p>' +
+              '<button onclick="location.reload()" style="padding:10px 24px;background:var(--primary);color:#fff;border:none;border-radius:var(--radius-sm);font-weight:700;cursor:pointer;font-size:.9rem">🔄 Retry</button>' +
+              '</div>';
+          }
+        });
     }
 
     /* ── Auth check ── */

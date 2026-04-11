@@ -1081,12 +1081,24 @@
     await batch.commit();
   };
 
-  window.clearAllNotifs = async function(){
-    if(!currentUser || !confirm("Saari notifications delete karni hain?")) return;
-    const snap = await getDocs(collection(db,"notifications",currentUser.uid,"items"));
-    const batch = writeBatch(db);
-    snap.docs.forEach(d=>batch.delete(d.ref));
-    await batch.commit();
+  window.clearAllNotifs = function(){
+    if(!currentUser) return;
+    var _existM = document.getElementById("gl-confirm-modal"); if(_existM) _existM.remove();
+    var _m = document.createElement("div"); _m.id="gl-confirm-modal";
+    _m.style.cssText="position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px;";
+    _m.innerHTML='<div style="background:var(--surface,#fff);border-radius:12px;padding:28px 24px;max-width:340px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.25);"><h3 style="font-size:1rem;font-weight:800;color:#dc2626;margin-bottom:8px">Saari notifications delete karo?</h3><p style="font-size:.85rem;color:var(--gray-500,#6b7280);line-height:1.6;margin-bottom:20px">Yeh action undo nahi ho sakta.</p><div style="display:flex;gap:10px;justify-content:flex-end;"><button onclick="document.getElementById('gl-confirm-modal').remove()" style="padding:9px 20px;border-radius:8px;border:1.5px solid #e5e7eb;background:none;font-weight:600;font-size:.875rem;cursor:pointer;">Cancel</button><button id="notif-clear-ok" style="padding:9px 20px;border-radius:8px;border:none;background:#dc2626;color:#fff;font-weight:700;font-size:.875rem;cursor:pointer;">Delete All</button></div></div>';
+    document.body.appendChild(_m);
+    document.getElementById("notif-clear-ok").onclick = async function() {
+      _m.remove();
+      try {
+        const snap = await getDocs(collection(db,"notifications",currentUser.uid,"items"));
+        const batch = writeBatch(db);
+        snap.docs.forEach(d=>batch.delete(d.ref));
+        await batch.commit();
+        showToast("Saari notifications delete ho gayi!","success");
+      } catch(e) { showToast("Delete failed: "+e.message,"error"); }
+    };
+    _m.addEventListener("click",function(e){if(e.target===_m)_m.remove();});
   };
 
   function loadNotifications(uid){

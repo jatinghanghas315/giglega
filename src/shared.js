@@ -1,4 +1,4 @@
-/* CACHE BUSTER v1.5.0 — auto-clears old SW on first load */
+/* CACHE BUSTER v1.2.0 — auto-clears old SW on first load */
 (function(){
   var APP_BUILD = '1.8.0';
   var stored = localStorage.getItem('gl_app_build');
@@ -20,7 +20,7 @@
   }
 })();
 /* ============================================================
-   GigLega v1.1 — shared.js
+   GigLega v1.2 — shared.js
    Foundation: config, auth, navbar, footer, toast, breadcrumb
    ============================================================ */
 
@@ -46,7 +46,7 @@
      1. CONFIG & STORAGE KEYS
   ══════════════════════════════════════════════════════════ */
   var GL = {
-    VERSION:          "1.1",
+    VERSION:          "1.2",
     APP_NAME:         "GigLega",
     TAGLINE:          "Gurugram's Trusted Gig Marketplace",
     FEE_RATE:         0.06,

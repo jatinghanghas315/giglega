@@ -1,6 +1,6 @@
 /* production-ready: 20260411-0430 */
 /* ════════════════════════════════════════════════════════════════
-   GigLega Service WorkWorker v1.5.0
+   GigLega Service Worker v1.5.0
    Handles: Caching · Offline · Push Notifications · Background Sync
    ════════════════════════════════════════════════════════════════ */
 

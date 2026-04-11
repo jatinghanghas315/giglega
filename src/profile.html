@@ -548,27 +548,46 @@ if (!user) {
        DANGER ZONE
     ═══════════════════════════════════════ */
     document.getElementById("btnLogout").addEventListener("click", function () {
-      if (confirm("Are you sure you want to log out?")) {
-        if (typeof safeLogout === "function") { safeLogout(); }
-        else {
-          localStorage.removeItem(USER_KEY);
-          window.location.href = "index.html";
+      showConfirmModal(
+        "Logout karna chahte ho?",
+        "Aapka session end ho jayega.",
+        "Logout",
+        function() {
+          if (typeof safeLogout === "function") { safeLogout(); }
+          else { localStorage.removeItem(USER_KEY); window.location.href = "index.html"; }
         }
-      }
+      );
     });
 
     document.getElementById("btnDeleteAccount").addEventListener("click", function () {
-      if (!confirm("⚠️ This will permanently delete your account and all your data. Are you absolutely sure?")) return;
-      if (!confirm("Last chance — this CANNOT be undone. Delete account?")) return;
-
-      var USERS_KEY = (typeof GL !== "undefined" && GL.STORAGE_KEY_USERS) ? GL.STORAGE_KEY_USERS : "gl_users";
-      var users = JSON.parse(localStorage.getItem(USERS_KEY) || "[]");
-      users = users.filter(function (u) { return u.id !== user.id; });
-      localStorage.setItem(USERS_KEY, JSON.stringify(users));
-      localStorage.removeItem(USER_KEY);
-
-      if (typeof showToast === "function") showToast("Account deleted.", "success");
-      setTimeout(function () { window.location.href = "index.html"; }, 1200);
+      showConfirmModal(
+        "⚠️ Account permanently delete karna chahte ho?",
+        "Yeh action UNDO nahi ho sakta. Aapka data, gigs, aur wallet sab delete ho jayega.",
+        "Delete Account",
+        async function() {
+          try {
+            var { auth, db } = await import('./firebase-config.js');
+            var { deleteUser } = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js');
+            var { doc, deleteDoc } = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js');
+            var currentFbUser = auth.currentUser;
+            if (currentFbUser) {
+              // Delete Firestore user doc
+              try { await deleteDoc(doc(db, "users", currentFbUser.uid)); } catch(e){}
+              // Delete Firebase Auth account
+              await deleteUser(currentFbUser);
+            }
+          } catch(e) {}
+          // Clear localStorage
+          var USERS_KEY = (typeof GL !== "undefined" && GL.STORAGE_KEY_USERS) ? GL.STORAGE_KEY_USERS : "gl_users";
+          var users = JSON.parse(localStorage.getItem(USERS_KEY) || "[]");
+          users = users.filter(function (u) { return u.id !== user.id; });
+          localStorage.setItem(USERS_KEY, JSON.stringify(users));
+          localStorage.removeItem(USER_KEY);
+          if (typeof showToast === "function") showToast("Account deleted.", "success");
+          setTimeout(function () { window.location.href = "index.html"; }, 1200);
+        },
+        "danger"
+      );
     });
 
     function escHtml(s) {
@@ -583,6 +602,31 @@ if (!user) {
     renderCompletion();
 
   })();
-  </script>
+  
+  /* ══════════════════════════════════
+     CONFIRM MODAL (replaces confirm())
+  ══════════════════════════════════ */
+  function showConfirmModal(title, body, actionLabel, onConfirm, variant) {
+    var existing = document.getElementById("gl-confirm-modal");
+    if (existing) existing.remove();
+    var color = variant === "danger" ? "#dc2626" : "var(--primary)";
+    var modal = document.createElement("div");
+    modal.id = "gl-confirm-modal";
+    modal.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px;";
+    modal.innerHTML =
+      '<div style="background:var(--surface,#fff);border-radius:12px;padding:28px 24px;max-width:360px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.25);">' +
+        '<h3 style="font-size:1rem;font-weight:800;color:var(--primary,#1a3c5e);margin-bottom:8px">' + title + '</h3>' +
+        '<p style="font-size:.85rem;color:var(--gray-500,#6b7280);line-height:1.6;margin-bottom:20px">' + body + '</p>' +
+        '<div style="display:flex;gap:10px;justify-content:flex-end;">' +
+          '<button id="gl-confirm-cancel" style="padding:9px 20px;border-radius:8px;border:1.5px solid var(--gray-200,#e5e7eb);background:none;font-weight:600;font-size:.875rem;cursor:pointer;">Cancel</button>' +
+          '<button id="gl-confirm-ok" style="padding:9px 20px;border-radius:8px;border:none;background:' + color + ';color:#fff;font-weight:700;font-size:.875rem;cursor:pointer;">' + actionLabel + '</button>' +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(modal);
+    document.getElementById("gl-confirm-cancel").onclick = function() { modal.remove(); };
+    document.getElementById("gl-confirm-ok").onclick    = function() { modal.remove(); onConfirm(); };
+    modal.addEventListener("click", function(e) { if (e.target === modal) modal.remove(); });
+  }
+</script>
 </body>
 </html>
