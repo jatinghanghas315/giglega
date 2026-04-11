@@ -224,6 +224,7 @@
         <button class="btn-save" id="btnSave">Save Profile</button>
         <span class="save-status" id="saveStatus">✅ Profile saved!</span>
       </div>
+      <button class="btn-save" id="btnPushToggle" style="margin-top:10px;background:rgba(13,148,136,.10);color:#0d9488;border:1.5px solid #0d9488;font-weight:700" onclick="(async function(b){b.disabled=true;b.textContent='Setting up…';var ok=await(window.GL&&window.GL.initPushNotifications?window.GL.initPushNotifications():window.initPushNotifications?window.initPushNotifications():Promise.resolve(false));b.disabled=false;b.textContent=ok?'🔔 Notifications ON ✅':'🔔 Enable Push Notifications';})(this)">🔔 Enable Push Notifications</button>
 
       <!-- Danger zone -->
       <div class="danger-zone" style="margin-top:32px">
