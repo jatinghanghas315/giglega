@@ -198,6 +198,20 @@
     [data-theme=dark] .modal-box{background:var(--gray-900)}
     [data-theme=dark] .modal-field input{border-color:var(--gray-600);background:var(--gray-800)}
     [data-theme=dark] .btn-cancel-modal{border-color:var(--gray-600);color:var(--gray-300)}
+
+    /* ── Sprint 3: Recent Transactions ── */
+    .txn-list{display:flex;flex-direction:column;gap:4px}
+    .txn-row{display:flex;align-items:center;gap:12px;padding:10px 14px;
+             background:var(--surface);border:1.5px solid var(--gray-200);
+             border-radius:var(--radius-sm)}
+    [data-theme=dark] .txn-row{border-color:var(--gray-700)}
+    .txn-icon{font-size:1.25rem;flex-shrink:0}
+    .txn-body{flex:1;min-width:0}
+    .txn-desc{font-size:.82rem;font-weight:600;color:var(--gray-700);
+              white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    [data-theme=dark] .txn-desc{color:var(--gray-300)}
+    .txn-time{font-size:.72rem;color:var(--gray-400);margin-top:2px}
+    .txn-amt{font-size:.95rem;font-weight:800;flex-shrink:0}
   </style>
   <link rel="canonical" href="https://giglega.vercel.app/dashboard-worker.html">
   <meta property="og:type"        content="website">
@@ -294,13 +308,13 @@
           <div class="wallet-sparkline">
             <div class="sparkline-label">7-Day Earnings</div>
             <div class="sparkline-bars" id="sparklineBars">
-              <div class="sp-bar" style="height:20%"></div>
-              <div class="sp-bar" style="height:0%"></div>
-              <div class="sp-bar" style="height:45%"></div>
-              <div class="sp-bar" style="height:30%"></div>
-              <div class="sp-bar" style="height:0%"></div>
-              <div class="sp-bar" style="height:70%"></div>
-              <div class="sp-bar sp-today" style="height:55%"></div>
+          <div class="sp-bar" style="height:3%"></div>
+          <div class="sp-bar" style="height:3%"></div>
+          <div class="sp-bar" style="height:3%"></div>
+          <div class="sp-bar" style="height:3%"></div>
+          <div class="sp-bar" style="height:3%"></div>
+          <div class="sp-bar" style="height:3%"></div>
+          <div class="sp-bar sp-today" style="height:3%"></div>
             </div>
             <div class="sp-day-labels">
               <span class="sp-day-lbl">S</span><span class="sp-day-lbl">M</span>
@@ -364,6 +378,16 @@
           <div class="section-title">✅ Completed Gigs</div>
         </div>
         <div id="completedGigsList"></div>
+      </div>
+
+
+      <!-- Sprint 3: Recent Transactions -->
+      <div class="section" style="margin-top:8px">
+        <div class="section-head">
+          <div class="section-title">📋 Recent Transactions</div>
+          <a href="wallet.html" class="section-link">View All →</a>
+        </div>
+        <div id="recentTxnList"></div>
       </div>
 
     </div>
@@ -530,7 +554,13 @@ if (!user) {
           '<div class="gig-earn-sub">after 6% fee</div>' +
           (status === "taken"
             ? '<a href="chat.html?gigId=' + g.id + '" class="btn btn-sm btn-primary" style="margin-top:4px">💬 Open Chat</a>'
-            : '<span style="font-size:.72rem;color:var(--gray-400)">Credited to wallet</span>'
+            : (g.reviewedByWorker
+               ? '<span style="font-size:.72rem;color:var(--gray-400)">✅ Rated</span>'
+               : '<a href="active-gig.html?id='+encodeURIComponent(g.id)+'&openReview=poster"'
+               + ' class="btn btn-sm" style="margin-top:4px;background:rgba(245,158,11,.1);'
+               + 'color:#b45309;border:1px solid rgba(245,158,11,.3);font-size:.72rem">'
+               + '⭐ Rate Poster</a>'
+              )
           ) +
         '</div>' +
       '</div>';
@@ -609,8 +639,78 @@ if (!user) {
       if (e.key === USER_KEY && e.newValue) { try { user = JSON.parse(e.newValue); } catch(ex){} if(user&&user.id){var h=new Date().getHours();var g2=h<12?'Good morning':h<17?'Good afternoon':'Good evening';var el=document.getElementById('greetingText');if(el)el.textContent=g2+', '+(user.name||'Worker')+'! 👋';render();} }
     });
 
+
+    /* ══ SPRINT 3: Live Sparkline + Recent Transactions ══ */
+    async function loadSparkline(uid){
+      try{
+        var fs=await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js');
+        var fb=await import('./firebase-config.js');
+        var q=fs.query(
+          fs.collection(fb.db,'wallets',uid,'transactions'),
+          fs.where('type','==','credit'),
+          fs.orderBy('createdAt','asc'),fs.limit(200));
+        var snap=await fs.getDocs(q);
+        var days=[0,0,0,0,0,0,0],now=Date.now();
+        snap.forEach(function(d){
+          var t=d.data();
+          var ts=t.createdAt&&t.createdAt.toDate
+            ?t.createdAt.toDate().getTime():new Date(t.createdAt||0).getTime();
+          var da=Math.floor((now-ts)/86400000);
+          if(da>=0&&da<=6)days[6-da]+=(t.amount||0);
+        });
+        var mx=Math.max.apply(null,days)||1;
+        var el=document.getElementById('sparklineBars');
+        if(el)el.innerHTML=days.map(function(v,i){
+          var h=Math.max(Math.round((v/mx)*100),3);
+          return'<div class="sp-bar'+(i===6?' sp-today':'')+'" style="height:'+h+'%" title="₹'+v+'"></div>';
+        }).join('');
+        var DC=['S','M','T','W','T','F','S'],td=new Date().getDay();
+        document.querySelectorAll('.sp-day-lbl').forEach(function(el,i){
+          el.textContent=DC[((td-(6-i))+7)%7];
+        });
+      }catch(e){console.warn('[GigLega] sparkline:',e.message);}
+    }
+
+    async function loadRecentTxns(uid){
+      try{
+        var fs=await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js');
+        var fb=await import('./firebase-config.js');
+        var q=fs.query(
+          fs.collection(fb.db,'wallets',uid,'transactions'),
+          fs.orderBy('createdAt','desc'),fs.limit(5));
+        var snap=await fs.getDocs(q);
+        var c=document.getElementById('recentTxnList');
+        if(!c)return;
+        if(snap.empty){
+          c.innerHTML=emptyHtml('Abhi koi transaction nahi.',
+            'Pehla gig complete karo — earnings yahaan dikhegi!');
+          return;
+        }
+        var html='<div class="txn-list">';
+        snap.forEach(function(d){
+          var t=d.data(),isC=t.type==='credit';
+          var icon=isC?'💚':(t.type==='withdrawal'?'🏦':'🔴');
+          var clr=isC?'var(--teal,#0d9488)':'var(--danger,#ef4444)';
+          var sign=isC?'+':'-';
+          var ts=t.createdAt&&t.createdAt.toDate
+            ?t.createdAt.toDate().toISOString():(t.createdAt||'');
+          html+='<div class="txn-row">'
+            +'<span class="txn-icon">'+icon+'</span>'
+            +'<div class="txn-body">'
+            +'<div class="txn-desc">'+escHtml(t.description||t.type||'Transaction')+'</div>'
+            +'<div class="txn-time">'+timeAgo(ts)+'</div>'
+            +'</div>'
+            +'<div class="txn-amt" style="color:'+clr+'">'+sign+'₹'+(t.amount||0)+'</div>'
+            +'</div>';
+        });
+        c.innerHTML=html+'</div>';
+      }catch(e){console.warn('[GigLega] loadRecentTxns:',e.message);}
+    }
+
     loadWorkerGigs();
-        loadWalletBalance(); // loads from Firestore, calls render() on each snapshot
+    loadWalletBalance();
+    loadSparkline(user.uid || user.id);
+    loadRecentTxns(user.uid || user.id);
 
   })();
   
