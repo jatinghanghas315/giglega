@@ -29,12 +29,45 @@ service cloud.firestore {
           && request.resource.data.posterId == resource.data.posterId
         )
 
-        // 3. Assigned worker: update live GPS location on their taken gig
+        // 3. Assigned worker: GPS update only
         || (
           resource.data.status == "taken"
           && resource.data.workerId == uid()
           && request.resource.data.diff(resource.data).affectedKeys()
                .hasOnly(["workerLat","workerLng","workerLocUpdatedAt"])
+        )
+        // 4. Assigned worker: request OTP
+        || (
+          resource.data.status == "taken"
+          && resource.data.workerId == uid()
+          && request.resource.data.completionRequested == true
+          && request.resource.data.diff(resource.data).affectedKeys()
+               .hasOnly(["completionOTP","completionOTPExpiry",
+                         "completionRequested","completionRequestedAt"])
+        )
+        // 5. Assigned worker: complete gig (OTP verified)
+        || (
+          resource.data.status == "taken"
+          && resource.data.workerId == uid()
+          && request.resource.data.status == "completed"
+          && request.resource.data.diff(resource.data).affectedKeys()
+               .hasOnly(["status","completedAt","workerEarnings","platformFee",
+                         "completionOTP","completionOTPExpiry",
+                         "completionRequested","completionRequestedAt"])
+        )
+        // 6. Assigned worker: cancel gig
+        || (
+          resource.data.status == "taken"
+          && resource.data.workerId == uid()
+          && request.resource.data.status == "cancelled"
+          && request.resource.data.diff(resource.data).affectedKeys()
+               .hasOnly(["status","cancelledBy","cancelReason","cancelledAt"])
+        )
+        // 7. Assigned worker: mark review submitted
+        || (
+          resource.data.workerId == uid()
+          && request.resource.data.diff(resource.data).affectedKeys()
+               .hasOnly(["reviewedByWorker"])
         )
       );
 
