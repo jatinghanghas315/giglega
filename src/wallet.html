@@ -2043,7 +2043,7 @@
         }
 
         document.getElementById("modalAmount").textContent = "₹" + amount.toLocaleString("en-IN");
-        document.getElementById("modalRef").textContent = "Ref: GL-WD-2026031401";
+        document.getElementById("modalRef").textContent = "Ref: GL-WD-" + Date.now().toString().slice(-8);
         document.getElementById("withdrawModal").classList.add("open");
       }, 2000);
     }
