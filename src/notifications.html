@@ -1110,6 +1110,7 @@
 
     // No orderBy — avoid missing-index errors; sort in JS by timestamp
     const q = query(collection(db,"notifications",uid,"items"), limit(50));
+    let _notifInitLoad = true;
     onSnapshot(q, snap => {
       // Sort by timestamp DESC in JS (avoids Firestore composite index requirement)
       const sortedDocs = snap.docs.slice().sort(function(a,b){
@@ -1118,6 +1119,15 @@
         return tb - ta;
       });
       const unread = snap.docs.filter(d=>!d.data().read).length;
+        // Play sound only for genuinely new notifications (not initial page load)
+        if (!_notifInitLoad && typeof _glPlaySound === 'function') {
+          const newUnread = snap.docChanges().filter(c => c.type === 'added' && !c.doc.data().read);
+          if (newUnread.length > 0) {
+            const isPayment = newUnread.some(c => c.doc.data().type === 'payment' || c.doc.data().type === 'gig_completed');
+            _glPlaySound(isPayment ? 'payment' : 'notification');
+          }
+        }
+        _notifInitLoad = false;
       if(unreadEl) unreadEl.textContent = unread;
 
       // Update page title badge
