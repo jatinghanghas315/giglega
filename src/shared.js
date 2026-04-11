@@ -726,6 +726,48 @@
   global.getUnreadNotifCount = getUnreadNotifCount;
   global.pushNotif           = pushNotif;
 
+  /* ══ SPRINT 5: Browser Push Notification Setup ══ */
+  global.initPushNotifications = async function() {
+    try {
+      if (!('Notification' in window)) {
+        showToast('⚠️ Yeh browser push support nahi karta.','warning'); return false;
+      }
+      const perm = await Notification.requestPermission();
+      if (perm !== 'granted') {
+        showToast('🔕 Notifications blocked — browser settings se allow karo.','warning'); return false;
+      }
+      const reg = await navigator.serviceWorker.ready;
+      let sub = await reg.pushManager.getSubscription();
+      if (!sub) {
+        sub = await reg.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: 'BNgxPMRhO2KFnWODfY8e1_ggJB3L5kY4h7mXqZvT3R0pN1sWz9dCuAeVbFjHKxIiYmOlPcQtSuXwZaBcDe'
+        }).catch(function(e){ console.warn('[GigLega] push subscribe:',e.message); return null; });
+      }
+      const u = getCurrentUser();
+      if (sub && u) {
+        const uid = u.uid || u.id;
+        const subJSON = sub.toJSON();
+        import('https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js')
+          .then(function(fs){ return import('./firebase-config.js').then(function(fb){
+            return fs.setDoc(fs.doc(fb.db,'users',uid), {
+              pushEndpoint:  subJSON.endpoint || '',
+              pushKeys:      subJSON.keys     || {},
+              pushEnabled:   true,
+              pushUpdatedAt: new Date().toISOString()
+            }, { merge: true });
+          }); }).catch(function(e){ console.warn('[GigLega] push save:',e.message); });
+      }
+      showToast('🔔 Push notifications ON! Gig updates milenge.','success');
+      return true;
+    } catch(e) {
+      console.warn('[GigLega] initPushNotifications:', e.message);
+      showToast('❌ Push setup fail: ' + e.message, 'error');
+      return false;
+    }
+  };
+
+
   /* ══ SPRINT 4: Live Firestore unread notification badge ══ */
   (function(){
     var _unsub = null;
