@@ -1207,7 +1207,9 @@
       if (!AudioCtx) return;
       var ctx = new AudioCtx();
 
-      function tone(freq, startTime, duration, volume) {
+      // Browsers suspend AudioContext until user interaction — resume first
+      function _doPlay() {
+        function tone(freq, startTime, duration, volume) {
         var o = ctx.createOscillator();
         var g = ctx.createGain();
         o.type = 'sine';
@@ -1245,6 +1247,12 @@
       } else if (type === 'send') {
         // Very subtle whoosh — message sent
         tone(660, 0, 0.06, 0.10);
+      }
+      }
+      if (ctx.state === 'suspended') {
+        ctx.resume().then(_doPlay).catch(function(){});
+      } else {
+        _doPlay();
       }
     } catch (e) {}
   }
