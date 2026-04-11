@@ -673,6 +673,17 @@ async function submitGig(){
   } catch(e){}
   if(!validateStep1()||!validateStep2()) return;
   if(!currentUser){ window.location.href='login.html?redirect=post-gig.html'; return; }
+  // Profile completeness gate
+  try{
+    var { doc: _d2, getDoc: _gd2 } = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js');
+    var _pSnap = await _gd2(_d2(db,'users',currentUser.uid));
+    var _pData = _pSnap.exists() ? _pSnap.data() : {};
+    if(!_pData.phone || !(currentUser.displayName||_pData.displayName)){
+      if(typeof showToast==='function') showToast('⚠️ Gig post karne ke liye pehle profile complete karo — name + phone zaruri hai.','warning',4000);
+      setTimeout(function(){ window.location.href='profile.html?redirect=post-gig.html'; },1800);
+      return;
+    }
+  }catch(_pe2){ console.warn('[GigLega] profile gate:',_pe2.message); }
   var btn=$('btnPost'); btn.disabled=true; btn.textContent='⏳ Post ho raha hai...';
   var hrs=selDur==='custom'?(Number($('fCustomHrs').value)||0):selDurHrs;
   var skills=($('fSkills').value||'').split(',').map(function(s){return s.trim();}).filter(Boolean);
