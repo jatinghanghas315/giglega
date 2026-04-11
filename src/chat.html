@@ -409,7 +409,8 @@
 
       // Listen for messages
       const msgsQ = query(collection(db,"conversations",knownConvId,"messages"),orderBy("timestamp","asc"));
-      unsubMessages = onSnapshot(msgsQ, snap=>{
+      let _msgInitLoad = true;
+    unsubMessages = onSnapshot(msgsQ, snap=>{
         const wasAtBottom = msgs.scrollHeight-msgs.scrollTop-msgs.clientHeight < 80;
         snap.docChanges().forEach(change=>{
           if(change.type!=="added") return;
@@ -443,7 +444,12 @@
             </div>`;
           }
           msgs.appendChild(div);
+          // Play sound for received messages (not on initial load)
+          if (!isMine && !_msgInitLoad && typeof _glPlaySound === 'function') {
+            _glPlaySound('message');
+          }
         });
+        _msgInitLoad = false;
         if(wasAtBottom) msgs.scrollTop=msgs.scrollHeight;
       }, err=>{
         showErr("Messages load failed: "+err.message);
@@ -529,6 +535,7 @@
           lastMessageAt: serverTimestamp(),
           lastMessage: text
         },{merge:true});
+        if (typeof _glPlaySound === 'function') _glPlaySound('send');
       } catch(e){ console.error(e); }
     };
 
