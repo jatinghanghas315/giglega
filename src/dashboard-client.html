@@ -368,6 +368,12 @@ function gigCardHtml(g) {
            '</div>' +
            '<div class="worker-actions">' +
              '<a href="chat.html?with=' + encodeURIComponent(g.workerId) + '&gig=' + encodeURIComponent(g.id) + '" class="btn btn-sm btn-primary">💬 Chat</a>' +
+        + (g.reviewedByPoster
+           ? '<span style="font-size:.72rem;color:var(--gray-400);margin-left:6px">✅ Rated</span>'
+           : ' <a href="active-gig.html?id='+encodeURIComponent(g.id)+'&openReview=worker"'
+           + ' class="btn btn-sm" style="background:rgba(245,158,11,.1);color:#b45309;'
+           + 'border:1px solid rgba(245,158,11,.3);font-size:.72rem">⭐ Rate Worker</a>'
+          )
              '<a href="gig-detail.html?id=' + encodeURIComponent(g.id) + '" class="btn btn-sm btn-outline">View Gig</a>' +
            '</div>' +
          '</div>')
@@ -502,4 +508,3 @@ document.getElementById('btnSwitchRole').addEventListener('click', function() {
 </script>
 </body>
 </html>
-
