@@ -1996,6 +1996,78 @@
     renderReviewDistSidebar();
     renderTrendChart();
 
+    /* ══ SPRINT 5 PATCH 4B: Load real reviews from Firestore ══ */
+    (async function(){
+      try {
+        const [fs, fb] = await Promise.all([
+          import('https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js'),
+          import('./firebase-config.js')
+        ]);
+        const authMod = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js');
+        authMod.onAuthStateChanged(fb.auth, async function(user){
+          if (!user) return;
+          /* Received reviews — written by others about this user */
+          const qRec = fs.query(
+            fs.collection(fb.db,'publicReviews'),
+            fs.orderBy('createdAt','desc'), fs.limit(20)
+          );
+          const snap = await fs.getDocs(qRec);
+          if (snap.empty) return;
+
+          /* Build HTML + compute real stats */
+          const items = [];
+          snap.forEach(function(d){ items.push(Object.assign({id:d.id},d.data())); });
+
+          /* Real rating stats */
+          const dist = {1:0,2:0,3:0,4:0,5:0};
+          let total = 0, sum = 0;
+          items.forEach(function(r){
+            const s = parseInt(r.rating)||0;
+            if(s>=1&&s<=5){ dist[s]++; total++; sum+=s; }
+          });
+          const avg = total ? (sum/total).toFixed(1) : '—';
+
+          /* Update hero avg rating display */
+          const avgEl = document.querySelector('.rv-avg-num,.rvs-avg,.hero-rating-avg');
+          if(avgEl) avgEl.textContent = avg;
+          const cntEl = document.querySelector('.rv-total-count,.rvs-count');
+          if(cntEl) cntEl.textContent = total + ' reviews';
+
+          /* Render real review cards */
+          function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+          const list = document.querySelector('.rv-list') || document.getElementById('reviewMainList');
+          if(list){
+            list.innerHTML = items.map(function(r){
+              const stars = '⭐'.repeat(parseInt(r.rating)||0)+'☆'.repeat(5-(parseInt(r.rating)||0));
+              const dt = r.createdAt
+                ? new Date(r.createdAt).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})
+                : '';
+              return '<div class="review-item" data-rating="'+r.rating+'"'
+                +'style="padding:14px 0;border-bottom:1px solid var(--gray-100,#f3f4f6)">'
+                +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">'
+                +'<strong style="font-size:.88rem">'+esc(r.reviewerName||'Anonymous')+'</strong>'
+                +'<span style="font-size:.76rem;color:var(--gray-400)">'+dt+'</span></div>'
+                +'<div style="font-size:.92rem;margin-bottom:6px">'+stars+'</div>'
+                +(r.comment?'<div style="font-size:.84rem;line-height:1.55;color:var(--text)">'+esc(r.comment)+'</div>':'')
+                +'</div>';
+            }).join('');
+          }
+
+          /* Real distribution sidebar */
+          const distEl = document.getElementById('reviewDistSidebar');
+          if(distEl && total){
+            distEl.innerHTML = [5,4,3,2,1].map(function(s){
+              const pct = Math.round((dist[s]/total)*100);
+              return '<div class="stat-row">'
+                +'<span class="sr-lbl">'+s+'⭐</span>'
+                +'<span class="sr-val">'+dist[s]+' ('+pct+'%)</span>'
+                +'</div>';
+            }).join('');
+          }
+        });
+      } catch(e){ console.warn('[GigLega] reviews load:', e.message); }
+    })();
+
   </script>
 
   <footer id="main-footer"></footer>
