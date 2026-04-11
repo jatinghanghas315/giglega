@@ -620,6 +620,44 @@
         if(cdTimer) clearInterval(cdTimer);
         var tc = el('trackCard'); if(tc) tc.style.display='none';
         el('otpReveal').classList.remove('show');
+
+        // Auto-debit poster wallet (runs once — posterDebited flag prevents double-debit)
+        if(!gig.posterDebited && currentUser && currentUser.uid === gig.posterId){
+          (async function autoPosterDebit(){
+            try {
+              var budget = Number(gig.budget||0);
+              var gigRef = doc(db,'gigs',gig.id);
+              var wRef   = doc(db,'wallets',currentUser.uid);
+              // runTransaction ensures debit only happens once even across multiple tabs
+              await runTransaction(db, async function(txn){
+                var gigSnap2 = await txn.get(gigRef);
+                if(!gigSnap2.exists() || gigSnap2.data().posterDebited) return;
+                var wSnap2   = await txn.get(wRef);
+                var prevBal  = wSnap2.exists() ? (wSnap2.data().balance||0) : 0;
+                txn.set(wRef, {
+                  balance:     Math.max(0, prevBal - budget),
+                  totalSpent:  (wSnap2.exists()?(wSnap2.data().totalSpent||0):0) + budget,
+                  updatedAt:   serverTimestamp(),
+                  uid:         currentUser.uid
+                }, { merge: true });
+                txn.update(gigRef, { posterDebited: true });
+              });
+              // Write debit transaction record outside the transaction
+              await addDoc(collection(db,'wallets',currentUser.uid,'transactions'),{
+                type:      'debit',
+                amount:    budget,
+                title:     'Gig Payment — '+(gig.title||'Gig'),
+                meta:      'Gig #'+gig.id+' · Worker: '+(gig.workerName||'Worker'),
+                gigId:     gig.id,
+                createdAt: serverTimestamp(),
+                status:    'completed'
+              });
+              toast('💳 ₹'+budget.toLocaleString('en-IN')+' aapke wallet se debit hua.','info');
+            } catch(debitErr){
+              console.error('[GigLega] poster debit:', debitErr.message);
+            }
+          })();
+        }
         ['tld1','tld2','tld3','tld4'].forEach(function(x){ el(x).className='tl-dot done'; el(x).textContent='✓'; });
         ['tll1','tll2','tll3'].forEach(function(x){ el(x)&&el(x).classList.add('done'); });
         if(gig.completedAt) el('tlt4').textContent=fmtDt(gig.completedAt);
