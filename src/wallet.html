@@ -1671,6 +1671,18 @@
       if(!user){ window.location.replace('login.html?redirect=wallet.html'); return; }
 
       const uid = user.uid;
+
+      /* Role guard — wallet is for workers only */
+      try {
+        const { doc: _doc, getDoc: _getDoc } = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js');
+        const { db: _db } = await import('./firebase-config.js');
+        const _uSnap = await _getDoc(_doc(_db, 'users', uid));
+        if (_uSnap.exists() && _uSnap.data().role === 'poster') {
+          if (typeof showToast === 'function') showToast('Wallet is only available for workers.', 'error');
+          setTimeout(function(){ window.location.replace('dashboard-client.html'); }, 1500);
+          return;
+        }
+      } catch(_e) { console.warn('[GigLega] wallet role check:', _e.message); }
       // Populate referral code
       (function(){
         const refEl = document.getElementById('referralCodeDisplay');
