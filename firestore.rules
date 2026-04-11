@@ -13,7 +13,9 @@ service cloud.firestore {
 
       // Only authenticated poster can create
       allow create: if isAuth()
-        && request.resource.data.posterId == uid();
+        && request.resource.data.posterId == uid()
+        && request.resource.data.keys().hasAll(['title','category','status','createdAt'])
+        && request.resource.data.status == 'open';
 
       // Update allowed for 3 roles:
       allow update: if isAuth() && (
