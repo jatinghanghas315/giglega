@@ -1045,5 +1045,156 @@
     document.body.appendChild(banner);
   }
 
+
+
+  /* ══════════════════════════════════════════════════════════
+     15. ONBOARDING TOUR — First-time user walkthrough
+     Auto-triggers on dashboard pages for users with hasSeenOnboarding !== true
+  ══════════════════════════════════════════════════════════ */
+
+  var TOUR_STEPS = {
+    worker: [
+      { title: "👋 Welcome to GigLega!", text: "You're now a verified gig worker. Let's show you around so you can start earning fast.", target: null },
+      { title: "⚡ Active Gig", text: "When you accept a gig, it appears here. Track progress and chat with the poster directly.", target: ".wallet-card" },
+      { title: "💰 Your Wallet", text: "Earnings from completed gigs land here automatically. Tap Withdraw to get paid via UPI.", target: ".wallet-card" },
+      { title: "🔍 Browse Gigs", text: "Tap Browse Gigs in the nav to see all open jobs near you and accept one instantly.", target: null },
+      { title: "🌟 You're All Set!", text: "Your profile is live. Browse open gigs and land your first job today!", target: null }
+    ],
+    poster: [
+      { title: "👋 Welcome to GigLega!", text: "You can now post gigs and find trusted local workers in Gurugram in minutes.", target: null },
+      { title: "📝 Post a New Gig", text: "Tap 'Post a New Gig' to describe the work, set a budget, and go live in under 60 seconds.", target: ".btn-post-new" },
+      { title: "📂 Manage Your Gigs", text: "All your posted gigs appear here — switch between Open, In Progress, and Completed tabs.", target: ".tab-bar" },
+      { title: "💬 Chat with Worker", text: "Once a worker accepts your gig, use the built-in chat to coordinate everything.", target: ".tab-bar" },
+      { title: "🌟 You're All Set!", text: "Post your first gig now — GigLega workers in Gurugram are ready and waiting!", target: null }
+    ]
+  };
+
+  function _glStartTour(role, uid) {
+    var steps = TOUR_STEPS[role] || TOUR_STEPS.worker;
+    var current = 0;
+    var overlay, card, cleanupFn;
+
+    function injectTourStyles() {
+      if (document.getElementById('gl-tour-styles')) return;
+      var s = document.createElement('style');
+      s.id = 'gl-tour-styles';
+      s.textContent = '.gl-tour-overlay{position:fixed;inset:0;background:rgba(0,0,0,.52);z-index:99998}' +
+        '.gl-tour-card{position:fixed;z-index:99999;max-width:300px;width:calc(100vw - 32px);' +
+        'background:#1c1b19;border:1.5px solid #393836;border-radius:14px;padding:20px 22px;' +
+        'box-shadow:0 16px 40px rgba(0,0,0,.6);font-family:inherit;color:#cdccca}' +
+        '.gl-tour-step{font-size:11px;font-weight:700;color:#4f98a3;margin-bottom:8px;letter-spacing:.5px;text-transform:uppercase}' +
+        '.gl-tour-bar-wrap{height:3px;background:#2d2c2a;border-radius:99px;margin-bottom:16px}' +
+        '.gl-tour-bar{height:3px;background:#4f98a3;border-radius:99px;transition:width .35s ease}' +
+        '.gl-tour-title{font-size:15px;font-weight:800;color:#fff;margin-bottom:8px;line-height:1.3}' +
+        '.gl-tour-text{font-size:13.5px;line-height:1.6;color:#9a9896;margin-bottom:20px}' +
+        '.gl-tour-actions{display:flex;justify-content:space-between;align-items:center}' +
+        '.gl-tour-skip{background:none;border:none;color:#5a5957;font-size:13px;cursor:pointer;padding:4px 0;font-family:inherit}' +
+        '.gl-tour-skip:hover{color:#797876}' +
+        '.gl-tour-next{background:#01696f;color:#fff;border:none;border-radius:8px;padding:9px 20px;' +
+        'font-size:13.5px;font-weight:700;cursor:pointer;font-family:inherit}' +
+        '.gl-tour-next:hover{background:#0c4e54}' +
+        '.gl-tour-hl{outline:2.5px solid #4f98a3!important;outline-offset:4px!important;border-radius:8px!important;z-index:99997;position:relative}';
+      document.head.appendChild(s);
+    }
+
+    function render(idx) {
+      var step = steps[idx];
+      var isLast = idx === steps.length - 1;
+      var pct = Math.round(((idx + 1) / steps.length) * 100);
+
+      if (cleanupFn) { cleanupFn(); cleanupFn = null; }
+
+      var targetEl = step.target ? document.querySelector(step.target) : null;
+      if (targetEl) {
+        targetEl.classList.add('gl-tour-hl');
+        cleanupFn = function() { targetEl.classList.remove('gl-tour-hl'); };
+        setTimeout(function() {
+          var rect = targetEl.getBoundingClientRect();
+          var top = rect.bottom + window.scrollY + 14;
+          var left = Math.max(16, Math.min(rect.left + window.scrollX, window.innerWidth - 316));
+          if (top + 240 > window.innerHeight + window.scrollY) top = Math.max(16, rect.top + window.scrollY - 250);
+          card.style.cssText = 'top:' + top + 'px;left:' + left + 'px;transform:none;position:fixed';
+        }, 60);
+      } else {
+        card.style.cssText = 'top:50%;left:50%;transform:translate(-50%,-50%);position:fixed';
+      }
+
+      card.innerHTML =
+        '<div class="gl-tour-step">Step ' + (idx+1) + ' of ' + steps.length + '</div>' +
+        '<div class="gl-tour-bar-wrap"><div class="gl-tour-bar" style="width:' + pct + '%"></div></div>' +
+        '<div class="gl-tour-title">' + step.title + '</div>' +
+        '<div class="gl-tour-text">' + step.text + '</div>' +
+        '<div class="gl-tour-actions">' +
+          '<button class="gl-tour-skip">Skip tour</button>' +
+          '<button class="gl-tour-next">' + (isLast ? "Let\'s Go! 🚀" : "Next →") + '</button>' +
+        '</div>';
+
+      card.querySelector('.gl-tour-skip').onclick = endTour;
+      card.querySelector('.gl-tour-next').onclick = function() {
+        isLast ? endTour() : render(++current);
+      };
+    }
+
+    function endTour() {
+      if (cleanupFn) cleanupFn();
+      if (overlay && overlay.parentNode) overlay.parentNode.removeChild(overlay);
+      if (card && card.parentNode) card.parentNode.removeChild(card);
+      try {
+        Promise.all([
+          import('https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js'),
+          import('./firebase-config.js')
+        ]).then(function(m) {
+          m[0].updateDoc(m[0].doc(m[1].db, 'users', uid), { hasSeenOnboarding: true }).catch(function(){});
+        }).catch(function(){});
+      } catch(e) {}
+    }
+
+    injectTourStyles();
+    overlay = document.createElement('div');
+    overlay.className = 'gl-tour-overlay';
+    overlay.onclick = endTour;
+    document.body.appendChild(overlay);
+    card = document.createElement('div');
+    card.className = 'gl-tour-card';
+    document.body.appendChild(card);
+    render(0);
+  }
+
+  function _glInitOnboarding() {
+    var page = window.location.pathname.split('/').pop() || 'index.html';
+    if (page !== 'dashboard-worker.html' && page !== 'dashboard-client.html') return;
+    setTimeout(function() {
+      Promise.all([
+        import('https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js'),
+        import('https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js'),
+        import('./firebase-config.js')
+      ]).then(function(mods) {
+        var authMod = mods[0], fsMod = mods[1], fbApp = mods[2];
+        authMod.onAuthStateChanged(fbApp.auth, function(user) {
+          if (!user) return;
+          setTimeout(function() {
+            fsMod.getDoc(fsMod.doc(fbApp.db, 'users', user.uid)).then(function(snap) {
+              if (!snap.exists()) return;
+              var data = snap.data();
+              if (data.hasSeenOnboarding) return;
+              var role = data.role || (page === 'dashboard-worker.html' ? 'worker' : 'poster');
+              _glStartTour(role, user.uid);
+            }).catch(function(e) { console.warn('[GL] onboarding check:', e.message); });
+          }, 1500);
+        });
+      }).catch(function(e) { console.warn('[GL] onboarding init:', e); });
+    }, 600);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', _glInitOnboarding);
+  } else {
+    _glInitOnboarding();
+  }
+
+  /* ══════════════════════════════════════════════════════════
+     END ONBOARDING TOUR
+  ══════════════════════════════════════════════════════════ */
+
 })(window);
 
