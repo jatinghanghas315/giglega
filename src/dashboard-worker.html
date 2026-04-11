@@ -430,6 +430,30 @@ if (!user) {
       }catch(e){ console.warn('[GigLega] loadWorkerGigs:', e.message); }
     }
 
+    /* ── Live wallet balance from wallets/{uid} (single source of truth) ── */
+    var _walletUnSub = null;
+    async function loadWalletBalance() {
+      try {
+        var fs    = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js');
+        var fbApp = await import('./firebase-config.js');
+        var uid   = user.uid || user.id;
+        if (_walletUnSub) _walletUnSub();
+        _walletUnSub = fs.onSnapshot(fs.doc(fbApp.db, 'wallets', uid), function(snap) {
+          var d = snap.exists() ? snap.data() : {};
+          var bal          = d.balance       || 0;
+          var totalEarned  = d.totalEarned   || 0;
+          var gigsCompleted= d.gigsCompleted || 0;
+          var feePaid      = d.feePaid       || 0;
+          var avg = gigsCompleted ? Math.round(totalEarned / gigsCompleted) : 0;
+          document.getElementById('walletBalance').textContent  = bal;
+          document.getElementById('totalEarned').textContent    = totalEarned;
+          document.getElementById('gigsCompleted').textContent  = gigsCompleted;
+          document.getElementById('avgEarn').textContent        = avg;
+          document.getElementById('feePaid').textContent        = feePaid;
+        }, function(err){ console.warn('[GigLega] wallet balance:', err.message); });
+      } catch(e){ console.warn('[GigLega] loadWalletBalance:', e.message); }
+    }
+
     /* ── Time ago ── */
     function timeAgo(iso) {
       var d = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
@@ -451,31 +475,16 @@ if (!user) {
       var active   = myGigs.filter(function (g) { return g.status === "taken"; });
       var completed = getCompletedGigs();
 
-      /* Wallet calc */
-      var totalEarned = 0;
-      var feePaid     = 0;
-      completed.forEach(function (g) {
-        var fee  = Math.round(g.pricePerHr * FEE_RATE);
-        var net  = g.pricePerHr - fee;
-        totalEarned += net;
-        feePaid     += fee;
-      });
+      /* Gig counts (still from live gig data) */
       var pendingAmt = 0;
       active.forEach(function (g) {
         var fee = Math.round(g.pricePerHr * FEE_RATE);
         pendingAmt += g.pricePerHr - fee;
       });
-      var avg = completed.length ? Math.round(totalEarned / completed.length) : 0;
-
-      /* Update wallet UI */
-      document.getElementById("walletBalance").textContent  = totalEarned;
-      document.getElementById("totalEarned").textContent    = totalEarned;
-      document.getElementById("gigsCompleted").textContent  = completed.length;
-      document.getElementById("avgEarn").textContent        = avg;
-      document.getElementById("feePaid").textContent        = feePaid;
       document.getElementById("statActive").textContent     = active.length;
       document.getElementById("statCompleted").textContent  = completed.length;
       document.getElementById("statPending").textContent    = "₹" + pendingAmt;
+      /* Wallet UI is now driven by wallets/{uid} via loadWalletBalance() */
 
       /* Render active */
       var activeEl = document.getElementById("activeGigsList");
@@ -600,7 +609,8 @@ if (!user) {
       if (e.key === USER_KEY && e.newValue) { try { user = JSON.parse(e.newValue); } catch(ex){} if(user&&user.id){var h=new Date().getHours();var g2=h<12?'Good morning':h<17?'Good afternoon':'Good evening';var el=document.getElementById('greetingText');if(el)el.textContent=g2+', '+(user.name||'Worker')+'! 👋';render();} }
     });
 
-    loadWorkerGigs(); // loads from Firestore, calls render() on each snapshot
+    loadWorkerGigs();
+        loadWalletBalance(); // loads from Firestore, calls render() on each snapshot
 
   })();
   
