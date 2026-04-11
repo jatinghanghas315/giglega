@@ -674,7 +674,7 @@
       <div class="nfb-inner">
         <div class="nfb-tabs" id="nfbTabs">
           <button class="nfb-tab active" data-filter="all">
-            All <span class="nfb-count" id="badgeAll">8</span>
+            All <span class="nfb-count" id="badgeAll">0</span>
           </button>
           <button class="nfb-tab" data-filter="payment">
             💰 Payment <span class="nfb-count" id="badgePayment">3</span>
@@ -1065,7 +1065,7 @@
 
   async function markRead(id){
     if(!currentUser) return;
-    try{ await updateDoc(doc(db,"notifications",currentUser.uid,"items",id),{read:true}); }catch(e){}
+    try{ await updateDoc(doc(db,"notifications",currentUser.uid,"items",id),{read:true}); }catch(e){ console.warn("[GigLega] markRead:",e.message); }
   }
 
   window.deleteNotif = async function(id){
@@ -1102,6 +1102,12 @@
   };
 
   function loadNotifications(uid){
+    /* Sprint 4: live unread count → badge */
+    const qBadge = query(collection(db,"notifications",uid,"items"),where("read","==",false));
+    onSnapshot(qBadge, function(snap){
+      const el = document.getElementById("badgeAll");
+      if (el) el.textContent = snap.size;
+    });
     const list = document.getElementById("notifMainList");
     const emptyEl = document.getElementById("notifEmpty");
     const unreadEl= document.getElementById("statUnread");
