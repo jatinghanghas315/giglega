@@ -74,6 +74,13 @@ service cloud.firestore {
     // ── WALLET ────────────────────────────────────────────
     match /wallets/{userId} {
       allow read, write: if isOwner(userId);
+
+      // Transactions subcollection — only owner reads/writes
+      match /transactions/{txnId} {
+        allow read:          if isOwner(userId);
+        allow create:        if isOwner(userId);
+        allow update, delete: if false;
+      }
     }
 
     // ── TRANSACTIONS ──────────────────────────────────────
