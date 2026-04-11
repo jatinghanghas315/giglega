@@ -6,39 +6,29 @@ service cloud.firestore {
     function uid()            { return request.auth.uid; }
     function isOwner(ownerId) { return isAuth() && uid() == ownerId; }
 
-    // ── GIGS ─────────────────────────────────────────────
+    // ── GIGS ───────────────────────────────────────────
     match /gigs/{gigId} {
-      // Anyone can read gig listings (public browse)
       allow read: if true;
 
-      // Only authenticated poster can create
       allow create: if isAuth()
         && request.resource.data.posterId == uid()
         && request.resource.data.keys().hasAll(['title','category','status','createdAt'])
         && request.resource.data.status == 'open';
 
-      // Update allowed for 3 roles:
       allow update: if isAuth() && (
-
-        // 1. Poster: full control over their own gig
         isOwner(resource.data.posterId)
-
-        // 2. Worker: book an OPEN gig (open → taken transition only)
         || (
           resource.data.status == "open"
           && request.resource.data.status == "taken"
           && request.resource.data.workerId == uid()
           && request.resource.data.posterId == resource.data.posterId
         )
-
-        // 3. Assigned worker: GPS update only
         || (
           resource.data.status == "taken"
           && resource.data.workerId == uid()
           && request.resource.data.diff(resource.data).affectedKeys()
                .hasOnly(["workerLat","workerLng","workerLocUpdatedAt"])
         )
-        // 4. Assigned worker: request OTP
         || (
           resource.data.status == "taken"
           && resource.data.workerId == uid()
@@ -47,7 +37,6 @@ service cloud.firestore {
                .hasOnly(["completionOTP","completionOTPExpiry",
                          "completionRequested","completionRequestedAt"])
         )
-        // 5. Assigned worker: complete gig (OTP verified)
         || (
           resource.data.status == "taken"
           && resource.data.workerId == uid()
@@ -57,7 +46,6 @@ service cloud.firestore {
                          "completionOTP","completionOTPExpiry",
                          "completionRequested","completionRequestedAt"])
         )
-        // 6. Assigned worker: cancel gig
         || (
           resource.data.status == "taken"
           && resource.data.workerId == uid()
@@ -65,19 +53,22 @@ service cloud.firestore {
           && request.resource.data.diff(resource.data).affectedKeys()
                .hasOnly(["status","cancelledBy","cancelReason","cancelledAt"])
         )
-        // 7. Assigned worker: mark review submitted
         || (
           resource.data.workerId == uid()
           && request.resource.data.diff(resource.data).affectedKeys()
                .hasOnly(["reviewedByWorker"])
         )
+        || (
+          resource.data.posterId == uid()
+          && request.resource.data.diff(resource.data).affectedKeys()
+               .hasOnly(["reviewedByPoster","posterDebited"])
+        )
       );
 
-      // Only poster can delete their gig
       allow delete: if isOwner(resource.data.posterId);
     }
 
-    // ── CONVERSATIONS ─────────────────────────────────────
+    // ── CONVERSATIONS ───────────────────────────────────
     match /conversations/{convId} {
       allow read:   if isAuth() && uid() in resource.data.participants;
       allow create: if isAuth();
@@ -91,7 +82,7 @@ service cloud.firestore {
       }
     }
 
-    // ── USERS ─────────────────────────────────────────────
+    // ── USERS ───────────────────────────────────────────
     match /users/{userId} {
       allow read:   if isAuth();
       allow create: if isAuth() && uid() == userId;
@@ -99,10 +90,9 @@ service cloud.firestore {
       allow delete: if false;
     }
 
-    // ── NOTIFICATIONS ─────────────────────────────────────
+    // ── NOTIFICATIONS ───────────────────────────────────
     match /notifications/{userId}/items/{notifId} {
       allow read, update, delete: if isOwner(userId);
-      // Any auth user can create a notification for someone else
       allow create: if isAuth();
     }
 
@@ -110,10 +100,9 @@ service cloud.firestore {
     match /wallets/{userId} {
       allow read, write: if isOwner(userId);
 
-      // Transactions subcollection — only owner reads/writes
       match /transactions/{txnId} {
-        allow read:          if isOwner(userId);
-        allow create:        if isOwner(userId);
+        allow read:           if isOwner(userId);
+        allow create:         if isOwner(userId);
         allow update, delete: if false;
       }
     }
@@ -134,6 +123,15 @@ service cloud.firestore {
       allow read: if true;
       allow create: if isAuth();
       allow update, delete: if isOwner(resource.data.authorId);
+    }
+
+    // ── PUBLIC REVIEWS ───────────────────────────────────
+    match /publicReviews/{reviewId} {
+      allow read: if true;
+      allow create: if isAuth()
+        && request.resource.data.rating >= 1
+        && request.resource.data.rating <= 5;
+      allow update, delete: if isAuth() && resource.data.reviewerUid == uid();
     }
   }
 }
