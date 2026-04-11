@@ -891,7 +891,17 @@
           },1000);
 
         }catch(e){
-          var msg = e.message && e.message.includes("already book") ? e.message : "Booking failed. Please try again.";
+          console.error("[GigLega] booking error:", e.code, e.message);
+          var msg;
+          if(e.message && e.message.includes("already book")){
+            msg = e.message;
+          } else if(e.code === "permission-denied" || (e.message && e.message.toLowerCase().includes("permission"))){
+            msg = "❌ Permission denied. Firestore rules block this. Contact support.";
+          } else if(e.code === "not-found"){
+            msg = "❌ Gig not found. It may have been deleted.";
+          } else {
+            msg = "❌ " + (e.message || "Booking failed. Please try again.");
+          }
           showToast(msg,"error");
           btn.disabled=false; btn.textContent="Confirm Booking ✅";
         }
