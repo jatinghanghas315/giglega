@@ -764,6 +764,16 @@
       if(btnAccept){
         btnAccept.addEventListener("click", function(){
           if(!currentUser){ window.location.href="login.html?redirect="+encodeURIComponent(window.location.href); return; }
+          // Profile completeness gate
+          try{
+            var _uSnap2 = await getDoc(doc(db,"users",currentUser.uid));
+            var _uData  = _uSnap2.exists() ? _uSnap2.data() : {};
+            if(!_uData.phone || !currentUser.displayName){
+              showToast("⚠️ Booking ke liye pehle profile complete karo — name + phone number zaruri hai.","warning",4000);
+              setTimeout(function(){ window.location.href="profile.html?redirect="+encodeURIComponent(window.location.href); },1800);
+              return;
+            }
+          }catch(_pe){ console.warn("[GigLega] profile check:",_pe.message); }
           openBookingModal(gig, earn, fee);
         });
       }
