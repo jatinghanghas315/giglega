@@ -738,11 +738,14 @@
           var wSnap   = await getDoc(wRef);
           var curBal  = wSnap.exists() ? (wSnap.data().balance||0) : 0;
           var newBal  = curBal + earn;
+          var prevData     = wSnap.exists() ? wSnap.data() : {};
           await setDoc(wRef, {
-            balance:     newBal,
-            totalEarned: (wSnap.exists() ? (wSnap.data().totalEarned||0) : 0) + earn,
-            updatedAt:   serverTimestamp(),
-            uid:         currentUser.uid
+            balance:       newBal,
+            totalEarned:   (prevData.totalEarned   || 0) + earn,
+            gigsCompleted: (prevData.gigsCompleted || 0) + 1,
+            feePaid:       (prevData.feePaid       || 0) + fee,
+            updatedAt:     serverTimestamp(),
+            uid:           currentUser.uid
           }, { merge: true });
           // Write credit transaction record
           await addDoc(collection(db,'wallets',currentUser.uid,'transactions'),{
