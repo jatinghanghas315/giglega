@@ -266,8 +266,26 @@
     }
     .ofb-close { font-size:1.1rem; opacity:.75; cursor:pointer; padding:4px; flex-shrink:0; align-self:flex-start; }
     .ofb-close:hover { opacity:1; }
+
+    /* ── Real-time tracking map (poster view) ── */
+    .track-card { background:var(--surface); border-radius:var(--radius); border:1px solid var(--border); overflow:hidden; margin-bottom:16px; }
+    .track-card-hdr { display:flex; justify-content:space-between; align-items:center; padding:14px 16px; cursor:pointer; user-select:none; }
+    .track-card-hdr h3 { font-size:.9rem; font-weight:700; color:var(--text); margin:0; }
+    .track-toggle-btn { font-size:.78rem; color:var(--teal); font-weight:600; background:none; border:none; cursor:pointer; padding:0; }
+    #trackMap { height:240px; width:100%; display:none; }
+    .track-meta { display:flex; gap:12px; padding:10px 16px; border-top:1px solid var(--border); font-size:.78rem; color:var(--gray-400); }
+    .track-meta .dist-val { font-weight:700; color:var(--teal); }
+    .track-offline { padding:12px 16px; font-size:.8rem; color:var(--gray-400); text-align:center; display:none; }
+
+    /* ── Worker tracking badge ── */
+    .tracking-badge { display:none; align-items:center; gap:6px; background:rgba(13,148,136,.1); color:#0d9488; border-radius:20px; padding:5px 12px; font-size:.76rem; font-weight:700; margin-top:10px; width:fit-content; }
+    .tracking-badge .tb-dot { width:7px; height:7px; border-radius:50%; background:#0d9488; animation:tbpulse 1.5s ease-in-out infinite; }
+    @keyframes tbpulse { 0%,100%{opacity:1;transform:scale(1);} 50%{opacity:.4;transform:scale(.7);} }
   </style>
   <link rel="canonical" href="https://giglega.vercel.app/active-gig.html">
+  <!-- Leaflet.js — real-time worker tracking map -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV/XN/WLs=" crossorigin=""></script>
 </head>
 <body>
   <div id="main-nav" role="navigation"></div>
@@ -324,6 +342,20 @@
           <div class="w-avatar" id="wAvatar">?</div>
           <div><div class="w-name" id="wName">—</div><div class="w-sub">⚡ Kaam kar raha hai</div></div>
           <a href="#" class="w-chat" id="wChatBtn">💬 Chat</a>
+        </div>
+
+        <!-- Real-time worker tracking map -->
+        <div class="track-card" id="trackCard" style="display:none;">
+          <div class="track-card-hdr" id="trackCardHdr">
+            <h3>📍 Worker Ka Live Location</h3>
+            <button class="track-toggle-btn" id="trackToggleBtn">Map Dekho ▾</button>
+          </div>
+          <div id="trackMap"></div>
+          <div class="track-meta" id="trackMeta" style="display:none;">
+            <span>🚶 Distance: <span class="dist-val" id="trackDist">—</span></span>
+            <span>🕒 Updated: <span id="trackUpd">—</span></span>
+          </div>
+          <div class="track-offline" id="trackOffline">📡 Worker ka location abhi available nahi hai...</div>
         </div>
 
         <!-- OTP reveal -->
@@ -394,7 +426,11 @@
         </div>
 
         <!-- Steps -->
-        <div class="steps-card" id="workerSteps">
+        <div class="tracking-badge" id="trackingBadge">
+        <div class="tb-dot"></div>
+        <span>📡 Location tracking active</span>
+      </div>
+    <div class="steps-card" id="workerSteps">
           <div class="steps-hdr">⚡ Gig Complete Karo</div>
 
           <!-- Step 1 GPS -->
@@ -576,9 +612,13 @@
         var _b2=el('otpFixedBanner'); if(_b2) _b2.classList.remove('show');
       }
 
+      // Update live tracking map (fires on every onSnapshot update)
+      initTrackingMap(gig);
+
       // Completed
       if(gig.status==='completed'){
         if(cdTimer) clearInterval(cdTimer);
+        var tc = el('trackCard'); if(tc) tc.style.display='none';
         el('otpReveal').classList.remove('show');
         ['tld1','tld2','tld3','tld4'].forEach(function(x){ el(x).className='tl-dot done'; el(x).textContent='✓'; });
         ['tll1','tll2','tll3'].forEach(function(x){ el(x)&&el(x).classList.add('done'); });
@@ -609,14 +649,18 @@
       el('gPay').textContent      = '₹'+(gig.budget||0).toLocaleString('en-IN');
       el('chatLink').href         = 'chat.html?with='+encodeURIComponent(gig.posterId||'')+'&gig='+encodeURIComponent(id);
 
-      // Already completed
+      // Already completed — stop tracking
       if(gig.status==='completed'){
+        stopLocationTracking();
         el('workerSteps').style.display='none';
         el('workerDoneAmt').textContent='₹'+(gig.workerEarnings||0).toLocaleString('en-IN');
         el('workerDone').classList.add('show');
         el('agBadgeText').textContent='Completed ✅'; el('agHeading').textContent='Gig Complete!';
         return;
       }
+
+      // Start live GPS tracking for poster to see
+      if(gig.status==='taken') startLocationTracking(id);
 
       // OTP already requested — restore state
       if(gig.completionRequested){
@@ -788,6 +832,7 @@
           gigId:gigId, read:false, createdAt:serverTimestamp()
         });
 
+        stopLocationTracking();
         el('workerSteps').style.display='none';
         el('workerDoneAmt').textContent='₹'+earn.toLocaleString('en-IN');
         el('workerDone').classList.add('show');
@@ -947,6 +992,191 @@
 
       if(gigDocId){ listenGig(gigDocId, mode); if(mode==='poster') startOTPPolling(gigDocId); }
     });
+
+    /* ══════════════════════════════════════════════════════
+       REAL-TIME WORKER TRACKING
+       Worker side  : watchPosition → throttled Firestore writes every 5s
+       Poster side  : Leaflet map, onSnapshot already live-updates markers
+    ══════════════════════════════════════════════════════ */
+
+    var _watchId       = null;
+    var _lastWriteTs   = 0;
+    var _THROTTLE_MS   = 5000;   // write at most every 5 seconds
+
+    function startLocationTracking(gigDocId) {
+      if (!navigator.geolocation) return;
+      if (_watchId !== null) return; // already watching
+      var badge = el('trackingBadge');
+      if (badge) badge.style.display = 'flex';
+
+      _watchId = navigator.geolocation.watchPosition(
+        async function(pos) {
+          var now = Date.now();
+          if (now - _lastWriteTs < _THROTTLE_MS) return; // throttle
+          _lastWriteTs = now;
+          var lat = pos.coords.latitude;
+          var lng = pos.coords.longitude;
+          try {
+            await updateDoc(doc(db, 'gigs', gigDocId), {
+              workerLat:           lat,
+              workerLng:           lng,
+              workerLocUpdatedAt:  new Date().toISOString()
+            });
+          } catch(e) { console.warn('[GigLega] tracking write:', e.message); }
+        },
+        function(err) { console.warn('[GigLega] watchPosition:', err.message); },
+        { enableHighAccuracy: false, maximumAge: 4000, timeout: 10000 }
+      );
+
+      // Pause on tab hidden, resume on visible
+      document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+          stopLocationTracking();
+        } else {
+          if (_watchId === null) startLocationTracking(gigDocId);
+        }
+      });
+
+      // Stop on page leave
+      window.addEventListener('beforeunload', stopLocationTracking);
+    }
+
+    function stopLocationTracking() {
+      if (_watchId !== null) {
+        navigator.geolocation.clearWatch(_watchId);
+        _watchId = null;
+      }
+      var badge = el('trackingBadge');
+      if (badge) badge.style.display = 'none';
+    }
+
+    /* ── Leaflet map state ── */
+    var _map           = null;
+    var _workerMarker  = null;
+    var _gigMarker     = null;
+    var _trackLine     = null;
+    var _mapOpen       = false;
+
+    function haversineM(lat1,lng1,lat2,lng2){
+      var R=6371000, dLat=(lat2-lat1)*Math.PI/180, dLng=(lng2-lng1)*Math.PI/180;
+      var a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)*Math.sin(dLng/2);
+      return Math.round(R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)));
+    }
+
+    function fmtAgo(isoStr) {
+      if (!isoStr) return '—';
+      var secs = Math.floor((Date.now() - new Date(isoStr).getTime()) / 1000);
+      if (secs < 10)  return 'just now';
+      if (secs < 60)  return secs + 's ago';
+      if (secs < 3600) return Math.floor(secs/60) + 'm ago';
+      return Math.floor(secs/3600) + 'h ago';
+    }
+
+    function initTrackingMap(gig) {
+      var trackCard = el('trackCard');
+      if (!trackCard) return;
+
+      // Show tracking card only when gig is taken
+      if (gig.status !== 'taken') { trackCard.style.display = 'none'; return; }
+      trackCard.style.display = 'block';
+
+      var hasWorkerLoc = gig.workerLat && gig.workerLng;
+
+      // Toggle map open/close
+      var hdr = el('trackCardHdr');
+      if (hdr && !hdr._bound) {
+        hdr._bound = true;
+        hdr.addEventListener('click', function() {
+          _mapOpen = !_mapOpen;
+          var mapEl   = el('trackMap');
+          var metaEl  = el('trackMeta');
+          var btn     = el('trackToggleBtn');
+          mapEl.style.display  = _mapOpen ? 'block' : 'none';
+          if (metaEl) metaEl.style.display = _mapOpen && hasWorkerLoc ? 'flex' : 'none';
+          if (btn) btn.textContent = _mapOpen ? 'Band Karo ▴' : 'Map Dekho ▾';
+          if (_mapOpen) {
+            if (!_map) {
+              _map = L.map('trackMap', { zoomControl: true, attributionControl: false });
+              L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19
+              }).addTo(_map);
+            }
+            setTimeout(function(){ if(_map) _map.invalidateSize(); }, 100);
+            updateTrackingMap(gig);
+          }
+        });
+      }
+
+      // If map already open, update markers silently
+      if (_mapOpen && _map) updateTrackingMap(gig);
+
+      // Offline notice
+      var offlineEl = el('trackOffline');
+      if (offlineEl) offlineEl.style.display = hasWorkerLoc ? 'none' : 'block';
+    }
+
+    function updateTrackingMap(gig) {
+      if (!_map) return;
+
+      var workerLat = parseFloat(gig.workerLat);
+      var workerLng = parseFloat(gig.workerLng);
+      var gigLat    = parseFloat(gig.lat || gig.workerLastLat);
+      var gigLng    = parseFloat(gig.lng || gig.workerLastLng);
+
+      if (!workerLat || !workerLng) return;
+
+      // Custom blue worker icon
+      var workerIcon = L.divIcon({
+        html: '<div style="width:16px;height:16px;border-radius:50%;background:#0d9488;border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.35)"></div>',
+        className: '', iconSize:[16,16], iconAnchor:[8,8]
+      });
+
+      // Custom red gig icon
+      var gigIcon = L.divIcon({
+        html: '<div style="width:14px;height:14px;border-radius:50%;background:#dc2626;border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.35)"></div>',
+        className: '', iconSize:[14,14], iconAnchor:[7,7]
+      });
+
+      // Worker marker
+      if (_workerMarker) {
+        _workerMarker.setLatLng([workerLat, workerLng]);
+      } else {
+        _workerMarker = L.marker([workerLat, workerLng], { icon: workerIcon })
+          .bindTooltip('🔵 Worker', { permanent: false })
+          .addTo(_map);
+      }
+
+      // Gig location marker (fixed)
+      if (gigLat && gigLng && !_gigMarker) {
+        _gigMarker = L.marker([gigLat, gigLng], { icon: gigIcon })
+          .bindTooltip('📍 Gig Location', { permanent: false })
+          .addTo(_map);
+      }
+
+      // Dashed line between worker and gig
+      if (gigLat && gigLng) {
+        var pts = [[workerLat, workerLng], [gigLat, gigLng]];
+        if (_trackLine) { _trackLine.setLatLngs(pts); }
+        else { _trackLine = L.polyline(pts, { color:'#0d9488', weight:2, dashArray:'6,6', opacity:.7 }).addTo(_map); }
+
+        // Distance
+        var dist = haversineM(workerLat, workerLng, gigLat, gigLng);
+        var distEl = el('trackDist');
+        if (distEl) distEl.textContent = dist >= 1000 ? (dist/1000).toFixed(1)+'km' : dist+'m';
+
+        // Fit both markers in view
+        _map.fitBounds([[workerLat, workerLng], [gigLat, gigLng]], { padding:[30,30] });
+      } else {
+        _map.setView([workerLat, workerLng], 16);
+      }
+
+      // Updated time
+      var updEl = el('trackUpd');
+      if (updEl) updEl.textContent = fmtAgo(gig.workerLocUpdatedAt);
+
+      var metaEl = el('trackMeta');
+      if (metaEl) metaEl.style.display = 'flex';
+    }
 
     function listenGig(gigDocId, mode){
       if(unsubSnap) unsubSnap();
