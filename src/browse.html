@@ -327,7 +327,7 @@
       box-shadow: var(--shadow-md);
       border-color: rgba(13,148,136,.25);
     }
-    .gig-card.taken { opacity: .5; pointer-events: none; }
+    .gig-card.taken { opacity: .5; pointer-events: none; }     .gig-card.expired { opacity: .45; pointer-events: none; border-color: rgba(239,68,68,.2); }     .status-expired { background: rgba(239,68,68,.1); color: #dc2626; }
 
     .gig-top-row {
       display: flex;
@@ -1044,11 +1044,7 @@
       var posterName = escH(gig.posterName || getUserName(gig.posterId) || 'User');
       var posterInitials = escH(getUserInitials(gig.posterId));
 
-      var statusHtml = gig.status === 'open'
-        ? '<span class="gig-status-badge status-open">Open</span>'
-        : gig.status === 'taken'
-          ? '<span class="gig-status-badge status-taken">Taken</span>'
-          : '<span class="gig-status-badge status-done">Done</span>';
+      var isExpired = gig.status === 'open' && gig.expiresAt && new Date(gig.expiresAt) < new Date();       var statusHtml = isExpired         ? '<span class="gig-status-badge status-expired">⏰ Expired</span>'            : gig.status === 'open' ? '<span class="gig-status-badge status-open">Open</span>' : gig.status === 'taken' ? '<span class="gig-status-badge status-taken">Taken</span>' : '<span class="gig-status-badge status-done">Done</span>';
 
       var urgentBadge = isUrgent
         ? '<span class="gig-urgent-badge">' + IC_ZAP + ' Urgent</span>'
@@ -1058,7 +1054,7 @@
         ? '<span class="gig-type-tag tag-hyperlocal">' + IC_PIN + ' Hyperlocal</span>'
         : '<span class="gig-type-tag tag-remote">' + IC_GLOBE + ' Remote</span>';
 
-      return '<div class="gig-card' + (isTaken ? " taken" : "") + (isUrgent ? " urgent" : "") + '" ' +
+      return '<div class="gig-card' + (isTaken ? " taken" : "") + (isUrgent ? " urgent" : "") + (isExpired ? " expired" : "") + '" ' +
         'onclick="window.location.href=\'gig-detail.html?id=' + escH(gig.id) + '\'">' +
         '<div class="gig-card-left">' +
           '<div class="gig-top-row">' + typeTag + urgentBadge + '<div style="margin-left:auto">' + statusHtml + '</div></div>' +
