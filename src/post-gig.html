@@ -700,6 +700,7 @@ async function submitGig(){
     status:'open', lat:posterLat, lng:posterLng,
     posterId:currentUser.uid, posterName:(currentUser.displayName || (currentUser.email ? currentUser.email.split('@')[0] : 'User')),
     type:'hyperlocal', createdAt:serverTimestamp(), createdAtISO:new Date().toISOString(),
+    expiresAt: new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString(),
     applications:0, views:0, images:[]
   };
   // Save post timestamp for rate limiting
