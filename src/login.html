@@ -901,7 +901,9 @@
         skills:    [],
         avatar:    null,
         bio:       '',
-        workType:  ''
+        workType:  '',
+        onboardingWorkerDone: false,
+        onboardingPosterDone: false
       };
 
       await setDoc(doc(db, 'users', cred.user.uid), userData);
@@ -917,7 +919,10 @@
       document.getElementById('registerSuccess').classList.add('show');
       showToast('🎉 Welcome to GigLega, ' + name + '!', 'success');
       setTimeout(() => {
-        window.location.replace(prefRole === 'poster' ? 'dashboard-client.html' : 'dashboard-worker.html');
+        var tourDest = prefRole === 'poster'
+          ? 'post-gig.html?tour=1'
+          : 'browse.html?tour=1';
+        window.location.replace(tourDest);
       }, 1800);
     } catch (err) {
       setLoading('btnRegister', false);

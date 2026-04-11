@@ -707,5 +707,33 @@ onAuthStateChanged(auth, function(user){
   currentUser=user;
 });
 </script>
+  <script src="onboarding.js" defer>
+  /* ── Onboarding Tour: Poster — fires once on post-gig page ── */
+  (function tryPosterTour(){
+    var tourFired = false;
+    function maybeFireTour(){
+      if(tourFired) return;
+      if(typeof GigLegaTour === 'undefined') return;
+      var u = null;
+      try{ u = JSON.parse(localStorage.getItem('gl_user')||'null'); }catch(e){}
+      var uid = u && (u.uid||u.id);
+      if(!uid) return;
+      var mode = u.mode || u.role || 'worker';
+      if(mode !== 'poster') return;
+      // Only run if catGrid (step 1 target) is present and visible
+      var catGrid = document.getElementById('catGrid');
+      if(!catGrid) return;
+      tourFired = true;
+      setTimeout(function(){ GigLegaTour.start('poster', uid); }, 700);
+    }
+    if(document.readyState === 'complete'){
+      maybeFireTour();
+    } else {
+      window.addEventListener('load', maybeFireTour);
+    }
+    setTimeout(maybeFireTour, 1800);
+  })();
+
+</script>
 </body>
 </html>

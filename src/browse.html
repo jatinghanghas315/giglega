@@ -1138,5 +1138,34 @@
     /* ── Init: loadGigs() is now triggered by onAuthStateChanged above ── */
 
   </script>
+  <script src="onboarding.js" defer>
+  /* ── Onboarding Tour: Worker — fires once after gigs load ── */
+  (function tryWorkerTour(){
+    var tourFired = false;
+    function maybeFireTour(){
+      if(tourFired) return;
+      if(typeof GigLegaTour === 'undefined') return;
+      var u = null;
+      try{ u = JSON.parse(localStorage.getItem('gl_user')||'null'); }catch(e){}
+      var uid = u && (u.uid||u.id);
+      if(!uid) return;
+      // Only show if user is in worker mode
+      var mode = u.mode || u.role || 'worker';
+      if(mode !== 'worker') return;
+      tourFired = true;
+      // Small delay so gig cards render first
+      setTimeout(function(){ GigLegaTour.start('worker', uid); }, 900);
+    }
+    // Try after DOM + scripts settle
+    if(document.readyState === 'complete'){
+      maybeFireTour();
+    } else {
+      window.addEventListener('load', maybeFireTour);
+    }
+    // Also try after a short delay in case auth loads late
+    setTimeout(maybeFireTour, 2200);
+  })();
+
+</script>
 </body>
 </html>
