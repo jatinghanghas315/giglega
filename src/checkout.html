@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GigLega • Checkout</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="container-sm section">
+    <h1>Checkout</h1>
+    <p>Transparent pricing with a 10% platform support fee.</p>
+    <section class="card" style="padding:24px; margin-top:16px;">
+      <p>Gig Budget: <strong id="gigBudget">₹0</strong></p>
+      <p>Platform Fee (10%): <strong id="platformFee">₹0</strong></p>
+      <p>Total Payable: <strong id="totalPayable">₹0</strong></p>
+      <button id="payNow">Pay with Razorpay</button>
+    </section>
+  </main>
+
+  <script type="module">
+    const FEE_RATE = 0.10;
+    const showToast = window.showToast || ((msg) => alert(msg));
+
+    const params = new URLSearchParams(window.location.search);
+    const gigId = params.get('gigId');
+    const budgetPaise = Number(params.get('budget') || '0');
+
+    const feePaise = Math.round(budgetPaise * FEE_RATE);
+    const totalPaise = budgetPaise;
+
+    const formatINR = (paise) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 2 }).format((Number(paise) || 0) / 100);
+
+    document.getElementById('gigBudget').textContent = formatINR(budgetPaise);
+    document.getElementById('platformFee').textContent = formatINR(feePaise);
+    document.getElementById('totalPayable').textContent = formatINR(totalPaise);
+
+    document.getElementById('payNow').addEventListener('click', async () => {
+      try {
+        const orderResponse = await fetch('/api/create-order', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ gigId, uid: localStorage.getItem('gl_uid') || '' })
+        });
+
+        if (!orderResponse.ok) {
+          throw new Error('Unable to create order.');
+        }
+
+        const orderData = await orderResponse.json();
+        showToast(`Order created: ${orderData.orderId}`, 'info');
+      } catch (error) {
+        console.error('checkout payment failed:', error);
+        showToast('Payment initialization failed.', 'error');
+      }
+    });
+  </script>
+</body>
+</html>

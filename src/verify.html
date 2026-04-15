@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GigLega • Aadhaar Verification</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="container-sm section">
+    <h1>Identity Verification</h1>
+    <ol>
+      <li>Create Account</li>
+      <li><strong>Verify Identity</strong></li>
+      <li>Start Earning</li>
+    </ol>
+    <p style="margin-top:16px;">Complete Aadhaar verification to get your Verified badge.</p>
+    <button id="startKyc">Start DigiLocker Verification</button>
+  </main>
+
+  <script>
+    const showToast = window.showToast || ((msg) => alert(msg));
+    document.getElementById('startKyc').addEventListener('click', async () => {
+      try {
+        const res = await fetch('/api/digilocker-init', { method: 'POST' });
+        if (!res.ok) {
+          throw new Error('KYC init failed');
+        }
+        const data = await res.json();
+        if (!data.url) {
+          throw new Error('Missing DigiLocker redirect URL');
+        }
+        window.location.href = data.url;
+      } catch (error) {
+        console.error('verify init failed:', error);
+        showToast('Could not start verification flow.', 'error');
+      }
+    });
+  </script>
+</body>
+</html>
