@@ -1,17 +1,15 @@
-/* CACHE BUSTER v1.2.0 — auto-clears old SW on first load */
+/* CACHE BUSTER v1.3.0 */
 (function(){
-  var APP_BUILD = '1.8.0';
-  var stored = localStorage.getItem('gl_app_build');
+  const APP_BUILD = '1.9.0';
+  const stored = localStorage.getItem('gl_app_build');
   if (stored !== APP_BUILD) {
     localStorage.setItem('gl_app_build', APP_BUILD);
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.getRegistrations().then(function(regs) {
         if (regs.length) {
-          Promise.all(regs.map(function(r){return r.unregister();})).then(function(){
-            caches.keys().then(function(keys){
-              Promise.all(keys.map(function(k){return caches.delete(k);})).then(function(){
-                window.location.reload();
-              });
+          Promise.all(regs.map(r => r.unregister())).then(() => {
+            caches.keys().then(keys => {
+              Promise.all(keys.map(k => caches.delete(k))).then(() => window.location.reload());
             });
           });
         }
@@ -19,280 +17,225 @@
     }
   }
 })();
+
 /* ============================================================
-   GigLega v1.2 — shared.js
-   Foundation: config, auth, navbar, footer, toast, breadcrumb
+   GigLega v1.3 — shared.js
+   Foundation: config, auth, navbar, footer, toast
    ============================================================ */
 
 (function (global) {
-  "use strict";
+  'use strict';
 
   /* ══════════════════════════════════════════════════════════
-     0. FONT INJECTION — Satoshi + General Sans via Fontshare
+     0. FONT — Inter via Google Fonts
   ══════════════════════════════════════════════════════════ */
   (function injectFonts() {
     if (document.querySelector('link[data-gl-fonts]')) return;
-    var pc = document.createElement('link');
-    pc.rel = 'preconnect'; pc.href = 'https://api.fontshare.com';
+    const pc = document.createElement('link');
+    pc.rel = 'preconnect'; pc.href = 'https://fonts.googleapis.com';
     document.head.insertBefore(pc, document.head.firstChild);
-    var fl = document.createElement('link');
+    const pc2 = document.createElement('link');
+    pc2.rel = 'preconnect'; pc2.href = 'https://fonts.gstatic.com'; pc2.crossOrigin = 'anonymous';
+    document.head.insertBefore(pc2, document.head.firstChild);
+    const fl = document.createElement('link');
     fl.rel = 'stylesheet';
-    fl.href = 'https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700,900&f[]=general-sans@300,400,500,600,700&display=swap';
+    fl.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap';
     fl.setAttribute('data-gl-fonts', '1');
     document.head.appendChild(fl);
   })();
 
   /* ══════════════════════════════════════════════════════════
-     1. CONFIG & STORAGE KEYS
+     1. CONSTANTS
   ══════════════════════════════════════════════════════════ */
-  var GL = {
-    VERSION:          "1.2",
-    APP_NAME:         "GigLega",
-    TAGLINE:          "Gurugram's Trusted Gig Marketplace",
-    FEE_RATE:         0.10,
+  const FEE_RATE = 0.10;
 
-    // Storage keys — single source of truth
-    STORAGE_KEY_USER:   "gl_user",
-    STORAGE_KEY_USERS:  "gl_users",
-    STORAGE_KEY_GIGS:   "gl_gigs",
-    STORAGE_KEY_CHATS:  "gl_chats",
-    STORAGE_KEY_WALLET: "gl_wallet",
-    STORAGE_KEY_NOTIFS: "gl_notifs",
-    STORAGE_KEY_THEME:  "gl_theme",
+  const GL = {
+    VERSION:   '1.3',
+    APP_NAME:  'GigLega',
+    TAGLINE:   "Gurugram's Trusted Gig Marketplace",
+    FEE_RATE,
 
-    // Nav links shown to everyone
+    STORAGE_KEY_THEME:  'gl_theme',
+    STORAGE_KEY_BUILD:  'gl_app_build',
+
     PUBLIC_NAV: [
-      { label: "Browse Gigs",  href: "browse.html",     iconKey: "search" },
-      { label: "How It Works", href: "about.html",      iconKey: "info" },
-      { label: "Enterprise",   href: "enterprise.html", iconKey: "building" }
+      { label: 'Browse Gigs',  href: 'browse.html',     iconKey: 'search' },
+      { label: 'How It Works', href: 'about.html',      iconKey: 'info' },
+      { label: 'Enterprise',   href: 'enterprise.html', iconKey: 'building' }
     ],
 
-    // Pages that require login — redirect if not authed
     PROTECTED_PAGES: [
-      "post-gig.html", "gig-edit.html",
-      "dashboard.html", "dashboard-worker.html", "dashboard-client.html",
-      "chat.html", "profile.html", "wallet.html",
-      "notifications.html", "reviews.html"
+      'post-gig.html', 'gig-edit.html',
+      'dashboard.html', 'dashboard-worker.html', 'dashboard-client.html',
+      'chat.html', 'profile.html', 'wallet.html',
+      'notifications.html', 'reviews.html', 'admin.html'
     ]
   };
 
-  // Expose GL globally
   global.GL = GL;
-
+  global.FEE_RATE = FEE_RATE;
 
   /* ══════════════════════════════════════════════════════════
-     2. AUTH HELPERS
+     2. CURRENCY
+  ══════════════════════════════════════════════════════════ */
+  function formatINR(paise) {
+    return '\u20B9' + (Number(paise || 0) / 100).toLocaleString('en-IN');
+  }
+  global.formatINR = formatINR;
+  global.formatCurrency = formatINR;
+
+  /* ══════════════════════════════════════════════════════════
+     3. AUTH HELPERS — Firebase Auth based, no localStorage for user data
   ══════════════════════════════════════════════════════════ */
 
-  /**
-   * getCurrentUser()
-   * Safe user read — checks localStorage only.
-   * Returns user object {id, name, email, ...} or null.
-   */
-  function getCurrentUser() {
-    try {
-      var raw = localStorage.getItem(GL.STORAGE_KEY_USER);
-      if (!raw) return null;
-      var u = JSON.parse(raw);
-      return (u && u.id) ? u : null;
-    } catch (_e) { return null; }
-  }
+  let _cachedFirebaseUser = null;
 
-  /**
-   * setCurrentUser(user)
-   * Saves user to localStorage.
-   */
-  function setCurrentUser(user) {
-    try { localStorage.setItem(GL.STORAGE_KEY_USER, JSON.stringify(user)); }
-    catch (_e) {}
+  function redirectByRole(role) {
+    const map = {
+      worker:     'dashboard-worker.html',
+      tasker:     'dashboard-worker.html',
+      poster:     'dashboard-client.html',
+      client:     'dashboard-client.html',
+      admin:      'admin.html',
+      enterprise: 'enterprise.html'
+    };
+    window.location.href = map[role] || 'dashboard-client.html';
   }
+  global.redirectByRole = redirectByRole;
 
-  /**
-   * logoutUser()
-   * Clears session and redirects to index.
-   */
   function logoutUser() {
-    localStorage.removeItem(GL.STORAGE_KEY_USER);
-    sessionStorage.removeItem(GL.STORAGE_KEY_USER);
-    showToast("Logged out successfully.", "success");
-    // Also sign out of Firebase Auth so onAuthStateChanged fires correctly
+    showToast('Logged out successfully.', 'success');
     try {
       import('https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js')
-        .then(function(m){ return m.signOut(m.getAuth()); })
-        .catch(function(){});
-    } catch(_e) {}
-    setTimeout(function () { window.location.href = "index.html"; }, 900);
+        .then(m => {
+          return import('./firebase-config.js').then(fb => m.signOut(fb.auth));
+        })
+        .catch(e => console.error('[GigLega] signOut:', e));
+    } catch (e) { console.error('[GigLega] logoutUser:', e); }
+    setTimeout(() => { window.location.href = 'index.html'; }, 900);
   }
+  global.logoutUser = logoutUser;
 
-  /**
-   * requireAuth(redirectBack)
-   * Call at top of protected pages.
-   * If not logged in → shows error UI and returns null (NO redirect loop).
-   * Returns user object if logged in.
-   */
-  function requireAuth(redirectBack) {
-    var user = getCurrentUser();
-    if (!user) {
-      var page = redirectBack || (window.location.pathname.split("/").pop() || "index.html");
-      // Show a full-page auth wall instead of redirecting
-      document.addEventListener("DOMContentLoaded", function () {
-        var main = document.querySelector("main") || document.body;
-        var wall = document.createElement("div");
-        wall.style.cssText = "text-align:center;padding:80px 24px;";
-        wall.innerHTML =
-          '<div style="font-size:3rem;margin-bottom:16px">🔐</div>' +
-          '<h2 style="font-size:1.2rem;font-weight:800;color:var(--primary);margin-bottom:8px">Login Required</h2>' +
-          '<p style="font-size:.88rem;color:var(--gray-500);margin-bottom:24px;line-height:1.6">' +
-            'You need to be logged in to view this page.' +
-          '</p>' +
-          '<a href="login.html?redirect=' + encodeURIComponent(page) + '" ' +
-            'style="display:inline-block;padding:12px 28px;background:linear-gradient(135deg,var(--primary),var(--teal));' +
-            'color:#fff;border-radius:var(--radius-sm);font-weight:700;text-decoration:none;font-size:.9rem">' +
-            '→ Login to Continue' +
-          '</a>' +
-          '<p style="margin-top:14px;font-size:.82rem;color:var(--gray-400)">' +
-            "Don't have an account? <a href='login.html#mode=register' style='color:var(--teal);font-weight:600'>Register free</a>" +
-          '</p>';
-        // Replace main content with wall
-        if (main.firstChild) {
-          main.innerHTML = "";
-          main.appendChild(wall);
-        } else {
-          main.appendChild(wall);
-        }
-      });
-      return null;
-    }
-    return user;
+  function requireAuth() {
+    document.addEventListener('DOMContentLoaded', () => {
+      import('https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js')
+        .then(m => import('./firebase-config.js').then(fb => {
+          m.onAuthStateChanged(fb.auth, user => {
+            if (!user) {
+              const page = window.location.pathname.split('/').pop() || 'index.html';
+              window.location.href = 'login.html?redirect=' + encodeURIComponent(page);
+            }
+          });
+        }))
+        .catch(e => console.error('[GigLega] requireAuth:', e));
+    });
   }
-
-  // Expose auth functions globally
-  global.getCurrentUser = getCurrentUser;
-  global.setCurrentUser = setCurrentUser;
-  global.logoutUser     = logoutUser;
-  global.requireAuth    = requireAuth;
-
+  global.requireAuth = requireAuth;
 
   /* ══════════════════════════════════════════════════════════
-     3. THEME (DARK / LIGHT)
+     4. THEME (DARK / LIGHT)
   ══════════════════════════════════════════════════════════ */
-
   function getTheme() {
-    return localStorage.getItem(GL.STORAGE_KEY_THEME) || "light";
+    return localStorage.getItem(GL.STORAGE_KEY_THEME) || 'dark';
   }
 
   function applyTheme(theme) {
-    document.documentElement.setAttribute("data-theme", theme);
-      // Also add .dark class for compatibility with new styles
-  if (theme === "dark") {
-    document.documentElement.classList.add("dark");
-  } else {
-    document.documentElement.classList.remove("dark");
-  }
+    document.documentElement.setAttribute('data-theme', theme);
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
     localStorage.setItem(GL.STORAGE_KEY_THEME, theme);
-    // Update toggle button if it exists
-    var btn = document.getElementById("themeToggle");
-    if (btn) btn.innerHTML = theme === "dark" ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>' : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+    const btn = document.getElementById('themeToggle');
+    if (btn) {
+      btn.innerHTML = theme === 'dark'
+        ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>'
+        : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+    }
   }
 
   function toggleTheme() {
-    applyTheme(getTheme() === "dark" ? "light" : "dark");
+    applyTheme(getTheme() === 'dark' ? 'light' : 'dark');
   }
 
   global.toggleTheme = toggleTheme;
   global.applyTheme  = applyTheme;
 
-
   /* ══════════════════════════════════════════════════════════
-     4. TOAST NOTIFICATIONS
+     5. TOAST NOTIFICATIONS
   ══════════════════════════════════════════════════════════ */
+  const TOAST_ICONS = {
+    success: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
+    error:   '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
+    warning: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+    info:    '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>'
+  };
 
   function showToast(message, type, duration) {
-    type     = type     || "info";
-    duration = duration || 3200;
+    type     = type     || 'info';
+    duration = duration || 3000;
 
-    var container = document.getElementById("toast-container");
+    let container = document.getElementById('toast-container');
     if (!container) {
-      container = document.createElement("div");
-      container.id = "toast-container";
+      container = document.createElement('div');
+      container.id = 'toast-container';
       document.body.appendChild(container);
     }
 
-    var icons = { success: "✅", error: "❌", warning: "⚠️", info: "ℹ️" };
-    var toast = document.createElement("div");
-    toast.className = "toast toast-" + type;
+    const toast = document.createElement('div');
+    toast.className = 'toast toast-' + type;
     toast.innerHTML =
-      '<span class="toast-icon">' + (icons[type] || "ℹ️") + '</span>' +
+      '<span class="toast-icon">' + (TOAST_ICONS[type] || TOAST_ICONS.info) + '</span>' +
       '<span class="toast-msg">'  + escHtml(String(message)) + '</span>' +
-      '<button class="toast-close" aria-label="Close">✕</button>';
+      '<button class="toast-close" aria-label="Close"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>';
 
-    toast.querySelector(".toast-close").addEventListener("click", function () {
-      dismissToast(toast);
-    });
-
+    toast.querySelector('.toast-close').addEventListener('click', () => dismissToast(toast));
     container.appendChild(toast);
 
-    // Animate in
-    requestAnimationFrame(function () {
-      requestAnimationFrame(function () { toast.classList.add("show"); });
-    });
+    requestAnimationFrame(() => requestAnimationFrame(() => toast.classList.add('show')));
 
-    // Auto dismiss
-    var timer = setTimeout(function () { dismissToast(toast); }, duration);
-    toast.dataset.timer = timer;
+    const timer = setTimeout(() => dismissToast(toast), duration);
+    toast._timer = timer;
   }
 
   function dismissToast(toast) {
-    clearTimeout(toast.dataset.timer);
-    toast.classList.remove("show");
-    toast.classList.add("hide");
-    setTimeout(function () {
-      if (toast.parentNode) toast.parentNode.removeChild(toast);
-    }, 350);
+    clearTimeout(toast._timer);
+    toast.classList.remove('show');
+    toast.classList.add('hide');
+    setTimeout(() => { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 350);
   }
 
   global.showToast = showToast;
 
-
   /* ══════════════════════════════════════════════════════════
-     5. ANNOUNCEMENT BAR
+     6. SPINNER
   ══════════════════════════════════════════════════════════ */
-
-  function renderAnnounceBar() {
-    var el = document.getElementById("announce-bar");
-    if (!el) return;
-
-    var msg = "GigLega v1.2 is live! Gurugram ke best gigs abhi browse karo.";
-    var dismissed = sessionStorage.getItem("gl_announce_dismissed");
-    if (dismissed) { el.style.display = "none"; return; }
-
-    el.className  = "announce-bar";
-    el.innerHTML  =
-      '<span>' + msg + '</span>' +
-      '<button class="announce-close" aria-label="Dismiss" id="announceClose">✕</button>';
-
-    document.getElementById("announceClose").addEventListener("click", function () {
-      el.style.height = el.offsetHeight + "px";
-      requestAnimationFrame(function () {
-        el.style.transition = "height .3s, opacity .3s";
-        el.style.height  = "0";
-        el.style.opacity = "0";
-        setTimeout(function () { el.style.display = "none"; }, 320);
-      });
-      sessionStorage.setItem("gl_announce_dismissed", "1");
-    });
+  function showSpinner() {
+    let s = document.getElementById('gl-spinner-overlay');
+    if (!s) {
+      s = document.createElement('div');
+      s.id = 'gl-spinner-overlay';
+      s.innerHTML = '<div class="gl-spinner"></div>';
+      document.body.appendChild(s);
+    }
+    s.style.display = 'flex';
   }
 
+  function hideSpinner() {
+    const s = document.getElementById('gl-spinner-overlay');
+    if (s) s.style.display = 'none';
+  }
+
+  global.showSpinner = showSpinner;
+  global.hideSpinner = hideSpinner;
+  global.showPageLoader = showSpinner;
+  global.hidePageLoader = hideSpinner;
 
   /* ══════════════════════════════════════════════════════════
-     6. NAVBAR
+     7. ICONS
   ══════════════════════════════════════════════════════════ */
-
-
-  /* ══════════════════════════════════════════════════════════
-     SVG ICON LIBRARY — inline Lucide-style icons
-  ══════════════════════════════════════════════════════════ */
-  var ICONS = {
+  const ICONS = {
     search:      '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>',
     info:        '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>',
     building:    '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="16" height="20" x="4" y="2" rx="2"/><path d="M9 22v-4h6v4M8 6h.01M16 6h.01M8 10h.01M16 10h.01M8 14h.01M16 14h.01"/></svg>',
@@ -307,330 +250,277 @@
     logout:      '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>',
     login:       '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>',
     'user-plus': '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>',
-    refresh:     '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>',
     plus:        '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>',
     home:        '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
     'search-lg': '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>',
     'zap-lg':    '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>',
     'user-lg':   '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
-    'plus-lg':   '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>'
+    'plus-lg':   '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>',
+    grid:        '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>'
   };
 
-  function renderNav() {
-    var el = document.getElementById("main-nav");
-    if (!el) return;
-
-    // ── Skip-to-content link (accessibility) ──
-    if (!document.getElementById("gl-skip-link")) {
-      var skip = document.createElement("a");
-      skip.id        = "gl-skip-link";
-      skip.href      = "#main-content";
-      skip.className = "sr-only-focusable";
-      skip.textContent = "Skip to content";
-      document.body.insertBefore(skip, document.body.firstChild);
-    }
-
-    var user      = getCurrentUser();
-    var theme     = getTheme();
-    var notifCount = getUnreadNotifCount();
-    var currentPage = window.location.pathname.split("/").pop() || "index.html";
-
-    // Build public nav links
-    var pubLinks = GL.PUBLIC_NAV.map(function (link) {
-      var active = (currentPage === link.href) ? " active" : "";
-      var ico = ICONS[link.iconKey] || '';
-      return '<a href="' + link.href + '" class="nav-link' + active + '">' +
-               '<span class="nav-link-icon">' + ico + '</span> ' + link.label +
-             '</a>';
-    }).join("");
-
-    // Auth section
-    var authSection = "";
-    if (!user) {
-      authSection =
-        '<a href="login.html" class="btn btn-ghost nav-btn-login">' + ICONS.login + ' Login</a>' +
-        '<a href="login.html#mode=register" class="btn btn-primary nav-btn-signup">' + ICONS['user-plus'] + ' Join Free</a>';
-    } else {
-      var initials = (user.name || "U").split(" ").map(function (w) { return w[0]; }).join("").slice(0,2).toUpperCase();
-      var notifBadge = notifCount > 0
-        ? '<span class="nav-notif-badge">' + (notifCount > 9 ? "9+" : notifCount) + '</span>'
-        : "";
-
-      authSection =
-        '<a href="post-gig.html" class="btn btn-primary nav-post-btn">' + ICONS.plus + ' Post Gig</a>' +
-
-        '<div class="nav-user-menu" id="navUserMenu">' +
-          '<button class="nav-avatar-btn" id="navAvatarBtn" aria-expanded="false" aria-haspopup="true">' +
-            '<div class="nav-avatar">' + initials + '</div>' +
-            '<span class="nav-username">' + escHtml(user.name ? user.name.split(" ")[0] : "Me") + '</span>' +
-            notifBadge +
-            '<span class="nav-chevron">▾</span>' +
-          '</button>' +
-
-          '<div class="nav-dropdown" id="navDropdown" role="menu">' +
-            '<div class="nav-dropdown-header">' +
-              '<div class="nav-dropdown-name">' + escHtml(user.name || "User") + '</div>' +
-              '<div class="nav-dropdown-email">' + escHtml(user.email || user.phone || "") + '</div>' +
-            '</div>' +
-            '<div class="nav-dropdown-divider"></div>' +
-
-            (user.mode === "worker"(user.role === "tasker" || user.mode === "worker"
-          ? dropdownItem("zap", "Tasker Dashboard", "dashboard-worker.html", currentPage)
-          : user.role === "enterprise"
-          ? dropdownItem("building", "Enterprise Dashboard", "enterprise.html", currentPage)
-          : user.role === "admin"
-          ? dropdownItem("zap", "Admin Panel", "dashboard.html", currentPage)
-          : dropdownItem("clipboard", "Poster Dashboard", "dashboard-client.html", currentPage))
-            dropdownItem("user", "My Profile", "profile.html", currentPage) +
-            dropdownItem("message", "My Chats",   "chat.html",    currentPage) +
-            dropdownItem("zap", "Active Gig",  "active-gig.html", currentPage) +
-
-            '<div class="nav-dropdown-divider"></div>' +
-
-            '<button class="nav-dd-item nav-dd-switch" id="navSwitchModeBtn" role="menuitem">' +
-              '<span class="nav-dd-icon">' + ICONS.refresh + '</span>' +
-              '<span>Switch to ' + (user.mode === "worker" ? "Poster" : "Worker") + ' Mode</span>' +(user.role === "tasker" || user.mode === "worker" ? "Switch to Poster Mode" : user.role === "poster" ? "Switch to Tasker Mode" : "Switch Role") + ' Mode</span>' +
-            '<span class="nav-dd-mode-badge">' + (user.role === "tasker" || user.mode === "worker" ? "Poster" : "Tasker") + '</span>
-            '</button>' +
-
-            '<div class="nav-dropdown-divider"></div>' +
-
-            dropdownItem("search", "Browse Gigs",  "browse.html",    currentPage) +
-            dropdownItem("plus", "Post a Gig",   "post-gig.html",  currentPage) +
-
-            '<div class="nav-dropdown-divider"></div>' +
-
-            dropdownItem("wallet", "My Wallet", "wallet.html", currentPage) +
-            '<a href="notifications.html" class="nav-dd-item" role="menuitem">' +
-              '<span class="nav-dd-icon">' + ICONS.bell + '</span>' +
-              '<span>Notifications</span>' +
-              (notifCount > 0 ? '<span class="dd-badge">' + notifCount + '</span>' : '') +
-            '</a>' +
-            dropdownItem("star", "My Reviews",  "reviews.html",     currentPage) +
-            dropdownItem("help", "Help Center", "help-center.html", currentPage) +
-
-            '<div class="nav-dropdown-divider"></div>' +
-            '<button class="nav-dd-item nav-dd-logout" id="navLogoutBtn" role="menuitem">' +
-              '<span class="nav-dd-icon">' + ICONS.logout + '</span><span>Logout</span>' +
-            '</button>' +
-          '</div>' +
-        '</div>';
-    }
-
-    el.className = "main-nav";
-    el.innerHTML =
-      '<div class="nav-inner">' +
-        '<a href="index.html" class="nav-logo" aria-label="GigLega Home">' +
-          'Gig<span>Lega</span>' +
-        '</a>' +
-
-        '<div class="nav-links" id="navLinks">' +
-          pubLinks +
-        '</div>' +
-
-        '<div class="nav-right">' +
-          '<button class="nav-icon-btn" id="themeToggle" aria-label="Toggle theme" title="Toggle theme">' +
-            (theme === "dark" ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>' : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>') +
-          '</button>' +
-          authSection +
-        '</div>' +
-
-        '<button class="nav-hamburger" id="navHamburger" aria-label="Toggle menu" aria-expanded="false">' +
-          '<span></span><span></span><span></span>' +
-        '</button>' +
-      '</div>' +
-
-      /* Mobile menu */
-      '<div class="nav-mobile-menu" id="navMobileMenu" aria-hidden="true">' +
-        pubLinks +
-        '<div class="nav-mobile-divider"></div>' +
-        (user
-          ? (user.mode === "worker"
-              ? '<a href="dashboard-worker.html" class="nav-mobile-link">Worker Dashboard</a>'
-              : '<a href="dashboard-client.html" class="nav-mobile-link">Poster Dashboard</a>') +
-            '<a href="chat.html"             class="nav-mobile-link">My Chats</a>' +
-            '<a href="active-gig.html"        class="nav-mobile-link">Active Gig</a>' +
-            '<button class="nav-mobile-link nav-mobile-switch" id="mobileSwithModeBtn">'+
-              (user.mode === "worker" ? "Switch to Poster Mode" : "Switch to Worker Mode") +
-            '</button>' +
-            '<a href="post-gig.html"         class="nav-mobile-link">Post a Gig</a>' +
-            '<a href="profile.html"          class="nav-mobile-link">My Profile</a>' +
-            '<a href="wallet.html"           class="nav-mobile-link">My Wallet</a>' +
-            '<a href="notifications.html"    class="nav-mobile-link">Notifications' +
-              (notifCount > 0 ? ' <span class="dd-badge">' + notifCount + '</span>' : '') +
-            '</a>' +
-            '<div class="nav-mobile-divider"></div>' +
-            '<button class="nav-mobile-link nav-mobile-logout" id="mobileLogoutBtn">Logout</button>'
-          : '<a href="login.html"  class="nav-mobile-link">Login</a>' +
-            '<a href="login.html#mode=register" class="nav-mobile-link">Register Free</a>'
-        ) +
-      '</div>';
-
-    bindNavEvents();
-  }
+  /* ══════════════════════════════════════════════════════════
+     8. NAVBAR
+  ══════════════════════════════════════════════════════════ */
 
   function dropdownItem(iconKey, label, href, currentPage) {
-    var active = (currentPage === href) ? ' style="background:rgba(13,148,136,.07);color:var(--teal)"' : "";
-    var ico = ICONS[iconKey] || iconKey; // fallback to raw string
+    const active = (currentPage === href) ? ' style="background:rgba(26,143,160,.1);color:var(--primary)"' : '';
+    const ico = ICONS[iconKey] || '';
     return '<a href="' + href + '" class="nav-dd-item" role="menuitem"' + active + '>' +
              '<span class="nav-dd-icon">' + ico + '</span>' +
              '<span>' + label + '</span>' +
            '</a>';
   }
 
+  function renderNav() {
+    const el = document.getElementById('main-nav');
+    if (!el) return;
+
+    if (!document.getElementById('gl-skip-link')) {
+      const skip = document.createElement('a');
+      skip.id = 'gl-skip-link';
+      skip.href = '#main-content';
+      skip.className = 'sr-only-focusable';
+      skip.textContent = 'Skip to content';
+      document.body.insertBefore(skip, document.body.firstChild);
+    }
+
+    const theme = getTheme();
+    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+
+    const pubLinks = GL.PUBLIC_NAV.map(link => {
+      const active = (currentPage === link.href) ? ' active' : '';
+      const ico = ICONS[link.iconKey] || '';
+      return '<a href="' + link.href + '" class="nav-link' + active + '">' +
+               '<span class="nav-link-icon">' + ico + '</span> ' + link.label +
+             '</a>';
+    }).join('');
+
+    const themeIconSun = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>';
+    const themeIconMoon = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+
+    el.className = 'main-nav';
+    el.innerHTML =
+      '<div class="nav-inner">' +
+        '<a href="index.html" class="nav-logo" aria-label="GigLega Home">Gig<span>Lega</span></a>' +
+        '<div class="nav-links" id="navLinks">' + pubLinks + '</div>' +
+        '<div class="nav-right">' +
+          '<button class="nav-icon-btn" id="themeToggle" aria-label="Toggle theme" title="Toggle theme">' +
+            (theme === 'dark' ? themeIconSun : themeIconMoon) +
+          '</button>' +
+          '<div id="nav-auth-section">' +
+            '<a href="login.html" class="btn btn-ghost nav-btn-login">' + ICONS.login + ' Login</a>' +
+            '<a href="login.html#mode=register" class="btn btn-primary nav-btn-signup">' + ICONS['user-plus'] + ' Join Free</a>' +
+          '</div>' +
+        '</div>' +
+        '<button class="nav-hamburger" id="navHamburger" aria-label="Toggle menu" aria-expanded="false">' +
+          '<span></span><span></span><span></span>' +
+        '</button>' +
+      '</div>' +
+      '<div class="nav-mobile-menu" id="navMobileMenu" aria-hidden="true">' +
+        pubLinks +
+        '<div class="nav-mobile-divider"></div>' +
+        '<a href="login.html" class="nav-mobile-link" id="mobileLoginLink">Login</a>' +
+        '<a href="login.html#mode=register" class="nav-mobile-link" id="mobileRegisterLink">Register Free</a>' +
+        '<button class="nav-mobile-link nav-mobile-logout" id="mobileLogoutBtn" style="display:none">Logout</button>' +
+      '</div>';
+
+    bindNavEvents();
+
+    try {
+      Promise.all([
+        import('https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js'),
+        import('https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js'),
+        import('./firebase-config.js')
+      ]).then(([authMod, fsMod, fb]) => {
+        authMod.onAuthStateChanged(fb.auth, async user => {
+          const authSection = document.getElementById('nav-auth-section');
+          const mobileLogin = document.getElementById('mobileLoginLink');
+          const mobileReg   = document.getElementById('mobileRegisterLink');
+          const mobileOut   = document.getElementById('mobileLogoutBtn');
+          if (!user) {
+            if (authSection) {
+              authSection.innerHTML =
+                '<a href="login.html" class="btn btn-ghost nav-btn-login">' + ICONS.login + ' Login</a>' +
+                '<a href="login.html#mode=register" class="btn btn-primary nav-btn-signup">' + ICONS['user-plus'] + ' Join Free</a>';
+            }
+            return;
+          }
+          let userData = {};
+          try {
+            const snap = await fsMod.getDoc(fsMod.doc(fb.db, 'users', user.uid));
+            if (snap.exists()) userData = snap.data();
+          } catch (e) { console.error('[GigLega] nav user fetch:', e); }
+
+          const role = userData.role || 'poster';
+          const name = userData.name || user.displayName || 'User';
+          const isVerified = userData.aadhaarVerified === true;
+          const initials = name.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+
+          const dashLink = role === 'worker' || role === 'tasker'
+            ? 'dashboard-worker.html'
+            : role === 'admin' ? 'admin.html'
+            : role === 'enterprise' ? 'enterprise.html'
+            : 'dashboard-client.html';
+
+          const dashLabel = role === 'worker' || role === 'tasker' ? 'Worker Dashboard'
+            : role === 'admin' ? 'Admin Panel'
+            : role === 'enterprise' ? 'Enterprise Dashboard'
+            : 'Poster Dashboard';
+
+          const verifiedBadge = isVerified
+            ? '<span class="verified-badge" title="Aadhaar Verified">Verified</span>'
+            : '';
+
+          if (authSection) {
+            authSection.innerHTML =
+              '<a href="post-gig.html" class="btn btn-primary nav-post-btn">' + ICONS.plus + ' Post Gig</a>' +
+              '<div class="nav-user-menu" id="navUserMenu">' +
+                '<button class="nav-avatar-btn" id="navAvatarBtn" aria-expanded="false" aria-haspopup="true">' +
+                  '<div class="nav-avatar">' + initials + '</div>' +
+                  '<span class="nav-username">' + escHtml(name.split(' ')[0]) + '</span>' +
+                  '<span class="nav-chevron">&#9660;</span>' +
+                '</button>' +
+                '<div class="nav-dropdown" id="navDropdown" role="menu">' +
+                  '<div class="nav-dropdown-header">' +
+                    '<div class="nav-dropdown-name">' + escHtml(name) + verifiedBadge + '</div>' +
+                    '<div class="nav-dropdown-email">' + escHtml(user.email || '') + '</div>' +
+                  '</div>' +
+                  '<div class="nav-dropdown-divider"></div>' +
+                  dropdownItem('zap', dashLabel, dashLink, currentPage) +
+                  dropdownItem('user', 'My Profile', 'profile.html', currentPage) +
+                  dropdownItem('message', 'My Chats', 'chat.html', currentPage) +
+                  '<div class="nav-dropdown-divider"></div>' +
+                  dropdownItem('search', 'Browse Gigs', 'browse.html', currentPage) +
+                  dropdownItem('plus', 'Post a Gig', 'post-gig.html', currentPage) +
+                  '<div class="nav-dropdown-divider"></div>' +
+                  dropdownItem('wallet', 'My Wallet', 'wallet.html', currentPage) +
+                  '<a href="notifications.html" class="nav-dd-item" role="menuitem">' +
+                    '<span class="nav-dd-icon">' + ICONS.bell + '</span>' +
+                    '<span>Notifications</span>' +
+                    '<span class="dd-badge" id="navNotifBadge" style="display:none"></span>' +
+                  '</a>' +
+                  dropdownItem('star', 'My Reviews', 'reviews.html', currentPage) +
+                  dropdownItem('help', 'Help Center', 'help-center.html', currentPage) +
+                  '<div class="nav-dropdown-divider"></div>' +
+                  '<button class="nav-dd-item nav-dd-logout" id="navLogoutBtn" role="menuitem">' +
+                    '<span class="nav-dd-icon">' + ICONS.logout + '</span><span>Logout</span>' +
+                  '</button>' +
+                '</div>' +
+              '</div>';
+          }
+
+          if (mobileLogin) mobileLogin.style.display = 'none';
+          if (mobileReg)   mobileReg.style.display   = 'none';
+          if (mobileOut)   mobileOut.style.display    = '';
+
+          const avatarBtn = document.getElementById('navAvatarBtn');
+          const dropdown  = document.getElementById('navDropdown');
+          if (avatarBtn && dropdown) {
+            avatarBtn.addEventListener('click', e => {
+              e.stopPropagation();
+              const isOpen = dropdown.classList.contains('open');
+              dropdown.classList.toggle('open', !isOpen);
+              avatarBtn.setAttribute('aria-expanded', String(!isOpen));
+            });
+          }
+          document.addEventListener('click', () => {
+            if (dropdown) dropdown.classList.remove('open');
+            if (avatarBtn) avatarBtn.setAttribute('aria-expanded', 'false');
+          }, { once: false });
+
+          const logoutBtn = document.getElementById('navLogoutBtn');
+          if (logoutBtn) logoutBtn.addEventListener('click', logoutUser);
+
+          startNotifBadgeListener(user.uid, fb.db, fsMod);
+        });
+      }).catch(e => console.error('[GigLega] nav auth init:', e));
+    } catch (e) { console.error('[GigLega] nav init:', e); }
+  }
+
   function bindNavEvents() {
-    /* Theme toggle */
-    var themeBtn = document.getElementById("themeToggle");
+    const themeBtn = document.getElementById('themeToggle');
     if (themeBtn) {
-      themeBtn.addEventListener("click", function () {
-        toggleTheme();
-        // Re-render nav so moon/sun icon updates
-        renderNav();
-        renderFooter();
-      });
+      themeBtn.addEventListener('click', () => { toggleTheme(); renderNav(); renderFooter(); });
     }
 
-    /* Avatar dropdown */
-    var avatarBtn = document.getElementById("navAvatarBtn");
-    var dropdown  = document.getElementById("navDropdown");
-    if (avatarBtn && dropdown) {
-      avatarBtn.addEventListener("click", function (e) {
-        e.stopPropagation();
-        var isOpen = dropdown.classList.contains("open");
-        closeAllDropdowns();
-        if (!isOpen) {
-          dropdown.classList.add("open");
-          avatarBtn.setAttribute("aria-expanded", "true");
-        }
-      });
-    }
-
-    /* Close dropdown on outside click */
-    document.addEventListener("click", function () { closeAllDropdowns(); });
-    if (dropdown) dropdown.addEventListener("click", function (e) { e.stopPropagation(); });
-
-    /* Logout buttons */
-    var logoutBtn = document.getElementById("navLogoutBtn");
-    if (logoutBtn) logoutBtn.addEventListener("click", logoutUser);
-    var mobileLogout = document.getElementById("mobileLogoutBtn");
-    if (mobileLogout) mobileLogout.addEventListener("click", logoutUser);
-
-    /* Mode switch */
-    function switchMode() {
-      var u = getCurrentUser();
-      if (!u) return;
-      // Toggle between tasker and poster roles
-          u.role = (u.role === "tasker" || u.mode === "worker") ? "poster" : "tasker";
-          u.mode = (u.role === "tasker") ? "worker" : "poster";
-          setCurrentUser(u);
-      showToast((u.role === "tasker" ? "Switched to Tasker Mode" : "Switched to Poster Mode"), "success", 2500);
-      closeAllDropdowns();
-      renderNav();
-    }
-    var switchBtn = document.getElementById("navSwitchModeBtn");
-    if (switchBtn) switchBtn.addEventListener("click", switchMode);
-    var mobileSwitchBtn = document.getElementById("mobileSwithModeBtn");
-    if (mobileSwitchBtn) mobileSwitchBtn.addEventListener("click", switchMode);
-
-    /* Hamburger */
-    var hamburger  = document.getElementById("navHamburger");
-    var mobileMenu = document.getElementById("navMobileMenu");
+    const hamburger  = document.getElementById('navHamburger');
+    const mobileMenu = document.getElementById('navMobileMenu');
     if (hamburger && mobileMenu) {
-      hamburger.addEventListener("click", function (e) {
+      hamburger.addEventListener('click', e => {
         e.stopPropagation();
-        var isOpen = mobileMenu.classList.contains("open");
-        mobileMenu.classList.toggle("open", !isOpen);
-        hamburger.classList.toggle("open", !isOpen);
-        hamburger.setAttribute("aria-expanded", String(!isOpen));
-        mobileMenu.setAttribute("aria-hidden", String(isOpen));
+        const isOpen = mobileMenu.classList.contains('open');
+        mobileMenu.classList.toggle('open', !isOpen);
+        hamburger.classList.toggle('open', !isOpen);
+        hamburger.setAttribute('aria-expanded', String(!isOpen));
+        mobileMenu.setAttribute('aria-hidden', String(isOpen));
       });
-      /* Close mobile menu on outside click */
-      document.addEventListener("click", function () {
-        mobileMenu.classList.remove("open");
-        hamburger.classList.remove("open");
-        hamburger.setAttribute("aria-expanded", "false");
-        mobileMenu.setAttribute("aria-hidden", "true");
+      document.addEventListener('click', () => {
+        mobileMenu.classList.remove('open');
+        hamburger.classList.remove('open');
+        hamburger.setAttribute('aria-expanded', 'false');
+        mobileMenu.setAttribute('aria-hidden', 'true');
       });
-      mobileMenu.addEventListener("click", function (e) { e.stopPropagation(); });
+      mobileMenu.addEventListener('click', e => e.stopPropagation());
     }
+
+    const mobileLogout = document.getElementById('mobileLogoutBtn');
+    if (mobileLogout) mobileLogout.addEventListener('click', logoutUser);
   }
 
-  function closeAllDropdowns() {
-    var dropdown  = document.getElementById("navDropdown");
-    var avatarBtn = document.getElementById("navAvatarBtn");
-    if (dropdown)  dropdown.classList.remove("open");
-    if (avatarBtn) avatarBtn.setAttribute("aria-expanded", "false");
-  }
-
-
   /* ══════════════════════════════════════════════════════════
-     7. FOOTER
+     9. BOTTOM MOBILE NAV
   ══════════════════════════════════════════════════════════ */
-
-
-  /* ══════════════════════════════════════════════════════════
-     7. BOTTOM MOBILE NAV
-  ══════════════════════════════════════════════════════════ */
-
   function renderBottomNav() {
-    // Only render on mobile — desktop uses the top nav
-    if (window.innerWidth > 768) return;
-    if (document.getElementById('gl-bottom-nav')) return; // already rendered
+    if (document.getElementById('gl-bottom-nav')) return;
 
-    var user = getCurrentUser();
-    var currentPage = window.location.pathname.split('/').pop() || 'index.html';
+    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
 
-    function bnTab(iconKey, label, href, extraClass) {
-      var active = (currentPage === href) ? ' bn-active' : '';
-      var cls = 'bn-tab' + active + (extraClass ? ' ' + extraClass : '');
-      return '<a href="' + href + '" class="' + cls + '" aria-label="' + label + '">' +
+    function bnTab(iconKey, label, href) {
+      const active = (currentPage === href) ? ' bn-active' : '';
+      return '<a href="' + href + '" class="bn-tab' + active + '" aria-label="' + label + '">' +
                '<span class="bn-icon">' + (ICONS[iconKey] || '') + '</span>' +
                '<span class="bn-label">' + label + '</span>' +
              '</a>';
     }
 
-    var notifCount = getUnreadNotifCount();
-    var notifBadge = notifCount > 0
-      ? '<span class="bn-badge">' + (notifCount > 9 ? '9+' : notifCount) + '</span>'
-      : '';
-
-    var nav = document.createElement('nav');
+    const nav = document.createElement('nav');
     nav.id = 'gl-bottom-nav';
     nav.className = 'gl-bottom-nav';
     nav.setAttribute('aria-label', 'Main navigation');
     nav.innerHTML =
-      bnTab('home',       'Home',   'index.html') +
-      bnTab('search-lg',  'Browse', 'browse.html') +
-      '<a href="' + (user ? 'post-gig.html' : 'login.html') + '" class="bn-tab bn-post" aria-label="Post Gig">' +
+      bnTab('home', 'Home', 'index.html') +
+      bnTab('search-lg', 'Browse', 'browse.html') +
+      '<a href="post-gig.html" class="bn-tab bn-post" aria-label="Post Gig">' +
         '<span class="bn-post-fab">' + ICONS['plus-lg'] + '</span>' +
         '<span class="bn-label">Post</span>' +
       '</a>' +
-      '<a href="' + (user ? 'active-gig.html' : 'login.html') + '" class="bn-tab' + (currentPage === 'active-gig.html' ? ' bn-active' : '') + '" aria-label="Active Gig">' +
-        '<span class="bn-icon">' + ICONS['zap-lg'] + '</span>' +
-        '<span class="bn-label">Active</span>' +
+      '<a href="dashboard-client.html" class="bn-tab' + (currentPage === 'dashboard-client.html' || currentPage === 'dashboard-worker.html' ? ' bn-active' : '') + '" aria-label="Dashboard">' +
+        '<span class="bn-icon">' + ICONS['grid'] + '</span>' +
+        '<span class="bn-label">Dashboard</span>' +
       '</a>' +
-      '<a href="' + (user ? 'profile.html' : 'login.html') + '" class="bn-tab' + (currentPage === 'profile.html' ? ' bn-active' : '') + '" aria-label="Profile">' +
-        '<span class="bn-icon" style="position:relative">' + ICONS['user-lg'] + notifBadge + '</span>' +
+      '<a href="profile.html" class="bn-tab' + (currentPage === 'profile.html' ? ' bn-active' : '') + '" aria-label="Profile">' +
+        '<span class="bn-icon" style="position:relative">' + ICONS['user-lg'] + '<span class="bn-badge" id="bnNotifBadge" style="display:none"></span></span>' +
         '<span class="bn-label">Profile</span>' +
       '</a>';
 
     document.body.appendChild(nav);
   }
 
+  /* ══════════════════════════════════════════════════════════
+     10. FOOTER
+  ══════════════════════════════════════════════════════════ */
   function renderFooter() {
-    var el = document.getElementById("main-footer");
+    const el = document.getElementById('main-footer');
     if (!el) return;
-
-    el.className = "main-footer";
+    el.className = 'main-footer';
     el.innerHTML =
       '<div class="footer-inner">' +
-
         '<div class="footer-brand">' +
           '<a href="index.html" class="footer-logo">Gig<span>Lega</span></a>' +
           '<p class="footer-tagline">' + GL.TAGLINE + '</p>' +
-          '<p class="footer-city">📍 Gurugram, Haryana</p>' +
+          '<p class="footer-city">Gurugram, Haryana</p>' +
         '</div>' +
-
         '<div class="footer-links">' +
           '<div class="footer-col">' +
             '<div class="footer-col-title">Platform</div>' +
@@ -643,50 +533,120 @@
             '<div class="footer-col-title">Company</div>' +
             '<a href="about.html">About Us</a>' +
             '<a href="enterprise.html">Enterprise</a>' +
-            '<a href="trust-safety.html">Trust & Safety</a>' +
+            '<a href="trust-safety.html">Trust &amp; Safety</a>' +
             '<a href="contact.html">Contact</a>' +
           '</div>' +
           '<div class="footer-col">' +
-            '<div class="footer-col-title">Support</div>' +
+            '<div class="footer-col-title">Legal &amp; Support</div>' +
             '<a href="help-center.html">Help Center</a>' +
+            '<a href="faq.html">FAQ</a>' +
             '<a href="privacy-policy.html">Privacy Policy</a>' +
             '<a href="terms.html">Terms of Service</a>' +
-            '<a href="sitemap.xml">Sitemap</a>' +
           '</div>' +
         '</div>' +
-
       '</div>' +
-
       '<div class="footer-bottom">' +
-        '<span>© ' + new Date().getFullYear() + ' GigLega. All rights reserved.</span>' +
-        '<span>Made with ❤️ in Gurugram &nbsp;|  <a href="https://wa.me/919319635257" target="_blank" rel="noopener noreferrer" style="color:inherit;text-decoration:underline">💬 WhatsApp Support</a></span>' +
+        '<span>&copy; 2026 GigLega. Built for Gurugram.</span>' +
+        '<span><a href="https://wa.me/919319635257" target="_blank" rel="noopener noreferrer" style="color:inherit;text-decoration:underline">WhatsApp Support</a></span>' +
       '</div>';
   }
 
+  /* ══════════════════════════════════════════════════════════
+     11. NOTIFICATION BADGE (Firestore)
+  ══════════════════════════════════════════════════════════ */
+  let _unsubNotif = null;
+
+  function startNotifBadgeListener(uid, db, fsMod) {
+    if (_unsubNotif) { try { _unsubNotif(); } catch (_) {} _unsubNotif = null; }
+    try {
+      const q = fsMod.query(
+        fsMod.collection(db, 'notifications', uid, 'items'),
+        fsMod.where('read', '==', false),
+        fsMod.limit(50)
+      );
+      _unsubNotif = fsMod.onSnapshot(q, snap => {
+        const count = snap.size;
+        document.querySelectorAll('#navNotifBadge, #bnNotifBadge, .nav-notif-badge, .dd-badge').forEach(el => {
+          el.textContent = count > 9 ? '9+' : String(count);
+          el.style.display = count > 0 ? '' : 'none';
+        });
+      }, e => console.warn('[GigLega] notif badge:', e.message));
+    } catch (e) { console.warn('[GigLega] startNotifBadgeListener:', e); }
+  }
+
+  global.startNotifBadgeListener = startNotifBadgeListener;
 
   /* ══════════════════════════════════════════════════════════
-     8. BREADCRUMB
+     12. UTILITY HELPERS
   ══════════════════════════════════════════════════════════ */
+  function escHtml(str) {
+    return String(str || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
 
-  /**
-   * buildBreadcrumb(elementId, items)
-   * items = [{label, href}, ..., {label}]  ← last item has no href (current page)
-   */
+  function timeAgo(isoStrOrTimestamp) {
+    let ms;
+    if (isoStrOrTimestamp && typeof isoStrOrTimestamp.toDate === 'function') {
+      ms = isoStrOrTimestamp.toDate().getTime();
+    } else {
+      ms = new Date(isoStrOrTimestamp).getTime();
+    }
+    const diff = Math.floor((Date.now() - ms) / 1000);
+    if (diff < 60)    return diff + 's ago';
+    if (diff < 3600)  return Math.floor(diff / 60) + 'm ago';
+    if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
+    return Math.floor(diff / 86400) + 'd ago';
+  }
+
+  function getParam(name) {
+    return new URLSearchParams(window.location.search).get(name);
+  }
+
+  function generateId(prefix) {
+    return (prefix || 'id') + '_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7);
+  }
+
+  function renderStars(rating) {
+    const full  = Math.floor(rating || 0);
+    const empty = 5 - full;
+    let html = '';
+    for (let i = 0; i < full;  i++) html += '<span class="star-filled" aria-hidden="true">&#9733;</span>';
+    for (let i = 0; i < empty; i++) html += '<span class="star-empty" aria-hidden="true">&#9734;</span>';
+    return '<span class="star-rating" aria-label="Rating: ' + (rating || 0) + ' out of 5">' + html + '</span>';
+  }
+
+  function verifiedBadgeHTML(isVerified) {
+    if (!isVerified) return '';
+    return '<span class="verified-badge" title="Aadhaar Verified">Verified &#10003;</span>';
+  }
+
+  global.escHtml          = escHtml;
+  global.timeAgo          = timeAgo;
+  global.getParam         = getParam;
+  global.generateId       = generateId;
+  global.renderStars      = renderStars;
+  global.verifiedBadgeHTML = verifiedBadgeHTML;
+
+  /* ══════════════════════════════════════════════════════════
+     13. BREADCRUMB
+  ══════════════════════════════════════════════════════════ */
   function buildBreadcrumb(elementId, items) {
-    var el = document.getElementById(elementId);
+    const el = document.getElementById(elementId);
     if (!el || !items || !items.length) return;
-
-    el.className = "breadcrumb";
-    var html = '<ol class="breadcrumb-list" itemscope itemtype="https://schema.org/BreadcrumbList">';
-    items.forEach(function (item, i) {
-      var isLast = i === items.length - 1;
+    el.className = 'breadcrumb';
+    let html = '<ol class="breadcrumb-list" itemscope itemtype="https://schema.org/BreadcrumbList">';
+    items.forEach((item, i) => {
+      const isLast = i === items.length - 1;
       html +=
-        '<li class="breadcrumb-item' + (isLast ? " active" : "") + '" ' +
+        '<li class="breadcrumb-item' + (isLast ? ' active' : '') + '" ' +
           'itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">' +
           (isLast
             ? '<span itemprop="name">' + escHtml(item.label) + '</span>'
             : '<a href="' + item.href + '" itemprop="item"><span itemprop="name">' + escHtml(item.label) + '</span></a>' +
-              '<span class="breadcrumb-sep" aria-hidden="true">›</span>'
+              '<span class="breadcrumb-sep" aria-hidden="true">&rsaquo;</span>'
           ) +
           '<meta itemprop="position" content="' + (i + 1) + '" />' +
         '</li>';
@@ -694,658 +654,198 @@
     html += '</ol>';
     el.innerHTML = html;
   }
-
   global.buildBreadcrumb = buildBreadcrumb;
 
+  /* ══════════════════════════════════════════════════════════
+     14. AUTO-INIT
+  ══════════════════════════════════════════════════════════ */
+  function init() {
+    applyTheme(getTheme());
+    renderNav();
+    renderFooter();
+    renderBottomNav();
+    hideSpinner();
+    injectSharedStyles();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
 
   /* ══════════════════════════════════════════════════════════
-     9. NOTIFICATIONS HELPER
+     15. SHARED STYLES
   ══════════════════════════════════════════════════════════ */
-
-  function getNotifs() {
-    try { return JSON.parse(localStorage.getItem(GL.STORAGE_KEY_NOTIFS) || "[]"); }
-    catch (_e) { return []; }
+  function injectSharedStyles() {
+    if (document.getElementById('gl-shared-styles')) return;
+    const style = document.createElement('style');
+    style.id = 'gl-shared-styles';
+    style.textContent = [
+      ':root{--primary:#1a8fa0;--accent:#6366f1;--bg:#0d1117;--surface:#161b22;--card-bg:#161b22;--border:rgba(255,255,255,0.10);--text:#e6edf3;--text-muted:#8b949e;--success:#3fb950;--warning:#d29922;--danger:#f85149;--radius:12px;--shadow:0 4px 24px rgba(0,0,0,0.4);font-family:Inter,system-ui,sans-serif}',
+      'body{background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif;margin:0}',
+      /* Verified badge */
+      '.verified-badge{display:inline-block;background:rgba(63,185,80,.15);color:var(--success);border:1px solid rgba(63,185,80,.3);border-radius:4px;font-size:.7rem;font-weight:700;padding:1px 6px;margin-left:4px;vertical-align:middle;letter-spacing:.3px}',
+      /* Star rating */
+      '.star-filled{color:#d29922}.star-empty{color:var(--text-muted)}',
+      /* Toast */
+      '#toast-container{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:10px;pointer-events:none}',
+      '.toast{display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:10px;background:var(--surface);border:1.5px solid var(--border);box-shadow:var(--shadow);font-size:.88rem;font-weight:600;color:var(--text);min-width:260px;max-width:360px;pointer-events:all;opacity:0;transform:translateY(12px);transition:opacity .3s,transform .3s}',
+      '.toast.show{opacity:1;transform:translateY(0)}.toast.hide{opacity:0;transform:translateY(12px)}',
+      '.toast-success{border-color:rgba(63,185,80,.4);background:rgba(63,185,80,.06)}',
+      '.toast-error{border-color:rgba(248,81,73,.4);background:rgba(248,81,73,.06)}',
+      '.toast-warning{border-color:rgba(210,153,34,.4);background:rgba(210,153,34,.06)}',
+      '.toast-info{border-color:rgba(99,102,241,.4);background:rgba(99,102,241,.06)}',
+      '.toast-icon{flex-shrink:0;color:inherit}.toast-msg{flex:1;line-height:1.4}',
+      '.toast-close{background:none;border:none;cursor:pointer;color:var(--text-muted);padding:2px 4px;line-height:1;margin-left:4px}',
+      /* Spinner */
+      '#gl-spinner-overlay{position:fixed;inset:0;background:rgba(13,17,23,.6);z-index:99999;display:none;align-items:center;justify-content:center}',
+      '.gl-spinner{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:gl-spin .8s linear infinite}',
+      '@keyframes gl-spin{to{transform:rotate(360deg)}}',
+      /* Navbar */
+      '.main-nav{background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:1000;box-shadow:0 2px 12px rgba(0,0,0,.3)}',
+      '.nav-inner{max-width:1200px;margin:0 auto;padding:0 20px;height:62px;display:flex;align-items:center;gap:20px}',
+      '.nav-logo{font-size:1.4rem;font-weight:900;letter-spacing:-1px;color:var(--primary);text-decoration:none;flex-shrink:0}',
+      '.nav-logo span{color:var(--accent)}',
+      '.nav-links{display:flex;align-items:center;gap:4px;flex:1}',
+      '.nav-link{padding:8px 12px;border-radius:8px;font-size:.86rem;font-weight:600;color:var(--text-muted);text-decoration:none;transition:all .2s;white-space:nowrap}',
+      '.nav-link:hover,.nav-link.active{color:var(--primary);background:rgba(26,143,160,.1)}',
+      '.nav-right{display:flex;align-items:center;gap:10px;flex-shrink:0}',
+      '.nav-icon-btn{background:none;border:1px solid var(--border);border-radius:8px;width:36px;height:36px;cursor:pointer;color:var(--text);display:flex;align-items:center;justify-content:center;transition:all .2s}',
+      '.nav-icon-btn:hover{border-color:var(--primary)}',
+      '.btn{display:inline-flex;align-items:center;gap:6px;padding:12px 24px;border-radius:8px;font-weight:600;font-size:.9rem;cursor:pointer;border:none;text-decoration:none;transition:all .2s}',
+      '.btn-primary{background:var(--primary);color:#fff}.btn-primary:hover{opacity:.9}',
+      '.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--text)}.btn-ghost:hover{border-color:var(--primary);color:var(--primary)}',
+      '.nav-btn-login,.nav-btn-signup,.nav-post-btn{font-size:.84rem;padding:8px 16px}',
+      '.nav-user-menu{position:relative}',
+      '.nav-avatar-btn{display:flex;align-items:center;gap:8px;background:none;border:1px solid var(--border);border-radius:10px;padding:6px 12px 6px 6px;cursor:pointer;transition:all .2s;color:var(--text)}',
+      '.nav-avatar-btn:hover{border-color:var(--primary)}',
+      '.nav-avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:800;flex-shrink:0}',
+      '.nav-username{font-size:.84rem;font-weight:700;color:var(--text);max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}',
+      '.nav-chevron{font-size:.7rem;color:var(--text-muted)}',
+      '.nav-notif-badge,.dd-badge{background:var(--danger);color:#fff;font-size:.65rem;font-weight:800;border-radius:10px;padding:1px 6px;min-width:18px;text-align:center}',
+      '.nav-dropdown{position:absolute;top:calc(100% + 10px);right:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);min-width:220px;padding:6px;z-index:2000;opacity:0;visibility:hidden;transform:translateY(-8px);transition:all .2s}',
+      '.nav-dropdown.open{opacity:1;visibility:visible;transform:translateY(0)}',
+      '.nav-dropdown-header{padding:10px 12px 8px}',
+      '.nav-dropdown-name{font-weight:800;font-size:.9rem;color:var(--text)}',
+      '.nav-dropdown-email{font-size:.74rem;color:var(--text-muted);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}',
+      '.nav-dropdown-divider{height:1px;background:var(--border);margin:4px 0}',
+      '.nav-dd-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;font-size:.86rem;font-weight:600;color:var(--text);text-decoration:none;cursor:pointer;transition:all .15s;background:none;border:none;width:100%;text-align:left}',
+      '.nav-dd-item:hover{background:rgba(26,143,160,.1);color:var(--primary)}',
+      '.nav-dd-icon{width:20px;text-align:center;flex-shrink:0}',
+      '.nav-dd-logout{color:var(--danger)}.nav-dd-logout:hover{background:rgba(248,81,73,.07);color:var(--danger)}',
+      '.nav-hamburger{display:none;flex-direction:column;gap:5px;background:none;border:1px solid var(--border);border-radius:8px;padding:8px;cursor:pointer;margin-left:auto}',
+      '.nav-hamburger span{display:block;width:18px;height:2px;background:var(--text-muted);border-radius:2px;transition:all .3s}',
+      '.nav-hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}.nav-hamburger.open span:nth-child(2){opacity:0}.nav-hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}',
+      '.nav-mobile-menu{display:none;flex-direction:column;gap:2px;padding:12px 16px 16px;border-top:1px solid var(--border);background:var(--surface)}',
+      '.nav-mobile-menu.open{display:flex}',
+      '.nav-mobile-link{display:block;padding:11px 14px;border-radius:8px;font-size:.9rem;font-weight:600;color:var(--text);text-decoration:none;transition:all .2s;background:none;border:none;text-align:left;cursor:pointer;width:100%;min-height:44px}',
+      '.nav-mobile-link:hover{background:rgba(26,143,160,.1);color:var(--primary)}',
+      '.nav-mobile-divider{height:1px;background:var(--border);margin:6px 0}',
+      '.nav-mobile-logout{color:var(--danger)}',
+      /* Bottom nav */
+      '.gl-bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);z-index:900;padding:0 0 env(safe-area-inset-bottom,0)}',
+      '.bn-tab{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;padding:10px 4px;text-decoration:none;color:var(--text-muted);font-size:.65rem;font-weight:600;gap:3px;min-height:56px;min-width:44px;transition:color .2s}',
+      '.bn-tab.bn-active,.bn-tab:hover{color:var(--primary)}',
+      '.bn-icon{display:flex;align-items:center;justify-content:center}',
+      '.bn-post{color:var(--primary)}.bn-post-fab{display:flex;align-items:center;justify-content:center;width:40px;height:40px;background:var(--primary);border-radius:50%;color:#fff}',
+      '.bn-badge{position:absolute;top:-4px;right:-4px;background:var(--danger);color:#fff;font-size:.6rem;font-weight:800;border-radius:10px;padding:1px 4px;min-width:14px;text-align:center}',
+      '@media(max-width:768px){.nav-links{display:none}.nav-right .nav-btn-login,.nav-right .nav-btn-signup,.nav-right .nav-post-btn{display:none}.nav-hamburger{display:flex}.nav-username{display:none}.gl-bottom-nav{display:flex}}',
+      /* Footer */
+      '.main-footer{background:#0a0d14;color:var(--text-muted);padding:48px 20px 0;margin-top:80px}',
+      '.footer-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 2fr;gap:48px;padding-bottom:40px}',
+      '.footer-logo{font-size:1.5rem;font-weight:900;letter-spacing:-1px;color:var(--text);text-decoration:none;display:inline-block;margin-bottom:10px}',
+      '.footer-logo span{color:var(--primary)}',
+      '.footer-tagline,.footer-city{font-size:.83rem;color:var(--text-muted);line-height:1.5;margin-bottom:4px}',
+      '.footer-links{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}',
+      '.footer-col{display:flex;flex-direction:column;gap:10px}',
+      '.footer-col-title{font-size:.78rem;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:var(--text-muted);margin-bottom:4px}',
+      '.footer-col a{font-size:.83rem;color:var(--text-muted);text-decoration:none;transition:color .2s}',
+      '.footer-col a:hover{color:var(--primary)}',
+      '.footer-bottom{max-width:1200px;margin:0 auto;border-top:1px solid var(--border);padding:16px 0;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font-size:.76rem;color:var(--text-muted)}',
+      '@media(max-width:768px){.footer-inner{grid-template-columns:1fr}.footer-links{grid-template-columns:repeat(2,1fr)}.footer-bottom{flex-direction:column;text-align:center}}',
+      /* Breadcrumb */
+      '.breadcrumb{margin-bottom:20px}.breadcrumb-list{display:flex;flex-wrap:wrap;align-items:center;gap:4px;list-style:none;padding:0;margin:0;font-size:.8rem}',
+      '.breadcrumb-item{display:flex;align-items:center;gap:4px;color:var(--text-muted)}',
+      '.breadcrumb-item a{color:var(--text-muted);text-decoration:none;font-weight:600;transition:color .2s}',
+      '.breadcrumb-item a:hover{color:var(--primary)}.breadcrumb-item.active{color:var(--text);font-weight:700}',
+      '.breadcrumb-sep{color:var(--border);font-size:.75rem}'
+    ].join('\n');
+    document.head.appendChild(style);
   }
 
-  function getUnreadNotifCount() {
-    return getNotifs().filter(function (n) { return !n.read; }).length;
-  }
+  /* ══════════════════════════════════════════════════════════
+     16. SERVICE WORKER
+  ══════════════════════════════════════════════════════════ */
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      try {
+        navigator.serviceWorker.register(new URL('service-worker.js', window.location.href).toString(), {
+          scope: './',
+          updateViaCache: 'none'
+        }).then(reg => {
+          reg.addEventListener('updatefound', () => {
+            const newSW = reg.installing;
+            if (!newSW) return;
+            newSW.addEventListener('statechange', () => {
+              if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
+                newSW.postMessage({ type: 'SKIP_WAITING' });
+              }
+            });
+          });
+        }).catch(e => console.error('[GigLega] SW register:', e));
 
-  function pushNotif(notif) {
-    var notifs = getNotifs();
-    notifs.unshift({
-      id:        "notif_" + Date.now(),
-      read:      false,
-      createdAt: new Date().toISOString(),
-      icon:      notif.icon  || "🔔",
-      title:     notif.title || "Notification",
-      body:      notif.body  || "",
-      href:      notif.href  || null
+        let swRefreshing = false;
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          if (swRefreshing) return;
+          swRefreshing = true;
+          window.location.reload();
+        });
+      } catch (e) { console.error('[GigLega] SW init:', e); }
     });
-    // Keep max 50
-    if (notifs.length > 50) notifs = notifs.slice(0, 50);
-    try { localStorage.setItem(GL.STORAGE_KEY_NOTIFS, JSON.stringify(notifs)); }
-    catch (_e) {}
   }
 
-  global.getNotifs           = getNotifs;
-  global.getUnreadNotifCount = getUnreadNotifCount;
-  global.pushNotif           = pushNotif;
-
-  /* ══ SPRINT 5: Browser Push Notification Setup ══ */
+  /* ══════════════════════════════════════════════════════════
+     17. PUSH NOTIFICATIONS
+  ══════════════════════════════════════════════════════════ */
   global.initPushNotifications = async function() {
     try {
-      if (!('Notification' in window)) {
-        showToast('⚠️ Yeh browser push support nahi karta.','warning'); return false;
-      }
+      if (!('Notification' in window)) { showToast('Browser does not support push notifications.', 'warning'); return false; }
       const perm = await Notification.requestPermission();
-      if (perm !== 'granted') {
-        showToast('🔕 Notifications blocked — browser settings se allow karo.','warning'); return false;
-      }
+      if (perm !== 'granted') { showToast('Notifications blocked — enable in browser settings.', 'warning'); return false; }
       const reg = await navigator.serviceWorker.ready;
       let sub = await reg.pushManager.getSubscription();
       if (!sub) {
         sub = await reg.pushManager.subscribe({
           userVisibleOnly: true,
           applicationServerKey: 'BNgxPMRhO2KFnWODfY8e1_ggJB3L5kY4h7mXqZvT3R0pN1sWz9dCuAeVbFjHKxIiYmOlPcQtSuXwZaBcDe'
-        }).catch(function(e){ console.warn('[GigLega] push subscribe:',e.message); return null; });
+        }).catch(e => { console.warn('[GigLega] push subscribe:', e.message); return null; });
       }
-      const u = getCurrentUser();
-      if (sub && u) {
-        const uid = u.uid || u.id;
-        const subJSON = sub.toJSON();
-        import('https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js')
-          .then(function(fs){ return import('./firebase-config.js').then(function(fb){
-            return fs.setDoc(fs.doc(fb.db,'users',uid), {
-              pushEndpoint:  subJSON.endpoint || '',
-              pushKeys:      subJSON.keys     || {},
-              pushEnabled:   true,
-              pushUpdatedAt: new Date().toISOString()
+      if (sub) {
+        try {
+          const [fsMod, fb] = await Promise.all([
+            import('https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js'),
+            import('./firebase-config.js')
+          ]);
+          const authMod = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js');
+          const user = authMod.getAuth(fb.app).currentUser;
+          if (user) {
+            const subJSON = sub.toJSON();
+            await fsMod.setDoc(fsMod.doc(fb.db, 'users', user.uid), {
+              pushEndpoint: subJSON.endpoint || '',
+              pushKeys: subJSON.keys || {},
+              pushEnabled: true
             }, { merge: true });
-          }); }).catch(function(e){ console.warn('[GigLega] push save:',e.message); });
+          }
+        } catch (e) { console.warn('[GigLega] push save:', e.message); }
       }
-      showToast('🔔 Push notifications ON! Gig updates milenge.','success');
+      showToast('Push notifications enabled.', 'success');
       return true;
-    } catch(e) {
-      console.warn('[GigLega] initPushNotifications:', e.message);
-      showToast('❌ Push setup fail: ' + e.message, 'error');
+    } catch (e) {
+      console.error('[GigLega] initPushNotifications:', e.message);
+      showToast('Push setup failed: ' + e.message, 'error');
       return false;
     }
   };
 
-
-  /* ══ SPRINT 4: Live Firestore unread notification badge ══ */
-  (function(){
-    var _unsub = null;
-    function _setBadge(count) {
-      document.querySelectorAll('.nav-notif-badge,.dd-badge,.bn-badge').forEach(function(el){
-        el.textContent = count > 9 ? '9+' : String(count);
-        el.style.display = count > 0 ? '' : 'none';
-      });
-    }
-    global.startNotifBadgeListener = function(uid, db) {
-      if (_unsub) { try{_unsub();}catch(_){} _unsub = null; }
-      import('https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js')
-        .then(function(fs){
-          var q = fs.query(
-            fs.collection(db,'notifications',uid,'items'),
-            fs.where('read','==',false), fs.limit(50)
-          );
-          _unsub = fs.onSnapshot(q,
-            function(snap){ _setBadge(snap.size); },
-            function(e){ console.warn('[GigLega] badge:',e.message); }
-          );
-        }).catch(function(){});
-    };
-    global.stopNotifBadgeListener = function(){
-      if(_unsub){ try{_unsub();}catch(_){} _unsub=null; }
-    };
-  })();
-
-
-
-  /* ══════════════════════════════════════════════════════════
-     10. UTILITY HELPERS
-  ══════════════════════════════════════════════════════════ */
-
-  function escHtml(str) {
-    return String(str || "")
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;");
-  }
-
-  function timeAgo(isoStr) {
-    var diff = Math.floor((Date.now() - new Date(isoStr).getTime()) / 1000);
-    if (diff < 60)    return diff + "s ago";
-    if (diff < 3600)  return Math.floor(diff / 60) + "m ago";
-    if (diff < 86400) return Math.floor(diff / 3600) + "h ago";
-    return Math.floor(diff / 86400) + "d ago";
-  }
-
-  function getParam(name) {
-    return new URLSearchParams(window.location.search).get(name);
-  }
-
-  function formatCurrency(amount) {
-    return "₹" + Number(amount || 0).toLocaleString("en-IN");
-  }
-
-  function generateId(prefix) {
-    return (prefix || "id") + "_" + Date.now() + "_" + Math.random().toString(36).slice(2, 7);
-  }
-
-  // Expose utilities
-  global.escHtml        = escHtml;
-  global.timeAgo        = timeAgo;
-  global.getParam       = getParam;
-  global.formatCurrency = formatCurrency;
-  global.generateId     = generateId;
-
-
-  /* ══════════════════════════════════════════════════════════
-     11. PAGE LOADER
-  ══════════════════════════════════════════════════════════ */
-
-  function showPageLoader() {
-    var loader = document.getElementById("page-loader");
-    if (loader) loader.classList.add("show");
-  }
-
-  function hidePageLoader() {
-    var loader = document.getElementById("page-loader");
-    if (loader) {
-      setTimeout(function () {
-        loader.classList.remove("show");
-        loader.classList.add("hide");
-      }, 200);
-    }
-  }
-
-  global.showPageLoader = showPageLoader;
-  global.hidePageLoader = hidePageLoader;
-
-
-  /* ══════════════════════════════════════════════════════════
-     12. AUTO-INIT ON DOM READY
-  ══════════════════════════════════════════════════════════ */
-
-  function init() {
-    // Apply saved theme immediately (prevents flash)
-    applyTheme(getTheme());
-
-    // Render shared components
-    renderAnnounceBar();
-    renderNav();
-    renderFooter();
-    renderBottomNav();
-
-    // Hide page loader when page is ready
-    hidePageLoader();
-
-    // Add toast styles if not already in CSS
-    injectToastStyles();
-    /* Sprint 4: live Firestore bell badge */
-    var _glU = getCurrentUser();
-    if (_glU && typeof global.startNotifBadgeListener === 'function') {
-      import('./firebase-config.js')
-        .then(function(fb){ global.startNotifBadgeListener(_glU.uid||_glU.id, fb.db); })
-        .catch(function(){});
-    }
-  }
-
-  // Run as soon as DOM is ready
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", init);
-  } else {
-    init();
-  }
-
-
-  /* ══════════════════════════════════════════════════════════
-     13. INJECT TOAST + NAV STYLES (self-contained)
-  ══════════════════════════════════════════════════════════ */
-
-  function injectToastStyles() {
-    if (document.getElementById("gl-shared-styles")) return;
-    var style = document.createElement("style");
-    style.id  = "gl-shared-styles";
-    style.textContent = [
-
-      /* ── Toast ── */
-      "#toast-container{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:10px;pointer-events:none}",
-      ".toast{display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:10px;background:var(--surface);border:1.5px solid var(--gray-200);box-shadow:0 8px 24px rgba(0,0,0,.12);font-size:.88rem;font-weight:600;color:var(--text);min-width:260px;max-width:360px;pointer-events:all;opacity:0;transform:translateY(12px);transition:opacity .3s,transform .3s}",
-      ".toast.show{opacity:1;transform:translateY(0)}",
-      ".toast.hide{opacity:0;transform:translateY(12px)}",
-      ".toast-success{border-color:rgba(16,185,129,.4);background:rgba(16,185,129,.06)}",
-      ".toast-error{border-color:rgba(239,68,68,.4);background:rgba(239,68,68,.06)}",
-      ".toast-warning{border-color:rgba(245,158,11,.4);background:rgba(245,158,11,.06)}",
-      ".toast-info{border-color:rgba(99,102,241,.4);background:rgba(99,102,241,.06)}",
-      ".toast-icon{font-size:1rem;flex-shrink:0}",
-      ".toast-msg{flex:1;line-height:1.4}",
-      ".toast-close{background:none;border:none;cursor:pointer;color:var(--gray-400);font-size:.9rem;padding:2px 4px;line-height:1;margin-left:4px}",
-      ".toast-close:hover{color:var(--gray-700)}",
-
-      /* ── Announce bar ── */
-      ".announce-bar{background:linear-gradient(90deg,var(--primary) 0%,var(--teal) 100%);color:#fff;text-align:center;padding:9px 40px;font-size:.82rem;font-weight:600;position:relative;overflow:hidden}",
-      ".announce-close{position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;color:rgba(255,255,255,.75);font-size:1rem;cursor:pointer;padding:4px;line-height:1}",
-      ".announce-close:hover{color:#fff}",
-
-      /* ── Navbar ── */
-      ".main-nav{background:var(--surface);border-bottom:1.5px solid var(--gray-200);position:sticky;top:0;z-index:1000;box-shadow:0 2px 12px rgba(0,0,0,.06)}",
-      ".nav-inner{max-width:1200px;margin:0 auto;padding:0 20px;height:62px;display:flex;align-items:center;gap:20px}",
-      ".nav-logo{font-size:1.4rem;font-weight:900;letter-spacing:-1px;color:var(--primary);text-decoration:none;flex-shrink:0}",
-      ".nav-logo span{color:var(--teal)}",
-      ".nav-links{display:flex;align-items:center;gap:4px;flex:1}",
-      ".nav-link{padding:8px 12px;border-radius:8px;font-size:.86rem;font-weight:600;color:var(--gray-600);text-decoration:none;transition:all .2s;white-space:nowrap}",
-      ".nav-link:hover,.nav-link.active{color:var(--primary);background:rgba(26,60,94,.06)}",
-      ".nav-right{display:flex;align-items:center;gap:10px;flex-shrink:0}",
-      ".nav-icon-btn{background:none;border:1.5px solid var(--gray-200);border-radius:8px;width:36px;height:36px;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:all .2s}",
-      ".nav-icon-btn:hover{border-color:var(--teal)}",
-      ".nav-btn-login{font-size:.86rem;padding:8px 16px}",
-      ".nav-btn-signup{font-size:.86rem;padding:8px 16px}",
-      ".nav-post-btn{font-size:.84rem;padding:8px 16px;white-space:nowrap}",
-
-      /* Avatar button */
-      ".nav-user-menu{position:relative}",
-      ".nav-avatar-btn{display:flex;align-items:center;gap:8px;background:none;border:1.5px solid var(--gray-200);border-radius:10px;padding:6px 12px 6px 6px;cursor:pointer;transition:all .2s;color:var(--text)}",
-      ".nav-avatar-btn:hover{border-color:var(--teal)}",
-      ".nav-avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--teal));color:#fff;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:800;flex-shrink:0}",
-      ".nav-username{font-size:.84rem;font-weight:700;color:var(--text);max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}",
-      ".nav-chevron{font-size:.7rem;color:var(--gray-400);transition:transform .2s}",
-      ".nav-avatar-btn[aria-expanded=true] .nav-chevron{transform:rotate(180deg)}",
-      ".nav-notif-badge{background:var(--danger);color:#fff;font-size:.65rem;font-weight:800;border-radius:10px;padding:1px 6px;min-width:18px;text-align:center}",
-
-      /* Dropdown */
-      ".nav-dropdown{position:absolute;top:calc(100% + 10px);right:0;background:var(--surface);border:1.5px solid var(--gray-200);border-radius:14px;box-shadow:0 12px 40px rgba(0,0,0,.14);min-width:220px;padding:6px;z-index:2000;opacity:0;visibility:hidden;transform:translateY(-8px);transition:all .2s}",
-      ".nav-dropdown.open{opacity:1;visibility:visible;transform:translateY(0)}",
-      ".nav-dropdown-header{padding:10px 12px 8px}",
-      ".nav-dropdown-name{font-weight:800;font-size:.9rem;color:var(--text)}",
-      ".nav-dropdown-email{font-size:.74rem;color:var(--gray-400);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}",
-      ".nav-dropdown-divider{height:1px;background:var(--gray-200);margin:4px 0}",
-      ".nav-dd-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;font-size:.86rem;font-weight:600;color:var(--gray-700);text-decoration:none;cursor:pointer;transition:all .15s;background:none;border:none;width:100%;text-align:left}",
-      ".nav-dd-item:hover{background:rgba(13,148,136,.07);color:var(--teal)}",
-      ".nav-dd-icon{font-size:1rem;width:20px;text-align:center;flex-shrink:0}",
-      ".nav-dd-logout{color:var(--danger)}",
-      ".nav-dd-logout:hover{background:rgba(239,68,68,.07);color:var(--danger)}",
-      ".dd-badge{background:var(--danger);color:#fff;font-size:.65rem;font-weight:800;border-radius:10px;padding:1px 6px;margin-left:auto}",
-
-      /* Hamburger */
-      ".nav-hamburger{display:none;flex-direction:column;gap:5px;background:none;border:1.5px solid var(--gray-200);border-radius:8px;padding:8px;cursor:pointer;margin-left:auto}",
-      ".nav-hamburger span{display:block;width:18px;height:2px;background:var(--gray-600);border-radius:2px;transition:all .3s}",
-      ".nav-hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}",
-      ".nav-hamburger.open span:nth-child(2){opacity:0}",
-      ".nav-hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}",
-
-      /* Mobile menu */
-      ".nav-mobile-menu{display:none;flex-direction:column;gap:2px;padding:12px 16px 16px;border-top:1.5px solid var(--gray-200);background:var(--surface)}",
-      ".nav-mobile-menu.open{display:flex}",
-      ".nav-mobile-link{display:block;padding:11px 14px;border-radius:8px;font-size:.9rem;font-weight:600;color:var(--gray-700);text-decoration:none;transition:all .2s;background:none;border:none;text-align:left;cursor:pointer;width:100%}",
-      ".nav-mobile-link:hover{background:rgba(13,148,136,.07);color:var(--teal)}",
-      ".nav-mobile-divider{height:1px;background:var(--gray-200);margin:6px 0}",
-      ".nav-mobile-logout{color:var(--danger)}",
-
-      /* Responsive */
-      "@media(max-width:768px){",
-        ".nav-links{display:none}",
-        ".nav-right .nav-btn-login,.nav-right .nav-btn-signup,.nav-right .nav-post-btn{display:none}",
-        ".nav-hamburger{display:flex}",
-        ".nav-username{display:none}",
-      "}",
-
-      /* ── Breadcrumb ── */
-      ".breadcrumb{margin-bottom:20px}",
-      ".breadcrumb-list{display:flex;flex-wrap:wrap;align-items:center;gap:4px;list-style:none;padding:0;margin:0;font-size:.8rem}",
-      ".breadcrumb-item{display:flex;align-items:center;gap:4px;color:var(--gray-400)}",
-      ".breadcrumb-item a{color:var(--gray-500);text-decoration:none;font-weight:600;transition:color .2s}",
-      ".breadcrumb-item a:hover{color:var(--teal)}",
-      ".breadcrumb-item.active{color:var(--gray-600);font-weight:700}",
-      ".breadcrumb-sep{color:var(--gray-300);font-size:.75rem}",
-
-      /* ── Footer ── */
-      ".main-footer{background:var(--gray-900);color:var(--gray-300);padding:48px 20px 0;margin-top:80px}",
-      ".footer-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 2fr;gap:48px;padding-bottom:40px}",
-      ".footer-logo{font-size:1.5rem;font-weight:900;letter-spacing:-1px;color:#fff;text-decoration:none;display:inline-block;margin-bottom:10px}",
-      ".footer-logo span{color:var(--teal)}",
-      ".footer-tagline{font-size:.83rem;color:var(--gray-400);line-height:1.5;margin-bottom:6px}",
-      ".footer-city{font-size:.78rem;color:var(--gray-500)}",
-      ".footer-links{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}",
-      ".footer-col{display:flex;flex-direction:column;gap:10px}",
-      ".footer-col-title{font-size:.78rem;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:var(--gray-400);margin-bottom:4px}",
-      ".footer-col a{font-size:.83rem;color:var(--gray-400);text-decoration:none;transition:color .2s}",
-      ".footer-col a:hover{color:var(--teal)}",
-      ".footer-bottom{max-width:1200px;margin:0 auto;border-top:1px solid rgba(255,255,255,.08);padding:16px 0;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font-size:.76rem;color:var(--gray-500)}",
-      "@media(max-width:768px){.footer-inner{grid-template-columns:1fr}.footer-links{grid-template-columns:repeat(2,1fr)}.footer-bottom{flex-direction:column;text-align:center}}",
-
-      /* ── Dark mode overrides ── */
-      "[data-theme=dark] .main-nav{border-color:var(--gray-700);background:var(--bg)}",
-      "[data-theme=dark] .nav-link:hover,[data-theme=dark] .nav-link.active{background:rgba(13,148,136,.1)}",
-      "[data-theme=dark] .nav-icon-btn{border-color:var(--gray-700);color:var(--gray-300)}",
-      "[data-theme=dark] .nav-avatar-btn{border-color:var(--gray-700)}",
-      "[data-theme=dark] .nav-dropdown{border-color:var(--gray-700);background:var(--surface)}",
-      "[data-theme=dark] .nav-dropdown-divider{background:var(--gray-700)}",
-      "[data-theme=dark] .nav-dd-item{color:var(--gray-300)}",
-      "[data-theme=dark] .nav-mobile-menu{border-color:var(--gray-700)}",
-      "[data-theme=dark] .nav-mobile-link{color:var(--gray-300)}",
-      "[data-theme=dark] .nav-hamburger{border-color:var(--gray-700)}",
-      "[data-theme=dark] .nav-hamburger span{background:var(--gray-300)}",
-      "[data-theme=dark] .announce-bar{opacity:.9}",
-      "[data-theme=dark] .main-footer{background:#020617;color:var(--gray-400)}",
-      "[data-theme=dark] .footer-logo{color:var(--gray-700)}",
-      "[data-theme=dark] .footer-col a{color:var(--gray-500)}",
-      "[data-theme=dark] .footer-bottom{color:var(--gray-400);border-color:rgba(148,163,184,.2)}",
-      "[data-theme=dark] .toast{border-color:var(--gray-700);background:var(--surface)}"
-
-    ].join("\n");
-    document.head.appendChild(style);
-  }
-
-
-  /* ══════════════════════════════════════════════════════════
-     14. REGISTER SERVICE WORKER + UPDATE BANNER
-  ══════════════════════════════════════════════════════════ */
-
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', function () {
-      try {
-        var swUrl = new URL('service-worker.js', window.location.href).toString();
-        navigator.serviceWorker.register(swUrl, {
-          scope: './',
-          updateViaCache: 'none'
-        }).then(function (reg) {
-          console.log('[GigLega] SW registered:', reg.scope);
-
-          // Detect new SW waiting — show update prompt
-          reg.addEventListener('updatefound', function () {
-            var newSW = reg.installing;
-            if (!newSW) return;
-            newSW.addEventListener('statechange', function () {
-              if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
-                // Activate update immediately so users don't keep stale shell assets.
-                newSW.postMessage({ type: 'SKIP_WAITING' });
-                showUpdateBanner(newSW);
-              }
-            });
-          });
-        });
-
-        // Reload once when a new service worker takes control.
-        var swRefreshing = false;
-        navigator.serviceWorker.addEventListener('controllerchange', function () {
-          if (swRefreshing) return;
-          swRefreshing = true;
-          window.location.reload();
-        });
-
-        // Listen for messages from SW
-        navigator.serviceWorker.addEventListener('message', function (event) {
-          var data = event.data || {};
-          var type = data.type;
-          var url  = data.url;
-          if (type === 'NAVIGATE' && url) window.location.href = url;
-          if (type === 'SW_UPDATED') console.log('[GigLega] SW updated to', data.version);
-          if (type === 'SYNC_SUCCESS') console.log('[GigLega] Synced:', data.url);
-        });
-
-      } catch (err) {
-        console.error('[GigLega] SW registration failed:', err);
-      }
-    });
-  }
-
-  function showUpdateBanner(newSW) {
-    var banner = document.createElement('div');
-    banner.style.cssText =
-      'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);' +
-      'background:#1a3c5e;color:#fff;padding:12px 20px;border-radius:10px;' +
-      'display:flex;align-items:center;gap:12px;z-index:9999;' +
-      'box-shadow:0 4px 20px rgba(0,0,0,.3);font-family:inherit;' +
-      'border:1.5px solid rgba(13,148,136,.3);font-size:.86rem;';
-
-    banner.innerHTML =
-      '<span>🚀 <strong>GigLega update ready!</strong></span>' +
-      '<button style="padding:6px 14px;background:linear-gradient(135deg,#059669,#0d9488);border:none;' +
-        'border-radius:6px;color:#fff;font-weight:800;cursor:pointer;font-family:inherit;font-size:.82rem">' +
-        'Update Karo ↻' +
-      '</button>' +
-      '<button style="background:none;border:none;color:rgba(255,255,255,.5);cursor:pointer;font-size:1rem">✕</button>';
-
-    var updateBtn = banner.querySelector('button:nth-child(2)');
-    var closeBtn  = banner.querySelector('button:nth-child(3)');
-
-    updateBtn.addEventListener('click', function () {
-      if (banner.parentNode) banner.parentNode.removeChild(banner);
-      if (newSW && newSW.state === 'installed' && navigator.serviceWorker.controller) {
-        navigator.serviceWorker.controller.postMessage({ type: 'SKIP_WAITING' });
-      }
-      window.location.reload();
-    });
-
-    closeBtn.addEventListener('click', function () {
-      if (banner.parentNode) banner.parentNode.removeChild(banner);
-    });
-
-    document.body.appendChild(banner);
-  }
-
-
-
-  /* ══════════════════════════════════════════════════════════
-     15. ONBOARDING TOUR — First-time user walkthrough
-     Auto-triggers on dashboard pages for users with hasSeenOnboarding !== true
-  ══════════════════════════════════════════════════════════ */
-
-  var TOUR_STEPS = {
-    worker: [
-      { title: "👋 Welcome to GigLega!", text: "You're now a verified gig worker. Let's show you around so you can start earning fast.", target: null },
-      { title: "⚡ Active Gig", text: "When you accept a gig, it appears here. Track progress and chat with the poster directly.", target: ".wallet-card" },
-      { title: "💰 Your Wallet", text: "Earnings from completed gigs land here automatically. Tap Withdraw to get paid via UPI.", target: ".wallet-card" },
-      { title: "🔍 Browse Gigs", text: "Tap Browse Gigs in the nav to see all open jobs near you and accept one instantly.", target: null },
-      { title: "🌟 You're All Set!", text: "Your profile is live. Browse open gigs and land your first job today!", target: null }
-    ],
-    poster: [
-      { title: "👋 Welcome to GigLega!", text: "You can now post gigs and find trusted local workers in Gurugram in minutes.", target: null },
-      { title: "📝 Post a New Gig", text: "Tap 'Post a New Gig' to describe the work, set a budget, and go live in under 60 seconds.", target: ".btn-post-new" },
-      { title: "📂 Manage Your Gigs", text: "All your posted gigs appear here — switch between Open, In Progress, and Completed tabs.", target: ".tab-bar" },
-      { title: "💬 Chat with Worker", text: "Once a worker accepts your gig, use the built-in chat to coordinate everything.", target: ".tab-bar" },
-      { title: "🌟 You're All Set!", text: "Post your first gig now — GigLega workers in Gurugram are ready and waiting!", target: null }
-    ]
-  };
-
-  function _glStartTour(role, uid) {
-    var steps = TOUR_STEPS[role] || TOUR_STEPS.worker;
-    var current = 0;
-    var overlay, card, cleanupFn;
-
-    function injectTourStyles() {
-      if (document.getElementById('gl-tour-styles')) return;
-      var s = document.createElement('style');
-      s.id = 'gl-tour-styles';
-      s.textContent = '.gl-tour-overlay{position:fixed;inset:0;background:rgba(0,0,0,.52);z-index:99998}' +
-        '.gl-tour-card{position:fixed;z-index:99999;max-width:300px;width:calc(100vw - 32px);' +
-        'background:#1c1b19;border:1.5px solid #393836;border-radius:14px;padding:20px 22px;' +
-        'box-shadow:0 16px 40px rgba(0,0,0,.6);font-family:inherit;color:#cdccca}' +
-        '.gl-tour-step{font-size:11px;font-weight:700;color:#4f98a3;margin-bottom:8px;letter-spacing:.5px;text-transform:uppercase}' +
-        '.gl-tour-bar-wrap{height:3px;background:#2d2c2a;border-radius:99px;margin-bottom:16px}' +
-        '.gl-tour-bar{height:3px;background:#4f98a3;border-radius:99px;transition:width .35s ease}' +
-        '.gl-tour-title{font-size:15px;font-weight:800;color:#fff;margin-bottom:8px;line-height:1.3}' +
-        '.gl-tour-text{font-size:13.5px;line-height:1.6;color:#9a9896;margin-bottom:20px}' +
-        '.gl-tour-actions{display:flex;justify-content:space-between;align-items:center}' +
-        '.gl-tour-skip{background:none;border:none;color:#5a5957;font-size:13px;cursor:pointer;padding:4px 0;font-family:inherit}' +
-        '.gl-tour-skip:hover{color:#797876}' +
-        '.gl-tour-next{background:#01696f;color:#fff;border:none;border-radius:8px;padding:9px 20px;' +
-        'font-size:13.5px;font-weight:700;cursor:pointer;font-family:inherit}' +
-        '.gl-tour-next:hover{background:#0c4e54}' +
-        '.gl-tour-hl{outline:2.5px solid #4f98a3!important;outline-offset:4px!important;border-radius:8px!important;z-index:99997;position:relative}';
-      document.head.appendChild(s);
-    }
-
-    function render(idx) {
-      var step = steps[idx];
-      var isLast = idx === steps.length - 1;
-      var pct = Math.round(((idx + 1) / steps.length) * 100);
-
-      if (cleanupFn) { cleanupFn(); cleanupFn = null; }
-
-      var targetEl = step.target ? document.querySelector(step.target) : null;
-      if (targetEl) {
-        targetEl.classList.add('gl-tour-hl');
-        cleanupFn = function() { targetEl.classList.remove('gl-tour-hl'); };
-        setTimeout(function() {
-          var rect = targetEl.getBoundingClientRect();
-          var top = rect.bottom + window.scrollY + 14;
-          var left = Math.max(16, Math.min(rect.left + window.scrollX, window.innerWidth - 316));
-          if (top + 240 > window.innerHeight + window.scrollY) top = Math.max(16, rect.top + window.scrollY - 250);
-          card.style.cssText = 'top:' + top + 'px;left:' + left + 'px;transform:none;position:fixed';
-        }, 60);
-      } else {
-        card.style.cssText = 'top:50%;left:50%;transform:translate(-50%,-50%);position:fixed';
-      }
-
-      card.innerHTML =
-        '<div class="gl-tour-step">Step ' + (idx+1) + ' of ' + steps.length + '</div>' +
-        '<div class="gl-tour-bar-wrap"><div class="gl-tour-bar" style="width:' + pct + '%"></div></div>' +
-        '<div class="gl-tour-title">' + step.title + '</div>' +
-        '<div class="gl-tour-text">' + step.text + '</div>' +
-        '<div class="gl-tour-actions">' +
-          '<button class="gl-tour-skip">Skip tour</button>' +
-          '<button class="gl-tour-next">' + (isLast ? "Let\'s Go! 🚀" : "Next →") + '</button>' +
-        '</div>';
-
-      card.querySelector('.gl-tour-skip').onclick = endTour;
-      card.querySelector('.gl-tour-next').onclick = function() {
-        isLast ? endTour() : render(++current);
-      };
-    }
-
-    function endTour() {
-      if (cleanupFn) cleanupFn();
-      if (overlay && overlay.parentNode) overlay.parentNode.removeChild(overlay);
-      if (card && card.parentNode) card.parentNode.removeChild(card);
-      try {
-        Promise.all([
-          import('https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js'),
-          import('./firebase-config.js')
-        ]).then(function(m) {
-          m[0].updateDoc(m[0].doc(m[1].db, 'users', uid), { hasSeenOnboarding: true }).catch(function(){});
-        }).catch(function(){});
-      } catch(e) {}
-    }
-
-    injectTourStyles();
-    overlay = document.createElement('div');
-    overlay.className = 'gl-tour-overlay';
-    overlay.onclick = endTour;
-    document.body.appendChild(overlay);
-    card = document.createElement('div');
-    card.className = 'gl-tour-card';
-    document.body.appendChild(card);
-    render(0);
-  }
-
-  function _glInitOnboarding() {
-    var page = window.location.pathname.split('/').pop() || 'index.html';
-    if (page !== 'dashboard-worker.html' && page !== 'dashboard-client.html') return;
-    setTimeout(function() {
-      Promise.all([
-        import('https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js'),
-        import('https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js'),
-        import('./firebase-config.js')
-      ]).then(function(mods) {
-        var authMod = mods[0], fsMod = mods[1], fbApp = mods[2];
-        authMod.onAuthStateChanged(fbApp.auth, function(user) {
-          if (!user) return;
-          setTimeout(function() {
-            fsMod.getDoc(fsMod.doc(fbApp.db, 'users', user.uid)).then(function(snap) {
-              if (!snap.exists()) return;
-              var data = snap.data();
-              if (data.hasSeenOnboarding) return;
-              var role = data.role || (page === 'dashboard-worker.html' ? 'worker' : 'poster');
-              _glStartTour(role, user.uid);
-            }).catch(function(e) { console.warn('[GL] onboarding check:', e.message); });
-          }, 1500);
-        });
-      }).catch(function(e) { console.warn('[GL] onboarding init:', e); });
-    }, 600);
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', _glInitOnboarding);
-  } else {
-    _glInitOnboarding();
-  }
-
-  /* ══════════════════════════════════════════════════════════
-     END ONBOARDING TOUR
-  ══════════════════════════════════════════════════════════ */
-
-
-  /* ══════════════════════════════════════════════════════════
-     16. NOTIFICATION SOUNDS — Web Audio API (no external files)
-  ══════════════════════════════════════════════════════════ */
-
-  function _glPlaySound(type) {
-    try {
-      var AudioCtx = window.AudioContext || window.webkitAudioContext;
-      if (!AudioCtx) return;
-      var ctx = new AudioCtx();
-
-      // Browsers suspend AudioContext until user interaction — resume first
-      function _doPlay() {
-        function tone(freq, startTime, duration, volume) {
-        var o = ctx.createOscillator();
-        var g = ctx.createGain();
-        o.type = 'sine';
-        o.connect(g);
-        g.connect(ctx.destination);
-        o.frequency.setValueAtTime(freq, ctx.currentTime + startTime);
-        g.gain.setValueAtTime(volume || 0.22, ctx.currentTime + startTime);
-        g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + startTime + duration);
-        o.start(ctx.currentTime + startTime);
-        o.stop(ctx.currentTime + startTime + duration);
-      }
-
-      if (type === 'message') {
-        // Soft two-note pop — incoming chat message
-        tone(880, 0,    0.08, 0.18);
-        tone(1100, 0.07, 0.12, 0.14);
-
-      } else if (type === 'notification') {
-        // Double ding — new notification
-        tone(660, 0,    0.18, 0.20);
-        tone(880, 0.18, 0.18, 0.18);
-
-      } else if (type === 'payment') {
-        // Ascending three-note chime — payment received
-        tone(523, 0,    0.22, 0.20);
-        tone(659, 0.15, 0.22, 0.20);
-        tone(784, 0.30, 0.30, 0.22);
-
-      } else if (type === 'gig_booked') {
-        // Upbeat confirm tone
-        tone(440, 0,    0.15, 0.18);
-        tone(660, 0.15, 0.15, 0.18);
-        tone(880, 0.30, 0.25, 0.20);
-
-      } else if (type === 'send') {
-        // Very subtle whoosh — message sent
-        tone(660, 0, 0.06, 0.10);
-      }
-      }
-      if (ctx.state === 'suspended') {
-        ctx.resume().then(_doPlay).catch(function(){});
-      } else {
-        _doPlay();
-      }
-    } catch (e) {}
-  }
-
-  global._glPlaySound = _glPlaySound;
-
-  /* ══════════════════════════════════════════════════════════
-     END NOTIFICATION SOUNDS
-  ══════════════════════════════════════════════════════════ */
-
 })(window);
-
