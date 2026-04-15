@@ -399,7 +399,7 @@
   <script>
   (function () {
 
-    var FEE_RATE = 0.06;
+    var FEE_RATE = 0.10;
     var GIG_KEY  = (typeof GL !== "undefined" && GL.STORAGE_KEY_GIGS) ? GL.STORAGE_KEY_GIGS : "gl_gigs";
     var USER_KEY = (typeof GL !== "undefined" && GL.STORAGE_KEY_USER)  ? GL.STORAGE_KEY_USER  : "gl_user";
 
@@ -413,6 +413,11 @@
 if (!user) {
   window.location.href = "login.html?redirect=dashboard-worker.html";
   return;
+}
+/* Role guard: only worker/tasker/admin allowed on this page */
+var _workerRole = user.role || '';
+if (_workerRole && _workerRole !== 'tasker' && _workerRole !== 'worker' && _workerRole !== 'admin') {
+  window.location.href = (_workerRole === 'poster' || _workerRole === 'client') ? 'dashboard-client.html' : _workerRole === 'enterprise' ? 'enterprise.html' : 'dashboard.html';
 }
 
     /* ── Breadcrumb ── */

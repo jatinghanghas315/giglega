@@ -238,10 +238,10 @@
 
 <script type="module">
 import { auth, db } from './firebase-config.js';
-import { collection, query, where, onSnapshot, doc, updateDoc, deleteDoc, getDocs, limit } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+import { collection, query, where, onSnapshot, doc, updateDoc, deleteDoc, getDocs, getDoc, limit } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
 import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
 
-var FEE_RATE = 0.06;
+var FEE_RATE = 0.10;
 var currentUser = null;
 var unsubscribe = null;
 
@@ -252,6 +252,14 @@ onAuthStateChanged(auth, function(user) {
     return;
   }
   currentUser = user;
+    /* Role guard: only poster/client/admin can access this page */
+  getDoc(doc(db, 'users', user.uid)).then(function(snap){
+    var role = snap.exists() ? (snap.data().role || '') : '';
+    if (role && role !== 'poster' && role !== 'client' && role !== 'admin') {
+      window.location.href = (role === 'tasker' || role === 'worker') ? 'dashboard-worker.html' : role === 'enterprise' ? 'enterprise.html' : 'dashboard.html';
+      return;
+    }
+  }).catch(function(){});
       loadPosterBanner(user.uid);
       loadOTPCard(user.uid);
   /* Greeting */
