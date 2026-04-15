@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GigLega • Support</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="container-sm section">
+    <h1>Support Tickets</h1>
+    <form id="supportForm" class="card" style="padding:24px; display:grid; gap:12px; margin-top:16px;">
+      <label>Subject<input id="subject" required /></label>
+      <label>Message<textarea id="message" required></textarea></label>
+      <label>Priority
+        <select id="priority" required>
+          <option value="low">Low</option>
+          <option value="medium">Medium</option>
+          <option value="high">High</option>
+        </select>
+      </label>
+      <label>Category
+        <select id="category" required>
+          <option value="payment">Payment</option>
+          <option value="account">Account</option>
+          <option value="gig">Gig</option>
+        </select>
+      </label>
+      <label>Gig ID (optional)<input id="gigId" /></label>
+      <button type="submit">Create Ticket</button>
+    </form>
+  </main>
+
+  <script>
+    const showToast = window.showToast || ((msg) => alert(msg));
+    document.getElementById('supportForm').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const body = {
+        subject: document.getElementById('subject').value.trim(),
+        message: document.getElementById('message').value.trim(),
+        priority: document.getElementById('priority').value,
+        category: document.getElementById('category').value,
+        gigId: document.getElementById('gigId').value.trim()
+      };
+
+      try {
+        const response = await fetch('/api/create-ticket', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+
+        if (!response.ok) {
+          throw new Error('Ticket creation failed');
+        }
+
+        const data = await response.json();
+        showToast(`Ticket created: ${data.ticketId || 'Success'}`, 'success');
+      } catch (error) {
+        console.error('support ticket creation failed:', error);
+        showToast('Unable to create ticket right now.', 'error');
+      }
+    });
+  </script>
+</body>
+</html>

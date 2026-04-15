@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GigLega • Onboarding</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="container-sm section">
+    <h1>Complete your profile</h1>
+    <p>3-step onboarding to start posting or taking gigs.</p>
+    <form id="onboardingForm" class="card" style="padding:24px; margin-top:16px; display:grid; gap:14px;">
+      <label>Name<input id="name" required /></label>
+      <label>Role
+        <select id="role" required>
+          <option value="">Choose role</option>
+          <option value="poster">Poster</option>
+          <option value="worker">Worker</option>
+          <option value="admin">Admin</option>
+          <option value="enterprise">Enterprise</option>
+        </select>
+      </label>
+      <label>Location Name<input id="locationName" required placeholder="Sector 45, Gurugram" /></label>
+      <label>Profile Photo URL<input id="photoURL" type="url" placeholder="https://..." /></label>
+      <button type="button" id="detectLocation">Use current GPS location</button>
+      <button type="submit">Save & Continue</button>
+    </form>
+  </main>
+
+  <script type="module">
+    import { auth, db } from './firebase-config.js';
+    import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+    import { doc, setDoc, serverTimestamp, GeoPoint } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+
+    const form = document.getElementById('onboardingForm');
+    const detectBtn = document.getElementById('detectLocation');
+    let currentUser = null;
+    let gpsCoords = null;
+
+    const showToast = window.showToast || ((msg) => alert(msg));
+
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        window.location.href = 'login.html';
+        return;
+      }
+      currentUser = user;
+    });
+
+    detectBtn.addEventListener('click', () => {
+      if (!navigator.geolocation) {
+        showToast('Geolocation is not supported in your browser.', 'error');
+        return;
+      }
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          gpsCoords = position.coords;
+          showToast('GPS location captured.', 'success');
+        },
+        () => {
+          showToast('Unable to fetch GPS location. Enter location manually.', 'warning');
+        }
+      );
+    });
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      if (!currentUser) {
+        showToast('Please login again.', 'error');
+        return;
+      }
+
+      const name = document.getElementById('name').value.trim();
+      const role = document.getElementById('role').value;
+      const locationName = document.getElementById('locationName').value.trim();
+      const photoURL = document.getElementById('photoURL').value.trim();
+
+      const payload = {
+        name,
+        role,
+        locationName,
+        photoURL: photoURL || '',
+        email: currentUser.email || '',
+        phone: currentUser.phoneNumber || '',
+        isVerified: false,
+        aadhaarVerified: false,
+        rating: 0,
+        totalGigs: 0,
+        walletBalance: 0,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      };
+
+      if (gpsCoords) {
+        payload.location = new GeoPoint(gpsCoords.latitude, gpsCoords.longitude);
+      }
+
+      try {
+        await setDoc(doc(db, 'users', currentUser.uid), payload, { merge: true });
+        showToast('Onboarding completed.', 'success');
+        if (role === 'worker') {
+          window.location.href = 'dashboard-worker.html';
+        } else if (role === 'enterprise') {
+          window.location.href = 'enterprise.html';
+        } else {
+          window.location.href = 'dashboard-client.html';
+        }
+      } catch (error) {
+        console.error('onboarding save failed:', error);
+        showToast('Failed to save onboarding details.', 'error');
+      }
+    });
+  </script>
+</body>
+</html>
