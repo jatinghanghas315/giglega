@@ -390,6 +390,7 @@
           <div>
             <div style="font-weight:800;font-size:.95rem">${escH(otherName)}</div>
             <div style="font-size:.74rem;color:var(--gray-500)">📌 ${escH(gigTitle)}</div>
+                    <div style="font-size:.7rem;color:var(--teal);font-weight:700;margin-top:2px">🆔 Gig ID: <span id="chatGigIdBadge" style="background:rgba(13,148,136,.12);padding:2px 8px;border-radius:20px;letter-spacing:.5px">${escH(data.gigId ? 'GL-'+data.gigId.slice(0,8).toUpperCase() : (gigId ? 'GL-'+gigId.slice(0,8).toUpperCase() : 'Loading...'))}</span></div>
           </div>
         </div>`;
 

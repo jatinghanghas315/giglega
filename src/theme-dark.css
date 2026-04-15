@@ -635,3 +635,117 @@
   background: rgba(79,195,200,.2);
   color: var(--text);
 }
+
+/* ════════════════════════════════════════════
+   27. DARK MODE TEXT VISIBILITY FIXES v2.1
+   Ensures ALL text is legible in dark theme
+   ════════════════════════════════════════════ */
+
+/* Hero section — white text is fine, stats need contrast */
+[data-theme="dark"] .hero-stat-num { color: #fff !important; }
+[data-theme="dark"] .hero-stat-lbl { color: rgba(255,255,255,.7) !important; }
+[data-theme="dark"] .hero-chip { color: rgba(255,255,255,.9) !important; }
+
+/* Sections headings */
+[data-theme="dark"] .section-head h2,
+[data-theme="dark"] .section-head p,
+[data-theme="dark"] .gigs-header h2 { color: var(--text) !important; }
+
+/* Card content */
+[data-theme="dark"] .gig-card-title { color: var(--text) !important; }
+[data-theme="dark"] .gig-card-desc { color: var(--text-muted) !important; }
+[data-theme="dark"] .gig-earn-label { color: var(--text-muted) !important; }
+[data-theme="dark"] .gig-earn-val { color: var(--teal) !important; }
+[data-theme="dark"] .gig-price { color: var(--text) !important; }
+[data-theme="dark"] .gig-meta-chip { color: var(--text-muted) !important; background: var(--surface-2) !important; }
+
+/* How It Works */
+[data-theme="dark"] .hiw-content h4 { color: var(--text) !important; }
+[data-theme="dark"] .hiw-content p { color: var(--text-muted) !important; }
+[data-theme="dark"] .hiw-col-title { color: var(--text) !important; }
+
+/* Feature cards */
+[data-theme="dark"] .feat-title { color: var(--text) !important; }
+[data-theme="dark"] .feat-desc { color: var(--text-muted) !important; }
+
+/* Testimonials */
+[data-theme="dark"] .testi-name { color: var(--text) !important; }
+[data-theme="dark"] .testi-role { color: var(--text-muted) !important; }
+[data-theme="dark"] .testi-body { color: var(--text-muted) !important; }
+
+/* FAQ */
+[data-theme="dark"] .faq-q { color: var(--text) !important; }
+[data-theme="dark"] .faq-a { color: var(--text-muted) !important; }
+
+/* Dashboard stat cards */
+[data-theme="dark"] .stat-card { color: var(--text) !important; }
+[data-theme="dark"] .stat-value,
+[data-theme="dark"] .stat-label { color: var(--text) !important; }
+[data-theme="dark"] .stat-card .stat-label { color: var(--text-muted) !important; }
+
+/* Nav dropdown items */
+[data-theme="dark"] .nav-dd-item { color: var(--gray-300) !important; }
+[data-theme="dark"] .nav-dropdown-name { color: var(--text) !important; }
+[data-theme="dark"] .nav-dropdown-email { color: var(--text-muted) !important; }
+
+/* Category chips */
+[data-theme="dark"] .cat-chip { color: var(--gray-300) !important; border-color: var(--border) !important; }
+[data-theme="dark"] .cat-chip:hover { color: var(--teal) !important; }
+
+/* Browse page */
+[data-theme="dark"] .page-title { color: var(--text) !important; }
+[data-theme="dark"] .filter-label { color: var(--text-muted) !important; }
+[data-theme="dark"] .result-count { color: var(--text-muted) !important; }
+
+/* Help center */
+[data-theme="dark"] .hc-cat-title { color: var(--text) !important; }
+[data-theme="dark"] .hc-cat-desc { color: var(--text-muted) !important; }
+[data-theme="dark"] .hc-article-title { color: var(--text) !important; }
+
+/* Profile page */
+[data-theme="dark"] .profile-name { color: var(--text) !important; }
+[data-theme="dark"] .profile-bio { color: var(--text-muted) !important; }
+[data-theme="dark"] .profile-stat-val { color: var(--text) !important; }
+[data-theme="dark"] .profile-stat-lbl { color: var(--text-muted) !important; }
+
+/* Wallet page */
+[data-theme="dark"] .wallet-balance { color: #fff !important; }
+[data-theme="dark"] .wallet-label { color: rgba(255,255,255,.75) !important; }
+[data-theme="dark"] .txn-title { color: var(--text) !important; }
+[data-theme="dark"] .txn-date { color: var(--text-muted) !important; }
+[data-theme="dark"] .txn-amount { color: var(--teal) !important; }
+
+/* Enterprise page */
+[data-theme="dark"] .ent-hero-title { color: var(--text) !important; }
+[data-theme="dark"] .ent-hero-sub { color: var(--text-muted) !important; }
+[data-theme="dark"] .plan-name { color: var(--text) !important; }
+[data-theme="dark"] .plan-price { color: var(--teal) !important; }
+[data-theme="dark"] .plan-feature { color: var(--text-muted) !important; }
+
+/* Form elements */
+[data-theme="dark"] label,
+[data-theme="dark"] .form-label { color: var(--gray-300) !important; }
+[data-theme="dark"] .field label { color: var(--gray-300) !important; }
+[data-theme="dark"] .form-hint { color: var(--text-muted) !important; }
+
+/* Footer in dark - ensure links visible */
+[data-theme="dark"] .footer-col-title { color: var(--gray-400) !important; }
+[data-theme="dark"] .footer-col a { color: var(--gray-400) !important; }
+[data-theme="dark"] .footer-col a:hover { color: var(--teal) !important; }
+[data-theme="dark"] .footer-tagline { color: var(--gray-400) !important; }
+[data-theme="dark"] .footer-city { color: var(--gray-500) !important; }
+[data-theme="dark"] .footer-bottom { color: var(--gray-400) !important; }
+
+/* Role dashboard badges */
+[data-theme="dark"] .role-badge { color: var(--teal) !important; }
+[data-theme="dark"] .role-badge-enterprise { color: #a78bfa !important; }
+
+/* Gig ID badge */
+[data-theme="dark"] #chatGigIdBadge { background: rgba(79,195,200,.15) !important; color: var(--teal) !important; }
+
+/* Chatbot dark mode */
+[data-theme="dark"] .gl-chatbot { background: var(--surface-2) !important; border-color: var(--border) !important; }
+[data-theme="dark"] .gl-chatbot-input input { background: var(--surface-3) !important; color: var(--text) !important; border-color: var(--border) !important; }
+[data-theme="dark"] .gl-quick-btn { background: var(--surface-2) !important; color: var(--teal) !important; border-color: rgba(79,195,200,.3) !important; }
+[data-theme="dark"] .gl-chatbot-quick { border-color: var(--border) !important; }
+[data-theme="dark"] .gl-chatbot-input { border-color: var(--border) !important; }

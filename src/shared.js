@@ -49,7 +49,7 @@
     VERSION:          "1.2",
     APP_NAME:         "GigLega",
     TAGLINE:          "Gurugram's Trusted Gig Marketplace",
-    FEE_RATE:         0.06,
+    FEE_RATE:         0.10,
 
     // Storage keys — single source of truth
     STORAGE_KEY_USER:   "gl_user",
@@ -374,9 +374,13 @@
             '</div>' +
             '<div class="nav-dropdown-divider"></div>' +
 
-            (user.mode === "worker"
-              ? dropdownItem("zap", "Worker Dashboard", "dashboard-worker.html", currentPage)
-              : dropdownItem("clipboard", "Poster Dashboard",  "dashboard-client.html", currentPage)) +
+            (user.mode === "worker"(user.role === "tasker" || user.mode === "worker"
+          ? dropdownItem("zap", "Tasker Dashboard", "dashboard-worker.html", currentPage)
+          : user.role === "enterprise"
+          ? dropdownItem("building", "Enterprise Dashboard", "enterprise.html", currentPage)
+          : user.role === "admin"
+          ? dropdownItem("zap", "Admin Panel", "dashboard.html", currentPage)
+          : dropdownItem("clipboard", "Poster Dashboard", "dashboard-client.html", currentPage))
             dropdownItem("user", "My Profile", "profile.html", currentPage) +
             dropdownItem("message", "My Chats",   "chat.html",    currentPage) +
             dropdownItem("zap", "Active Gig",  "active-gig.html", currentPage) +
@@ -385,8 +389,8 @@
 
             '<button class="nav-dd-item nav-dd-switch" id="navSwitchModeBtn" role="menuitem">' +
               '<span class="nav-dd-icon">' + ICONS.refresh + '</span>' +
-              '<span>Switch to ' + (user.mode === "worker" ? "Poster" : "Worker") + ' Mode</span>' +
-              '<span class="nav-dd-mode-badge">' + (user.mode === "worker" ? "Poster" : "Worker") + '</span>' +
+              '<span>Switch to ' + (user.mode === "worker" ? "Poster" : "Worker") + ' Mode</span>' +(user.role === "tasker" || user.mode === "worker" ? "Switch to Poster Mode" : user.role === "poster" ? "Switch to Tasker Mode" : "Switch Role") + ' Mode</span>' +
+            '<span class="nav-dd-mode-badge">' + (user.role === "tasker" || user.mode === "worker" ? "Poster" : "Tasker") + '</span>
             '</button>' +
 
             '<div class="nav-dropdown-divider"></div>' +
@@ -515,9 +519,11 @@
     function switchMode() {
       var u = getCurrentUser();
       if (!u) return;
-      u.mode = (u.mode === "worker") ? "poster" : "worker";
-      setCurrentUser(u);
-      showToast((u.mode === "worker" ? "Switched to Worker Mode" : "Switched to Poster Mode"), "success", 2500);
+      // Toggle between tasker and poster roles
+          u.role = (u.role === "tasker" || u.mode === "worker") ? "poster" : "tasker";
+          u.mode = (u.role === "tasker") ? "worker" : "poster";
+          setCurrentUser(u);
+      showToast((u.role === "tasker" ? "Switched to Tasker Mode" : "Switched to Poster Mode"), "success", 2500);
       closeAllDropdowns();
       renderNav();
     }

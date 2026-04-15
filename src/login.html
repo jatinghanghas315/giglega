@@ -191,7 +191,7 @@
     .pw-toggle:hover { color: var(--gray-700); }
 
     /* Role selector */
-    .role-row {
+    .grid-template-columns: 1fr 1fr 1fr; {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 10px;
@@ -536,12 +536,12 @@
           <!-- Role selector -->
           <div class="field">
             <label>I want to…</label>
-            <div class="role-row">
+            <div class="grid-template-columns: 1fr 1fr 1fr;">
               <div class="role-opt selected" id="roleWorker" onclick="selectRole('worker')">
-                <input type="radio" name="role" value="worker" checked>
+                <input type="radio" name="role" value="tasker" checked>
                 <div class="role-icon">💼</div>
-                <span class="role-name">Find Work</span>
-                <div class="role-desc">Apply to gigs near me</div>
+                <span class="role-name">Tasker</span>
+                <div class="role-desc">Browse & accept gigs</div>
               </div>
               <div class="role-opt" id="rolePoster" onclick="selectRole('poster')">
                 <input type="radio" name="role" value="poster">
@@ -549,6 +549,12 @@
                 <span class="role-name">Post Gigs</span>
                 <div class="role-desc">Hire people near me</div>
               </div>
+                        <div class="role-opt" id="roleEnterprise" onclick="selectRole('enterprise')">
+            <input type="radio" name="role" value="enterprise">
+            <div class="role-icon">🏢</div>
+            <span class="role-name">Enterprise</span>
+            <div class="role-desc">Bulk hiring & teams</div>
+          </div>
             </div>
           </div>
 
@@ -785,6 +791,7 @@
     prefRole = role;
     document.getElementById('roleWorker').classList.toggle('selected', role === 'worker');
     document.getElementById('rolePoster').classList.toggle('selected', role === 'poster');
+      document.getElementById('roleEnterprise').classList.toggle('selected', role === 'enterprise');
   };
   if (params.get('mode') === 'register' || hash.get('mode') === 'register') {
     switchTab('register');
@@ -956,22 +963,27 @@
           name:      user.displayName || 'GigLega User',
           email:     user.email,
           phone:     null,
-          city:      'Gurugram',
-          role:      prefRole === 'poster' ? 'poster' : 'worker',
-          mode:      prefRole === 'poster' ? 'poster' : 'worker',
-          createdAt: new Date().toISOString(),
-          skills:    [],
-          avatar:    user.photoURL || null,
-          bio:       '',
-          workType:  ''
-        };
-        await setDoc(doc(db, 'users', user.uid), userData);
+            const userData = {
+    uid:       user.uid,
+    name:      regName.trim(),
+    email:     user.email || '',
+    phone:     null,
+    city:      'Gurugram',
+    role:      prefRole || 'tasker',
+    mode:      (prefRole === 'tasker' ? 'worker' : prefRole) || 'worker',
+    createdAt: new Date().toISOString(),
+    skills:    [],
+    avatar:    user.photoURL || null,
+    bio:       '',
+    workType:  ''
+  };
+          
       }
 
       localStorage.setItem(USER_KEY, JSON.stringify(userData));
       showToast('✅ Welcome, ' + (userData.name || 'User') + '!', 'success');
       const dest = redirectTo !== 'index.html' ? redirectTo
-        : (userData.role === 'poster' ? 'dashboard-client.html' : 'dashboard-worker.html');
+              : (userData.role === 'poster' ? 'dashboard-client.html' : userData.role === 'enterprise' ? 'enterprise.html' : 'dashboard-worker.html');
       setTimeout(() => window.location.replace(dest), 900);
     } catch (err) {
       if (err.code !== 'auth/popup-closed-by-user' && err.code !== 'auth/cancelled-popup-request') {

@@ -4,16 +4,16 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>GigLega — Gurugram's #1 Hyperlocal Gig Platform | Find Workers Near You</title>
-  <meta name="description" content="GigLega — Gurugram's #1 hyperlocal gig platform. Find verified workers near you for cleaning, delivery, tutoring & more. Post a gig free, pay only on completion. Secure payments, 6% low fee." />
+  <meta name="description" content="GigLega — Gurugram's #1 hyperlocal gig platform. Find verified workers near you for cleaning, delivery, tutoring & more. Post a gig free, pay only on completion. Secure payments, Trusted Platform." />
   <meta name="keywords" content="gig work Gurugram, part time jobs Gurugram, freelance Gurugram, gig economy India" />
     <meta property="og:title" content="GigLega - Gurugram's #1 Hyperlocal Gig Platform" />
-  <meta property="og:description" content="Find verified workers near you in Gurugram NCR. Post gigs or find work today. Same-day gigs, 6% low fee, secure payments." />
+  <meta property="og:description" content="Find verified workers near you in Gurugram NCR. Post gigs or find work today. Same-day gigs, Trusted Platform, secure payments." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://giglega.vercel.app/" />
   <meta property="og:image" content="https://giglega.vercel.app/logo.png" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="GigLega - Gurugram's #1 Gig Platform" />
-  <meta name="twitter:description" content="Post gigs or find work near you in Gurugram NCR. Same-day gigs, 6% low fee." />
+  <meta name="twitter:description" content="Post gigs or find work near you in Gurugram NCR. Same-day gigs, Trusted Platform." />
   <link rel="stylesheet" href="styles.css" />   <!-- V1.2: Schema.org structured data -->   <script type="application/ld+json">   {     "@context": "https://schema.org",     "@type": "Organization",     "name": "GigLega",     "url": "https://giglega.vercel.app",     "description": "Gurugram's #1 hyperlocal gig platform connecting verified workers with customers for cleaning, delivery, tutoring, and more.",     "areaServed": {"@type": "City", "name": "Gurugram"},     "sameAs": ["https://instagram.com/giglega"]   }   
   /* Count-up animation for hero stats */
   function countUp(el, target, duration, prefix, suffix) {
@@ -448,10 +448,10 @@
             <div class="hero-stat-lbl">First Gig Free</div>
           </div>
           <div class="hero-stat-item">
-            <div class="hero-stat-num" data-target="6" data-suffix="%">6%</div>
-            <div class="hero-stat-lbl">Low Platform Fee</div>
+            <div class="hero-stat-num" id="statHelp" data-target="15" data-suffix="min">15min</div>
+              <div class="hero-stat-lbl">Get Help In</div>
+            </div>
           </div>
-        </div>
 
       </div>
     </section>
@@ -596,7 +596,7 @@
     <section class="trust-strip">
       <div class="trust-inner">
         <h2>Join Gurugram's Fastest Growing Gig Platform</h2>
-        <p>Verified workers. Secure payments. 6% low fee. Post free, pay on completion.</p>
+        <p>Verified workers. Secure payments. Trusted Platform. Post free, pay on completion.</p>
         <div class="trust-ctas">
           <a href="login.html#mode=register&role=worker" class="btn-trust-primary">Join as Worker</a>
           <a href="login.html#mode=register&role=poster" class="btn-trust-secondary">Post a Gig</a>
@@ -626,8 +626,8 @@
           </div>
           <div class="feat-card">
             <div class="feat-icon">💰</div>
-            <div class="feat-title">Low 6% Fee</div>
-            <div class="feat-desc">Sirf 6% platform fee — worker aur poster dono ke liye transparent. Koi hidden charge nahi.</div>
+            <div class="feat-title">Transparent Pricing</div>
+            <div class="feat-desc">Sirf 10% platform fee (charged at checkout) — worker aur poster dono ke liye transparent. Koi hidden charge nahi.</div>
           </div>
           <div class="feat-card">
             <div class="feat-icon">🔒</div>
@@ -811,7 +811,7 @@
     } else {
       emptyEl.classList.add("hidden");
       show.forEach(function(gig){
-        var fee    = Math.round((gig.budget || 0) * 0.06);
+        var fee    = Math.round((gig.budget || 0) * 0.10);
         var earn   = (gig.budget || 0) - fee;
         var isHyper = gig.type === "hyperlocal";
         container.innerHTML += '<div class="gig-card card-hover">' +
@@ -869,7 +869,7 @@
     var FAQS = [
       { q:"GigLega pe kaise join karein?",                      a:"Bilkul free hai! Upar 'Join Free' button click karo, naam, email/phone aur password daalo. 2 minute mein account ready." },
       { q:"Payment kaise milti hai workers ko?",                a:"Gig complete hone ke baad payment in-app wallet mein aa jaati hai. Wahan se UPI/bank account pe withdraw kar sakte ho. Same-day processing." },
-      { q:"Poster ke liye koi charge hai?",                     a:"Gig post karna completely free hai. Sirf jab gig successfully complete hoti hai tab 6% platform fee lagti hai — koi upfront charge nahi." },
+      { q:"Poster ke liye koi charge hai?",                     a:"Gig post karna completely free hai. Sirf jab gig successfully complete hoti hai tab 10% platform fee (charged at checkout) lagti hai — koi upfront charge nahi." },
       { q:"Kya GigLega safe hai?",                              a:"Haan! Sabhi workers verified hain, in-app chat hai toh personal number share nahi karna padta, aur reviews/ratings system trust build karta hai." },
       { q:"Gurugram ke bahar bhi gigs available hain?",         a:"Abhi primarily Gurugram NCR focus hai. Remote gigs (design, coding, writing) ke liye India anywhere se apply kar sakte ho." },
       { q:"Mujhe koi gig nahi mili, ab kya karein?",            a:"Browse page pe filters use karo — category, budget, type (remote/hyperlocal). Aur apna profile strong banao taaki posters tumhe directly reach karein." }
@@ -904,7 +904,13 @@
       /* Swap "Join Free" CTA to dashboard link */
       document.querySelectorAll('a[href="login.html#mode=register"], a[href="login.html#mode=register&role=worker"], a[href="login.html#mode=register&role=poster"]').forEach(function(a){
         if (a.href.includes("login.html")) {
-          a.href = "dashboard.html";
+                    // Role-based dashboard redirect
+          var dashUrl = "dashboard.html";
+          if (currentUser.role === "tasker" || currentUser.mode === "worker") dashUrl = "dashboard-worker.html";
+          else if (currentUser.role === "poster") dashUrl = "dashboard-client.html";
+          else if (currentUser.role === "enterprise") dashUrl = "enterprise.html";
+          else if (currentUser.role === "admin") dashUrl = "dashboard.html";
+          a.href = dashUrl;
           if (a.textContent.includes("Join")) a.innerHTML = "⚡ Go to Dashboard";
         }
       });

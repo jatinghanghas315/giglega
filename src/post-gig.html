@@ -719,7 +719,9 @@ async function submitGig(){
 
   addDoc(collection(db,'gigs'),gig)
     .then(function(ref){
-      $('successSub').textContent='Gig ID: '+ref.id.slice(0,8).toUpperCase()+' — Workers ko notify kar diya!';
+            // Store gigId in gig document for easy reference
+      gig.gigId = 'GL-'+ref.id.slice(0,8).toUpperCase();
+            $('successSub').textContent='Gig ID: GL-'+ref.id.slice(0,8).toUpperCase()+' — Share this ID with workers or support for help.';
       $('successOverlay').classList.add('show');
     })
     .catch(function(err){

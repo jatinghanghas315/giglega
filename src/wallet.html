@@ -1654,6 +1654,20 @@
       </div>
 
     </div><!-- /wl-body -->
+      <section style="max-width:760px;margin:0 auto;padding:0 20px 40px;">
+            <div style="background:var(--surface);border:1.5px solid var(--gray-200);border-radius:14px;padding:24px;">
+                    <h3 style="font-size:1rem;font-weight:800;color:var(--primary);margin:0 0 16px;">💳 How GigLega Payments Work</h3>
+                          <ol style="padding-left:20px;color:var(--gray-600);font-size:.88rem;line-height:1.8;">
+                                    <li><strong>Poster Pays GigLega</strong> — Full amount paid securely to GigLega.</li>
+                                            <li><strong>GigLega Holds Funds</strong> — Secure escrow until gig completion.</li>
+                                                    <li><strong>Gig Done → Released</strong> — Minus 10% platform fee + taxes from Tasker payout.</li>
+                                                            <li><strong>Payout to Your Wallet</strong> — Net amount lands here automatically.</li>
+                                                                    <li><strong>Withdraw to Bank</strong> — Transfer to your verified bank account in ~30 min.</li>
+                                                                          </ol>
+                                                                                <p style="margin-top:14px;padding:10px 14px;background:rgba(13,148,136,.07);border-radius:8px;border-left:3px solid var(--teal);font-size:.82rem;color:var(--teal);font-weight:700;margin-bottom:0;">💡 10% fee charged to Posters only — shown at checkout. Taskers earn the net payout directly.</p>
+                                                                                    </div>
+                                                                                      </section>
+      </section>
   </main>
 
   <!-- ══ Firestore wallet integration ══ -->
@@ -1994,7 +2008,7 @@
             const pSnap = await gds(pQ);
             const pendingAmt = pSnap.docs.reduce((s,d) => {
               const b = d.data().budget || 0;
-              return s + Math.round(b - b*0.06);
+              return s + Math.round(b - b*b*0.10);
             }, 0);
             const ppCard = document.getElementById("pendingPayoutCard");
             if (ppCard && pendingAmt > 0) {

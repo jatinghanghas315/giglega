@@ -666,5 +666,69 @@
 
   });
   </script>
+
+<!-- GIGLEGA CHATBOT WIDGET -->
+<style>
+.gl-chat-fab{position:fixed;bottom:88px;right:20px;z-index:9990;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--teal));border:none;cursor:pointer;box-shadow:0 4px 20px rgba(13,148,136,.4);display:flex;align-items:center;justify-content:center;font-size:1.5rem;transition:transform .2s,box-shadow .2s;}
+.gl-chat-fab:hover{transform:scale(1.1);}
+.gl-chat-fab .gl-fab-badge{position:absolute;top:-4px;right:-4px;background:#ef4444;color:#fff;border-radius:50%;width:18px;height:18px;font-size:.65rem;font-weight:800;display:flex;align-items:center;justify-content:center;}
+.gl-chatbot{position:fixed;bottom:156px;right:20px;z-index:9991;width:340px;max-height:480px;background:var(--surface);border:1.5px solid var(--gray-200);border-radius:16px;box-shadow:0 16px 48px rgba(0,0,0,.18);display:none;flex-direction:column;overflow:hidden;}
+.gl-chatbot.open{display:flex;}
+.gl-chatbot-header{background:linear-gradient(135deg,var(--primary),var(--teal));padding:14px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.gl-chatbot-avatar{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:1.2rem;}
+.gl-chatbot-info{flex:1;}
+.gl-chatbot-name{font-weight:800;color:#fff;font-size:.95rem;}
+.gl-chatbot-status{font-size:.72rem;color:rgba(255,255,255,.75);}
+.gl-chatbot-close{background:none;border:none;color:rgba(255,255,255,.8);cursor:pointer;font-size:1.1rem;padding:4px;}
+.gl-chatbot-msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:8px;}
+.gl-bot-msg,.gl-user-msg{max-width:80%;padding:9px 13px;border-radius:12px;font-size:.85rem;line-height:1.5;}
+.gl-bot-msg{background:var(--gray-100);color:var(--text);border-bottom-left-radius:4px;align-self:flex-start;}
+.gl-user-msg{background:var(--teal);color:#fff;border-bottom-right-radius:4px;align-self:flex-end;}
+[data-theme=dark] .gl-bot-msg{background:var(--gray-800);color:var(--gray-100);}
+.gl-chatbot-quick{padding:8px 14px;display:flex;flex-wrap:wrap;gap:6px;border-top:1px solid var(--gray-200);flex-shrink:0;}
+.gl-quick-btn{background:var(--surface);border:1.5px solid var(--teal);color:var(--teal);border-radius:20px;padding:5px 12px;font-size:.78rem;font-weight:600;cursor:pointer;transition:all .2s;}
+.gl-quick-btn:hover{background:var(--teal);color:#fff;}
+.gl-chatbot-input{display:flex;gap:8px;padding:10px 14px;border-top:1px solid var(--gray-200);flex-shrink:0;}
+.gl-chatbot-input input{flex:1;border:1.5px solid var(--gray-200);border-radius:20px;padding:8px 14px;font-size:.85rem;outline:none;background:var(--surface);color:var(--text);}
+.gl-chatbot-input input:focus{border-color:var(--teal);}
+.gl-chatbot-input button{background:var(--teal);border:none;border-radius:50%;width:36px;height:36px;color:#fff;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;}
+</style>
+<button class="gl-chat-fab" id="glChatFab">💬<span class="gl-fab-badge">1</span></button>
+<div class="gl-chatbot" id="glChatbot">
+  <div class="gl-chatbot-header">
+    <div class="gl-chatbot-avatar">🤖</div>
+    <div class="gl-chatbot-info">
+      <div class="gl-chatbot-name">GigLega Support</div>
+      <div class="gl-chatbot-status">🟢 Online — Get help in 15 min</div>
+    </div>
+    <button class="gl-chatbot-close" id="glChatClose">✕</button>
+  </div>
+  <div class="gl-chatbot-msgs" id="glChatMsgs"><div class="gl-bot-msg">👋 Hi! I'm GigLega's support bot. How can I help?</div></div>
+  <div class="gl-chatbot-quick">
+    <button class="gl-quick-btn" data-q="How does payment work?">💰 Payment</button>
+    <button class="gl-quick-btn" data-q="What is platform fee?">💸 Platform Fee</button>
+    <button class="gl-quick-btn" data-q="How to post a gig?">📋 Post Gig</button>
+    <button class="gl-quick-btn" data-q="I need help with my gig">🆘 Issue</button>
+    <button class="gl-quick-btn" data-q="Talk to human">👤 Human</button>
+  </div>
+  <div class="gl-chatbot-input">
+    <input type="text" id="glChatInput" placeholder="Ask me anything...">
+    <button id="glChatSend">➤</button>
+  </div>
+</div>
+<script>
+(function(){
+  var fab=document.getElementById('glChatFab'),bot=document.getElementById('glChatbot'),close=document.getElementById('glChatClose'),msgs=document.getElementById('glChatMsgs'),inp=document.getElementById('glChatInput'),send=document.getElementById('glChatSend'),badge=fab.querySelector('.gl-fab-badge');
+  var KB={'payment':'Payment flow: Poster pays GigLega → funds held securely → gig completed → payment released minus 10% fee → Tasker wallet → withdraw to bank anytime.','platform fee':'10% platform fee charged to Posters only. Shown at checkout in bill summary. Deducted before Tasker payout. No hidden charges.','post a gig':'Login → Post a Gig → Fill details & budget → Submit. Goes live instantly with unique Gig ID!','gig id':'Every gig gets Gig ID (GL-XXXXXXXX). Visible in dashboard, chat window, and confirmation. Share with support for quick help.','issue':'Share your Gig ID at WhatsApp: wa.me/919319635257. We resolve within 15 min.','human':'Human agent: WhatsApp wa.me/919319635257 | Email support@giglega.com | 9 AM-9 PM IST, 15 min response.'};
+  function reply(q){q=q.toLowerCase();for(var k in KB)if(q.includes(k))return KB[k];return 'Please contact: WhatsApp wa.me/919319635257 | support@giglega.com';}
+  function addMsg(t,u){var d=document.createElement('div');d.className=u?'gl-user-msg':'gl-bot-msg';d.textContent=t;msgs.appendChild(d);msgs.scrollTop=msgs.scrollHeight;}
+  function send2(t){if(!t.trim())return;addMsg(t,true);inp.value='';setTimeout(function(){addMsg(reply(t),false);},500);}
+  fab.onclick=function(){bot.classList.toggle('open');badge.style.display='none';};
+  close.onclick=function(){bot.classList.remove('open');};
+  send.onclick=function(){send2(inp.value);};
+  inp.onkeydown=function(e){if(e.key==='Enter')send2(inp.value);};
+  document.querySelectorAll('.gl-quick-btn').forEach(function(b){b.onclick=function(){send2(b.dataset.q);};});
+})();
+</script>
 </body>
 </html>
