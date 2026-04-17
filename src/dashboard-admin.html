@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Panel — GigLega</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="theme-dark.css" />
+  <link rel="stylesheet" href="mobile.css?v=20260417" />
+  <script src="shared.js?v=20260417" defer></script>
+  <style>
+    .admin-wrap{max-width:1100px;margin:0 auto;padding:24px 16px 80px}
+    .admin-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:24px}
+    .admin-header h1{font-size:1.35rem;font-weight:800;color:var(--text);margin:0}
+    .admin-badge{background:rgba(220,38,38,.12);color:#dc2626;border:1px solid rgba(220,38,38,.25);border-radius:8px;font-size:.72rem;font-weight:800;padding:4px 12px;letter-spacing:.5px;text-transform:uppercase}
+    .stats-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;margin-bottom:24px}
+    .stat-card{background:var(--surface);border:1.5px solid var(--gray-200);border-radius:12px;padding:16px 18px}
+    .stat-label{font-size:.72rem;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+    .stat-value{font-size:1.55rem;font-weight:900;color:var(--primary);letter-spacing:-.5px}
+    .stat-value.red{color:#dc2626} .stat-value.amber{color:#d97706} .stat-value.green{color:#059669}
+    .tab-bar{display:flex;gap:4px;border-bottom:2px solid var(--gray-200);margin-bottom:20px;overflow-x:auto}
+    .tab-btn{padding:10px 18px;border:none;background:transparent;font-weight:600;font-size:.85rem;color:var(--gray-500);cursor:pointer;border-bottom:2.5px solid transparent;margin-bottom:-2px;white-space:nowrap;transition:all .2s;font-family:inherit}
+    .tab-btn.active{color:var(--primary);border-bottom-color:var(--primary)}
+    .tab-btn:hover:not(.active){color:var(--gray-700)}
+    .tab-panel{display:none} .tab-panel.active{display:block}
+    .search-bar{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+    .search-bar input{flex:1;min-width:200px;padding:9px 14px;border:1.5px solid var(--gray-300);border-radius:10px;font-size:.875rem;background:var(--bg);color:var(--text);font-family:inherit}
+    .search-bar input:focus{outline:none;border-color:var(--primary)}
+    .search-bar button{padding:9px 18px;background:var(--primary);color:#fff;border:none;border-radius:10px;font-weight:700;font-size:.83rem;cursor:pointer;font-family:inherit}
+    .admin-table{width:100%;border-collapse:collapse;font-size:.83rem}
+    .admin-table th{text-align:left;padding:10px 12px;font-size:.72rem;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:.4px;border-bottom:1.5px solid var(--gray-200)}
+    .admin-table td{padding:10px 12px;border-bottom:1px solid var(--gray-200);color:var(--text);vertical-align:middle}
+    .admin-table tr:hover td{background:var(--surface)}
+    .r-badge{font-size:.7rem;font-weight:700;padding:3px 9px;border-radius:8px;white-space:nowrap}
+    .r-poster{background:rgba(99,102,241,.1);color:#6366f1}
+    .r-tasker,.r-worker{background:rgba(13,148,136,.1);color:#0d9488}
+    .r-enterprise{background:rgba(217,153,58,.1);color:#D9993A}
+    .r-admin{background:rgba(220,38,38,.1);color:#dc2626}
+    .btn-xs{font-size:.72rem;font-weight:700;padding:4px 11px;border-radius:7px;border:none;cursor:pointer;font-family:inherit;white-space:nowrap}
+    .btn-xs.approve{background:rgba(5,150,105,.12);color:#059669;border:1px solid rgba(5,150,105,.25)}
+    .btn-xs.reject{background:rgba(220,38,38,.1);color:#dc2626;border:1px solid rgba(220,38,38,.2)}
+    .btn-xs.ban{background:rgba(220,38,38,.1);color:#dc2626;border:1px solid rgba(220,38,38,.2)}
+    .btn-xs.unban{background:rgba(13,148,136,.1);color:#0d9488;border:1px solid rgba(13,148,136,.2)}
+    .btn-xs.release{background:rgba(217,153,58,.12);color:#D9993A;border:1px solid rgba(217,153,58,.3)}
+    .btn-xs.view{background:var(--surface);color:var(--text);border:1px solid var(--gray-200)}
+    .sla-alert{background:rgba(220,38,38,.08);border:1.5px solid rgba(220,38,38,.25);border-radius:10px;padding:12px 16px;margin-bottom:12px;display:flex;align-items:center;gap:12px}
+    .sla-dot{width:8px;height:8px;background:#dc2626;border-radius:50%;flex-shrink:0;animation:pulse 1.2s infinite}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+    .empty-state{text-align:center;padding:40px 20px;color:var(--gray-400)}
+    .empty-state .ei{font-size:2rem;margin-bottom:8px}
+    .empty-state p{font-size:.85rem;margin:0}
+    .gig-id-tag{font-size:.68rem;font-weight:700;color:var(--gray-400);background:rgba(255,255,255,.05);border:1px solid var(--gray-200);border-radius:5px;padding:2px 7px;font-family:monospace}
+  </style>
+</head>
+<body>
+  <header id="main-header"></header>
+
+  <div class="admin-wrap">
+    <div class="admin-header">
+      <div>
+        <h1>Admin Panel <span class="admin-badge">Admin Only</span></h1>
+        <div style="font-size:.82rem;color:var(--gray-400);margin-top:4px" id="adminGreeting">Loading...</div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <a href="index.html" style="padding:8px 16px;background:var(--surface);border:1.5px solid var(--gray-200);border-radius:8px;font-size:.82rem;font-weight:600;color:var(--text);text-decoration:none">← Homepage</a>
+      </div>
+    </div>
+
+    <!-- Stats Row -->
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-label">Total Users</div><div class="stat-value" id="statUsers">—</div></div>
+      <div class="stat-card"><div class="stat-label">Active Gigs</div><div class="stat-value green" id="statGigs">—</div></div>
+      <div class="stat-card"><div class="stat-label">Open Disputes</div><div class="stat-value red" id="statDisputes">—</div></div>
+      <div class="stat-card"><div class="stat-label">Pending Enterprise</div><div class="stat-value amber" id="statEnterprise">—</div></div>
+      <div class="stat-card"><div class="stat-label">Overdue SLA</div><div class="stat-value red" id="statSLA">—</div></div>
+      <div class="stat-card"><div class="stat-label">Pending Payouts</div><div class="stat-value amber" id="statPayouts">—</div></div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tab-bar">
+      <button class="tab-btn active" data-tab="users">👥 Users</button>
+      <button class="tab-btn" data-tab="gigs">📋 Gigs</button>
+      <button class="tab-btn" data-tab="disputes">⚠️ Disputes</button>
+      <button class="tab-btn" data-tab="payouts">💰 Payouts</button>
+      <button class="tab-btn" data-tab="enterprise">🏢 Enterprise</button>
+      <button class="tab-btn" data-tab="support">🎧 Support SLA</button>
+    </div>
+
+    <!-- TAB: Users -->
+    <div id="tabUsers" class="tab-panel active">
+      <div class="search-bar">
+        <input type="text" id="userSearch" placeholder="Search by name, email or role..." />
+        <button onclick="searchUsers()">Search</button>
+        <select id="roleFilter" style="padding:9px 14px;border:1.5px solid var(--gray-300);border-radius:10px;font-size:.875rem;background:var(--bg);color:var(--text);font-family:inherit">
+          <option value="">All Roles</option>
+          <option value="poster">Poster</option>
+          <option value="tasker">Tasker</option>
+          <option value="enterprise">Enterprise</option>
+          <option value="admin">Admin</option>
+        </select>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="admin-table">
+          <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Verified</th><th>Joined</th><th>Actions</th></tr></thead>
+          <tbody id="usersTableBody"><tr><td colspan="6"><div class="empty-state"><div class="ei">⏳</div><p>Loading users...</p></div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB: Gigs -->
+    <div id="tabGigs" class="tab-panel">
+      <div class="search-bar">
+        <input type="text" id="gigSearch" placeholder="Search by Gig ID, title or poster..." />
+        <button onclick="searchGigs()">Search</button>
+        <select id="gigStatusFilter" style="padding:9px 14px;border:1.5px solid var(--gray-300);border-radius:10px;font-size:.875rem;background:var(--bg);color:var(--text);font-family:inherit">
+          <option value="">All Status</option>
+          <option value="open">Open</option>
+          <option value="taken">In Progress</option>
+          <option value="completed">Completed</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="admin-table">
+          <thead><tr><th>Gig ID</th><th>Title</th><th>Poster</th><th>Tasker</th><th>Budget</th><th>Status</th><th>Posted</th><th>Actions</th></tr></thead>
+          <tbody id="gigsTableBody"><tr><td colspan="8"><div class="empty-state"><div class="ei">⏳</div><p>Loading gigs...</p></div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB: Disputes -->
+    <div id="tabDisputes" class="tab-panel">
+      <div id="disputesList"><div class="empty-state"><div class="ei">⏳</div><p>Loading disputes...</p></div></div>
+    </div>
+
+    <!-- TAB: Payouts -->
+    <div id="tabPayouts" class="tab-panel">
+      <div class="search-bar">
+        <input type="text" id="payoutSearch" placeholder="Search by Gig ID or Tasker name..." />
+        <button onclick="searchPayouts()">Search</button>
+        <select id="payoutStatusFilter" style="padding:9px 14px;border:1.5px solid var(--gray-300);border-radius:10px;font-size:.875rem;background:var(--bg);color:var(--text);font-family:inherit">
+          <option value="">All</option>
+          <option value="pending">Pending Release</option>
+          <option value="released">Released</option>
+          <option value="held">On Hold</option>
+        </select>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="admin-table">
+          <thead><tr><th>Gig ID</th><th>Tasker</th><th>Gross</th><th>Fee (10%)</th><th>Net Payout</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="payoutsTableBody"><tr><td colspan="7"><div class="empty-state"><div class="ei">⏳</div><p>Loading payouts...</p></div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB: Enterprise -->
+    <div id="tabEnterprise" class="tab-panel">
+      <div style="margin-bottom:14px;font-size:.85rem;color:var(--gray-400)">Enterprise accounts require manual approval before activation.</div>
+      <div style="overflow-x:auto">
+        <table class="admin-table">
+          <thead><tr><th>Business Name</th><th>Email</th><th>Applied</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="enterpriseTableBody"><tr><td colspan="5"><div class="empty-state"><div class="ei">⏳</div><p>Loading enterprise applications...</p></div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB: Support SLA -->
+    <div id="tabSupport" class="tab-panel">
+      <div style="background:rgba(217,153,58,.08);border:1px solid rgba(217,153,58,.2);border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:.82rem;color:var(--text)">
+        ⚡ <strong>SLA Promise:</strong> Every support ticket must receive a response within <strong>15 minutes</strong>. Overdue tickets are flagged in red below.
+      </div>
+      <div id="slaOverdueList"></div>
+      <div id="supportTicketsList"><div class="empty-state"><div class="ei">⏳</div><p>Loading support tickets...</p></div></div>
+    </div>
+
+  </div>
+
+  <footer id="main-footer"></footer>
+  <div id="toast-container"></div>
+
+  <script type="module">
+    import { auth, db } from './firebase-config.js';
+    import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+    import {
+      collection, query, where, orderBy, limit, getDocs,
+      doc, getDoc, updateDoc, onSnapshot, serverTimestamp
+    } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+
+    var currentUser = null;
+
+    /* ── Auth + Admin Guard ── */
+    onAuthStateChanged(auth, async function(user) {
+      if (!user) { window.location.href = 'login.html'; return; }
+      currentUser = user;
+      try {
+        var snap = await getDoc(doc(db, 'users', user.uid));
+        if (!snap.exists() || snap.data().role !== 'admin') {
+          var role = snap.exists() ? snap.data().role : 'tasker';
+          var routes = { poster:'dashboard-client.html', tasker:'dashboard-worker.html', enterprise:'enterprise.html' };
+          window.location.href = routes[role] || 'index.html';
+          return;
+        }
+        var hour = new Date().getHours();
+        var greet = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+        document.getElementById('adminGreeting').textContent = greet + ', ' + (user.displayName || 'Admin') + ' — Full platform access active.';
+        loadAllStats();
+        loadUsers();
+      } catch(e) {
+        console.warn('[GigLega] admin guard error:', e);
+      }
+    });
+
+    /* ── Tabs ── */
+    var tabLoaded = {};
+    document.querySelectorAll('.tab-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
+        document.querySelectorAll('.tab-panel').forEach(function(p){ p.classList.remove('active'); });
+        btn.classList.add('active');
+        var tab = btn.dataset.tab;
+        var panel = document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1));
+        if (panel) panel.classList.add('active');
+        if (!tabLoaded[tab]) {
+          tabLoaded[tab] = true;
+          if (tab === 'gigs') loadGigs();
+          else if (tab === 'disputes') loadDisputes();
+          else if (tab === 'payouts') loadPayouts();
+          else if (tab === 'enterprise') loadEnterprise();
+          else if (tab === 'support') loadSupportTickets();
+        }
+      });
+    });
+
+    function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+    function timeAgo(iso) {
+      if (!iso) return '—';
+      var d = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
+      if (d < 60) return d + 's ago';
+      if (d < 3600) return Math.floor(d/60) + 'm ago';
+      if (d < 86400) return Math.floor(d/3600) + 'h ago';
+      return Math.floor(d/86400) + 'd ago';
+    }
+
+    /* ── Stats ── */
+    async function loadAllStats() {
+      try {
+        var [usersSnap, gigsSnap, disputeSnap, entSnap, slaSnap, paySnap] = await Promise.all([
+          getDocs(query(collection(db, 'users'), limit(500))),
+          getDocs(query(collection(db, 'gigs'), where('status', 'in', ['open','taken']), limit(500))),
+          getDocs(query(collection(db, 'gigs'), where('disputed', '==', true), limit(100))),
+          getDocs(query(collection(db, 'users'), where('enterpriseStatus', '==', 'pending'), limit(100))),
+          getDocs(query(collection(db, 'supportTickets'), where('resolvedAt', '==', null), limit(200))),
+          getDocs(query(collection(db, 'payouts'), where('status', '==', 'pending'), limit(200)))
+        ]);
+        document.getElementById('statUsers').textContent = usersSnap.size;
+        document.getElementById('statGigs').textContent = gigsSnap.size;
+        document.getElementById('statDisputes').textContent = disputeSnap.size;
+        document.getElementById('statEnterprise').textContent = entSnap.size;
+        var overdue = 0;
+        var now = Date.now();
+        slaSnap.forEach(function(d){ if (d.data().createdAt && (now - new Date(d.data().createdAt.toDate ? d.data().createdAt.toDate() : d.data().createdAt).getTime()) > 900000) overdue++; });
+        document.getElementById('statSLA').textContent = overdue;
+        document.getElementById('statPayouts').textContent = paySnap.size;
+      } catch(e) { console.warn('[GigLega] stats error:', e); }
+    }
+
+    /* ── Users Tab ── */
+    async function loadUsers(searchTerm, roleFilter) {
+      var tbody = document.getElementById('usersTableBody');
+      tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><div class="ei">⏳</div><p>Loading...</p></div></td></tr>';
+      try {
+        var q = query(collection(db, 'users'), orderBy('createdAt', 'desc'), limit(100));
+        if (roleFilter) q = query(collection(db, 'users'), where('role', '==', roleFilter), limit(100));
+        var snap = await getDocs(q);
+        var rows = [];
+        snap.forEach(function(d) {
+          var u = d.data();
+          if (searchTerm && !(u.name||'').toLowerCase().includes(searchTerm) && !(u.email||'').toLowerCase().includes(searchTerm)) return;
+          var roleClass = 'r-' + (u.role||'tasker').replace('worker','tasker');
+          rows.push('<tr>' +
+            '<td>' + esc(u.name||'—') + (u.isBanned ? ' <span style="color:#dc2626;font-size:.7rem">🚫 Banned</span>' : '') + '</td>' +
+            '<td style="font-size:.78rem">' + esc(u.email||'—') + '</td>' +
+            '<td><span class="r-badge ' + roleClass + '">' + esc(u.role||'—') + '</span></td>' +
+            '<td>' + (u.aadhaarVerified ? '<span style="color:#059669;font-size:.8rem">✅ Verified</span>' : '<span style="color:var(--gray-400);font-size:.78rem">—</span>') + '</td>' +
+            '<td style="font-size:.78rem">' + (u.createdAt ? timeAgo(u.createdAt.toDate ? u.createdAt.toDate() : u.createdAt) : '—') + '</td>' +
+            '<td><div style="display:flex;gap:6px;flex-wrap:wrap">' +
+              '<button class="btn-xs view" onclick="viewUser(\'' + d.id + '\')">View</button>' +
+              (u.isBanned
+                ? '<button class="btn-xs unban" onclick="toggleBan(\'' + d.id + '\',false)">Unban</button>'
+                : '<button class="btn-xs ban" onclick="toggleBan(\'' + d.id + '\',true)">Ban</button>') +
+            '</div></td>' +
+            '</tr>');
+        });
+        tbody.innerHTML = rows.length ? rows.join('') : '<tr><td colspan="6"><div class="empty-state"><div class="ei">🔍</div><p>No users found.</p></div></td></tr>';
+      } catch(e) { console.warn('[GigLega] loadUsers:', e); }
+    }
+
+    window.searchUsers = function() {
+      var term = document.getElementById('userSearch').value.trim().toLowerCase();
+      var role = document.getElementById('roleFilter').value;
+      loadUsers(term||null, role||null);
+    };
+
+    window.toggleBan = async function(uid, ban) {
+      try {
+        await updateDoc(doc(db, 'users', uid), { isBanned: ban, bannedAt: ban ? serverTimestamp() : null });
+        if (window.showToast) showToast(ban ? 'User banned.' : 'User unbanned.', 'success');
+        loadUsers();
+      } catch(e) { console.warn('[GigLega] toggleBan:', e); if (window.showToast) showToast('Action failed.', 'error'); }
+    };
+
+    window.viewUser = function(uid) { window.open('profile.html?uid=' + uid, '_blank'); };
+
+    /* ── Gigs Tab ── */
+    async function loadGigs(searchTerm, statusFilter) {
+      var tbody = document.getElementById('gigsTableBody');
+      tbody.innerHTML = '<tr><td colspan="8"><div class="empty-state"><div class="ei">⏳</div><p>Loading...</p></div></td></tr>';
+      try {
+        var q = query(collection(db, 'gigs'), orderBy('createdAt', 'desc'), limit(100));
+        if (statusFilter) q = query(collection(db, 'gigs'), where('status', '==', statusFilter), orderBy('createdAt', 'desc'), limit(100));
+        var snap = await getDocs(q);
+        var rows = [];
+        snap.forEach(function(d) {
+          var g = d.data();
+          if (searchTerm && !(g.gigId||'').toLowerCase().includes(searchTerm) && !(g.title||'').toLowerCase().includes(searchTerm) && !(g.posterName||'').toLowerCase().includes(searchTerm)) return;
+          var statusColor = g.status==='open' ? '#059669' : g.status==='taken' ? '#d97706' : g.status==='completed' ? 'var(--gray-400)' : '#dc2626';
+          rows.push('<tr>' +
+            '<td><span class="gig-id-tag">' + esc(g.gigId||d.id.slice(0,8)) + '</span></td>' +
+            '<td style="font-weight:600;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(g.title||'—') + '</td>' +
+            '<td style="font-size:.78rem">' + esc(g.posterName||'—') + '</td>' +
+            '<td style="font-size:.78rem">' + esc(g.workerName||'—') + '</td>' +
+            '<td style="font-weight:700">₹' + esc(g.budget||'TBD') + '</td>' +
+            '<td><span style="color:' + statusColor + ';font-weight:700;font-size:.78rem">' + esc(g.status||'—') + '</span></td>' +
+            '<td style="font-size:.75rem">' + timeAgo(g.createdAt ? (g.createdAt.toDate ? g.createdAt.toDate() : g.createdAt) : null) + '</td>' +
+            '<td><a href="gig-detail.html?id=' + d.id + '" class="btn-xs view" target="_blank">View</a></td>' +
+            '</tr>');
+        });
+        tbody.innerHTML = rows.length ? rows.join('') : '<tr><td colspan="8"><div class="empty-state"><div class="ei">🔍</div><p>No gigs found.</p></div></td></tr>';
+      } catch(e) { console.warn('[GigLega] loadGigs:', e); }
+    }
+
+    window.searchGigs = function() {
+      var term = document.getElementById('gigSearch').value.trim().toLowerCase();
+      var status = document.getElementById('gigStatusFilter').value;
+      loadGigs(term||null, status||null);
+    };
+
+    /* ── Disputes Tab ── */
+    async function loadDisputes() {
+      var el = document.getElementById('disputesList');
+      try {
+        var snap = await getDocs(query(collection(db, 'gigs'), where('disputed', '==', true), limit(50)));
+        if (snap.empty) { el.innerHTML = '<div class="empty-state"><div class="ei">✅</div><p>No open disputes.</p></div>'; return; }
+        var html = '';
+        snap.forEach(function(d) {
+          var g = d.data();
+          html += '<div style="background:var(--surface);border:1.5px solid rgba(220,38,38,.2);border-radius:12px;padding:16px 18px;margin-bottom:12px">' +
+            '<div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px">' +
+              '<div>' +
+                '<div style="font-weight:700;color:var(--text);margin-bottom:4px">' + esc(g.title||'—') + ' <span class="gig-id-tag">' + esc(g.gigId||d.id.slice(0,8)) + '</span></div>' +
+                '<div style="font-size:.78rem;color:var(--gray-400)">' + 'Poster: ' + esc(g.posterName||'—') + ' &nbsp;·&nbsp; Tasker: ' + esc(g.workerName||'—') + '</div>' +
+                (g.disputeReason ? '<div style="font-size:.8rem;color:#dc2626;margin-top:6px">Reason: ' + esc(g.disputeReason) + '</div>' : '') +
+              '</div>' +
+              '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-start">' +
+                '<button class="btn-xs release" onclick="releasePayoutForGig(\'' + d.id + '\')">Release Payout</button>' +
+                '<button class="btn-xs reject" onclick="holdPayoutForGig(\'' + d.id + '\')">Hold Payout</button>' +
+                '<a href="chat.html?gigId=' + d.id + '" class="btn-xs view" target="_blank">View Chat</a>' +
+              '</div>' +
+            '</div>' +
+          '</div>';
+        });
+        el.innerHTML = html;
+      } catch(e) { console.warn('[GigLega] loadDisputes:', e); }
+    }
+
+    window.releasePayoutForGig = async function(gigId) {
+      try {
+        await updateDoc(doc(db, 'gigs', gigId), { disputed: false, payoutReleased: true, disputeResolvedAt: serverTimestamp(), disputeResolvedBy: currentUser.uid });
+        if (window.showToast) showToast('Payout released.', 'success');
+        loadDisputes();
+      } catch(e) { console.warn('[GigLega] releasePayoutForGig:', e); if (window.showToast) showToast('Failed.', 'error'); }
+    };
+
+    window.holdPayoutForGig = async function(gigId) {
+      try {
+        await updateDoc(doc(db, 'gigs', gigId), { payoutHeld: true, payoutHeldAt: serverTimestamp(), payoutHeldBy: currentUser.uid });
+        if (window.showToast) showToast('Payout held.', 'success');
+      } catch(e) { console.warn('[GigLega] holdPayout:', e); if (window.showToast) showToast('Failed.', 'error'); }
+    };
+
+    /* ── Payouts Tab ── */
+    async function loadPayouts(searchTerm, statusFilter) {
+      var tbody = document.getElementById('payoutsTableBody');
+      tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><div class="ei">⏳</div><p>Loading...</p></div></td></tr>';
+      try {
+        var q = statusFilter
+          ? query(collection(db, 'payouts'), where('status', '==', statusFilter), limit(100))
+          : query(collection(db, 'payouts'), limit(100));
+        var snap = await getDocs(q);
+        var rows = [];
+        snap.forEach(function(d) {
+          var p = d.data();
+          if (searchTerm && !(p.gigId||'').toLowerCase().includes(searchTerm) && !(p.workerName||'').toLowerCase().includes(searchTerm)) return;
+          var statusColor = p.status==='released' ? '#059669' : p.status==='held' ? '#dc2626' : '#d97706';
+          rows.push('<tr>' +
+            '<td><span class="gig-id-tag">' + esc(p.gigId||d.id.slice(0,8)) + '</span></td>' +
+            '<td>' + esc(p.workerName||'—') + '</td>' +
+            '<td style="font-weight:700">₹' + esc(p.grossAmount||'—') + '</td>' +
+            '<td style="color:#dc2626">₹' + esc(p.platformFee||'—') + '</td>' +
+            '<td style="font-weight:700;color:#059669">₹' + esc(p.netPayout||'—') + '</td>' +
+            '<td style="font-weight:700;color:' + statusColor + ';font-size:.78rem">' + esc(p.status||'pending') + '</td>' +
+            '<td>' + (p.status==='pending' ? '<button class="btn-xs release" onclick="adminReleasePayout(\'' + d.id + '\')">Release</button>' : '<span style="color:var(--gray-400);font-size:.75rem">—</span>') + '</td>' +
+            '</tr>');
+        });
+        tbody.innerHTML = rows.length ? rows.join('') : '<tr><td colspan="7"><div class="empty-state"><div class="ei">💰</div><p>No payouts found.</p></div></td></tr>';
+      } catch(e) { console.warn('[GigLega] loadPayouts:', e); }
+    }
+
+    window.searchPayouts = function() {
+      var term = document.getElementById('payoutSearch').value.trim().toLowerCase();
+      var status = document.getElementById('payoutStatusFilter').value;
+      loadPayouts(term||null, status||null);
+    };
+
+    window.adminReleasePayout = async function(payoutId) {
+      try {
+        await updateDoc(doc(db, 'payouts', payoutId), { status: 'released', releasedAt: serverTimestamp(), releasedBy: currentUser.uid });
+        if (window.showToast) showToast('Payout released.', 'success');
+        loadPayouts();
+      } catch(e) { console.warn('[GigLega] adminReleasePayout:', e); if (window.showToast) showToast('Failed.', 'error'); }
+    };
+
+    /* ── Enterprise Tab ── */
+    async function loadEnterprise() {
+      var tbody = document.getElementById('enterpriseTableBody');
+      try {
+        var snap = await getDocs(query(collection(db, 'users'), where('role', '==', 'enterprise'), limit(100)));
+        var rows = [];
+        snap.forEach(function(d) {
+          var u = d.data();
+          var statusColor = u.enterpriseStatus==='approved' ? '#059669' : u.enterpriseStatus==='rejected' ? '#dc2626' : '#d97706';
+          rows.push('<tr>' +
+            '<td style="font-weight:600">' + esc(u.name||'—') + '</td>' +
+            '<td style="font-size:.78rem">' + esc(u.email||'—') + '</td>' +
+            '<td style="font-size:.78rem">' + (u.createdAt ? timeAgo(u.createdAt.toDate ? u.createdAt.toDate() : u.createdAt) : '—') + '</td>' +
+            '<td style="font-weight:700;color:' + statusColor + ';font-size:.8rem">' + esc(u.enterpriseStatus||'pending') + '</td>' +
+            '<td><div style="display:flex;gap:6px">' +
+              (u.enterpriseStatus!=='approved' ? '<button class="btn-xs approve" onclick="approveEnterprise(\'' + d.id + '\')">Approve</button>' : '') +
+              (u.enterpriseStatus!=='rejected' ? '<button class="btn-xs reject" onclick="rejectEnterprise(\'' + d.id + '\')">Reject</button>' : '') +
+            '</div></td>' +
+            '</tr>');
+        });
+        tbody.innerHTML = rows.length ? rows.join('') : '<tr><td colspan="5"><div class="empty-state"><div class="ei">🏢</div><p>No enterprise applications.</p></div></td></tr>';
+      } catch(e) { console.warn('[GigLega] loadEnterprise:', e); }
+    }
+
+    window.approveEnterprise = async function(uid) {
+      try {
+        await updateDoc(doc(db, 'users', uid), { enterpriseStatus: 'approved', enterpriseApprovedAt: serverTimestamp(), enterpriseApprovedBy: currentUser.uid });
+        if (window.showToast) showToast('Enterprise account approved.', 'success');
+        loadEnterprise(); loadAllStats();
+      } catch(e) { console.warn('[GigLega] approveEnterprise:', e); if (window.showToast) showToast('Failed.', 'error'); }
+    };
+
+    window.rejectEnterprise = async function(uid) {
+      try {
+        await updateDoc(doc(db, 'users', uid), { enterpriseStatus: 'rejected', enterpriseRejectedAt: serverTimestamp() });
+        if (window.showToast) showToast('Enterprise application rejected.', 'success');
+        loadEnterprise(); loadAllStats();
+      } catch(e) { console.warn('[GigLega] rejectEnterprise:', e); if (window.showToast) showToast('Failed.', 'error'); }
+    };
+
+    /* ── Support SLA Tab ── */
+    async function loadSupportTickets() {
+      var overdueEl = document.getElementById('slaOverdueList');
+      var listEl = document.getElementById('supportTicketsList');
+      try {
+        var snap = await getDocs(query(collection(db, 'supportTickets'), orderBy('createdAt', 'desc'), limit(100)));
+        if (snap.empty) { listEl.innerHTML = '<div class="empty-state"><div class="ei">🎧</div><p>No support tickets.</p></div>'; return; }
+        var now = Date.now();
+        var overdueHtml = '', ticketsHtml = '';
+        snap.forEach(function(d) {
+          var t = d.data();
+          var createdMs = t.createdAt ? (t.createdAt.toDate ? t.createdAt.toDate().getTime() : new Date(t.createdAt).getTime()) : now;
+          var isOverdue = !t.resolvedAt && (now - createdMs) > 900000;
+          var age = timeAgo(new Date(createdMs));
+          var card = '<div style="background:var(--surface);border:1.5px solid ' + (isOverdue ? 'rgba(220,38,38,.3)' : 'var(--gray-200)') + ';border-radius:12px;padding:14px 16px;margin-bottom:10px">' +
+            (isOverdue ? '<div class="sla-alert"><div class="sla-dot"></div><span style="font-size:.78rem;font-weight:700;color:#dc2626">OVERDUE — ' + age + ' (SLA: 15 min)</span></div>' : '') +
+            '<div style="font-weight:700;color:var(--text);font-size:.88rem;margin-bottom:4px">' + esc(t.subject||'Support Request') + '</div>' +
+            '<div style="font-size:.77rem;color:var(--gray-400)">From: ' + esc(t.userName||t.userId||'—') + ' &nbsp;·&nbsp; ' + age + (t.resolvedAt ? ' &nbsp;·&nbsp; <span style="color:#059669">✅ Resolved</span>' : ' &nbsp;·&nbsp; <span style="color:#d97706">⏳ Open</span>') + '</div>' +
+            (!t.resolvedAt ? '<div style="margin-top:10px;display:flex;gap:8px"><button class="btn-xs approve" onclick="resolveTicket(\'' + d.id + '\')">Mark Resolved</button><a href="contact.html" class="btn-xs view" target="_blank">Reply</a></div>' : '') +
+            '</div>';
+          if (isOverdue) overdueHtml += card;
+          else ticketsHtml += card;
+        });
+        overdueEl.innerHTML = overdueHtml;
+        listEl.innerHTML = ticketsHtml || '<div class="empty-state"><div class="ei">✅</div><p>All tickets within SLA.</p></div>';
+      } catch(e) { console.warn('[GigLega] loadSupportTickets:', e); }
+    }
+
+    window.resolveTicket = async function(ticketId) {
+      try {
+        await updateDoc(doc(db, 'supportTickets', ticketId), { resolvedAt: serverTimestamp(), resolvedBy: currentUser.uid });
+        if (window.showToast) showToast('Ticket resolved.', 'success');
+        loadSupportTickets(); loadAllStats();
+      } catch(e) { console.warn('[GigLega] resolveTicket:', e); if (window.showToast) showToast('Failed.', 'error'); }
+    };
+
+  </script>
+</body>
+</html>
