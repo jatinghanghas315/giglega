@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="styles.css"/>
   <link rel="stylesheet" href="theme-dark.css"/>
   <link rel="stylesheet" href="mobile.css?v=20260411-0215"/>
-  <script src="shared.js?v=20260411" defer></script>
+  <script src="shared.js?v=20260411" defer></script>   <script src="gig-id.js"></script>
   <style>
     body{
       background:
@@ -701,7 +701,7 @@ async function submitGig(){
     posterId:currentUser.uid, posterName:(currentUser.displayName || (currentUser.email ? currentUser.email.split('@')[0] : 'User')),
     type:'hyperlocal', createdAt:serverTimestamp(), createdAtISO:new Date().toISOString(),
     expiresAt: new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString(),
-    applications:0, views:0, images:[]
+    applications:0, views:0, images:[],     gigId:(typeof window.generateGigId==="function"?window.generateGigId():"GIG-"+Date.now())
   };
   // Save post timestamp for rate limiting
   try {
@@ -720,8 +720,8 @@ async function submitGig(){
   addDoc(collection(db,'gigs'),gig)
     .then(function(ref){
             // Store gigId in gig document for easy reference
-      gig.gigId = 'GL-'+ref.id.slice(0,8).toUpperCase();
-            $('successSub').textContent='Gig ID: GL-'+ref.id.slice(0,8).toUpperCase()+' — Share this ID with workers or support for help.';
+      /* gigId already set in gig object */
+            $('successSub').textContent='Gig ID: '+(gig.gigId||'—')+' — Share this ID with workers or support for help.';
       $('successOverlay').classList.add('show');
     })
     .catch(function(err){
