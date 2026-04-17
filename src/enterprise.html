@@ -726,6 +726,8 @@
   <nav id="main-nav"></nav>
 
   <main id="main-content">
+  <!-- Enterprise Approval Status Banner (Phase 2) -->
+  <div id="entStatusBanner" style="display:none;max-width:900px;margin:0 auto;padding:20px 16px 0"></div>
 
     <!-- ══════════════════════════════════
          HERO
@@ -1385,5 +1387,32 @@
 
   });
   </script>
+<script type="module">
+  import { auth, db } from './firebase-config.js';
+  import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+  import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+  onAuthStateChanged(auth, async function(user) {
+    if (!user) return;
+    try {
+      var snap = await getDoc(doc(db, 'users', user.uid));
+      if (!snap.exists()) return;
+      var data = snap.data();
+      var role = data.role || 'tasker';
+      var banner = document.getElementById('entStatusBanner');
+      if (!banner) return;
+      if (role === 'enterprise') {
+        var status = data.enterpriseStatus || 'pending';
+        var html = '';
+        if (status === 'pending') { html = '<div style="background:rgba(217,153,58,.1);border:1.5px solid rgba(217,153,58,.3);border-radius:14px;padding:18px 20px"><b>Enterprise Application Under Review</b> — awaiting admin approval, typically 24-48 hours.</div>'; }
+        else if (status === 'approved') { html = '<div style="background:rgba(5,150,105,.08);border:1.5px solid rgba(5,150,105,.25);border-radius:14px;padding:16px 20px;color:#059669"><b>Enterprise Account Active</b></div>'; }
+        else if (status === 'rejected') { html = '<div style="background:rgba(220,38,38,.08);border:1.5px solid rgba(220,38,38,.2);border-radius:14px;padding:16px 20px;color:#dc2626"><b>Enterprise Application Not Approved.</b> Please <a href="contact.html">contact support</a>.</div>'; }
+        if (html) { banner.innerHTML = html; banner.style.display = 'block'; }
+      } else if (role === 'poster' || role === 'tasker') {
+        banner.innerHTML = '<div style="background:rgba(13,148,136,.07);border:1.5px solid rgba(13,148,136,.18);border-radius:14px;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px"><span>Interested in Enterprise? Switch your role to apply.</span><a href="profile.html" style="padding:8px 18px;background:#D9993A;color:#fff;border-radius:8px;font-weight:700;font-size:.8rem;text-decoration:none">Switch to Enterprise</a></div>';
+        banner.style.display = 'block';
+      }
+    } catch(e) { console.warn('[GigLega] enterprise status check:', e); }
+  });
+</script>
 </body>
 </html>
