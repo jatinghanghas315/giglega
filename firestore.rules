@@ -5,18 +5,30 @@ service cloud.firestore {
     function isAuth()         { return request.auth != null; }
     function uid()            { return request.auth.uid; }
     function isOwner(ownerId) { return isAuth() && uid() == ownerId; }
+    function isAdmin()        {
+      return isAuth() &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+    function userRole() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+    function isPosterOrEnterprise() {
+      return isAuth() && userRole() in ['poster', 'enterprise', 'admin'];
+    }
 
     // ── GIGS ───────────────────────────────────────────
     match /gigs/{gigId} {
       allow read: if true;
 
       allow create: if isAuth()
+        && isPosterOrEnterprise()
         && request.resource.data.posterId == uid()
         && request.resource.data.keys().hasAll(['title','category','status','createdAt'])
         && request.resource.data.status == 'open';
 
       allow update: if isAuth() && (
-        isOwner(resource.data.posterId)
+        isAdmin()
+        || isOwner(resource.data.posterId)
         || (
           resource.data.status == "open"
           && request.resource.data.status == "taken"
@@ -65,14 +77,14 @@ service cloud.firestore {
         )
       );
 
-      allow delete: if isOwner(resource.data.posterId);
+      allow delete: if isOwner(resource.data.posterId) || isAdmin();
     }
 
     // ── CONVERSATIONS ───────────────────────────────────
     match /conversations/{convId} {
-      allow read:   if isAuth() && uid() in resource.data.participants;
+      allow read:   if isAuth() && (uid() in resource.data.participants || isAdmin());
       allow create: if isAuth();
-      allow update: if isAuth() && uid() in resource.data.participants;
+      allow update: if isAuth() && (uid() in resource.data.participants || isAdmin());
       allow delete: if false;
 
       match /messages/{msgId} {
@@ -86,23 +98,24 @@ service cloud.firestore {
     match /users/{userId} {
       allow read:   if isAuth();
       allow create: if isAuth() && uid() == userId;
-      allow update: if isOwner(userId);
+      allow update: if isOwner(userId) || isAdmin();
       allow delete: if false;
     }
 
     // ── NOTIFICATIONS ───────────────────────────────────
     match /notifications/{userId}/items/{notifId} {
-      allow read, update, delete: if isOwner(userId);
+      allow read, update, delete: if isOwner(userId) || isAdmin();
       allow create: if isAuth();
     }
 
     // ── WALLET ────────────────────────────────────────────
     match /wallets/{userId} {
-      allow read, write: if isOwner(userId);
+      allow read: if isOwner(userId) || isAdmin();
+      allow write: if isOwner(userId) || isAdmin();
 
       match /transactions/{txnId} {
-        allow read:           if isOwner(userId);
-        allow create:         if isOwner(userId);
+        allow read:           if isOwner(userId) || isAdmin();
+        allow create:         if isOwner(userId) || isAdmin();
         allow update, delete: if false;
       }
     }
@@ -113,6 +126,7 @@ service cloud.firestore {
         resource.data.userId     == uid()
         || resource.data.senderId   == uid()
         || resource.data.receiverId == uid()
+        || isAdmin()
       );
       allow create: if isAuth();
       allow update, delete: if false;
@@ -122,7 +136,7 @@ service cloud.firestore {
     match /reviews/{reviewId} {
       allow read: if true;
       allow create: if isAuth();
-      allow update, delete: if isOwner(resource.data.authorId);
+      allow update, delete: if isOwner(resource.data.authorId) || isAdmin();
     }
 
     // ── PUBLIC REVIEWS ───────────────────────────────────
@@ -131,7 +145,28 @@ service cloud.firestore {
       allow create: if isAuth()
         && request.resource.data.rating >= 1
         && request.resource.data.rating <= 5;
-      allow update, delete: if isAuth() && resource.data.reviewerUid == uid();
+      allow update, delete: if (isAuth() && resource.data.reviewerUid == uid()) || isAdmin();
     }
+
+    // ── SUPPORT TICKETS ───────────────────────────────────
+    match /supportTickets/{ticketId} {
+      allow read:   if isAuth() && (resource.data.userId == uid() || isAdmin());
+      allow create: if isAuth() && request.resource.data.userId == uid();
+      allow update: if isAdmin();
+      allow delete: if false;
+    }
+
+    // ── PAYOUTS ───────────────────────────────────────────
+    match /payouts/{gigId} {
+      allow read: if isAuth() && (
+        resource.data.workerId == uid()
+        || resource.data.posterId == uid()
+        || isAdmin()
+      );
+      allow create: if isAdmin();
+      allow update: if isAdmin();
+      allow delete: if false;
+    }
+
   }
 }
