@@ -3,117 +3,166 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>GigLega • Onboarding</title>
+  <title>GigLega &bull; Choose Your Role</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
+  <style>
+    body { min-height:100vh; display:flex; align-items:center; justify-content:center; background:var(--bg,#0f0f0f); padding:24px 16px; }
+    .ob-card { background:var(--surface,#1a1a1a); border:1px solid var(--gray-200,#2a2a2a); border-radius:20px; padding:40px 32px; max-width:580px; width:100%; box-shadow:0 16px 48px rgba(0,0,0,.32); }
+    .ob-logo { font-size:1.5rem; font-weight:900; color:var(--primary,#0d9488); letter-spacing:-1px; margin-bottom:24px; }
+    .ob-logo span { color:var(--text,#f0f0f0); }
+    .ob-card h1 { font-size:1.4rem; font-weight:700; color:var(--text,#f0f0f0); margin:0 0 8px; }
+    .ob-card > p { color:var(--gray-400,#c0c0c0); font-size:.875rem; margin:0 0 28px; line-height:1.5; }
+    .ob-fields { display:grid; gap:14px; margin-bottom:24px; }
+    .ob-field label { display:block; font-size:.78rem; font-weight:600; color:var(--gray-400,#c0c0c0); margin-bottom:6px; text-transform:uppercase; letter-spacing:.5px; }
+    .ob-field input { width:100%; padding:11px 14px; border:1.5px solid var(--gray-300,#333); border-radius:10px; font-size:.9rem; background:var(--bg,#0f0f0f); color:var(--text,#f0f0f0); font-family:inherit; transition:border-color .18s; box-sizing:border-box; }
+    .ob-field input:focus { outline:none; border-color:var(--primary,#0d9488); box-shadow:0 0 0 3px rgba(13,148,136,.12); }
+    .ob-field input::placeholder { color:var(--gray-500,#777); }
+    .role-label { font-size:.78rem; font-weight:600; color:var(--gray-400,#c0c0c0); text-transform:uppercase; letter-spacing:.5px; margin-bottom:12px; }
+    .role-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-bottom:8px; }
+    @media(max-width:480px){ .role-grid { grid-template-columns:1fr; } }
+    .role-card { border:2px solid var(--gray-300,#2e2e2e); border-radius:14px; padding:18px 12px; cursor:pointer; transition:border-color .2s,background .2s,transform .15s; text-align:center; user-select:none; }
+    .role-card:hover { border-color:var(--primary,#0d9488); transform:translateY(-2px); }
+    .role-card.selected { border-color:#D9993A; background:rgba(217,153,58,.08); }
+    .role-card .rc-icon { font-size:1.8rem; margin-bottom:8px; }
+    .role-card h3 { font-size:.92rem; font-weight:700; color:var(--text,#f0f0f0); margin:0 0 4px; }
+    .role-card p { font-size:.75rem; color:var(--gray-400,#c0c0c0); margin:0; line-height:1.4; }
+    .role-card.selected h3 { color:#D9993A; }
+    .enterprise-note { font-size:.75rem; color:var(--gray-400,#c0c0c0); text-align:center; margin:10px 0 24px; padding:8px 12px; background:rgba(217,153,58,.06); border-radius:8px; border:1px solid rgba(217,153,58,.15); }
+    .location-row { display:grid; grid-template-columns:1fr auto; gap:10px; align-items:end; }
+    .btn-gps { padding:11px 14px; background:rgba(13,148,136,.12); color:var(--primary,#0d9488); border:1.5px solid var(--primary,#0d9488); border-radius:10px; font-size:.8rem; font-weight:600; cursor:pointer; white-space:nowrap; font-family:inherit; transition:background .18s; }
+    .btn-gps:hover { background:rgba(13,148,136,.22); }
+    .ob-submit { width:100%; padding:14px; background:#D9993A; color:#fff; border:none; border-radius:12px; font-size:1rem; font-weight:700; cursor:pointer; font-family:inherit; transition:background .2s,transform .15s; margin-top:4px; }
+    .ob-submit:hover:not(:disabled) { background:#c4882e; transform:translateY(-1px); }
+    .ob-submit:disabled { background:#444; color:#888; cursor:not-allowed; }
+  </style>
 </head>
 <body>
-  <main class="container-sm section">
-    <h1>Complete your profile</h1>
-    <p>3-step onboarding to start posting or taking gigs.</p>
-    <form id="onboardingForm" class="card" style="padding:24px; margin-top:16px; display:grid; gap:14px;">
-      <label>Name<input id="name" required /></label>
-      <label>Role
-        <select id="role" required>
-          <option value="">Choose role</option>
-          <option value="poster">Poster</option>
-          <option value="worker">Worker</option>
-          <option value="admin">Admin</option>
-          <option value="enterprise">Enterprise</option>
-        </select>
-      </label>
-      <label>Location Name<input id="locationName" required placeholder="Sector 45, Gurugram" /></label>
-      <label>Profile Photo URL<input id="photoURL" type="url" placeholder="https://..." /></label>
-      <button type="button" id="detectLocation">Use current GPS location</button>
-      <button type="submit">Save & Continue</button>
-    </form>
-  </main>
-
+  <div class="ob-card">
+    <div class="ob-logo">Gig<span>Lega</span></div>
+    <h1>Welcome! Set up your account</h1>
+    <p>Fill in a few details to get started. You can switch your role anytime from profile settings.</p>
+    <div class="ob-fields">
+      <div class="ob-field">
+        <label>Full Name</label>
+        <input id="ob-name" type="text" placeholder="Your full name" required autocomplete="name" />
+      </div>
+      <div class="ob-field">
+        <label>Location</label>
+        <div class="location-row">
+          <input id="ob-location" type="text" placeholder="Sector 45, Gurugram" required />
+          <button class="btn-gps" id="btnGPS" type="button">&#128205; GPS</button>
+        </div>
+      </div>
+    </div>
+    <div class="role-label">Choose Your Role</div>
+    <div class="role-grid">
+      <div class="role-card" data-role="poster" onclick="selectRole(this)">
+        <div class="rc-icon">&#128203;</div>
+        <h3>Poster</h3>
+        <p>Post gigs &amp; hire verified Taskers</p>
+      </div>
+      <div class="role-card" data-role="tasker" onclick="selectRole(this)">
+        <div class="rc-icon">&#9889;</div>
+        <h3>Tasker</h3>
+        <p>Browse gigs &amp; earn money fast</p>
+      </div>
+      <div class="role-card" data-role="enterprise" onclick="selectRole(this)">
+        <div class="rc-icon">&#127970;</div>
+        <h3>Enterprise</h3>
+        <p>Bulk hiring for businesses &amp; teams</p>
+      </div>
+    </div>
+    <div class="enterprise-note" id="enterpriseNote" style="display:none;">
+      &#128272; Enterprise accounts require <strong>admin approval</strong> before activation. You will be notified once approved.
+    </div>
+    <button class="ob-submit" id="ob-submit" disabled onclick="submitOnboarding()">Continue to GigLega &rarr;</button>
+  </div>
+  <div id="toast-container"></div>
   <script type="module">
     import { auth, db } from './firebase-config.js';
     import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
-    import { doc, setDoc, serverTimestamp, GeoPoint } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
-
-    const form = document.getElementById('onboardingForm');
-    const detectBtn = document.getElementById('detectLocation');
-    let currentUser = null;
-    let gpsCoords = null;
-
-    const showToast = window.showToast || ((msg) => alert(msg));
-
-    onAuthStateChanged(auth, (user) => {
-      if (!user) {
-        window.location.href = 'login.html';
-        return;
-      }
+    import { doc, setDoc, getDoc, serverTimestamp, GeoPoint } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+    let currentUser = null, selectedRole = null, gpsCoords = null;
+    const ROLE_ROUTES = { poster:'dashboard-client.html', tasker:'dashboard-worker.html', enterprise:'enterprise.html' };
+    function showToast(msg, type='info') {
+      const colors = { success:'#059669', error:'#dc2626', warning:'#d97706', info:'#0d9488' };
+      const t = document.createElement('div');
+      t.textContent = msg;
+      t.style.cssText = `position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:${colors[type]||'#333'};color:#fff;padding:12px 24px;border-radius:10px;font-size:.875rem;font-weight:600;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.3);white-space:nowrap;max-width:90vw;text-align:center;`;
+      document.getElementById('toast-container').appendChild(t);
+      setTimeout(() => t.remove(), 3500);
+    }
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) { window.location.href = 'login.html'; return; }
       currentUser = user;
-    });
-
-    detectBtn.addEventListener('click', () => {
-      if (!navigator.geolocation) {
-        showToast('Geolocation is not supported in your browser.', 'error');
-        return;
-      }
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          gpsCoords = position.coords;
-          showToast('GPS location captured.', 'success');
-        },
-        () => {
-          showToast('Unable to fetch GPS location. Enter location manually.', 'warning');
+      const ni = document.getElementById('ob-name');
+      if (user.displayName && !ni.value) ni.value = user.displayName;
+      try {
+        const snap = await getDoc(doc(db, 'users', user.uid));
+        if (snap.exists() && snap.data().onboardingComplete) {
+          window.location.href = ROLE_ROUTES[snap.data().role] || 'dashboard-worker.html';
         }
+      } catch(e) { console.warn('[GigLega] onboarding check:', e); }
+    });
+    window.selectRole = function(card) {
+      document.querySelectorAll('.role-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      selectedRole = card.dataset.role;
+      document.getElementById('enterpriseNote').style.display = selectedRole === 'enterprise' ? 'block' : 'none';
+      checkSubmit();
+    };
+    function checkSubmit() {
+      const n = document.getElementById('ob-name').value.trim();
+      const l = document.getElementById('ob-location').value.trim();
+      document.getElementById('ob-submit').disabled = !(n && l && selectedRole);
+    }
+    document.getElementById('ob-name').addEventListener('input', checkSubmit);
+    document.getElementById('ob-location').addEventListener('input', checkSubmit);
+    document.getElementById('btnGPS').addEventListener('click', () => {
+      if (!navigator.geolocation) { showToast('GPS not supported.', 'warning'); return; }
+      const btn = document.getElementById('btnGPS');
+      btn.textContent = '⏳';
+      navigator.geolocation.getCurrentPosition(
+        (pos) => { gpsCoords = pos.coords; btn.textContent = '✅'; showToast('GPS location captured.', 'success'); },
+        () => { btn.textContent = '📍 GPS'; showToast('GPS failed. Enter manually.', 'warning'); }
       );
     });
-
-    form.addEventListener('submit', async (event) => {
-      event.preventDefault();
-      if (!currentUser) {
-        showToast('Please login again.', 'error');
-        return;
-      }
-
-      const name = document.getElementById('name').value.trim();
-      const role = document.getElementById('role').value;
-      const locationName = document.getElementById('locationName').value.trim();
-      const photoURL = document.getElementById('photoURL').value.trim();
-
+    window.submitOnboarding = async function() {
+      if (!currentUser || !selectedRole) return;
+      const name = document.getElementById('ob-name').value.trim();
+      const locationName = document.getElementById('ob-location').value.trim();
+      if (!name || !locationName) { showToast('Please fill all fields.', 'warning'); return; }
+      const btn = document.getElementById('ob-submit');
+      btn.disabled = true; btn.textContent = 'Saving...';
       const payload = {
-        name,
-        role,
+        name, role: selectedRole,
+        mode: selectedRole === 'tasker' ? 'worker' : selectedRole,
         locationName,
-        photoURL: photoURL || '',
         email: currentUser.email || '',
         phone: currentUser.phoneNumber || '',
-        isVerified: false,
-        aadhaarVerified: false,
-        rating: 0,
-        totalGigs: 0,
-        walletBalance: 0,
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp()
+        avatar: currentUser.photoURL || null,
+        isVerified: false, aadhaarVerified: false,
+        rating: 0, totalGigs: 0, walletBalance: 0,
+        onboardingComplete: true,
+        enterpriseStatus: selectedRole === 'enterprise' ? 'pending' : null,
+        roleHistory: [{ role: selectedRole, switchedAt: new Date().toISOString() }],
+        onboardingWorkerDone: false, onboardingPosterDone: false,
+        createdAt: serverTimestamp(), updatedAt: serverTimestamp()
       };
-
-      if (gpsCoords) {
-        payload.location = new GeoPoint(gpsCoords.latitude, gpsCoords.longitude);
-      }
-
+      if (gpsCoords) payload.location = new GeoPoint(gpsCoords.latitude, gpsCoords.longitude);
       try {
         await setDoc(doc(db, 'users', currentUser.uid), payload, { merge: true });
-        showToast('Onboarding completed.', 'success');
-        if (role === 'worker') {
-          window.location.href = 'dashboard-worker.html';
-        } else if (role === 'enterprise') {
-          window.location.href = 'enterprise.html';
-        } else {
-          window.location.href = 'dashboard-client.html';
-        }
-      } catch (error) {
-        console.error('onboarding save failed:', error);
-        showToast('Failed to save onboarding details.', 'error');
+        showToast('Welcome to GigLega! 🎉', 'success');
+        setTimeout(() => { window.location.href = ROLE_ROUTES[selectedRole] || 'dashboard-worker.html'; }, 1200);
+      } catch (err) {
+        console.warn('[GigLega] onboarding save failed:', err);
+        btn.disabled = false; btn.textContent = 'Continue to GigLega →';
+        showToast('Failed to save. Please try again.', 'error');
       }
-    });
+    };
   </script>
 </body>
 </html>
