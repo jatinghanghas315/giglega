@@ -689,7 +689,7 @@
           /* Header */
           '<div class="gig-header">'+
             '<div class="gig-header-top" style="margin-bottom:10px">'+
-              '<span class="gig-status-pill '+statusClass+'">'+statusText+'</span>'+
+              '<span class="gig-status-pill '+statusClass+'">'+statusText+'</span>'+(gig.gigId?'<span style="font-size:.68rem;font-weight:800;font-family:monospace;color:var(--teal);background:rgba(13,148,136,.1);border:1px solid rgba(13,148,136,.25);border-radius:6px;padding:2px 8px;cursor:pointer;user-select:all" title="Click to copy Gig ID" onclick="navigator.clipboard&&navigator.clipboard.writeText(\'' + escH(gig.gigId) + '\').then(function(){var el=event.target;var prev=el.textContent;el.textContent=\'✅ Copied!\';setTimeout(function(){el.textContent=prev},1400)})">' + escH(gig.gigId) + '</span>':'')+
               (gig.urgency==="urgent" ? '<span class="gig-cat-tag" style="background:#fef3c7;color:#b45309">🔥 Urgent</span>' : "")+
             '</div>'+
             '<h1 class="gig-title">'+escH(gig.title)+'</h1>'+
@@ -808,7 +808,7 @@
           try{
             await deleteDoc(doc(db,"gigs",gig.id));
             showToast("🗑️ Gig deleted","info");
-            setTimeout(function(){ window.location.href="dashboard-client.html"; },1200);
+            setTimeout(function(){ window.location.href="dashboard-poster.html"; },1200);
           }catch(e){ showToast("Error: "+e.message,"error"); }
         });
       }
