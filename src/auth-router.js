@@ -4,9 +4,9 @@ import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/fi
 import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
 
 export const ROLE_ROUTES = {
-  poster:     'dashboard-client.html',
-  tasker:     'dashboard-worker.html',
-  worker:     'dashboard-worker.html',
+  poster:     'dashboard-poster.html',
+  tasker:     'dashboard-tasker.html',
+  worker:     'dashboard-tasker.html',
   enterprise: 'enterprise.html',
   admin:      'dashboard-admin.html'
 };
