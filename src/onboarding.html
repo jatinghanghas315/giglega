@@ -86,7 +86,7 @@
     import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
     import { doc, setDoc, getDoc, serverTimestamp, GeoPoint } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
     let currentUser = null, selectedRole = null, gpsCoords = null;
-    const ROLE_ROUTES = { poster:'dashboard-client.html', tasker:'dashboard-worker.html', enterprise:'enterprise.html' };
+    const ROLE_ROUTES = { poster:'dashboard-poster.html', tasker:'dashboard-tasker.html', enterprise:'enterprise.html' };
     function showToast(msg, type='info') {
       const colors = { success:'#059669', error:'#dc2626', warning:'#d97706', info:'#0d9488' };
       const t = document.createElement('div');
@@ -103,7 +103,7 @@
       try {
         const snap = await getDoc(doc(db, 'users', user.uid));
         if (snap.exists() && snap.data().onboardingComplete) {
-          window.location.href = ROLE_ROUTES[snap.data().role] || 'dashboard-worker.html';
+          window.location.href = ROLE_ROUTES[snap.data().role] || 'dashboard-tasker.html';
         }
       } catch(e) { console.warn('[GigLega] onboarding check:', e); }
     });
@@ -156,7 +156,7 @@
       try {
         await setDoc(doc(db, 'users', currentUser.uid), payload, { merge: true });
         showToast('Welcome to GigLega! 🎉', 'success');
-        setTimeout(() => { window.location.href = ROLE_ROUTES[selectedRole] || 'dashboard-worker.html'; }, 1200);
+        setTimeout(() => { window.location.href = ROLE_ROUTES[selectedRole] || 'dashboard-tasker.html'; }, 1200);
       } catch (err) {
         console.warn('[GigLega] onboarding save failed:', err);
         btn.disabled = false; btn.textContent = 'Continue to GigLega →';
