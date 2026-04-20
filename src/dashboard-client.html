@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Poster Dashboard — GigLega</title>
-  <meta name="description" content="GigLega poster dashboard — apne posted gigs manage karo." />
+  <meta name="description" content="GigLega poster dashboard — manage your posted gigs, track orders and grow your reach." />
     <meta name="robots" content="noindex, nofollow" />
     <link rel="stylesheet" href="styles.css" />  
   <link rel="stylesheet" href="theme-dark.css" />
@@ -177,7 +177,7 @@
             animation:pulse-otp 1.2s ease-in-out infinite;flex-shrink:0;"></span>
         </div>
         <div style="font-size:.82rem;color:var(--gray-500);margin-bottom:12px;">
-          Yeh OTP worker ko batao. Jab worker complete kare tab OTP enter karega.
+          Share this OTP with the worker. They will enter it when the gig is complete.
         </div>
         <div style="display:flex;gap:8px;justify-content:center;margin-bottom:8px;" id="otpDisplay">
           <!-- digits filled by JS -->
@@ -444,7 +444,7 @@ function bindCardActions(container) {
         var existing = document.getElementById("gl-confirm-modal"); if(existing) existing.remove();
         var modal = document.createElement("div"); modal.id="gl-confirm-modal";
         modal.style.cssText="position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px;";
-        modal.innerHTML='<div style="background:var(--surface,#fff);border-radius:12px;padding:28px 24px;max-width:360px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.25);"><h3 style="font-size:1rem;font-weight:800;color:#dc2626;margin-bottom:8px">Gig Delete karna chahte ho?</h3><p style="font-size:.85rem;color:var(--gray-500,#6b7280);line-height:1.6;margin-bottom:20px">Yeh action undo nahi ho sakta.</p><div style="display:flex;gap:10px;justify-content:flex-end;"><button id="dc-cancel" style="padding:9px 20px;border-radius:8px;border:1.5px solid #e5e7eb;background:none;font-weight:600;font-size:.875rem;cursor:pointer;">Cancel</button><button id="dc-ok" style="padding:9px 20px;border-radius:8px;border:none;background:#dc2626;color:#fff;font-weight:700;font-size:.875rem;cursor:pointer;">Delete</button></div></div>';
+        modal.innerHTML='<div style="background:var(--surface,#fff);border-radius:12px;padding:28px 24px;max-width:360px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.25);"><h3 style="font-size:1rem;font-weight:800;color:#dc2626;margin-bottom:8px">Gig Delete karna chahte ho?</h3><p style="font-size:.85rem;color:var(--gray-500,#6b7280);line-height:1.6;margin-bottom:20px">This action cannot be undone.</p><div style="display:flex;gap:10px;justify-content:flex-end;"><button id="dc-cancel" style="padding:9px 20px;border-radius:8px;border:1.5px solid #e5e7eb;background:none;font-weight:600;font-size:.875rem;cursor:pointer;">Cancel</button><button id="dc-ok" style="padding:9px 20px;border-radius:8px;border:none;background:#dc2626;color:#fff;font-weight:700;font-size:.875rem;cursor:pointer;">Delete</button></div></div>';
         document.body.appendChild(modal);
         document.getElementById("dc-cancel").onclick=function(){modal.remove();resolve(false);};
         document.getElementById("dc-ok").onclick=function(){modal.remove();_proceed=true;resolve(true);};
@@ -513,7 +513,7 @@ document.getElementById('btnSwitchRole').addEventListener('click', function() {
       if(!card) return;
       card.style.display = 'block';
       var titleEl = document.getElementById('otpGigTitle');
-      if(titleEl) titleEl.textContent = '"' + (gig.title||'') + '" ke liye OTP';
+      if(titleEl) titleEl.textContent = '"' + (gig.title||'') + '" — OTP Verification';
       var dispEl = document.getElementById('otpDisplay');
       if(dispEl && gig.completionOTP){
         dispEl.innerHTML = String(gig.completionOTP).split('').map(function(d){
@@ -547,7 +547,7 @@ document.getElementById('btnSwitchRole').addEventListener('click', function() {
             var t=document.getElementById('posterBannerTitle');
             var w=document.getElementById('posterBannerWorker');
             if(t) t.textContent=g.title||'Active Gig';
-            if(w) w.textContent='👷 '+(g.workerName||'Worker')+' kaam kar raha hai';
+            if(w) w.textContent='👷 '+(g.workerName||'Worker')+' is working on this gig';
             // Point to specific gig
             banner.querySelector('a').href='active-gig.html?id='+encodeURIComponent(id);
           }
