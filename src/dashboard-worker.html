@@ -601,7 +601,7 @@ if (_workerRole && _workerRole !== 'tasker' && _workerRole !== 'worker' && _work
         '<div class="gig-item-right">' +
           '<span class="s-badge ' + badgeCls + '">' + badgeTxt + '</span>' +
           '<div class="gig-earn">₹' + earn + '</div>' +
-          '<div class="gig-earn-sub">after 10% fee</div>' +
+          '<div class="gig-earn-sub">after platform fee</div>' +
           (status === "taken"
             ? '<a href="chat.html?gigId=' + g.id + '&ref=' + (g.gigId || g.id) + '"' class="btn btn-sm btn-primary" style="margin-top:4px">💬 Open Chat</a>'
             : (g.reviewedByWorker
@@ -793,17 +793,18 @@ if (_workerRole && _workerRole !== 'tasker' && _workerRole !== 'worker' && _work
     loadActiveBanner(user.uid);
 
       /* ── Bank details prompt (Phase 2) ── */
-      (function checkBankDetails() {
-        if (!currentUser) return;
-        import('https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js').then(function(fs) {
-          fs.getDoc(fs.doc(db, 'wallets', currentUser.uid)).then(function(snap) {
-            var hasBankDetails = snap.exists() && snap.data().bankVerified;
-            if (!hasBankDetails) {
-              var el = document.getElementById('bankDetailsPrompt');
-              if (el) el.style.display = 'block';
-            }
-          }).catch(function(e) { console.warn('[GigLega] bank check:', e); });
-        });
+      (async function checkBankDetails() {
+        try {
+          var { auth, db: fdb } = await import('./firebase-config.js');
+          var { getDoc, doc: fsDoc } = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js');
+          await new Promise(function(res) { var u = auth.onAuthStateChanged(function(x){u();res(x);}); });
+          var cu = auth.currentUser;
+          if (!cu) return;
+          var snap = await getDoc(fsDoc(fdb, 'wallets', cu.uid));
+          var hasBankDetails = snap.exists() && snap.data().bankVerified;
+          var el = document.getElementById('bankDetailsPrompt');
+          if (el) el.style.display = hasBankDetails ? 'none' : 'block';
+        } catch(e) { console.warn('[GigLega] bank check:', e.message); }
       })();
 
 </script>
