@@ -1894,3 +1894,96 @@ textarea:focus-visible {
   white-space: nowrap;
   border-width: 0;
 }
+
+
+/* ═══════════════════════════════════════════════════════
+   PHASE 4 — Dark Mode Contrast Audit & Support SLA Copy
+   ═══════════════════════════════════════════════════════ */
+
+/* ── Dark mode: ensure form inputs, labels and placeholders are readable ── */
+[data-theme="dark"] input,
+[data-theme="dark"] textarea,
+[data-theme="dark"] select {
+  color: var(--text, #e6edf3);
+  background: var(--surface-3, #21262d);
+  border-color: var(--border, rgba(255,255,255,.08));
+}
+[data-theme="dark"] input::placeholder,
+[data-theme="dark"] textarea::placeholder {
+  color: var(--text-faint, #484f58);
+}
+[data-theme="dark"] label,
+[data-theme="dark"] .form-label {
+  color: var(--text-muted, #8b949e);
+}
+
+/* ── Dark mode: badge text contrast fixes ── */
+[data-theme="dark"] .badge,
+[data-theme="dark"] .tag,
+[data-theme="dark"] .gig-id-tag,
+[data-theme="dark"] .status-badge {
+  color: var(--text, #e6edf3);
+}
+
+/* ── Dark mode: tab labels readable ── */
+[data-theme="dark"] .tab-btn,
+[data-theme="dark"] .tab-label {
+  color: var(--text-muted, #8b949e);
+}
+[data-theme="dark"] .tab-btn.active,
+[data-theme="dark"] .tab-btn[aria-selected="true"] {
+  color: var(--teal, #4fc3c8);
+}
+
+/* ── Dark mode: focus ring visible ── */
+[data-theme="dark"] input:focus,
+[data-theme="dark"] textarea:focus,
+[data-theme="dark"] select:focus {
+  outline: 2px solid var(--teal, #4fc3c8);
+  outline-offset: 2px;
+  border-color: var(--teal, #4fc3c8);
+}
+
+/* ── Dark mode: notification copy contrast ── */
+[data-theme="dark"] .notif-title,
+[data-theme="dark"] .notif-body {
+  color: var(--text, #e6edf3);
+}
+[data-theme="dark"] .notif-time {
+  color: var(--text-muted, #8b949e);
+}
+
+/* ── Support SLA — "Get help in 15 minutes" utility classes ── */
+.sla-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(16,185,129,.12);
+  color: #10b981;
+  font-size: .72rem;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 20px;
+  border: 1px solid rgba(16,185,129,.25);
+  letter-spacing: .02em;
+}
+.sla-badge::before { content: "⚡"; font-size: .8rem; }
+
+.support-cta-text {
+  font-size: .82rem;
+  color: var(--text-muted);
+}
+.support-cta-text strong {
+  color: #10b981;
+}
+
+/* ── Dark mode: card body text never goes below --text-muted ── */
+[data-theme="dark"] .card-body,
+[data-theme="dark"] .panel-body,
+[data-theme="dark"] p {
+  color: var(--text, #e6edf3);
+}
+[data-theme="dark"] .text-muted,
+[data-theme="dark"] small {
+  color: var(--text-muted, #8b949e) !important;
+}
