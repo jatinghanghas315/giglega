@@ -191,9 +191,9 @@
     .pw-toggle:hover { color: var(--gray-700); }
 
     /* Role selector */
-    .grid-template-columns: 1fr 1fr 1fr; {
+    .role-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr 1fr 1fr;
       gap: 10px;
       margin-bottom: 18px;
     }
@@ -536,7 +536,7 @@
           <!-- Role selector -->
           <div class="field">
             <label>I want to…</label>
-            <div class="grid-template-columns: 1fr 1fr 1fr;">
+            <div class="role-grid">
               <div class="role-opt selected" id="roleWorker" onclick="selectRole('worker')">
                 <input type="radio" name="role" value="tasker" checked>
                 <div class="role-icon">💼</div>
@@ -559,7 +559,7 @@
           </div>
 
           <!-- Google -->
-          <button class="btn-google" id="btnGoogleReg" onclick="document.getElementById('btnGoogleLogin').click()">
+          <button class="btn-google" id="btnGoogleReg" onclick="document.getElementById('btnGoogleLogin').click();void 0">
             <svg width="18" height="18" viewBox="0 0 48 48" fill="none">
               <path fill="#4285F4" d="M47.5 24.6c0-1.6-.1-3.2-.4-4.7H24v8.9h13.2c-.6 3-2.3 5.5-4.9 7.2v6h7.9c4.6-4.3 7.3-10.6 7.3-17.4z"/>
               <path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.9-6c-2.2 1.5-5 2.4-8 2.4-6.1 0-11.3-4.1-13.2-9.7H2.7v6.2C6.6 42.7 14.8 48 24 48z"/>
@@ -714,7 +714,7 @@
   const params   = new URLSearchParams(window.location.search);
   const hash     = new URLSearchParams((window.location.hash || '').replace(/^#/, ''));
   const redirectTo = params.get('redirect') || hash.get('redirect') || 'index.html';
-  let   prefRole   = params.get('role') || hash.get('role') || 'worker';
+  let   prefRole   = params.get('role') || hash.get('role') || 'tasker';
 
   /* ── Dark mode toggle (global) ── */
   (function(){
@@ -789,7 +789,7 @@
   /* ── Role selector ── */
   window.selectRole = function(role) {
     prefRole = role;
-    document.getElementById('roleWorker').classList.toggle('selected', role === 'worker');
+    document.getElementById('roleWorker').classList.toggle('selected', role === 'tasker');
     document.getElementById('rolePoster').classList.toggle('selected', role === 'poster');
       document.getElementById('roleEnterprise').classList.toggle('selected', role === 'enterprise');
   };
@@ -902,8 +902,8 @@
         email:     id,
         phone:     null,
         city:      city,
-        role:      prefRole === 'poster' ? 'poster' : 'worker',
-        mode:      prefRole === 'poster' ? 'poster' : 'worker',
+        role:      prefRole === 'poster' ? 'poster' : prefRole === 'enterprise' ? 'enterprise' : 'tasker',
+        mode:      prefRole === 'poster' ? 'poster' : prefRole === 'enterprise' ? 'enterprise' : 'worker',
         createdAt: new Date().toISOString(),
         skills:    [],
         avatar:    null,
@@ -963,21 +963,16 @@
           name:      user.displayName || 'GigLega User',
           email:     user.email,
           phone:     null,
-            const userData = {
-    uid:       user.uid,
-    name:      regName.trim(),
-    email:     user.email || '',
-    phone:     null,
-    city:      'Gurugram',
-    role:      prefRole || 'tasker',
-    mode:      (prefRole === 'tasker' ? 'worker' : prefRole) || 'worker',
-    createdAt: new Date().toISOString(),
-    skills:    [],
-    avatar:    user.photoURL || null,
-    bio:       '',
-    workType:  ''
-  };
-          
+          city:      'Gurugram',
+          role:      prefRole || 'tasker',
+          mode:      (prefRole === 'tasker' ? 'worker' : prefRole) || 'worker',
+          createdAt: new Date().toISOString(),
+          skills:    [],
+          avatar:    user.photoURL || null,
+          bio:       '',
+          workType:  ''
+        };
+        await setDoc(doc(db, 'users', user.uid), userData);
       }
 
       localStorage.setItem(USER_KEY, JSON.stringify(userData));
