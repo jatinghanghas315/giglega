@@ -179,6 +179,7 @@
 
   </style>
   <link rel="canonical" href="https://giglega.vercel.app/contact.html">
+  <link rel="stylesheet" href="chatbot.css">
 </head>
 <body>
   <div id="page-loader"></div>
@@ -668,31 +669,7 @@
   </script>
 
 <!-- GIGLEGA CHATBOT WIDGET -->
-<style>
-.gl-chat-fab{position:fixed;bottom:88px;right:20px;z-index:9990;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--teal));border:none;cursor:pointer;box-shadow:0 4px 20px rgba(13,148,136,.4);display:flex;align-items:center;justify-content:center;font-size:1.5rem;transition:transform .2s,box-shadow .2s;}
-.gl-chat-fab:hover{transform:scale(1.1);}
-.gl-chat-fab .gl-fab-badge{position:absolute;top:-4px;right:-4px;background:#ef4444;color:#fff;border-radius:50%;width:18px;height:18px;font-size:.65rem;font-weight:800;display:flex;align-items:center;justify-content:center;}
-.gl-chatbot{position:fixed;bottom:156px;right:20px;z-index:9991;width:340px;max-height:480px;background:var(--surface);border:1.5px solid var(--gray-200);border-radius:16px;box-shadow:0 16px 48px rgba(0,0,0,.18);display:none;flex-direction:column;overflow:hidden;}
-.gl-chatbot.open{display:flex;}
-.gl-chatbot-header{background:linear-gradient(135deg,var(--primary),var(--teal));padding:14px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0;}
-.gl-chatbot-avatar{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:1.2rem;}
-.gl-chatbot-info{flex:1;}
-.gl-chatbot-name{font-weight:800;color:#fff;font-size:.95rem;}
-.gl-chatbot-status{font-size:.72rem;color:rgba(255,255,255,.75);}
-.gl-chatbot-close{background:none;border:none;color:rgba(255,255,255,.8);cursor:pointer;font-size:1.1rem;padding:4px;}
-.gl-chatbot-msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:8px;}
-.gl-bot-msg,.gl-user-msg{max-width:80%;padding:9px 13px;border-radius:12px;font-size:.85rem;line-height:1.5;}
-.gl-bot-msg{background:var(--gray-100);color:var(--text);border-bottom-left-radius:4px;align-self:flex-start;}
-.gl-user-msg{background:var(--teal);color:#fff;border-bottom-right-radius:4px;align-self:flex-end;}
-[data-theme=dark] .gl-bot-msg{background:var(--gray-800);color:var(--gray-100);}
-.gl-chatbot-quick{padding:8px 14px;display:flex;flex-wrap:wrap;gap:6px;border-top:1px solid var(--gray-200);flex-shrink:0;}
-.gl-quick-btn{background:var(--surface);border:1.5px solid var(--teal);color:var(--teal);border-radius:20px;padding:5px 12px;font-size:.78rem;font-weight:600;cursor:pointer;transition:all .2s;}
-.gl-quick-btn:hover{background:var(--teal);color:#fff;}
-.gl-chatbot-input{display:flex;gap:8px;padding:10px 14px;border-top:1px solid var(--gray-200);flex-shrink:0;}
-.gl-chatbot-input input{flex:1;border:1.5px solid var(--gray-200);border-radius:20px;padding:8px 14px;font-size:.85rem;outline:none;background:var(--surface);color:var(--text);}
-.gl-chatbot-input input:focus{border-color:var(--teal);}
-.gl-chatbot-input button{background:var(--teal);border:none;border-radius:50%;width:36px;height:36px;color:#fff;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;}
-</style>
+
 <button class="gl-chat-fab" id="glChatFab">💬<span class="gl-fab-badge">1</span></button>
 <div class="gl-chatbot" id="glChatbot">
   <div class="gl-chatbot-header">
@@ -730,5 +707,8 @@
   document.querySelectorAll('.gl-quick-btn').forEach(function(b){b.onclick=function(){send2(b.dataset.q);};});
 })();
 </script>
+
+  <script src="chatbot.js"></script>
+  <script>GigLegaBot.init({ page: 'contact' });</script>
 </body>
 </html>
