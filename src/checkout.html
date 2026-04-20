@@ -1,59 +1,645 @@
-<!doctype html>
-<html lang="en" data-theme="dark">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>GigLega • Checkout</title>
+  <title>Checkout — GigLega</title>
   <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="theme-dark.css" />
+  <link rel="icon" href="logo.png" />
+  <!-- Razorpay SDK -->
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <style>
+    /* ── Layout ── */
+    .checkout-wrapper {
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 40px 16px 80px;
+      background: var(--bg-primary, #0f0f23);
+    }
+    .checkout-card {
+      width: 100%;
+      max-width: 520px;
+      background: var(--bg-surface, #1a1a2e);
+      border: 1px solid var(--border, rgba(255,255,255,.08));
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 8px 40px rgba(0,0,0,.4);
+    }
+
+    /* ── Header ── */
+    .checkout-header {
+      padding: 24px 28px 20px;
+      border-bottom: 1px solid var(--border, rgba(255,255,255,.08));
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .checkout-back-btn {
+      background: none;
+      border: none;
+      color: var(--text-secondary, #94a3b8);
+      font-size: 20px;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 8px;
+      transition: background .15s, color .15s;
+      line-height: 1;
+    }
+    .checkout-back-btn:hover {
+      background: var(--bg-card, #16213e);
+      color: var(--text-primary, #e2e8f0);
+    }
+    .checkout-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-primary, #e2e8f0);
+    }
+
+    /* ── Gig Summary ── */
+    .gig-summary {
+      padding: 20px 28px;
+      border-bottom: 1px solid var(--border, rgba(255,255,255,.08));
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .gig-summary-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .gig-summary-label {
+      font-size: 13px;
+      color: var(--text-secondary, #94a3b8);
+    }
+    .gig-summary-value {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary, #e2e8f0);
+      max-width: 260px;
+      text-align: right;
+      word-break: break-word;
+    }
+    .gig-id-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(108,99,255,.12);
+      border: 1px solid rgba(108,99,255,.3);
+      color: #a78bfa;
+      border-radius: 8px;
+      padding: 3px 10px;
+      font-size: 12px;
+      font-family: monospace;
+      cursor: pointer;
+      transition: background .15s;
+    }
+    .gig-id-badge:hover { background: rgba(108,99,255,.22); }
+
+    /* ── Price Breakdown ── */
+    .price-breakdown {
+      padding: 20px 28px;
+      border-bottom: 1px solid var(--border, rgba(255,255,255,.08));
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .price-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 14px;
+    }
+    .price-row .label { color: var(--text-secondary, #94a3b8); }
+    .price-row .amount { color: var(--text-primary, #e2e8f0); font-weight: 600; }
+    .price-row.fee .amount { color: #fbbf24; }
+    .price-divider {
+      border: none;
+      border-top: 1px dashed var(--border, rgba(255,255,255,.1));
+      margin: 4px 0;
+    }
+    .price-row.total .label {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-primary, #e2e8f0);
+    }
+    .price-row.total .amount {
+      font-size: 18px;
+      font-weight: 800;
+      color: #6c63ff;
+    }
+    .fee-info {
+      font-size: 11px;
+      color: var(--text-secondary, #94a3b8);
+      margin-top: -4px;
+      line-height: 1.5;
+    }
+
+    /* ── Pay Button ── */
+    .checkout-footer {
+      padding: 20px 28px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    #pay-btn {
+      width: 100%;
+      padding: 15px;
+      background: linear-gradient(135deg, #6c63ff, #a78bfa);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity .2s, transform .1s, box-shadow .2s;
+      box-shadow: 0 4px 20px rgba(108,99,255,.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    #pay-btn:hover:not(:disabled) {
+      opacity: .92;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 28px rgba(108,99,255,.55);
+    }
+    #pay-btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+    .secure-note {
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-secondary, #94a3b8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+    }
+
+    /* ── State Screens ── */
+    .state-screen {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 28px;
+      text-align: center;
+      gap: 16px;
+      min-height: 320px;
+    }
+    .state-screen.active { display: flex; }
+    .state-icon { font-size: 56px; line-height: 1; }
+    .state-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-primary, #e2e8f0);
+    }
+    .state-sub {
+      font-size: 14px;
+      color: var(--text-secondary, #94a3b8);
+      max-width: 320px;
+      line-height: 1.6;
+    }
+    .state-action-btn {
+      margin-top: 8px;
+      padding: 11px 28px;
+      background: linear-gradient(135deg, #6c63ff, #a78bfa);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity .2s;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .state-action-btn:hover { opacity: .88; }
+    .state-action-btn.outline {
+      background: none;
+      border: 1px solid var(--border, rgba(255,255,255,.15));
+      color: var(--text-secondary, #94a3b8);
+    }
+    .state-action-btn.outline:hover {
+      border-color: #6c63ff;
+      color: #a78bfa;
+    }
+
+    /* Processing spinner */
+    .gl-spinner-lg {
+      width: 52px; height: 52px;
+      border: 4px solid rgba(108,99,255,.2);
+      border-top-color: #6c63ff;
+      border-radius: 50%;
+      animation: spin .8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Success checkmark */
+    .success-ring {
+      width: 72px; height: 72px;
+      border-radius: 50%;
+      background: rgba(34,197,94,.12);
+      border: 2px solid rgba(34,197,94,.3);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 36px;
+    }
+    .error-ring {
+      width: 72px; height: 72px;
+      border-radius: 50%;
+      background: rgba(239,68,68,.12);
+      border: 2px solid rgba(239,68,68,.3);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 36px;
+    }
+
+    /* Receipt block */
+    .receipt-block {
+      background: var(--bg-card, #16213e);
+      border: 1px solid var(--border, rgba(255,255,255,.08));
+      border-radius: 12px;
+      padding: 16px 20px;
+      width: 100%;
+      max-width: 360px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      text-align: left;
+    }
+    .receipt-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+    }
+    .receipt-row .rl { color: var(--text-secondary, #94a3b8); }
+    .receipt-row .rv { color: var(--text-primary, #e2e8f0); font-weight: 600; font-family: monospace; }
+
+    /* Loading skeleton */
+    .skeleton-line {
+      height: 14px;
+      border-radius: 7px;
+      background: linear-gradient(90deg, var(--bg-card,#16213e) 25%, rgba(255,255,255,.06) 50%, var(--bg-card,#16213e) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.4s infinite;
+    }
+    @keyframes shimmer { to { background-position: -200% 0; } }
+
+    @media (max-width: 540px) {
+      .checkout-header, .gig-summary, .price-breakdown, .checkout-footer { padding-left: 18px; padding-right: 18px; }
+    }
+  </style>
 </head>
 <body>
-  <main class="container-sm section">
-    <h1>Checkout</h1>
-    <p>Transparent pricing with a 10% platform support fee.</p>
-    <section class="card" style="padding:24px; margin-top:16px;">
-      <p>Gig Budget: <strong id="gigBudget">₹0</strong></p>
-      <p>Platform Fee (10%): <strong id="platformFee">₹0</strong></p>
-      <p>Total Payable: <strong id="totalPayable">₹0</strong></p>
-      <button id="payNow">Pay with Razorpay</button>
-    </section>
-  </main>
 
-  <script type="module">
-    const FEE_RATE = 0.10;
-    const showToast = window.showToast || ((msg) => alert(msg));
+<div class="checkout-wrapper">
+  <div class="checkout-card">
 
-    const params = new URLSearchParams(window.location.search);
-    const gigId = params.get('gigId');
-    const budgetPaise = Number(params.get('budget') || '0');
+    <!-- ── STATE: LOADING ── -->
+    <div class="state-screen active" id="state-loading">
+      <div class="gl-spinner-lg"></div>
+      <div class="state-title">Loading order…</div>
+      <div style="width:100%;max-width:320px;display:flex;flex-direction:column;gap:10px;margin-top:8px;">
+        <div class="skeleton-line" style="width:70%"></div>
+        <div class="skeleton-line" style="width:50%"></div>
+        <div class="skeleton-line" style="width:85%"></div>
+      </div>
+    </div>
 
-    const feePaise = Math.round(budgetPaise * FEE_RATE);
-    const totalPaise = budgetPaise;
+    <!-- ── STATE: READY (main checkout UI) ── -->
+    <div id="state-ready" style="display:none;">
+      <div class="checkout-header">
+        <button class="checkout-back-btn" id="back-btn" title="Go back">←</button>
+        <span class="checkout-title">Complete Payment</span>
+      </div>
 
-    const formatINR = (paise) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 2 }).format((Number(paise) || 0) / 100);
+      <div class="gig-summary">
+        <div class="gig-summary-row">
+          <span class="gig-summary-label">Gig</span>
+          <span class="gig-summary-value" id="summary-title">—</span>
+        </div>
+        <div class="gig-summary-row">
+          <span class="gig-summary-label">Gig ID</span>
+          <span class="gig-id-badge" id="summary-gig-id" title="Click to copy">📋 —</span>
+        </div>
+        <div class="gig-summary-row">
+          <span class="gig-summary-label">Tasker</span>
+          <span class="gig-summary-value" id="summary-tasker">—</span>
+        </div>
+        <div class="gig-summary-row">
+          <span class="gig-summary-label">Category</span>
+          <span class="gig-summary-value" id="summary-category">—</span>
+        </div>
+      </div>
 
-    document.getElementById('gigBudget').textContent = formatINR(budgetPaise);
-    document.getElementById('platformFee').textContent = formatINR(feePaise);
-    document.getElementById('totalPayable').textContent = formatINR(totalPaise);
+      <div class="price-breakdown">
+        <div class="price-row">
+          <span class="label">Gig amount</span>
+          <span class="amount" id="price-base">—</span>
+        </div>
+        <div class="price-row fee">
+          <span class="label">Platform fee</span>
+          <span class="amount" id="price-fee">—</span>
+        </div>
+        <div class="price-row">
+          <span class="label">GST (18% on fee)</span>
+          <span class="amount" id="price-gst">—</span>
+        </div>
+        <hr class="price-divider" />
+        <div class="price-row total">
+          <span class="label">Total payable</span>
+          <span class="amount" id="price-total">—</span>
+        </div>
+        <p class="fee-info" id="fee-info-text"></p>
+      </div>
 
-    document.getElementById('payNow').addEventListener('click', async () => {
-      try {
-        const orderResponse = await fetch('/api/create-order', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ gigId, uid: localStorage.getItem('gl_uid') || '' })
-        });
+      <div class="checkout-footer">
+        <button id="pay-btn" disabled>
+          <span id="pay-btn-label">Pay ₹—</span>
+        </button>
+        <div class="secure-note">🔒 Secured by Razorpay &nbsp;·&nbsp; UPI, Cards, Net Banking accepted</div>
+      </div>
+    </div>
 
-        if (!orderResponse.ok) {
-          throw new Error('Unable to create order.');
-        }
+    <!-- ── STATE: PROCESSING ── -->
+    <div class="state-screen" id="state-processing">
+      <div class="gl-spinner-lg"></div>
+      <div class="state-title">Processing payment…</div>
+      <div class="state-sub">Please don't close this window. We're confirming your payment with Razorpay.</div>
+    </div>
 
-        const orderData = await orderResponse.json();
-        showToast(`Order created: ${orderData.orderId}`, 'info');
-      } catch (error) {
-        console.error('checkout payment failed:', error);
-        showToast('Payment initialization failed.', 'error');
+    <!-- ── STATE: SUCCESS ── -->
+    <div class="state-screen" id="state-success">
+      <div class="success-ring">✅</div>
+      <div class="state-title">Payment Successful!</div>
+      <div class="state-sub">Funds are held in escrow and will be released to the tasker once you confirm completion.</div>
+      <div class="receipt-block" id="receipt-block">
+        <div class="receipt-row"><span class="rl">Razorpay ID</span><span class="rv" id="r-payment-id">—</span></div>
+        <div class="receipt-row"><span class="rl">Order ID</span><span class="rv" id="r-order-id">—</span></div>
+        <div class="receipt-row"><span class="rl">Gig ID</span><span class="rv" id="r-gig-id">—</span></div>
+        <div class="receipt-row"><span class="rl">Amount paid</span><span class="rv" id="r-amount">—</span></div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:4px;">
+        <a href="dashboard-poster.html" class="state-action-btn">Go to Dashboard</a>
+        <a id="go-active-gig" href="active-gig.html" class="state-action-btn outline">View Active Gig</a>
+      </div>
+    </div>
+
+    <!-- ── STATE: ERROR ── -->
+    <div class="state-screen" id="state-error">
+      <div class="error-ring">❌</div>
+      <div class="state-title">Payment Failed</div>
+      <div class="state-sub" id="error-msg">Something went wrong. Your money has not been deducted. Please try again.</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:4px;">
+        <button class="state-action-btn" id="retry-btn">Try Again</button>
+        <a href="contact.html" class="state-action-btn outline">Contact Support</a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Firebase -->
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+  import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+  import { getFirestore, doc, getDoc, updateDoc, setDoc, serverTimestamp }
+    from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+  import { FIREBASE_CONFIG } from './firebase-config.js';
+
+  // ── Firebase init ──────────────────────────────────────────────────────────
+  const app  = initializeApp(FIREBASE_CONFIG);
+  const auth = getAuth(app);
+  const db   = getFirestore(app);
+
+  // ── State machine ──────────────────────────────────────────────────────────
+  const STATES = { LOADING: 'loading', READY: 'ready', PROCESSING: 'processing', SUCCESS: 'success', ERROR: 'error' };
+  let currentState = STATES.LOADING;
+  let orderData = {};
+
+  function setState(s) {
+    currentState = s;
+    document.querySelectorAll('.state-screen').forEach(el => el.classList.remove('active'));
+    document.getElementById('state-ready').style.display = s === STATES.READY ? 'block' : 'none';
+    if (s !== STATES.READY) {
+      const el = document.getElementById('state-' + s);
+      if (el) el.classList.add('active');
+    }
+  }
+
+  // ── Helpers ────────────────────────────────────────────────────────────────
+  const fmt = n => '₹' + Number(n).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+  function copyText(text) {
+    navigator.clipboard.writeText(text).catch(() => {});
+  }
+
+  // ── URL params ─────────────────────────────────────────────────────────────
+  const params   = new URLSearchParams(window.location.search);
+  const gigDocId = params.get('gigId');
+  const taskerUid = params.get('taskerUid');
+
+  if (!gigDocId) {
+    setState(STATES.ERROR);
+    document.getElementById('error-msg').textContent = 'Missing gig reference. Please go back and try again.';
+  }
+
+  // ── Auth guard ─────────────────────────────────────────────────────────────
+  onAuthStateChanged(auth, async user => {
+    if (!user) {
+      window.location.href = 'login.html?redirect=checkout.html' + window.location.search;
+      return;
+    }
+    if (gigDocId) await loadGig(user);
+  });
+
+  // ── Load gig from Firestore ────────────────────────────────────────────────
+  async function loadGig(user) {
+    try {
+      const snap = await getDoc(doc(db, 'gigs', gigDocId));
+      if (!snap.exists()) throw new Error('Gig not found');
+      const gig = snap.data();
+
+      // Fee structure — shown transparently at checkout
+      const base     = Number(gig.budget || gig.price || 0);
+      const feeRate  = Number(gig.platformFeeRate || 0.05);   // default 5%, set per gig
+      const fee      = parseFloat((base * feeRate).toFixed(2));
+      const gst      = parseFloat((fee * 0.18).toFixed(2));
+      const total    = parseFloat((base + fee + gst).toFixed(2));
+      const totalPaise = Math.round(total * 100);
+
+      // Tasker name
+      let taskerName = gig.taskerName || taskerUid || 'Assigned Tasker';
+      if (taskerUid && !gig.taskerName) {
+        try {
+          const tSnap = await getDoc(doc(db, 'users', taskerUid));
+          if (tSnap.exists()) taskerName = tSnap.data().displayName || taskerName;
+        } catch (_) {}
       }
-    });
-  </script>
+
+      orderData = { gig, gigDocId, base, fee, gst, total, totalPaise, feeRate, user, taskerName };
+
+      // Render summary
+      document.getElementById('summary-title').textContent    = gig.title || '—';
+      document.getElementById('summary-category').textContent = gig.category || '—';
+      document.getElementById('summary-tasker').textContent   = taskerName;
+
+      const gigIdBadge = document.getElementById('summary-gig-id');
+      gigIdBadge.innerHTML = '📋 ' + (gig.gigId || gigDocId);
+      gigIdBadge.onclick = () => { copyText(gig.gigId || gigDocId); gigIdBadge.innerHTML = '✅ Copied!'; setTimeout(() => { gigIdBadge.innerHTML = '📋 ' + (gig.gigId || gigDocId); }, 1800); };
+
+      // Render price
+      document.getElementById('price-base').textContent  = fmt(base);
+      document.getElementById('price-fee').textContent   = fmt(fee);
+      document.getElementById('price-gst').textContent   = fmt(gst);
+      document.getElementById('price-total').textContent = fmt(total);
+      document.getElementById('fee-info-text').textContent =
+        `Platform fee: ${(feeRate * 100).toFixed(0)}% of gig amount. Shown here before payment — no hidden charges.`;
+
+      const payBtn = document.getElementById('pay-btn');
+      document.getElementById('pay-btn-label').textContent = 'Pay ' + fmt(total);
+      payBtn.disabled = false;
+      payBtn.onclick = () => launchRazorpay(totalPaise, gig, user, taskerName);
+
+      setState(STATES.READY);
+    } catch (err) {
+      console.error(err);
+      setState(STATES.ERROR);
+      document.getElementById('error-msg').textContent = err.message || 'Failed to load gig details.';
+    }
+  }
+
+  // ── Razorpay launch ────────────────────────────────────────────────────────
+  async function launchRazorpay(amountPaise, gig, user, taskerName) {
+    setState(STATES.PROCESSING);
+
+    let rzpOrderId = null;
+
+    // Create Razorpay order via Vercel API route
+    try {
+      const res = await fetch('/api/create-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          amount: amountPaise,
+          gigId: gigDocId,
+          gigTitle: gig.title,
+          posterUid: user.uid
+        })
+      });
+      if (!res.ok) throw new Error('Order creation failed (' + res.status + ')');
+      const json = await res.json();
+      rzpOrderId = json.id;
+    } catch (err) {
+      setState(STATES.ERROR);
+      document.getElementById('error-msg').textContent = 'Could not create payment order. ' + err.message;
+      return;
+    }
+
+    // Open Razorpay modal
+    const options = {
+      key: 'rzp_test_REPLACE_WITH_YOUR_KEY',   // ← replace with live key before prod
+      amount: amountPaise,
+      currency: 'INR',
+      name: 'GigLega',
+      description: gig.title,
+      order_id: rzpOrderId,
+      prefill: {
+        name:  user.displayName || '',
+        email: user.email || '',
+        contact: user.phoneNumber || ''
+      },
+      theme: { color: '#6c63ff' },
+      modal: {
+        ondismiss: () => {
+          if (currentState === STATES.PROCESSING) setState(STATES.READY);
+        }
+      },
+      handler: async (response) => {
+        await handlePaymentSuccess(response, amountPaise, gig, taskerName);
+      }
+    };
+
+    try {
+      const rzp = new window.Razorpay(options);
+      rzp.on('payment.failed', (resp) => {
+        setState(STATES.ERROR);
+        document.getElementById('error-msg').textContent =
+          (resp.error && resp.error.description) || 'Payment was declined. Please try a different method.';
+      });
+      rzp.open();
+    } catch (err) {
+      setState(STATES.ERROR);
+      document.getElementById('error-msg').textContent = 'Razorpay could not be loaded. Check your internet connection.';
+    }
+  }
+
+  // ── Payment success handler ────────────────────────────────────────────────
+  async function handlePaymentSuccess(response, amountPaise, gig, taskerName) {
+    setState(STATES.PROCESSING);
+    const { razorpay_payment_id, razorpay_order_id, razorpay_signature } = response;
+
+    try {
+      // Verify signature via API
+      const verifyRes = await fetch('/api/verify-payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ razorpay_payment_id, razorpay_order_id, razorpay_signature, gigId: gigDocId })
+      });
+      if (!verifyRes.ok) throw new Error('Signature verification failed');
+
+      // Write payment record to Firestore
+      const paymentRef = doc(db, 'payments', razorpay_payment_id);
+      await setDoc(paymentRef, {
+        razorpayPaymentId: razorpay_payment_id,
+        razorpayOrderId:   razorpay_order_id,
+        gigDocId,
+        gigId:      gig.gigId || gigDocId,
+        gigTitle:   gig.title,
+        posterUid:  orderData.user.uid,
+        taskerUid:  taskerUid || gig.taskerUid || null,
+        taskerName,
+        baseAmount: orderData.base,
+        platformFee: orderData.fee,
+        gst:        orderData.gst,
+        totalAmount: orderData.total,
+        status:     'escrow',
+        createdAt:  serverTimestamp()
+      });
+
+      // Update gig status to paid/active
+      await updateDoc(doc(db, 'gigs', gigDocId), {
+        paymentStatus:    'paid',
+        paymentId:        razorpay_payment_id,
+        status:           'active',
+        updatedAt:        serverTimestamp()
+      });
+
+      // Populate receipt
+      document.getElementById('r-payment-id').textContent = razorpay_payment_id;
+      document.getElementById('r-order-id').textContent   = razorpay_order_id;
+      document.getElementById('r-gig-id').textContent     = gig.gigId || gigDocId;
+      document.getElementById('r-amount').textContent     = fmt(orderData.total);
+
+      // Wire active gig link
+      document.getElementById('go-active-gig').href = 'active-gig.html?gigId=' + gigDocId;
+
+      setState(STATES.SUCCESS);
+    } catch (err) {
+      console.error(err);
+      setState(STATES.ERROR);
+      document.getElementById('error-msg').textContent =
+        'Payment received but verification failed. Contact support with ID: ' + razorpay_payment_id;
+    }
+  }
+
+  // ── UI bindings ────────────────────────────────────────────────────────────
+  document.getElementById('back-btn').addEventListener('click', () => history.back());
+  document.getElementById('retry-btn').addEventListener('click', () => {
+    if (orderData.totalPaise) setState(STATES.READY);
+    else window.location.reload();
+  });
+</script>
 </body>
 </html>
