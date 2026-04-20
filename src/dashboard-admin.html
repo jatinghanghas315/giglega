@@ -148,7 +148,7 @@
       </div>
       <div style="overflow-x:auto">
         <table class="admin-table">
-          <thead><tr><th>Gig ID</th><th>Tasker</th><th>Gross</th><th>Fee (10%)</th><th>Net Payout</th><th>Status</th><th>Actions</th></tr></thead>
+          <thead><tr><th>Gig ID</th><th>Tasker</th><th>Gross</th><th>Platform Fee</th><th>Net Payout</th><th>Status</th><th>Actions</th></tr></thead>
           <tbody id="payoutsTableBody"><tr><td colspan="7"><div class="empty-state"><div class="ei">⏳</div><p>Loading payouts...</p></div></td></tr></tbody>
         </table>
       </div>
@@ -355,10 +355,12 @@
         var html = '';
         snap.forEach(function(d) {
           var g = d.data();
-          html += '<div style="background:var(--surface);border:1.5px solid rgba(220,38,38,.2);border-radius:12px;padding:16px 18px;margin-bottom:12px">' +
+          var dispAge = g.disputeRaisedAt ? Math.floor((Date.now() - new Date(g.disputeRaisedAt.toDate ? g.disputeRaisedAt.toDate() : g.disputeRaisedAt).getTime())/3600000) : null;
+        var dispSlaOver = dispAge !== null && dispAge > 24;
+        html += '<div style="background:var(--surface);border:1.5px solid ' + (dispSlaOver ? 'rgba(220,38,38,.5)' : 'rgba(220,38,38,.2)') + ';border-radius:12px;padding:16px 18px;margin-bottom:12px">' +
             '<div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px">' +
               '<div>' +
-                '<div style="font-weight:700;color:var(--text);margin-bottom:4px">' + esc(g.title||'—') + ' <span class="gig-id-tag">' + esc(g.gigId||d.id.slice(0,8)) + '</span></div>' +
+                '<div style="font-weight:700;color:var(--text);margin-bottom:4px">' + esc(g.title||'—') + ' <span class="gig-id-tag" style="cursor:pointer" title="Click to copy" onclick="navigator.clipboard.writeText(\'' + (g.gigId||d.id) + '\')">📋 ' + esc(g.gigId||d.id.slice(0,8)) + '</span>' + (dispSlaOver ? ' <span style="background:rgba(220,38,38,.15);color:#dc2626;font-size:.68rem;font-weight:800;padding:2px 7px;border-radius:5px">⚠️ SLA BREACH ' + dispAge + 'h</span>' : '') + '</div>' +
                 '<div style="font-size:.78rem;color:var(--gray-400)">' + 'Poster: ' + esc(g.posterName||'—') + ' &nbsp;·&nbsp; Tasker: ' + esc(g.workerName||'—') + '</div>' +
                 (g.disputeReason ? '<div style="font-size:.8rem;color:#dc2626;margin-top:6px">Reason: ' + esc(g.disputeReason) + '</div>' : '') +
               '</div>' +
@@ -457,16 +459,27 @@
 
     window.approveEnterprise = async function(uid) {
       try {
-        await updateDoc(doc(db, 'users', uid), { enterpriseStatus: 'approved', enterpriseApprovedAt: serverTimestamp(), enterpriseApprovedBy: currentUser.uid });
-        if (window.showToast) showToast('Enterprise account approved.', 'success');
+        await updateDoc(doc(db, 'users', uid), {
+          enterpriseStatus: 'approved',
+          enterpriseApprovedAt: serverTimestamp(),
+          enterpriseApprovedBy: currentUser.uid,
+          role: 'enterprise'
+        });
+        try { await updateDoc(doc(db, 'enterpriseLeads', uid), { status: 'approved', approvedAt: serverTimestamp(), approvedBy: currentUser.uid }); } catch(_) {}
+        if (window.showToast) showToast('Enterprise approved. User notified.', 'success');
         loadEnterprise(); loadAllStats();
       } catch(e) { console.warn('[GigLega] approveEnterprise:', e); if (window.showToast) showToast('Failed.', 'error'); }
     };
 
     window.rejectEnterprise = async function(uid) {
       try {
-        await updateDoc(doc(db, 'users', uid), { enterpriseStatus: 'rejected', enterpriseRejectedAt: serverTimestamp() });
-        if (window.showToast) showToast('Enterprise application rejected.', 'success');
+        await updateDoc(doc(db, 'users', uid), {
+          enterpriseStatus: 'rejected',
+          enterpriseRejectedAt: serverTimestamp(),
+          enterpriseRejectedBy: currentUser.uid
+        });
+        try { await updateDoc(doc(db, 'enterpriseLeads', uid), { status: 'rejected', rejectedAt: serverTimestamp(), rejectedBy: currentUser.uid }); } catch(_) {}
+        if (window.showToast) showToast('Application rejected.', 'success');
         loadEnterprise(); loadAllStats();
       } catch(e) { console.warn('[GigLega] rejectEnterprise:', e); if (window.showToast) showToast('Failed.', 'error'); }
     };
