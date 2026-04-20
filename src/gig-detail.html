@@ -501,6 +501,14 @@
       .page-wrap { padding-bottom: 80px; }
     }
 
+  
+    .fee-breakdown{background:rgba(13,148,136,.05);border:1.5px solid rgba(13,148,136,.2);border-radius:10px;padding:14px 16px;margin:12px 0}
+    .fee-breakdown-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;font-size:.88rem;color:var(--gray-600)}
+    .fee-breakdown-row+.fee-breakdown-row{border-top:1px solid rgba(13,148,136,.12)}
+    .fee-breakdown-row.total{padding-top:10px;margin-top:4px;border-top:2px solid rgba(13,148,136,.25)!important;font-weight:700}
+    .fee-breakdown-earn{font-size:1.1rem;font-weight:900;color:var(--teal)}
+    [data-theme=dark] .fee-breakdown{background:rgba(13,148,136,.08);border-color:rgba(13,148,136,.3)}
+    [data-theme=dark] .fee-breakdown-row{color:var(--gray-400)}
   </style>
   <link rel="canonical" href="https://giglega.vercel.app/gig-detail.html">
 </head>
@@ -661,7 +669,7 @@
       } else if(isOpen){
         /* WORKER on open gig — show book button, no message */
         actionHtml = '<button class="btn btn-primary btn-accept" id="btnAccept" style="width:100%;font-size:1rem;padding:14px">Book This Gig</button>'+
-          '<p style="font-size:.75rem;color:var(--gray-400);text-align:center;margin-top:8px">Book karo, phir poster se chat karo</p>';
+          '<p style="font-size:.75rem;color:var(--gray-400);text-align:center;margin-top:8px">Book this gig, then chat with the poster to confirm timing and address.</p>'+'<div class="support-strip" style="margin-top:14px">'+'<span class="support-strip-icon">🔒</span>'+'<div style="font-size:.78rem"><strong>Secure payment.</strong> Funds are held in escrow and released only after the gig is marked complete.</div>'+'</div>';
         posterCardCTA = ""; /* No message until booked */
       } else {
         /* Taken by someone else or done */
@@ -675,7 +683,7 @@
           '<div class="poster-row" style="display:flex;align-items:center;gap:12px">'+
             '<div class="poster-avatar-lg" style="width:48px;height:48px;border-radius:50%;background:var(--primary),var(--teal,#0d9488));display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-size:1rem;flex-shrink:0">'+escH(posterInits)+'</div>'+
             '<div>'+
-              '<div class="poster-name">'+escH(posterName)+'</div>'+
+              '<div class="poster-name" style="display:flex;align-items:center;gap:6px">'+escH(posterName)+(poster&&poster.isVerified?'<span class="trust-badge" style="font-size:.67rem">✓ Verified</span>':'')+'</div>'+
               '<div class="poster-since">'+((poster && poster.city)||gig.area||"Gurugram")+'</div>'+
             '</div>'+
           '</div>'+
@@ -737,16 +745,10 @@
               /* Pricing card */
               '<div class="pricing-card">'+
                 '<div class="price-row" style="flex-direction:column;gap:0">'+
-                  '<span style="font-size:.78rem;color:var(--gray-400);font-weight:600;text-transform:uppercase;letter-spacing:.04em">Budget</span>'+
-                  '<span style="font-size:2rem;font-weight:900;color:var(--primary)">'+fmtCur(gig.budget)+'</span>'+
-                '</div>'+
-                '<div class="price-row">'+
-                  '<span class="label">GigLega Fee (6%)</span>'+
-                  '<span class="cp-val" style="color:var(--gray-500)">- '+fmtCur(fee)+'</span>'+
-                '</div>'+
-                '<div class="price-row">'+
-                  '<span class="label" style="font-weight:800">You Earn</span>'+
-                  '<span class="earn">'+fmtCur(earn)+'</span>'+
+                  '<div class="fee-breakdown">'+
+                  '<div class="fee-breakdown-row"><span>Posted Budget</span><span><strong>'+fmtCur(gig.budget)+'</strong></span></div>'+
+                  '<div class="fee-breakdown-row"><span>Platform Fee (6%)</span><span style="color:var(--danger)">−'+fmtCur(fee)+'</span></div>'+
+                  '<div class="fee-breakdown-row total"><span>💰 You Earn</span><span class="fee-breakdown-earn">'+fmtCur(earn)+'</span></div>'+
                 '</div>'+
                 '<div id="actionZone" class="action-zone" style="margin-top:16px">'+actionHtml+'</div>'+
               '</div>'+
