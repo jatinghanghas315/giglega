@@ -363,7 +363,7 @@
             : role === 'enterprise' ? 'enterprise.html'
             : 'dashboard-client.html';
 
-          const dashLabel = role === 'worker' || role === 'tasker' ? 'Worker Dashboard'
+          const dashLabel = role === 'worker' || role === 'tasker' ? 'Tasker Dashboard'
             : role === 'admin' ? 'Admin Panel'
             : role === 'enterprise' ? 'Enterprise Dashboard'
             : 'Poster Dashboard';
@@ -526,7 +526,7 @@
             '<div class="footer-col-title">Platform</div>' +
             '<a href="browse.html">Browse Gigs</a>' +
             '<a href="post-gig.html">Post a Gig</a>' +
-            '<a href="dashboard-worker.html">Worker Dashboard</a>' +
+            '<a href="dashboard-worker.html">Tasker Dashboard</a>' +
             '<a href="dashboard-client.html">Poster Dashboard</a>' +
           '</div>' +
           '<div class="footer-col">' +
