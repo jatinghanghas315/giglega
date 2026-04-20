@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Tasker Dashboard — GigLega</title>
-  <meta name="description" content="GigLega Tasker dashboard — apni earnings track karo aur gigs manage karo." />
+  <meta name="description" content="GigLega Tasker dashboard — track your earnings , manage gigs and withdraw payouts." />
     <meta name="robots" content="noindex, nofollow" />
   <link rel="stylesheet" href="styles.css" />
     <link rel="stylesheet" href="theme-dark.css" />
@@ -732,8 +732,8 @@ if (_workerRole && _workerRole !== 'tasker' && _workerRole !== 'worker' && _work
         var c=document.getElementById('recentTxnList');
         if(!c)return;
         if(snap.empty){
-          c.innerHTML=emptyHtml('Abhi koi transaction nahi.',
-            'Pehla gig complete karo — earnings yahaan dikhegi!');
+          c.innerHTML=emptyHtml('No transactions yet.',
+            'Complete your first gig — your earnings will appear here!');
           return;
         }
         var html='<div class="txn-list">';
