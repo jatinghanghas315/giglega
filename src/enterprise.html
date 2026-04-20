@@ -907,7 +907,7 @@
               <li><span class="check">✓</span> 5 active gigs at a time</li>
               <li><span class="check">✓</span> Basic browse & search</li>
               <li><span class="check">✓</span> In-app chat</li>
-              <li><span class="check">✓</span> 10% platform fee</li>
+              <li><span class="check">✓</span> Transparent platform fee</li>
               <li><span class="cross">✗</span> <span style="color:var(--gray-400)">Bulk posting</span></li>
               <li><span class="cross">✗</span> <span style="color:var(--gray-400)">Analytics dashboard</span></li>
               <li><span class="cross">✗</span> <span style="color:var(--gray-400)">Dedicated AM</span></li>
@@ -983,7 +983,7 @@
             <tr><td>Priority Listing</td><td><span class="ct-cross">✗</span></td><td><span class="ct-check">✓</span></td><td><span class="ct-check">✓</span></td></tr>
 
             <tr class="ct-group"><td colspan="4" style="text-align:left;padding:10px 18px">💰 Pricing & Fees</td></tr>
-            <tr><td>Platform Fee</td><td class="ct-val">10%</td><td class="ct-val">4%</td><td class="ct-val">3%–4%</td></tr>
+            <tr><td>Platform Fee</td><td class="ct-val">Shown at checkout</td><td class="ct-val">4%</td><td class="ct-val">3%–4%</td></tr>
             <tr><td>Monthly Plan Cost</td><td class="ct-val">Free</td><td class="ct-val">₹2,999</td><td class="ct-val">Custom</td></tr>
             <tr><td>Annual Discount</td><td><span class="ct-cross">✗</span></td><td class="ct-val">20% off</td><td class="ct-val">Negotiable</td></tr>
 
@@ -1361,11 +1361,23 @@
           gigsVolume: gigsVol, plan, message,
           createdAt: new Date().toISOString()
         };
+        /* localStorage fallback */
         try {
           var leads = JSON.parse(localStorage.getItem(ENT_KEY)||"[]");
           leads.unshift(lead);
           localStorage.setItem(ENT_KEY, JSON.stringify(leads));
         } catch(e){}
+        /* Firestore write — enterpriseLeads collection */
+        try {
+          const { initializeApp, getApps } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+          const { getFirestore, collection, addDoc, serverTimestamp: sTs } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+          const { FIREBASE_CONFIG } = await import('./firebase-config.js');
+          const _fa = getApps().length ? getApps()[0] : initializeApp(FIREBASE_CONFIG);
+          const _fdb = getFirestore(_fa);
+          await addDoc(collection(_fdb, 'enterpriseLeads'), {
+            ...lead, status: 'pending', source: 'enterprise-form', createdAt: sTs()
+          });
+        } catch(fsErr) { console.warn('[GigLega] Firestore lead save failed:', fsErr); }
 
         /* Show success */
         document.getElementById("leadFormCard").style.display = "none";
@@ -1387,64 +1399,3 @@
 
   });
   </script>
-<<<<<<< HEAD
-<script type="module">
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
-import { getFirestore, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
-const _app = initializeApp({ apiKey:'AIzaSyBs2GAtATfX9c_bPbOSULJRPKuHuOkG1Mc', authDomain:'giglega.firebaseapp.com', projectId:'giglega' });
-const _auth = getAuth(_app); const _db = getFirestore(_app);
-onAuthStateChanged(_auth, async function(user) {
-  try {
-    if (!user) return;
-    const snap = await getDoc(doc(_db,'users',user.uid));
-    if (!snap.exists()) return;
-    var data = snap.data();
-    var role = data.role || 'tasker';
-    var banner = document.getElementById('entStatusBanner');
-    if (!banner) return;
-    if (role === 'enterprise') {
-      var status = data.enterpriseStatus || 'pending';
-      var html = '';
-      if (status === 'pending') { html = '<div style="background:rgba(217,153,58,.1);border:1.5px solid rgba(217,153,58,.4);border-radius:10px;padding:14px 18px;color:#d9993a;font-size:.95rem">&#9203; Your enterprise account is <strong>pending review</strong>. We\'ll notify you once approved.</div>'; }
-      else if (status === 'approved') { html = '<div style="background:rgba(5,150,105,.08);border:1.5px solid rgba(5,150,105,.35);border-radius:10px;padding:14px 18px;color:#059669;font-size:.95rem">&#10003; Your enterprise account is <strong>approved</strong>. You can now post gigs.</div>'; }
-      else if (status === 'rejected') { html = '<div style="background:rgba(220,38,38,.08);border:1.5px solid rgba(220,38,38,.35);border-radius:10px;padding:14px 18px;color:#dc2626;font-size:.95rem">&#10007; Your enterprise application was <strong>rejected</strong>. Contact support for details.</div>'; }
-      if (html) { banner.innerHTML = html; banner.style.display = 'block'; }
-    } else if (role === 'poster' || role === 'tasker') {
-      banner.innerHTML = '<div style="background:rgba(13,148,136,.07);border:1.5px solid rgba(13,148,136,.3);border-radius:10px;padding:14px 18px;color:#0d9488;font-size:.95rem">Want to post gigs as an enterprise? <a href="/src/register-enterprise.html" style="color:#0d9488;font-weight:600;text-decoration:underline">Apply here</a>.</div>';
-      banner.style.display = 'block';
-    }
-  } catch(e) { console.warn('[GigLega] enterprise status check:', e); }
-});
-</script>
-=======
-<script type="module">
-  import { auth, db } from './firebase-config.js';
-  import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
-  import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
-  onAuthStateChanged(auth, async function(user) {
-    if (!user) return;
-    try {
-      var snap = await getDoc(doc(db, 'users', user.uid));
-      if (!snap.exists()) return;
-      var data = snap.data();
-      var role = data.role || 'tasker';
-      var banner = document.getElementById('entStatusBanner');
-      if (!banner) return;
-      if (role === 'enterprise') {
-        var status = data.enterpriseStatus || 'pending';
-        var html = '';
-        if (status === 'pending') { html = '<div style="background:rgba(217,153,58,.1);border:1.5px solid rgba(217,153,58,.3);border-radius:14px;padding:18px 20px"><b>Enterprise Application Under Review</b> — awaiting admin approval, typically 24-48 hours.</div>'; }
-        else if (status === 'approved') { html = '<div style="background:rgba(5,150,105,.08);border:1.5px solid rgba(5,150,105,.25);border-radius:14px;padding:16px 20px;color:#059669"><b>Enterprise Account Active</b></div>'; }
-        else if (status === 'rejected') { html = '<div style="background:rgba(220,38,38,.08);border:1.5px solid rgba(220,38,38,.2);border-radius:14px;padding:16px 20px;color:#dc2626"><b>Enterprise Application Not Approved.</b> Please <a href="contact.html">contact support</a>.</div>'; }
-        if (html) { banner.innerHTML = html; banner.style.display = 'block'; }
-      } else if (role === 'poster' || role === 'tasker') {
-        banner.innerHTML = '<div style="background:rgba(13,148,136,.07);border:1.5px solid rgba(13,148,136,.18);border-radius:14px;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px"><span>Interested in Enterprise? Switch your role to apply.</span><a href="profile.html" style="padding:8px 18px;background:#D9993A;color:#fff;border-radius:8px;font-weight:700;font-size:.8rem;text-decoration:none">Switch to Enterprise</a></div>';
-        banner.style.display = 'block';
-      }
-    } catch(e) { console.warn('[GigLega] enterprise status check:', e); }
-  });
-</script>
->>>>>>> 82735ea94e425b92196cd4bdc63bb0ff11f849c7
-</body>
-</html>
