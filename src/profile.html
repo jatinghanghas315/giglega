@@ -187,7 +187,7 @@
         <div class="card-title">📝 About You</div>
         <div class="field">
           <label>Bio</label>
-          <textarea id="fieldBio" maxlength="300" placeholder="Tell posters and workers a bit about yourself — your skills, experience, or what kind of gigs you prefer..."></textarea>
+          <textarea id="fieldBio" maxlength="300" placeholder="Tell posters and Taskers a bit about yourself — your skills, experience, or what kind of gigs you prefer..."></textarea>
         </div>
         <div class="field">
           <label>Preferred Work Type</label>
@@ -389,8 +389,8 @@ if (!user) {
 
       /* Chips */
       var chips = [];
-      if (user.workType === "hyperlocal") chips.push("📍 Hyperlocal Worker");
-      else if (user.workType === "remote") chips.push("💻 Remote Worker");
+      if (user.workType === "hyperlocal") chips.push("📍 Hyperlocal Tasker");
+      else if (user.workType === "remote") chips.push("💻 Remote Tasker");
       else if (user.workType === "both")   chips.push("⚡ Hyperlocal & Remote");
       if (user.city) chips.push("📍 " + user.city);
       document.getElementById("heroChips").innerHTML = chips.map(function (c) {
