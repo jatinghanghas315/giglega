@@ -168,7 +168,15 @@
     .s-taken{background:rgba(245,158,11,.1);color:#b45309}
     .s-completed{background:rgba(107,114,128,.1);color:#374151}
 
-    /* ── Empty state ── */
+    
+/* ── Loading skeletons ── */
+.skel{background:linear-gradient(90deg,var(--gray-200) 25%,var(--gray-100) 50%,var(--gray-200) 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;border-radius:10px;}
+[data-theme=dark] .skel{background:linear-gradient(90deg,var(--gray-700) 25%,var(--gray-600) 50%,var(--gray-700) 75%);background-size:200% 100%;}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.skel-card{height:90px;width:100%;border-radius:12px;margin-bottom:10px;}
+.section-min{min-height:110px;}
+
+/* ── Empty state ── */
     .empty-box{text-align:center;padding:40px 24px;color:var(--gray-400);background:var(--surface);border:1.5px dashed var(--gray-200);border-radius:var(--radius)}
     .empty-box .ei{font-size:2.5rem;margin-bottom:10px}
     .empty-box p{font-size:.88rem;line-height:1.6}
@@ -369,7 +377,7 @@
           <div class="section-title">⚡ Active Gigs</div>
           <a href="browse.html" class="section-link">Browse More →</a>
         </div>
-        <div id="activeGigsList"></div>
+        <div id="activeGigsList" class="section-min"><div class="skel skel-card"></div><div class="skel skel-card" style="opacity:.6"></div></div>
       </div>
 
       <!-- Completed gigs -->
@@ -377,7 +385,7 @@
         <div class="section-head">
           <div class="section-title">✅ Completed Gigs</div>
         </div>
-        <div id="completedGigsList"></div>
+        <div id="completedGigsList" class="section-min"><div class="skel skel-card"></div><div class="skel skel-card" style="opacity:.6"></div></div>
       </div>
 
 
@@ -387,7 +395,7 @@
           <div class="section-title">📋 Recent Transactions</div>
           <a href="wallet.html" class="section-link">View All →</a>
         </div>
-        <div id="recentTxnList"></div>
+        <div id="recentTxnList" class="section-min"><div class="skel skel-card"></div><div class="skel skel-card" style="opacity:.6"></div></div>
       </div>
 
     </div>
@@ -501,7 +509,7 @@ if (_workerRole && _workerRole !== 'tasker' && _workerRole !== 'worker' && _work
           workerGigs = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
           render();
         }, function(err){ console.warn('[GigLega] worker gigs:', err.message); });
-      }catch(e){ console.warn('[GigLega] loadWorkerGigs:', e.message); }
+      }catch(e){ console.warn('[GigLega] loadWorkerGigs:', e.message); render(); }
     }
 
     /* ── Live wallet balance from wallets/{uid} (single source of truth) ── */
@@ -754,9 +762,14 @@ if (_workerRole && _workerRole !== 'tasker' && _workerRole !== 'worker' && _work
             +'</div>';
         });
         c.innerHTML=html+'</div>';
-      }catch(e){console.warn('[GigLega] loadRecentTxns:',e.message);}
+      }catch(e){
+        console.warn('[GigLega] loadRecentTxns:',e.message);
+        var c=document.getElementById('recentTxnList');
+        if(c) c.innerHTML=emptyHtml('No transactions yet.','Complete your first gig — your earnings will appear here!');
+      }
     }
 
+    render(); /* show empty states immediately while data loads */
     loadWorkerGigs();
     loadWalletBalance();
     loadSparkline(user.uid || user.id);
