@@ -177,9 +177,12 @@
 .section-min{min-height:110px;}
 
 /* ── Empty state ── */
-    .empty-box{text-align:center;padding:40px 24px;color:var(--gray-400);background:var(--surface);border:1.5px dashed var(--gray-200);border-radius:var(--radius)}
-    .empty-box .ei{font-size:2.5rem;margin-bottom:10px}
-    .empty-box p{font-size:.88rem;line-height:1.6}
+    .empty-box{text-align:center;padding:36px 24px 32px;color:var(--gray-500);background:rgba(13,148,136,.05);border:2px dashed rgba(13,148,136,.45);border-radius:var(--radius)}
+    [data-theme=dark] .empty-box{background:rgba(13,148,136,.07);border-color:rgba(13,148,136,.4)}
+    .empty-box .ei{font-size:2.8rem;margin-bottom:12px;display:block}
+    .empty-box p{font-size:.88rem;line-height:1.6;color:var(--gray-500);margin:0 0 4px}
+    .empty-box .btn{margin-top:14px;display:inline-block;padding:9px 22px;background:var(--teal,#0d9488);color:#fff;border-radius:8px;font-weight:700;font-size:.83rem;text-decoration:none;transition:opacity .15s}
+    .empty-box .btn:hover{opacity:.85}
 
     /* ── Withdraw modal ── */
     .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9000;display:none;align-items:center;justify-content:center;padding:16px}
@@ -377,7 +380,7 @@
           <div class="section-title">⚡ Active Gigs</div>
           <a href="browse.html" class="section-link">Browse More →</a>
         </div>
-        <div id="activeGigsList" class="section-min"><div class="skel skel-card"></div><div class="skel skel-card" style="opacity:.6"></div></div>
+        <div id="activeGigsList"></div>
       </div>
 
       <!-- Completed gigs -->
@@ -385,7 +388,7 @@
         <div class="section-head">
           <div class="section-title">✅ Completed Gigs</div>
         </div>
-        <div id="completedGigsList" class="section-min"><div class="skel skel-card"></div><div class="skel skel-card" style="opacity:.6"></div></div>
+        <div id="completedGigsList"></div>
       </div>
 
 
@@ -395,10 +398,9 @@
           <div class="section-title">📋 Recent Transactions</div>
           <a href="wallet.html" class="section-link">View All →</a>
         </div>
-        <div id="recentTxnList" class="section-min"><div class="skel skel-card"></div><div class="skel skel-card" style="opacity:.6"></div></div>
+        <div id="recentTxnList"></div>
       </div>
 
-    </div>
 
     <!-- ── Bank Details Prompt (Phase 2) ── -->
     <div id="bankDetailsPrompt" style="display:none;margin-top:24px;background:linear-gradient(135deg,rgba(245,158,11,.1),rgba(245,158,11,.04));border:1.5px solid rgba(245,158,11,.3);border-radius:14px;padding:20px 18px">
@@ -415,7 +417,7 @@
     <!-- ── Tasker Info Cards (Phase 2) ── -->
     <div style="margin-top:28px">
       <div style="font-size:.78rem;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px">Your Tasker Benefits</div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px">
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px">
 
         <div style="background:var(--surface);border:1.5px solid var(--gray-200);border-radius:12px;padding:16px 14px">
           <div style="font-size:1.2rem;margin-bottom:6px">💸</div>
@@ -443,6 +445,7 @@
 
       </div>
     </div>
+    </div><!-- /.dash-wrap -->
 
   </main>
 
@@ -774,6 +777,15 @@ if (_workerRole && _workerRole !== 'tasker' && _workerRole !== 'worker' && _work
     loadWalletBalance();
     loadSparkline(user.uid || user.id);
     loadRecentTxns(user.uid || user.id);
+    /* Fallback: if Firestore never resolves, clear skeletons after 5s */
+    setTimeout(function() {
+      var a = document.getElementById('activeGigsList');
+      var c = document.getElementById('completedGigsList');
+      var t = document.getElementById('recentTxnList');
+      if (a && !a.querySelector('.gig-item,.empty-box')) a.innerHTML = emptyHtml('No active gigs right now.', 'Browse open gigs and accept one to start earning!', 'browse.html', 'Browse Gigs');
+      if (c && !c.querySelector('.gig-item,.empty-box')) c.innerHTML = emptyHtml('No completed gigs yet.', 'Complete your first gig to see earnings here.');
+      if (t && !t.querySelector('.txn-item,.empty-box')) t.innerHTML = emptyHtml('No transactions yet.', 'Complete your first gig — your earnings will appear here!');
+    }, 5000);
 
   })();
   
