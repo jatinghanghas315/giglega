@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Notifications — GigLega</title>
-  <meta name="description" content="GigLega notifications — apne gig updates, payments aur messages yahan dekho." />
+  <meta name="description" content="GigLega notifications — view your gig updates, payments and messages here." />
     <meta name="robots" content="noindex, nofollow" />
     <link rel="stylesheet" href="styles.css" />
   <link rel="stylesheet" href="theme-dark.css" />
@@ -711,18 +711,18 @@
     ══════════════════════════════════ -->
     <div class="notif-body">
 
-      <div class="swipe-hint">💡 Notification pe tap karo — dismiss ke liye ✕ dbaao</div>
+      <div class="swipe-hint">💡 Tap a notification to view details — press ✕ to dismiss</div>
 
       <!-- ════ MAIN NOTIFICATION LIST ════ -->
       <div id="notifMainList">
-        <div style="text-align:center;padding:48px;color:var(--gray-400)">⏳ Notifications load ho rahi hain...</div>
+        <div style="text-align:center;padding:48px;color:var(--gray-400)">⏳ Loading notifications...</div>
       </div><!-- /notifMainList -->
 
       <!-- ════ SETTINGS PANEL ════ -->
       <div class="notif-settings-panel" id="settingsPanel">
 
         <div class="ni-box teal">
-          🔔 <strong>Notifications settings</strong> — decide karo kya, kab aur kaise notifications receive karna chahte ho.
+          🔔 <strong>Notification settings</strong> — control what, when, and how you receive notifications.
         </div>
 
         <!-- Push Notifications -->
@@ -782,7 +782,7 @@
             <div class="ns-icon teal">🎯</div>
             <div class="ns-info">
               <div class="ns-title">New Gig Matches</div>
-              <div class="ns-sub">Jab tumhari skills se gig match ho Gurugram mein</div>
+              <div class="ns-sub">When a gig matches your skills in Gurugram</div>
             </div>
             <label class="ns-toggle">
               <input type="checkbox" checked onchange="saveSettingsDebounce()" />
@@ -837,7 +837,7 @@
             <div class="ns-icon green">💰</div>
             <div class="ns-info">
               <div class="ns-title">Payment Receipts</div>
-              <div class="ns-sub">Har payment ka email confirmation</div>
+              <div class="ns-sub">Email confirmation for every payment</div>
             </div>
             <label class="ns-toggle">
               <input type="checkbox" checked onchange="saveSettingsDebounce()" />
@@ -887,13 +887,13 @@
         <!-- Quiet Hours -->
         <div class="ns-section-title">🌙 Quiet Hours (Do Not Disturb)</div>
         <div class="ns-card">
-          <div class="ns-card-header">🌙 Disturbance free time set karo</div>
+          <div class="ns-card-header">🌙 Set disturbance-free hours</div>
 
           <div class="ns-row">
             <div class="ns-icon blue">🌙</div>
             <div class="ns-info">
               <div class="ns-title">Enable Quiet Hours</div>
-              <div class="ns-sub">Is time mein sirf urgent payment alerts aayenge</div>
+              <div class="ns-sub">Only urgent payment alerts during this time</div>
             </div>
             <label class="ns-toggle">
               <input type="checkbox" id="quietToggle" onchange="toggleQuietHours(this)" />
@@ -932,7 +932,7 @@
             <div class="ns-icon teal">🗂️</div>
             <div class="ns-info">
               <div class="ns-title">Group Similar Notifications</div>
-              <div class="ns-sub">Same type ke notifications ek group mein dikhao</div>
+              <div class="ns-sub">Group similar notifications together</div>
             </div>
             <label class="ns-toggle">
               <input type="checkbox" checked onchange="saveSettingsDebounce()" />
@@ -944,7 +944,7 @@
             <div class="ns-icon amber">🔊</div>
             <div class="ns-info">
               <div class="ns-title">Sound Alerts</div>
-              <div class="ns-sub">Payment aur urgent notifications pe sound</div>
+              <div class="ns-sub">Sound alerts for payments and urgent notifications</div>
             </div>
             <label class="ns-toggle">
               <input type="checkbox" checked onchange="saveSettingsDebounce()" />
@@ -968,7 +968,7 @@
             <div class="ns-icon blue">🔢</div>
             <div class="ns-info">
               <div class="ns-title">Badge Count</div>
-              <div class="ns-sub">App icon pe unread count badge dikhao</div>
+              <div class="ns-sub">Show unread count badge on app icon</div>
             </div>
             <label class="ns-toggle">
               <input type="checkbox" checked onchange="saveSettingsDebounce()" />
@@ -1033,11 +1033,11 @@
 
     let ctaHtml = '';
     if(data.chatUrl){
-      ctaHtml = `<button class="btn-notif-primary" onclick="event.stopPropagation();window.location.href='${escH(data.chatUrl)}'">💬 Chat Karo</button>`;
+      ctaHtml = `<button class="btn-notif-primary" onclick="event.stopPropagation();window.location.href='${escH(data.chatUrl)}'">💬 Open Chat</button>`;
     } else if(data.type === 'otp_requested' && data.gigId){
-      ctaHtml = `<button class="btn-notif-primary" style="background:#d97706;border-color:#d97706;" onclick="event.stopPropagation();window.location.href='active-gig.html?id=${escH(data.gigId)}'">🔑 OTP Dekho &rarr;</button>`;
+      ctaHtml = `<button class="btn-notif-primary" style="background:#d97706;border-color:#d97706;" onclick="event.stopPropagation();window.location.href='active-gig.html?id=${escH(data.gigId)}'">🔑 View OTP &rarr;</button>`;
     } else if(data.gigId){
-      ctaHtml = `<button class="btn-notif-primary" onclick="event.stopPropagation();window.location.href='gig-detail.html?id=${escH(data.gigId)}'">🔍 Gig Dekho</button>`;
+      ctaHtml = `<button class="btn-notif-primary" onclick="event.stopPropagation();window.location.href='gig-detail.html?id=${escH(data.gigId)}'">🔍 View Gig</button>`;
     }
 
     return `<div class="notif-card ${unread?'unread':''} ${typeClass}" id="nc-${id}"
@@ -1086,7 +1086,7 @@
     var _existM = document.getElementById("gl-confirm-modal"); if(_existM) _existM.remove();
     var _m = document.createElement("div"); _m.id="gl-confirm-modal";
     _m.style.cssText="position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px;";
-    _m.innerHTML='<div style="background:var(--surface,#fff);border-radius:12px;padding:28px 24px;max-width:340px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.25);"><h3 style="font-size:1rem;font-weight:800;color:#dc2626;margin-bottom:8px">Saari notifications delete karo?</h3><p style="font-size:.85rem;color:var(--gray-500,#6b7280);line-height:1.6;margin-bottom:20px">Yeh action undo nahi ho sakta.</p><div style="display:flex;gap:10px;justify-content:flex-end;"><button onclick="document.getElementById('gl-confirm-modal').remove()" style="padding:9px 20px;border-radius:8px;border:1.5px solid #e5e7eb;background:none;font-weight:600;font-size:.875rem;cursor:pointer;">Cancel</button><button id="notif-clear-ok" style="padding:9px 20px;border-radius:8px;border:none;background:#dc2626;color:#fff;font-weight:700;font-size:.875rem;cursor:pointer;">Delete All</button></div></div>';
+    _m.innerHTML='<div style="background:var(--surface,#fff);border-radius:12px;padding:28px 24px;max-width:340px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.25);"><h3 style="font-size:1rem;font-weight:800;color:#dc2626;margin-bottom:8px">Delete all notifications?</h3><p style="font-size:.85rem;color:var(--gray-500,#6b7280);line-height:1.6;margin-bottom:20px">This action cannot be undone.</p><div style="display:flex;gap:10px;justify-content:flex-end;"><button onclick="document.getElementById('gl-confirm-modal').remove()" style="padding:9px 20px;border-radius:8px;border:1.5px solid #e5e7eb;background:none;font-weight:600;font-size:.875rem;cursor:pointer;">Cancel</button><button id="notif-clear-ok" style="padding:9px 20px;border-radius:8px;border:none;background:#dc2626;color:#fff;font-weight:700;font-size:.875rem;cursor:pointer;">Delete All</button></div></div>';
     document.body.appendChild(_m);
     document.getElementById("notif-clear-ok").onclick = async function() {
       _m.remove();
@@ -1095,7 +1095,7 @@
         const batch = writeBatch(db);
         snap.docs.forEach(d=>batch.delete(d.ref));
         await batch.commit();
-        showToast("Saari notifications delete ho gayi!","success");
+        showToast("All notifications cleared!","success");
       } catch(e) { showToast("Delete failed: "+e.message,"error"); }
     };
     _m.addEventListener("click",function(e){if(e.target===_m)_m.remove();});
