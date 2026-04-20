@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Profile — GigLega</title>
-  <meta name="description" content="GigLega user profile — apni details update karo." />
+  <meta name="description" content="GigLega user profile — update your account detailso." />
     <meta property="og:image" content="https://giglega.vercel.app/logo.png" />
     <meta name="robots" content="noindex, nofollow" />
           <link rel="stylesheet" href="styles.css" />
@@ -608,7 +608,7 @@ if (!user) {
     document.getElementById("btnLogout").addEventListener("click", function () {
       showConfirmModal(
         "Logout karna chahte ho?",
-        "Aapka session end ho jayega.",
+        "Your session will end.",
         "Logout",
         function() {
           if (typeof safeLogout === "function") { safeLogout(); }
@@ -620,7 +620,7 @@ if (!user) {
     document.getElementById("btnDeleteAccount").addEventListener("click", function () {
       showConfirmModal(
         "⚠️ Account permanently delete karna chahte ho?",
-        "Yeh action UNDO nahi ho sakta. Aapka data, gigs, aur wallet sab delete ho jayega.",
+        "This action CANNOT be undone. Your data, gigs, and wallet will be permanently deleted.",
         "Delete Account",
         async function() {
           try {
