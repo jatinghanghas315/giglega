@@ -38,7 +38,8 @@
 
     /* ── Stats ── */
     .stats-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:16px;margin-bottom:24px}
-    .stat-card{background:var(--surface);border:1.5px solid var(--gray-200);border-radius:var(--radius);padding:18px 20px;box-shadow:var(--shadow-sm)}
+    .stat-card{background:var(--surface);border:1.5px solid var(--gray-200);border-radius:var(--radius);padding:18px 20px;box-shadow:var(--shadow-sm);transition:border-color .18s,box-shadow .18s}
+    .stat-card:hover{border-color:rgba(13,148,136,.45);box-shadow:0 4px 16px rgba(13,148,136,.1)}
     .stat-label{font-size:.75rem;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
     .stat-value{font-size:1.65rem;font-weight:900;color:var(--primary);font-family:var(--font-display);letter-spacing:-.5px}
     .stat-sub{font-size:.75rem;color:var(--gray-400);margin-top:3px}
@@ -89,17 +90,23 @@
     .cash-fee-desc{font-size:.8rem;color:var(--gray-600);line-height:1.5;margin-bottom:10px}
     .btn-pay-fee{padding:9px 18px;background:var(--accent);color:#fff;border:none;border-radius:var(--radius-sm);font-weight:700;font-size:.82rem;cursor:pointer}
 
-    /* ── Empty ── */
-    .empty-box{text-align:center;padding:40px 24px;color:var(--gray-400);background:var(--surface);border:1.5px dashed var(--gray-200);border-radius:var(--radius)}
-    .empty-box .ei{font-size:2.5rem;margin-bottom:10px}
-    .empty-box p{font-size:.88rem;line-height:1.6}
+    /* ── Empty state (gl-empty pattern) ── */
+    .empty-box{display:flex;flex-direction:column;align-items:center;text-align:center;padding:36px 20px 32px;border:2px dashed rgba(13,148,136,.38);border-radius:var(--radius);background:rgba(13,148,136,.04)}
+    [data-theme=dark] .empty-box{background:rgba(13,148,136,.07);border-color:rgba(79,195,200,.28)}
+    .empty-box .ei{font-size:2.8rem;margin-bottom:12px}
+    .empty-box p{font-size:.86rem;line-height:1.6;color:var(--gray-500);margin:0}
+    .gl-empty{display:flex;flex-direction:column;align-items:center;text-align:center;padding:36px 20px 32px;border:2px dashed rgba(13,148,136,.38);border-radius:var(--radius);background:rgba(13,148,136,.04)}
+    [data-theme=dark] .gl-empty{background:rgba(13,148,136,.07);border-color:rgba(79,195,200,.28)}
+    .gl-empty-icon{font-size:2.8rem;margin-bottom:12px}
+    .gl-empty-title{font-size:.97rem;font-weight:700;color:var(--text);margin-bottom:6px}
+    .gl-empty-sub{font-size:.85rem;color:var(--gray-500);line-height:1.6}
 
     /* Dark mode */
     [data-theme=dark] .stat-card{border-color:var(--gray-700)}
     [data-theme=dark] .gig-card{border-color:var(--gray-700)}
     [data-theme=dark] .tab-bar{border-color:var(--gray-700)}
     [data-theme=dark] .worker-row{background:var(--gray-800);border-color:var(--gray-700)}
-    [data-theme=dark] .empty-box{border-color:var(--gray-700)}
+    /* dark empty-box already handled above */
     [data-theme=dark] .complete-bar{background:rgba(16,185,129,.08)}
     [data-theme=dark] .complete-bar-text{color:var(--gray-300)}
     [data-theme=dark] .cash-fee-desc{color:var(--gray-400)}
@@ -132,7 +139,7 @@
           <p>Poster Dashboard — Manage your posted gigs</p>
         </div>
         <div class="topbar-actions">
-          <button class="btn-switch-role" id="btnSwitchRole"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>Switch to Worker Mode</button>
+          <span class="trust-badge" style="font-size:.72rem;margin-right:4px">✓ Poster Account</span><button class="btn-switch-role" id="btnSwitchRole"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:5px"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>Switch to Worker Mode</button>
           <button class="btn-post-new" onclick="window.location.href='post-gig.html'">+ Post a New Gig</button>
         </div>
       </div>
@@ -189,6 +196,7 @@
       @keyframes pulse-otp{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.5);opacity:.5}}
     </style>
 
+    <span class="section-label" style="margin-bottom:12px;display:block">Your Activity</span>
     <div class="stats-row">
         <div class="stat-card">
           <div class="stat-label">Total Posted</div>
@@ -219,7 +227,8 @@
 
       <!-- Tabs -->
       <div class="tab-bar">
-        <button class="tab-btn active" data-tab="open">🟢 Open (<span id="tabCountOpen">0</span>)</button>
+        <span class="section-label" style="margin:4px 0 10px;display:block">Your Posted Gigs</span>
+      <button class="tab-btn active" data-tab="open">🟢 Open (<span id="tabCountOpen">0</span>)</button>
         <button class="tab-btn" data-tab="progress">⚡ In Progress (<span id="tabCountProgress">0</span>)</button>
         <button class="tab-btn" data-tab="completed">✅ Completed (<span id="tabCountCompleted">0</span>)</button>
         <button class="tab-btn" data-tab="all">📋 All Gigs</button>
@@ -269,6 +278,16 @@
           <a href="contact.html" style="font-size:.78rem;font-weight:700;color:#059669;text-decoration:none">Contact Support →</a>
         </div>
 
+      </div>
+    </div>
+
+
+    <!-- ── Support strip ── -->
+    <div class="support-strip" style="margin-top:32px">
+      <span class="support-strip-icon">💬</span>
+      <div>
+        <strong>Need help with a gig?</strong> Our support team replies in under 15 minutes.
+        <a href="contact.html">Contact Support →</a>
       </div>
     </div>
 
@@ -367,13 +386,13 @@ function renderPanel(elId, gigs, status) {
   var el = document.getElementById(elId);
   if (gigs.length === 0) {
     var msgs = {
-      open: ['No open gigs.', 'Post a new gig to find workers in your area.'],
-      taken: ['No gigs in progress.', 'Once a worker accepts your gig, it appears here.'],
-      completed: ['No completed gigs yet.', 'Completed gigs will show up here with payment history.'],
-      all: ['You haven\'t posted any gigs yet.', 'Click \'Post a New Gig\' to get started!']
+      open:      ['No open gigs right now.', 'Post a new gig to find verified workers in your area.', 'post-gig.html', 'Post a Gig →'],
+      taken:     ['No gigs in progress.', 'Once a worker accepts your gig, it appears here.', '', ''],
+      completed: ['No completed gigs yet.', 'Completed gigs will appear here with full payment history.', '', ''],
+      all:       ['You haven\'t posted any gigs yet.', 'Post your first gig — it\'s free!', 'post-gig.html', 'Post a Gig →']
     };
     var m = msgs[status] || msgs.all;
-    el.innerHTML = emptyHtml(m[0], m[1]);
+    el.innerHTML = emptyHtml(m[0], m[1], m[2] || '', m[3] || '');
     return;
   }
   el.innerHTML = gigs.map(function(g){ return gigCardHtml(g); }).join('');
@@ -461,8 +480,15 @@ function bindCardActions(container) {
   });
 }
 
-function emptyHtml(title, sub) {
-  return '<div class="empty-box"><div class="ei">📭</div><p><strong>' + title + '</strong><br>' + sub + '</p></div>';
+function emptyHtml(title, sub, href, cta) {
+  var btn = (href && cta)
+    ? '<a href="' + href + '" class="btn btn-primary btn-sm" style="margin-top:14px">' + cta + '</a>'
+    : '';
+  return '<div class="gl-empty">' +
+    '<div class="gl-empty-icon">📭</div>' +
+    '<div class="gl-empty-title">' + title + '</div>' +
+    '<div class="gl-empty-sub">' + sub + '</div>' +
+    btn + '</div>';
 }
 
 /* Role switch */
