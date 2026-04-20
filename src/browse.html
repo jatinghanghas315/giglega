@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Browse Gigs — GigLega | Find Verified Workers Near You in Gurugram</title>
-  <meta name="description" content="Browse Live Gigs Near You in Gurugram NCR. Filter by category, budget, and location. Book verified workers for cleaning, delivery, tutoring & more." />
-    <meta name="keywords" content="browse gigs Gurugram, find workers near me, gig economy India, hyperlocal jobs NCR, part time work Gurugram" />
-  <meta property="og:title" content="Browse Gigs — GigLega | Find Verified Workers in Gurugram" />
-  <meta property="og:description" content="Browse live gigs in Gurugram NCR. Filter by category, budget & location. Book verified workers for cleaning, delivery, tutoring & more." />
+  <title>Browse Gigs — GigLega | Find Verified Taskers Near You in Gurugram</title>
+  <meta name="description" content="Browse Live Gigs Near You in Gurugram NCR. Filter by category, budget, and location. Book verified taskers for cleaning, delivery, tutoring & more." />
+    <meta name="keywords" content="browse gigs Gurugram, find taskers near me, gig economy India, hyperlocal jobs NCR, part time work Gurugram" />
+  <meta property="og:title" content="Browse Gigs — GigLega | Find Verified Taskers in Gurugram" />
+  <meta property="og:description" content="Browse live gigs in Gurugram NCR. Filter by category, budget & location. Book verified taskers for cleaning, delivery, tutoring & more." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://giglega.vercel.app/browse.html" />
   <meta property="og:image" content="https://giglega.vercel.app/logo.png" />
@@ -625,6 +625,12 @@
     .pgp-text h3 { color: #fff; font-size: .98rem; font-weight: 800; margin-bottom: 2px; }
     .pgp-text p  { color: rgba(255,255,255,.75); font-size: .82rem; }
 
+  
+    .gl-empty{display:flex;flex-direction:column;align-items:center;text-align:center;padding:48px 24px 40px;border:2px dashed rgba(13,148,136,.35);border-radius:12px;background:rgba(13,148,136,.04)}
+    [data-theme=dark] .gl-empty{background:rgba(13,148,136,.07);border-color:rgba(79,195,200,.25)}
+    .gl-empty-icon{font-size:3rem;margin-bottom:14px}
+    .gl-empty-title{font-size:1rem;font-weight:700;color:var(--text);margin-bottom:6px}
+    .gl-empty-sub{font-size:.88rem;color:var(--gray-500);line-height:1.6;max-width:38ch}
   </style>
   <link rel="canonical" href="https://giglega.vercel.app/browse.html">
 </head>
@@ -728,19 +734,17 @@
       </div>
 
       <!-- Gig Grid -->
+      <span class="section-label" style="display:block;margin-bottom:12px">Live Near You in Gurugram</span>
       <div class="gigs-grid" id="gigsGrid"></div>
 
       <!-- Empty state -->
-      <div class="browse-empty hidden" id="browseEmpty">
-        <div class="e-icon">🔍</div>
-        <div class="e-title">Koi gig nahi mili</div>
-        <div class="e-body">
-          Try different keywords, remove some filters,<br/>
-          ya ek naya gig post karo!
-        </div>
-        <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
-          <button class="btn btn-secondary btn-sm" id="btnResetSearch">✕ Clear Search</button>
-          <a href="post-gig.html" class="btn btn-primary btn-sm">Post a Gig</a>
+      <div class="gl-empty hidden" id="browseEmpty">
+        <div class="gl-empty-icon">🔍</div>
+        <div class="gl-empty-title">No gigs match your filters</div>
+        <div class="gl-empty-sub">Try different keywords, remove some filters, or post a gig yourself.</div>
+        <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:16px">
+          <button class="btn btn-secondary btn-sm" id="btnResetSearch">✕ Clear Filters</button>
+          <a href="post-gig.html" class="btn btn-primary btn-sm">Post a Gig →</a>
         </div>
       </div>
 
