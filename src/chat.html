@@ -255,8 +255,8 @@
           list.innerHTML = `
             <div class="chat-empty-state" style="padding:40px 20px">
               <div class="icon">💬</div>
-              <h3>Koi conversation nahi</h3>
-              <p>Jab koi tumhara gig book karega ya tum kisi se message karoge, yahan dikhega.</p>
+              <h3>No conversations yet</h3>
+              <p>When a Tasker books your gig or you message someone, your conversations will appear here.</p>
               <a href="browse.html" style="margin-top:16px;display:inline-block;padding:10px 20px;background:var(--teal,#0d9488);color:#fff;border-radius:8px;font-weight:700;text-decoration:none;font-size:.88rem">🔍 Browse Gigs</a>
             </div>`;
           return;
@@ -521,7 +521,7 @@
         input.style.border = "1.5px solid #dc2626";
         setTimeout(()=>{ input.style.border = ""; }, 2000);
         if(typeof showToast==="function")
-          showToast("🚫 Abusive language allowed nahi hai. Respectful raho!", "error", 3500);
+          showToast("🚫 Please keep conversations respectful — abusive language is not allowed on GigLega.", "error", 3500);
         return;
       }
       input.value="";
@@ -626,8 +626,8 @@
         <!-- Empty state when no conversation selected -->
         <div class="chat-empty-state">
           <div class="icon">💬</div>
-          <h3>Koi chat select nahi hai</h3>
-          <p>Left side se conversation choose karo ya kisi gig se message karo.</p>
+          <h3>No chat selected</h3>
+          <p>Select a conversation from the list, or open a chat from any gig page.</p>
         </div>
       </div>
 
