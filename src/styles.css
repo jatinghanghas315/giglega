@@ -1987,3 +1987,592 @@ textarea:focus-visible {
 [data-theme="dark"] small {
   color: var(--text-muted, #8b949e) !important;
 }
+
+
+/* ═══════════════════════════════════════════════════════════════
+   GIGLEGA UX IMPROVEMENT PATCH — v2.0
+   Trust-first design for Indian mobile users. Production-ready.
+   Improves: cards, CTAs, trust badges, spacing, empty states,
+   tap targets, contrast, fee clarity, toast, form UX.
+═══════════════════════════════════════════════════════════════ */
+
+/* ── 1. GLOBAL TAP TARGETS & ACCESSIBILITY ─────────────────── */
+button, a, [role="button"], .btn,
+.filter-chip, .auth-tab, .role-opt,
+.gig-card, .notif-item {
+  -webkit-tap-highlight-color: transparent;
+}
+button:not(.pw-toggle):not(.af-remove),
+.btn, a.btn, [role="button"] {
+  min-height: 44px;
+}
+/* Ensure focus ring is always visible */
+*:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}
+
+/* ── 2. TYPOGRAPHY REFINEMENTS ──────────────────────────────── */
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+h1, h2, h3 { letter-spacing: -0.3px; }
+p { line-height: 1.65; }
+
+/* ── 3. VERIFIED TRUST BADGE — global component ─────────────── */
+.trust-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  background: rgba(16,185,129,.12);
+  color: #059669;
+  border: 1px solid rgba(16,185,129,.28);
+  border-radius: var(--radius-full);
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .2px;
+  white-space: nowrap;
+}
+[data-theme="dark"] .trust-badge {
+  background: rgba(16,185,129,.15);
+  color: #34d399;
+  border-color: rgba(52,211,153,.3);
+}
+.trust-badge-blue {
+  background: rgba(99,102,241,.1);
+  color: #4f46e5;
+  border-color: rgba(99,102,241,.25);
+}
+[data-theme="dark"] .trust-badge-blue {
+  background: rgba(99,102,241,.15);
+  color: #818cf8;
+  border-color: rgba(129,140,248,.3);
+}
+
+/* ── 4. FEE TRANSPARENCY COMPONENT ──────────────────────────── */
+.fee-breakdown {
+  background: rgba(245,158,11,.07);
+  border: 1px solid rgba(245,158,11,.22);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  font-size: .82rem;
+  margin-top: 10px;
+}
+.fee-breakdown-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 3px 0;
+  color: var(--gray-600);
+}
+.fee-breakdown-row.total {
+  border-top: 1px solid rgba(245,158,11,.2);
+  margin-top: 6px;
+  padding-top: 8px;
+  font-weight: 700;
+  color: var(--text);
+}
+.fee-breakdown-earn {
+  color: var(--success, #10b981);
+  font-weight: 700;
+}
+[data-theme="dark"] .fee-breakdown {
+  background: rgba(245,158,11,.06);
+  border-color: rgba(245,158,11,.2);
+}
+[data-theme="dark"] .fee-breakdown-row { color: var(--text-muted); }
+[data-theme="dark"] .fee-breakdown-row.total { color: var(--text); }
+
+/* ── 5. CARD IMPROVEMENTS ───────────────────────────────────── */
+.gig-card {
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+  will-change: transform;
+}
+.gig-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+  border-color: rgba(13,148,136,.35);
+}
+[data-theme="dark"] .gig-card:hover {
+  border-color: rgba(79,195,200,.3);
+  box-shadow: 0 6px 24px rgba(0,0,0,.35);
+}
+/* Urgent gig card — stronger visual cue */
+.gig-card.urgent {
+  border-left: 4px solid #f59e0b;
+}
+.gig-card.urgent:hover {
+  border-left-color: #d97706;
+}
+
+/* ── 6. BUTTON SYSTEM REFINEMENTS ───────────────────────────── */
+.btn-primary, .btn.btn-primary {
+  box-shadow: 0 2px 8px rgba(13,148,136,.22);
+  transition: transform .15s, box-shadow .15s, background .15s;
+}
+.btn-primary:hover, .btn.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(13,148,136,.35);
+}
+.btn-primary:active, .btn.btn-primary:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 4px rgba(13,148,136,.2);
+}
+/* Hero primary button */
+.btn-hero-primary {
+  box-shadow: 0 4px 16px rgba(0,0,0,.2);
+  transition: transform .18s, box-shadow .18s, background .18s;
+}
+.btn-hero-primary:active { transform: scale(.97); }
+/* Danger/destructive button */
+.btn-danger {
+  background: var(--danger, #ef4444);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 10px 20px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.btn-danger:hover { background: #dc2626; transform: translateY(-1px); }
+
+/* ── 7. TOAST NOTIFICATIONS ─────────────────────────────────── */
+#toast-container {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: var(--z-toast, 9999);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: calc(100% - 32px);
+  max-width: 420px;
+  pointer-events: none;
+}
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 18px;
+  border-radius: var(--radius);
+  font-size: .9rem;
+  font-weight: 600;
+  color: #fff;
+  box-shadow: 0 8px 32px rgba(0,0,0,.25);
+  animation: toastIn .28s cubic-bezier(.34,1.56,.64,1) forwards;
+  pointer-events: all;
+  width: 100%;
+  line-height: 1.4;
+}
+.toast.success { background: #059669; }
+.toast.error   { background: #dc2626; }
+.toast.info    { background: var(--primary, #1a3c5e); }
+.toast.warning { background: #d97706; }
+.toast.fade-out {
+  animation: toastOut .22s ease forwards;
+}
+@keyframes toastIn {
+  from { opacity: 0; transform: translateY(12px) scale(.96); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes toastOut {
+  from { opacity: 1; transform: scale(1); }
+  to   { opacity: 0; transform: scale(.94); }
+}
+
+/* ── 8. SECTION SPACING SYSTEM ──────────────────────────────── */
+.page-section {
+  padding: 56px 0;
+}
+.page-section-sm {
+  padding: 36px 0;
+}
+.section-label {
+  font-size: .72rem;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--teal);
+  margin-bottom: 10px;
+  display: block;
+}
+
+/* ── 9. GLOBAL EMPTY STATE SYSTEM ───────────────────────────── */
+.gl-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 40px 24px 36px;
+  border: 2px dashed rgba(13,148,136,.35);
+  border-radius: var(--radius);
+  background: rgba(13,148,136,.04);
+}
+[data-theme="dark"] .gl-empty {
+  background: rgba(13,148,136,.06);
+  border-color: rgba(79,195,200,.25);
+}
+.gl-empty-icon {
+  font-size: 3rem;
+  line-height: 1;
+  margin-bottom: 14px;
+}
+.gl-empty-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+.gl-empty-sub {
+  font-size: .86rem;
+  color: var(--gray-500);
+  line-height: 1.6;
+  max-width: 300px;
+  margin-bottom: 20px;
+}
+.gl-empty .btn { min-width: 160px; }
+
+/* ── 10. LOADING SKELETON SYSTEM ────────────────────────────── */
+.gl-skel {
+  background: linear-gradient(
+    90deg,
+    var(--gray-100) 25%,
+    var(--gray-50) 50%,
+    var(--gray-100) 75%
+  );
+  background-size: 200% 100%;
+  animation: glShimmer 1.5s infinite ease-in-out;
+  border-radius: var(--radius-sm);
+}
+[data-theme="dark"] .gl-skel {
+  background: linear-gradient(
+    90deg,
+    var(--gray-800) 25%,
+    var(--gray-700) 50%,
+    var(--gray-800) 75%
+  );
+  background-size: 200% 100%;
+}
+@keyframes glShimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+.gl-skel-card {
+  height: 120px;
+  width: 100%;
+  border-radius: var(--radius);
+  margin-bottom: 12px;
+}
+.gl-skel-text-lg { height: 20px; width: 70%; border-radius: 6px; margin-bottom: 8px; }
+.gl-skel-text-sm { height: 14px; width: 90%; border-radius: 4px; }
+
+/* ── 11. FORM INPUT SYSTEM ──────────────────────────────────── */
+.gl-field { margin-bottom: 20px; }
+.gl-label {
+  display: block;
+  font-size: .82rem;
+  font-weight: 700;
+  color: var(--gray-700);
+  margin-bottom: 7px;
+  letter-spacing: .1px;
+}
+[data-theme="dark"] .gl-label { color: var(--text-muted); }
+.gl-input,
+.gl-select,
+.gl-textarea {
+  width: 100%;
+  padding: 11px 14px;
+  border: 1.5px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  font-size: .93rem;
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  transition: border-color .18s, box-shadow .18s;
+  box-sizing: border-box;
+  -webkit-appearance: none;
+}
+.gl-input:focus, .gl-select:focus, .gl-textarea:focus {
+  outline: none;
+  border-color: var(--teal);
+  box-shadow: 0 0 0 3px rgba(13,148,136,.12);
+}
+.gl-input.error, .gl-select.error, .gl-textarea.error {
+  border-color: var(--danger, #ef4444);
+  box-shadow: 0 0 0 3px rgba(239,68,68,.1);
+}
+.gl-field-err {
+  font-size: .78rem;
+  color: var(--danger, #ef4444);
+  margin-top: 5px;
+  display: none;
+  font-weight: 500;
+}
+.gl-field-err.show { display: block; }
+.gl-field-hint {
+  font-size: .76rem;
+  color: var(--gray-500);
+  margin-top: 4px;
+  line-height: 1.5;
+}
+
+/* ── 12. HERO CHIPS — mobile fix ────────────────────────────── */
+.hero-chips {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 18px;
+}
+.hero-chip {
+  padding: 5px 12px;
+  font-size: .78rem;
+  font-weight: 600;
+  border-radius: var(--radius-full);
+  background: rgba(255,255,255,.12);
+  color: rgba(255,255,255,.9);
+  border: 1px solid rgba(255,255,255,.2);
+  backdrop-filter: blur(4px);
+  white-space: nowrap;
+  transition: background .15s;
+}
+.hero-chip:hover {
+  background: rgba(255,255,255,.2);
+}
+
+/* ── 13. DASHBOARD SECTION HEADERS ─────────────────────────── */
+.dash-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.dash-section-title {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.dash-section-link {
+  font-size: .82rem;
+  color: var(--teal);
+  font-weight: 600;
+  text-decoration: none;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  transition: background .15s;
+}
+.dash-section-link:hover {
+  background: rgba(13,148,136,.08);
+  text-decoration: none;
+}
+
+/* ── 14. WALLET CARD STAT CHIPS ─────────────────────────────── */
+.stat-chip {
+  background: var(--surface);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  text-align: center;
+  transition: border-color .15s;
+}
+.stat-chip:hover { border-color: var(--teal); }
+.stat-chip-val {
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: var(--text);
+  font-family: var(--font-display);
+  line-height: 1.1;
+}
+.stat-chip-lbl {
+  font-size: .7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  color: var(--gray-500);
+  margin-top: 3px;
+}
+[data-theme="dark"] .stat-chip { border-color: var(--border); }
+
+/* ── 15. MOBILE RESPONSIVE FIXES ────────────────────────────── */
+@media (max-width: 480px) {
+  .hero-cta { flex-direction: column; gap: 10px; }
+  .hero-cta .btn-hero-primary,
+  .hero-cta .btn-hero-secondary { width: 100%; text-align: center; }
+  .final-cta-btns { flex-direction: column; align-items: stretch; }
+  .final-cta-btns .btn { text-align: center; }
+  .trust-ctas { flex-direction: column; align-items: stretch; }
+  .trust-ctas a { text-align: center; }
+  #toast-container { bottom: 70px; width: calc(100% - 24px); }
+  .gl-empty { padding: 28px 16px; }
+  .gig-card { padding: 14px; }
+}
+@media (max-width: 768px) {
+  .page-section { padding: 40px 0; }
+  .dash-section-title { font-size: .93rem; }
+}
+
+/* ── 16. NAV IMPROVEMENTS ───────────────────────────────────── */
+.nav-link {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  border-radius: var(--radius-sm);
+  transition: background .15s, color .15s;
+}
+.nav-link:hover {
+  background: rgba(13,148,136,.07);
+  text-decoration: none;
+}
+[data-theme="dark"] .nav-link:hover { background: rgba(79,195,200,.08); }
+
+/* ── 17. GIG CARD CTA BUTTON — larger tap target ────────────── */
+.gig-cta-btn {
+  min-height: 44px !important;
+  padding: 11px 18px !important;
+  font-size: .88rem !important;
+  font-weight: 700 !important;
+  width: 100%;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── 18. SUPPORT / ESCALATION STRIP ─────────────────────────── */
+.support-strip {
+  background: rgba(99,102,241,.06);
+  border: 1px solid rgba(99,102,241,.18);
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: .85rem;
+  color: var(--gray-600);
+  margin-top: 24px;
+}
+.support-strip-icon { font-size: 1.5rem; flex-shrink: 0; }
+.support-strip strong { color: var(--text); font-weight: 700; }
+.support-strip a { color: var(--teal); font-weight: 600; }
+[data-theme="dark"] .support-strip {
+  background: rgba(99,102,241,.08);
+  border-color: rgba(129,140,248,.2);
+  color: var(--text-muted);
+}
+
+/* ── 19. SUCCESS STATE ───────────────────────────────────────── */
+.gl-success-card {
+  text-align: center;
+  padding: 40px 24px;
+  border: 2px solid rgba(16,185,129,.3);
+  border-radius: var(--radius);
+  background: rgba(16,185,129,.05);
+}
+.gl-success-icon {
+  font-size: 3.5rem;
+  display: block;
+  margin-bottom: 16px;
+  animation: successPop .4s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes successPop {
+  from { transform: scale(0); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+.gl-success-title {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--success, #10b981);
+  margin-bottom: 8px;
+}
+.gl-success-sub {
+  font-size: .88rem;
+  color: var(--gray-500);
+  line-height: 1.6;
+}
+
+/* ── 20. STEP PROGRESS — post-gig / onboarding ──────────────── */
+.gl-progress {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  margin-bottom: 32px;
+  counter-reset: step;
+}
+.gl-progress-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  position: relative;
+}
+.gl-progress-step:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  top: 17px;
+  left: 50%;
+  width: 100%;
+  height: 2px;
+  background: var(--gray-200);
+  z-index: 0;
+}
+.gl-progress-step.done::after,
+.gl-progress-step.active::after {
+  background: var(--teal);
+}
+.gl-progress-dot {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 2px solid var(--gray-200);
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: .82rem;
+  font-weight: 800;
+  color: var(--gray-400);
+  position: relative;
+  z-index: 1;
+  transition: all .2s;
+}
+.gl-progress-step.done .gl-progress-dot {
+  background: var(--teal);
+  border-color: var(--teal);
+  color: #fff;
+}
+.gl-progress-step.active .gl-progress-dot {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+  box-shadow: 0 0 0 4px rgba(13,148,136,.18);
+}
+.gl-progress-label {
+  font-size: .67rem;
+  font-weight: 700;
+  color: var(--gray-400);
+  text-transform: uppercase;
+  letter-spacing: .4px;
+  text-align: center;
+}
+.gl-progress-step.active .gl-progress-label,
+.gl-progress-step.done .gl-progress-label {
+  color: var(--primary);
+}
+[data-theme="dark"] .gl-progress-step.active .gl-progress-label,
+[data-theme="dark"] .gl-progress-step.done .gl-progress-label {
+  color: var(--teal);
+}
