@@ -323,7 +323,7 @@
         <div class="icon">🔍</div>
         <h2 style="font-size:1.15rem;font-weight:800;color:var(--text);margin-bottom:8px;" id="emptyTitle">Koi Active Gig Nahi</h2>
         <p style="color:var(--gray-400);font-size:.88rem;margin-bottom:24px;" id="emptyBody">Abhi koi active gig nahi hai.</p>
-        <a href="browse.html" class="btn btn-primary" id="emptyBtn">🔍 Gigs Browse Karo</a>
+        <a href="browse.html" class="btn btn-primary" id="emptyBtn">🔍 Browse Gigs</a>
       </div>
     </div>
 
@@ -366,7 +366,7 @@
         <div class="track-card" id="trackCard" style="display:none;">
           <div class="track-card-hdr" id="trackCardHdr">
             <h3>📍 Worker Ka Live Location</h3>
-            <button class="track-toggle-btn" id="trackToggleBtn">Map Dekho ▾</button>
+            <button class="track-toggle-btn" id="trackToggleBtn">View Map ▾</button>
           </div>
           <div id="trackMap"></div>
           <div class="track-meta" id="trackMeta" style="display:none;">
@@ -396,7 +396,7 @@
             </div>
             <div class="tl-step">
               <div class="tl-left"><div class="tl-dot active" id="tld2">⚡</div><div class="tl-line" id="tll2"></div></div>
-              <div class="tl-body"><div class="tl-title">Worker Kaam Kar Raha Hai</div><div class="tl-sub" id="tls2">Worker location pe kaam kar raha hai.</div></div>
+              <div class="tl-body"><div class="tl-title">Tasker is Working</div><div class="tl-sub" id="tls2">Worker location pe kaam kar raha hai.</div></div>
             </div>
             <div class="tl-step">
               <div class="tl-left"><div class="tl-dot" id="tld3">🔑</div><div class="tl-line" id="tll3"></div></div>
@@ -590,18 +590,18 @@
       var badge=el('agBadge'); badge.className='ag-badge poster';
       el('agBadgeText').textContent='Gig In Progress';
       el('agHeading').textContent='Apni Active Gig Track Karo';
-      el('gPersonLabel').textContent='Worker';
+      el('gPersonLabel').textContent='Tasker';
 
       // Gig info
       el('gTitle').textContent    = gig.title||'—';
       el('gLocation').textContent = [gig.location,gig.area,gig.pincode].filter(Boolean).join(', ')||'—';
       el('gDateTime').textContent = [(gig.date||''),(gig.time||'')].filter(Boolean).join(' • ')||'—';
-      el('gPerson').textContent   = gig.workerName||'Worker';
+      el('gPerson').textContent   = gig.workerName||'Tasker';
       el('gPay').textContent      = '₹'+(gig.budget||0).toLocaleString('en-IN');
 
       // Worker card
       var init=(gig.workerName||'W').split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2);
-      el('wAvatar').textContent=init; el('wName').textContent=gig.workerName||'Worker';
+      el('wAvatar').textContent=init; el('wName').textContent=gig.workerName||'Tasker';
       el('wChatBtn').href='chat.html?with='+encodeURIComponent(gig.workerId||'')+'&gig='+encodeURIComponent(id);
 
       // Timeline booked time
@@ -621,14 +621,14 @@
           el('otpBannerDigits').innerHTML=_otpStr.split('').map(function(d){return '<div class="otp-banner-dig">'+d+'</div>';}).join('');
           if(!_banner.classList.contains('show')){
             _banner.classList.add('show');
-            toast('🔑 Worker ne OTP manga! Neeche code dekho.','warning',10000);
+            toast('🔑 Tasker has requested OTP manga! Neeche code dekho.','warning',10000);
             setTimeout(function(){el('otpReveal').scrollIntoView({behavior:'smooth',block:'center'});},500);
           }
         }
         // 3. Timeline
         el('tld2').className='tl-dot done'; el('tld2').textContent='✓'; el('tll2').classList.add('done');
         el('tld3').className='tl-dot active';
-        el('tls3').textContent='Worker ne OTP request kar diya — usse code batao.';
+        el('tls3').textContent='Tasker has requested OTP request kar diya — usse code batao.';
         if(gig.completionRequestedAt) el('tlt3').textContent=fmtDt(gig.completionRequestedAt);
       } else {
         var _b2=el('otpFixedBanner'); if(_b2) _b2.classList.remove('show');
@@ -670,7 +670,7 @@
                 type:      'debit',
                 amount:    budget,
                 title:     'Gig Payment — '+(gig.title||'Gig'),
-                meta:      'Gig #'+gig.id+' · Worker: '+(gig.workerName||'Worker'),
+                meta:      'Gig #'+gig.id+' · Worker: '+(gig.workerName||'Tasker'),
                 gigId:     gig.id,
                 createdAt: serverTimestamp(),
                 status:    'completed'
@@ -784,8 +784,8 @@
         var exp=new Date(Date.now()+30*60*1000).toISOString();
         await updateDoc(doc(db,'gigs',gigId),{completionOTP:otp,completionOTPExpiry:exp,completionRequested:true,completionRequestedAt:new Date().toISOString()});
         await addDoc(collection(db,'notifications',activeGig.posterId,'items'),{
-          type:'otp_requested',title:'🔑 Worker ne OTP manga!',
-          body:(activeGig.workerName||'Worker')+' ne gig "'+activeGig.title+'" complete karne ke liye OTP manga. Active Gig page pe OTP dekho.',
+          type:'otp_requested',title:'🔑 Tasker has requested OTP manga!',
+          body:(activeGig.workerName||'Tasker')+' ne gig "'+activeGig.title+'" complete karne ke liye OTP manga. Active Gig page pe OTP dekho.',
           gigId:gigId,
           link:'active-gig.html?id='+gigId,
           gigId:gigId,workerId:currentUser.uid,read:false,createdAt:serverTimestamp()
@@ -1270,10 +1270,10 @@
       _revRating = 0;
       var isWorker = target === 'worker';
       var name = isWorker
-        ? (activeGig && activeGig.workerName  || 'Worker')
+        ? (activeGig && activeGig.workerName  || 'Tasker')
         : (activeGig && activeGig.posterName  || 'Poster');
       el('revTitle').textContent    = '⭐ ' + name + ' ko Rate Karo';
-      el('revSubtitle').textContent = (isWorker ? 'Worker' : 'Poster') + ' ka review do';
+      el('revSubtitle').textContent = (isWorker ? 'Tasker' : 'Poster') + ' ka review do';
       el('revComment').value = '';
       document.querySelectorAll('.rev-star').forEach(function(s){ s.classList.remove('lit'); });
       el('glReviewOverlay').classList.add('show');
@@ -1304,7 +1304,7 @@
       try{
         var isWorker  = _revTarget === 'worker';
         var reveeId   = isWorker ? (activeGig.workerId||'')  : (activeGig.posterId||'');
-        var reveeName = isWorker ? (activeGig.workerName||'Worker') : (activeGig.posterName||'Poster');
+        var reveeName = isWorker ? (activeGig.workerName||'Tasker') : (activeGig.posterName||'Poster');
         var comment   = el('revComment').value.trim();
         // Write review doc
         await addDoc(collection(db,'reviews'),{
@@ -1347,7 +1347,7 @@
       var btn=this; btn.disabled=true; btn.textContent='⏳...';
       try{
         var otherPartyId  = _cancelRole==='poster' ? (activeGig.workerId||'')  : (activeGig.posterId||'');
-        var cancellerName = currentUser.displayName || (_cancelRole==='poster'?'Poster':'Worker');
+        var cancellerName = currentUser.displayName || (_cancelRole==='poster'?'Poster':'Tasker');
         await updateDoc(doc(db,'gigs',gigId),{
           status:       'cancelled',
           cancelledBy:  _cancelRole,
@@ -1388,7 +1388,7 @@
   <div id="otpFixedBanner" role="alert" aria-live="assertive">
     <div class="ofb-icon">🔑</div>
     <div class="ofb-body">
-      <div class="ofb-title">Worker ne OTP manga!</div>
+      <div class="ofb-title">Tasker has requested OTP manga!</div>
       <div class="ofb-sub">Yeh code worker ko batao:</div>
       <div class="ofb-digs" id="otpBannerDigits"></div>
     </div>
