@@ -744,60 +744,57 @@
   <footer id="main-footer"></footer>
   <div id="toast-container"></div>
 
-  <script>
-  document.addEventListener("DOMContentLoaded", function () {
-
-    var GIGS_KEY  = (typeof GL !== "undefined") ? GL.STORAGE_KEY_GIGS  : "gl_gigs";
-    var USERS_KEY = (typeof GL !== "undefined") ? GL.STORAGE_KEY_USERS : "gl_users";
-
-    /* ── Live stats from localStorage ── */
-    var gigs  = [];
-    var users = [];
-    try { gigs  = JSON.parse(localStorage.getItem(GIGS_KEY)  || "[]"); } catch(e){}
-    try { users = JSON.parse(localStorage.getItem(USERS_KEY) || "[]"); } catch(e){}
+  <script type="module">
+    import { db } from './firebase-config.js';
+    import { collection, query, where, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
 
     function animCount(elId, target) {
       var el = document.getElementById(elId);
       if (!el) return;
-      if (!target) { el.textContent = "0+"; return; }
-      var step = Math.ceil(target / 40);
-      var cur  = 0;
-      var t = setInterval(function(){
+      if (!target) { el.textContent = '0+'; return; }
+      var step = Math.ceil(target / 40), cur = 0;
+      var t = setInterval(function() {
         cur = Math.min(cur + step, target);
-        el.textContent = cur + "+";
+        el.textContent = cur.toLocaleString('en-IN') + '+';
         if (cur >= target) clearInterval(t);
-      }, 1200 / 40);
+      }, 30);
     }
 
-    animCount("sGigs",  gigs.length);
-    animCount("sUsers", users.length);
+    /* Live gigs count */
+    onSnapshot(query(collection(db,'gigs'), where('status','==','open')), function(snap) {
+      animCount('sGigs', snap.size);
+    }, function(e){ console.warn('[GigLega] about gigs:', e.message); });
 
-    /* Category stats in visual card */
-    function catCount(cat) {
-      return gigs.filter(function(g){ return g.category === cat && g.status === "open"; }).length;
-    }
-    function setStatEl(id, count) {
-      var el = document.getElementById(id);
-      if (el) el.textContent = count + " open";
-    }
-    setStatEl("catStat1", catCount("House Help"));
-    setStatEl("catStat2", catCount("Tech Help"));
-    setStatEl("catStat3", catCount("Tutoring"));
-    setStatEl("catStat4", catCount("Design"));
+    /* Total users count */
+    onSnapshot(collection(db,'users'), function(snap) {
+      animCount('sUsers', snap.size);
+    }, function(e){ console.warn('[GigLega] about users:', e.message); });
 
-    /* ── HIW Tabs ── */
-    document.querySelectorAll(".hiw-tab").forEach(function(tab){
-      tab.addEventListener("click", function(){
-        document.querySelectorAll(".hiw-tab").forEach(function(t){ t.classList.remove("active"); });
-        document.querySelectorAll(".hiw-panel").forEach(function(p){ p.classList.remove("active"); });
-        tab.classList.add("active");
-        var panelId = "tab" + tab.dataset.tab.charAt(0).toUpperCase() + tab.dataset.tab.slice(1);
-        var panel   = document.getElementById(panelId);
-        if (panel) panel.classList.add("active");
-      });
+    /* Category open gig counts */
+    var CATS   = ['House Help','Tech Help','Tutoring','Design'];
+    var CAT_IDS = ['catStat1','catStat2','catStat3','catStat4'];
+    CATS.forEach(function(cat, idx) {
+      onSnapshot(
+        query(collection(db,'gigs'), where('status','==','open'), where('category','==',cat)),
+        function(snap) {
+          var el = document.getElementById(CAT_IDS[idx]);
+          if (el) el.textContent = snap.size + ' open';
+        }, function(e){ console.warn('[GigLega] catStat:', e.message); }
+      );
     });
 
-  });
+    /* HIW Tabs */
+    document.addEventListener('DOMContentLoaded', function() {
+      document.querySelectorAll('.hiw-tab').forEach(function(tab) {
+        tab.addEventListener('click', function() {
+          document.querySelectorAll('.hiw-tab').forEach(function(t){ t.classList.remove('active'); });
+          document.querySelectorAll('.hiw-panel').forEach(function(p){ p.classList.remove('active'); });
+          tab.classList.add('active');
+          var panel = document.getElementById('tab' + tab.dataset.tab.charAt(0).toUpperCase() + tab.dataset.tab.slice(1));
+          if (panel) panel.classList.add('active');
+        });
+      });
+    });
   </script>
 </body>
 </html>
