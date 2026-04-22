@@ -110,7 +110,15 @@
     [data-theme=dark] .complete-bar{background:rgba(16,185,129,.08)}
     [data-theme=dark] .complete-bar-text{color:var(--gray-300)}
     [data-theme=dark] .cash-fee-desc{color:var(--gray-400)}
-  </style>
+  
+    /* Grow grid responsive */
+    @media(max-width:900px){
+      .grow-grid-resp{grid-template-columns:repeat(2,1fr)!important;}
+    }
+    @media(max-width:520px){
+      .grow-grid-resp{grid-template-columns:1fr!important;}
+    }
+    </style>
   <link rel="canonical" href="https://giglega.vercel.app/dashboard-client.html">
   <meta property="og:type"        content="website">
   <meta property="og:title"       content="Poster Dashboard — GigLega">
@@ -228,54 +236,62 @@
       <!-- Tabs -->
       <div class="tab-bar">
         <span class="section-label" style="margin:4px 0 10px;display:block">Your Posted Gigs</span>
-      <button class="tab-btn active" data-tab="open">🟢 Open (<span id="tabCountOpen">0</span>)</button>
+      <button class="tab-btn" data-tab="open">🟢 Open (<span id="tabCountOpen">0</span>)</button>
         <button class="tab-btn" data-tab="progress">⚡ In Progress (<span id="tabCountProgress">0</span>)</button>
         <button class="tab-btn" data-tab="completed">✅ Completed (<span id="tabCountCompleted">0</span>)</button>
-        <button class="tab-btn" data-tab="all">📋 All Gigs</button>
+        <button class="tab-btn active" data-tab="all">📋 All Gigs</button>
       </div>
 
-      <div id="tabOpen"      class="tab-panel active"></div>
+      <div id="tabOpen"      class="tab-panel"></div>
       <div id="tabProgress"  class="tab-panel"></div>
       <div id="tabCompleted" class="tab-panel"></div>
-      <div id="tabAll"       class="tab-panel"></div>
+      <div id="tabAll"       class="tab-panel active"></div>
 
     </div>
 
-    <!-- ── Poster Perks Pitch (Phase 2) ── -->
-    <div style="margin-top:32px">
-      <div style="font-size:.78rem;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px">Grow With GigLega</div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px">
+    <!-- ── Grow With GigLega ── -->
+    <div style="margin-top:36px">
+      <span class="section-label" style="margin-bottom:14px;display:block">Grow with GigLega</span>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px" class="grow-grid-resp">
 
         <!-- Featured Listing -->
-        <div style="background:linear-gradient(135deg,rgba(217,153,58,.12),rgba(217,153,58,.04));border:1.5px solid rgba(217,153,58,.3);border-radius:14px;padding:18px 16px">
-          <div style="font-size:1.3rem;margin-bottom:8px">⭐</div>
-          <div style="font-weight:700;font-size:.9rem;color:var(--text);margin-bottom:4px">Featured Gig Listing</div>
-          <div style="font-size:.78rem;color:var(--gray-400);line-height:1.5;margin-bottom:12px">Get your gig to the top. 3x more applications on featured gigs.</div>
-          <a href="post-gig.html?boost=1" style="font-size:.78rem;font-weight:700;color:var(--accent,#D9993A);text-decoration:none">Boost a Gig →</a>
+        <div style="background:linear-gradient(135deg,rgba(217,153,58,.13),rgba(217,153,58,.04));border:1.5px solid rgba(217,153,58,.35);border-radius:var(--radius);padding:18px;display:flex;flex-direction:column;justify-content:space-between;min-height:150px">
+          <div>
+            <div style="font-size:1.4rem;margin-bottom:8px">⭐</div>
+            <div style="font-weight:700;font-size:.88rem;color:var(--text);margin-bottom:5px">Featured Gig Listing</div>
+            <div style="font-size:.76rem;color:var(--gray-400);line-height:1.55">Get your gig to the top. 3x more applications on featured gigs.</div>
+          </div>
+          <a href="post-gig.html?boost=1" style="font-size:.76rem;font-weight:700;color:var(--accent,#D9993A);text-decoration:none;margin-top:12px;display:inline-block">Boost a Gig →</a>
         </div>
 
         <!-- Referral Bonus -->
-        <div style="background:linear-gradient(135deg,rgba(13,148,136,.1),rgba(13,148,136,.03));border:1.5px solid rgba(13,148,136,.2);border-radius:14px;padding:18px 16px">
-          <div style="font-size:1.3rem;margin-bottom:8px">🎁</div>
-          <div style="font-weight:700;font-size:.9rem;color:var(--text);margin-bottom:4px">Referral Bonus</div>
-          <div style="font-size:.78rem;color:var(--gray-400);line-height:1.5;margin-bottom:12px">Invite a Tasker — earn wallet credits when they complete their first gig.</div>
-          <a href="profile.html#referral" style="font-size:.78rem;font-weight:700;color:var(--teal,#0d9488);text-decoration:none">Get Referral Link →</a>
+        <div style="background:linear-gradient(135deg,rgba(13,148,136,.1),rgba(13,148,136,.03));border:1.5px solid rgba(13,148,136,.3);border-radius:var(--radius);padding:18px;display:flex;flex-direction:column;justify-content:space-between;min-height:150px">
+          <div>
+            <div style="font-size:1.4rem;margin-bottom:8px">🎁</div>
+            <div style="font-weight:700;font-size:.88rem;color:var(--text);margin-bottom:5px">Referral Bonus</div>
+            <div style="font-size:.76rem;color:var(--gray-400);line-height:1.55">Invite a Tasker — earn wallet credits when they complete their first gig.</div>
+          </div>
+          <a href="profile.html#referral" style="font-size:.76rem;font-weight:700;color:var(--teal,#0d9488);text-decoration:none;margin-top:12px;display:inline-block">Get Referral Link →</a>
         </div>
 
         <!-- Subscription Plan -->
-        <div style="background:linear-gradient(135deg,rgba(99,102,241,.1),rgba(99,102,241,.03));border:1.5px solid rgba(99,102,241,.2);border-radius:14px;padding:18px 16px">
-          <div style="font-size:1.3rem;margin-bottom:8px">📦</div>
-          <div style="font-weight:700;font-size:.9rem;color:var(--text);margin-bottom:4px">Subscription Plan</div>
-          <div style="font-size:.78rem;color:var(--gray-400);line-height:1.5;margin-bottom:12px">Post unlimited gigs at a flat monthly rate. Best for regular hirers.</div>
-          <a href="enterprise.html" style="font-size:.78rem;font-weight:700;color:var(--info,#6366f1);text-decoration:none">View Plans →</a>
+        <div style="background:linear-gradient(135deg,rgba(99,102,241,.1),rgba(99,102,241,.03));border:1.5px solid rgba(99,102,241,.3);border-radius:var(--radius);padding:18px;display:flex;flex-direction:column;justify-content:space-between;min-height:150px">
+          <div>
+            <div style="font-size:1.4rem;margin-bottom:8px">📦</div>
+            <div style="font-weight:700;font-size:.88rem;color:var(--text);margin-bottom:5px">Subscription Plan</div>
+            <div style="font-size:.76rem;color:var(--gray-400);line-height:1.55">Post unlimited gigs at a flat monthly rate. Best for regular hirers.</div>
+          </div>
+          <a href="enterprise.html" style="font-size:.76rem;font-weight:700;color:var(--info,#6366f1);text-decoration:none;margin-top:12px;display:inline-block">View Plans →</a>
         </div>
 
         <!-- 15 min support -->
-        <div style="background:linear-gradient(135deg,rgba(16,185,129,.1),rgba(16,185,129,.03));border:1.5px solid rgba(16,185,129,.2);border-radius:14px;padding:18px 16px">
-          <div style="font-size:1.3rem;margin-bottom:8px">⚡</div>
-          <div style="font-weight:700;font-size:.9rem;color:var(--text);margin-bottom:4px">Get Help Within 15 Minutes</div>
-          <div style="font-size:.78rem;color:var(--gray-400);line-height:1.5;margin-bottom:12px">Our support team responds in under 15 minutes. Guaranteed.</div>
-          <a href="contact.html" style="font-size:.78rem;font-weight:700;color:var(--success,#059669);text-decoration:none">Contact Support →</a>
+        <div style="background:linear-gradient(135deg,rgba(16,185,129,.1),rgba(16,185,129,.03));border:1.5px solid rgba(16,185,129,.3);border-radius:var(--radius);padding:18px;display:flex;flex-direction:column;justify-content:space-between;min-height:150px">
+          <div>
+            <div style="font-size:1.4rem;margin-bottom:8px">⚡</div>
+            <div style="font-weight:700;font-size:.88rem;color:var(--text);margin-bottom:5px">Get Help Within 15 Minutes</div>
+            <div style="font-size:.76rem;color:var(--gray-400);line-height:1.55">Our support team responds in under 15 minutes. Guaranteed.</div>
+          </div>
+          <a href="contact.html" style="font-size:.76rem;font-weight:700;color:var(--success,#059669);text-decoration:none;margin-top:12px;display:inline-block">Contact Support →</a>
         </div>
 
       </div>
@@ -338,7 +354,7 @@ document.querySelectorAll('.tab-btn').forEach(function(btn) {
 
 function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
 
-/* ── Load gigs from Firestore ── */
+/* ── Load gigs from Firestore (real-time) ── */
 function loadMyGigs(uid) {
   var q = query(collection(db, 'gigs'), where('posterId', '==', uid));
   if (unsubscribe) unsubscribe();
@@ -348,9 +364,16 @@ function loadMyGigs(uid) {
       mine.push(Object.assign({ id: docSnap.id }, docSnap.data()));
     });
     renderAll(mine);
+    /* Also start OTP + banner listeners once we have uid confirmed */
+    listenOTPCard(uid);
+    loadPosterBanner(uid);
   }, function(err) {
-    console.error('Error loading gigs:', err);
-    if (typeof showToast === 'function') showToast('❌ Error loading gigs: ' + err.message, 'error');
+    console.error('[GigLega] loadMyGigs error:', err);
+    var tabAll = document.getElementById('tabAll');
+    if (tabAll) tabAll.innerHTML = '<div class="gl-empty"><div class="gl-empty-icon">⚠️</div>' +
+      '<div class="gl-empty-title">Could not load your gigs</div>' +
+      '<div class="gl-empty-sub">' + (err.message || 'Permission or network error') + '</div>' +
+      '<a href="login.html" class="btn btn-primary btn-sm" style="margin-top:14px">Re-login to fix →</a></div>';
   });
 }
 
@@ -488,9 +511,24 @@ function emptyHtml(title, sub, href, cta) {
 }
 
 /* Role switch */
-document.getElementById('btnSwitchRole').addEventListener('click', function() {
-  window.location.href = 'dashboard-worker.html';
+document.addEventListener('DOMContentLoaded', function() {
+  var switchBtn = document.getElementById('btnSwitchRole');
+  if (switchBtn) {
+    switchBtn.addEventListener('click', function() {
+      window.location.href = 'dashboard-worker.html';
+    });
+  }
 });
+/* Also wire immediately if DOM already ready */
+(function() {
+  var switchBtn = document.getElementById('btnSwitchRole');
+  if (switchBtn && !switchBtn._wired) {
+    switchBtn._wired = true;
+    switchBtn.addEventListener('click', function() {
+      window.location.href = 'dashboard-worker.html';
+    });
+  }
+})();
 
 
 
