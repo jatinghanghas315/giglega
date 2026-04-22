@@ -180,6 +180,7 @@
   <div id="toast-container"></div>
 
   <script type="module">
+    import { routeByRole } from './auth-router.js';
     import { auth, db } from './firebase-config.js';
     import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
     import {
@@ -190,18 +191,10 @@
     var currentUser = null;
 
     /* ── Auth + Admin Guard ── */
-    onAuthStateChanged(auth, async function(user) {
-      if (!user) { window.location.href = 'login.html'; return; }
-      currentUser = user;
-      try {
-        var snap = await getDoc(doc(db, 'users', user.uid));
-        if (!snap.exists() || snap.data().role !== 'admin') {
-          var role = snap.exists() ? snap.data().role : 'tasker';
-          var routes = { poster:'dashboard-client.html', tasker:'dashboard-worker.html', enterprise:'enterprise.html' };
-          window.location.href = routes[role] || 'index.html';
-          return;
-        }
-        var hour = new Date().getHours();
+    routeByRole('admin', function(user, userData) {
+    currentUser = user;
+    try {
+    var hour = new Date().getHours();
         var greet = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
         document.getElementById('adminGreeting').textContent = greet + ', ' + (user.displayName || 'Admin') + ' — Full platform access active.';
         loadAllStats();
@@ -209,7 +202,7 @@
       } catch(e) {
         console.warn('[GigLega] admin guard error:', e);
       }
-    });
+  });
 
     /* ── Tabs ── */
     var tabLoaded = {};
