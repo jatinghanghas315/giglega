@@ -710,6 +710,7 @@
       '.btn-primary{background:var(--primary);color:#fff}.btn-primary:hover{opacity:.9}',
       '.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--text)}.btn-ghost:hover{border-color:var(--primary);color:var(--primary)}',
       '.nav-btn-login,.nav-btn-signup,.nav-post-btn{font-size:.84rem;padding:8px 16px}',
+      '#nav-auth-section{display:flex;align-items:center;gap:8px}',
       '.nav-user-menu{position:relative}',
       '.nav-avatar-btn{display:flex;align-items:center;gap:8px;background:none;border:1px solid var(--border);border-radius:10px;padding:6px 12px 6px 6px;cursor:pointer;transition:all .2s;color:var(--text)}',
       '.nav-avatar-btn:hover{border-color:var(--primary)}',
