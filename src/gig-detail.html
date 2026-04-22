@@ -664,7 +664,7 @@
         }
       } else if(isWorkerWhoBooked){
         /* WORKER who already booked this gig */
-        actionHtml = '<div style="background:#dcfce7;border-radius:10px;padding:14px;text-align:center;font-weight:700;color:#16a34a;margin-bottom:10px">You have Booked This Gig!</div>';
+        actionHtml = '<div style="background:var(--teal-faint,rgba(13,148,136,.08));border-radius:10px;padding:14px;text-align:center;font-weight:700;color:var(--success,#16a34a);margin-bottom:10px">You have Booked This Gig!</div>';
         posterCardCTA = '<a href="chat.html?with='+escH(gig.posterId)+'&gig='+escH(gig.id)+'" class="btn btn-primary" style="width:100%;display:block;text-align:center;margin-top:12px">Message Poster</a>';
       } else if(isOpen){
         /* WORKER on open gig — show book button, no message */
@@ -697,8 +697,8 @@
           /* Header */
           '<div class="gig-header">'+
             '<div class="gig-header-top" style="margin-bottom:10px">'+
-              '<span class="gig-status-pill '+statusClass+'">'+statusText+'</span>'+(gig.gigId?'<span style="font-size:.68rem;font-weight:800;font-family:monospace;color:var(--teal);background:rgba(13,148,136,.1);border:1px solid rgba(13,148,136,.25);border-radius:6px;padding:2px 8px;cursor:pointer;user-select:all" title="Click to copy Gig ID" onclick="navigator.clipboard&&navigator.clipboard.writeText(\'' + escH(gig.gigId) + '\').then(function(){var el=event.target;var prev=el.textContent;el.textContent=\'✅ Copied!\';setTimeout(function(){el.textContent=prev},1400)})">' + escH(gig.gigId) + '</span>':'')+
-              (gig.urgency==="urgent" ? '<span class="gig-cat-tag" style="background:#fef3c7;color:#b45309">🔥 Urgent</span>' : "")+
+              '<span class="gig-status-pill '+statusClass+'">'+statusText+'</span>'+(gig.gigId?'<span style="font-size:.68rem;font-weight:800;font-family:monospace;color:var(--teal);background:var(--teal-subtle,rgba(13,148,136,.1));border:1px solid rgba(13,148,136,.25);border-radius:6px;padding:2px 8px;cursor:pointer;user-select:all" title="Click to copy Gig ID" onclick="navigator.clipboard&&navigator.clipboard.writeText(\'' + escH(gig.gigId) + '\').then(function(){var el=event.target;var prev=el.textContent;el.textContent=\'✅ Copied!\';setTimeout(function(){el.textContent=prev},1400)})">' + escH(gig.gigId) + '</span>':'')+
+              (gig.urgency==="urgent" ? '<span class="gig-cat-tag" style="background:var(--teal-subtle,rgba(245,158,11,.12));color:#b45309">🔥 Urgent</span>' : "")+
             '</div>'+
             '<h1 class="gig-title">'+escH(gig.title)+'</h1>'+
             '<div class="gig-meta-row">'+
@@ -825,7 +825,7 @@
       modal.id = "acceptModal";
       modal.style.cssText="position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px";
       modal.innerHTML=
-        '<div style="background:#fff;border-radius:20px;padding:28px;max-width:420px;width:100%;box-shadow:0 24px 64px rgba(0,0,0,.3)">'+
+        '<div style="background:var(--surface);border-radius:20px;padding:28px;max-width:420px;width:100%;box-shadow:0 24px 64px rgba(0,0,0,.3)">'+
           '<h3 style="font-size:1.1rem;font-weight:800;color:var(--primary,#1a3c5e);margin-bottom:4px">🚀 Confirm Booking</h3>'+
           '<p style="font-size:.82rem;color:var(--gray-500);margin-bottom:18px">Book karne ke baad aap poster se chat kar sakte hain</p>'+
           '<p style="font-weight:700;margin-bottom:14px;font-size:.95rem">'+escH(gig.title)+'</p>'+
@@ -835,7 +835,7 @@
             '<div style="display:flex;justify-content:space-between;font-size:1rem;font-weight:800;color:#16a34a"><span>You Earn</span><span>'+fmtCur(earn)+'</span></div>'+
           '</div>'+
           '<div style="display:flex;gap:10px">'+
-            '<button id="modalCancelBtn" style="flex:1;padding:12px;border:1.5px solid #d1d5db;border-radius:10px;font-weight:700;cursor:pointer;background:#fff">Cancel</button>'+
+            '<button id="modalCancelBtn" style="flex:1;padding:12px;border:1.5px solid var(--border)db;border-radius:10px;font-weight:700;cursor:pointer;background:#fff">Cancel</button>'+
             '<button id="modalConfirmBtn" style="flex:2;padding:12px;background:var(--primary);color:#fff;border:none;border-radius:10px;font-weight:800;cursor:pointer;font-size:.95rem">Confirm Booking ✅</button>'+
           '</div>'+
         '</div>';
