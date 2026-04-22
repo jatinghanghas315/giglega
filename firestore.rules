@@ -168,5 +168,19 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+
+    // ── GIG REPORTS ─────────────────────────────────────────
+    // Any auth user can submit a report; only admins read (enforced server-side)
+    match /gig_reports/{reportId} {
+      allow create: if isAuth()
+        && request.resource.data.gigId     is string
+        && request.resource.data.reporterId == uid()
+        && request.resource.data.reason    is string
+        && request.resource.data.status    == 'pending';
+      allow read: if false; // admin reads via service account
+      allow update, delete: if false;
+    }
+
+
   }
 }
