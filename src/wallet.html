@@ -1674,6 +1674,7 @@
 
   <!-- ══ Firestore wallet integration ══ -->
   <script type="module">
+    import { requireAuth } from './auth-router.js';
     import { auth, db } from './firebase-config.js';
     import {
       doc, getDoc, setDoc, collection, onSnapshot,
@@ -1683,13 +1684,9 @@
 
     function fmt(n){ return Number(n||0).toLocaleString('en-IN'); }
 
-    onAuthStateChanged(auth, async function(user){
-      if(!user){ window.location.replace('login.html?redirect=wallet.html'); return; }
-
-      const uid = user.uid;
-
-      /* Role guard — wallet is for taskers only */
-      try {
+    requireAuth(function(user) {
+    currentUser = user;
+    const uid = user.uid; try {
         const { doc: _doc, getDoc: _getDoc } = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js');
         const { db: _db } = await import('./firebase-config.js');
         const _uSnap = await _getDoc(_doc(_db, 'users', uid));
@@ -1796,7 +1793,7 @@
           return null;
         }
       };
-    });
+  });
   </script>
 
   <script>
