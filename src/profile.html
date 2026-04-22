@@ -131,10 +131,10 @@
 
       <!-- Stats mini -->
       <div class="stats-mini" id="statsMini">
-        <div class="stat-mini"><div class="stat-mini-val" id="smGigsPosted">0</div><div class="stat-mini-lbl">Gigs Posted</div></div>
-        <div class="stat-mini"><div class="stat-mini-val" id="smGigsDone">0</div><div class="stat-mini-lbl">Gigs Completed</div></div>
-        <div class="stat-mini"><div class="stat-mini-val" id="smEarned">₹0</div><div class="stat-mini-lbl">Total Earned</div></div>
-        <div class="stat-mini"><div class="stat-mini-val" id="smSpent">₹0</div><div class="stat-mini-lbl">Total Spent</div></div>
+        <div class="stat-mini" id="statWrapPosted"><div class="stat-mini-val" id="smGigsPosted">0</div><div class="stat-mini-lbl">Gigs Posted</div></div>
+        <div class="stat-mini" id="statWrapDone"><div class="stat-mini-val" id="smGigsDone">0</div><div class="stat-mini-lbl">Gigs Completed</div></div>
+        <div class="stat-mini" id="statWrapEarned"><div class="stat-mini-val" id="smEarned">₹0</div><div class="stat-mini-lbl">Total Earned</div></div>
+        <div class="stat-mini" id="statWrapSpent"><div class="stat-mini-val" id="smSpent">₹0</div><div class="stat-mini-lbl">Total Spent</div></div>
         <div class="stat-mini" style="cursor:pointer" onclick="window.location.href='reviews.html'">
   <div class="stat-mini-val" style="color:var(--accent)">⭐ 4.8</div>
   <div class="stat-mini-lbl">My Reviews →</div>
@@ -189,7 +189,7 @@
           <label>Bio</label>
           <textarea id="fieldBio" maxlength="300" placeholder="Tell posters and Taskers a bit about yourself — your skills, experience, or what kind of gigs you prefer..."></textarea>
         </div>
-        <div class="field">
+        <div class="field" id="sectionWorkType">
           <label>Preferred Work Type</label>
           <select id="fieldWorkType">
             <option value="">— Select —</option>
@@ -201,7 +201,7 @@
       </div>
 
       <!-- Skills -->
-      <div class="form-card">
+      <div class="form-card" id="sectionSkills">
         <div class="card-title">🛠️ Your Skills</div>
         <div class="skills-input-wrap" id="skillTags"></div>
         <div class="skill-add-row">
@@ -227,41 +227,18 @@
       <button class="btn-save" id="btnPushToggle" style="margin-top:10px;background:rgba(13,148,136,.10);color:#0d9488;border:1.5px solid #0d9488;font-weight:700" onclick="(async function(b){b.disabled=true;b.textContent='Setting up…';var ok=await(window.GL&&window.GL.initPushNotifications?window.GL.initPushNotifications():window.initPushNotifications?window.initPushNotifications():Promise.resolve(false));b.disabled=false;b.textContent=ok?'🔔 Notifications ON ✅':'🔔 Enable Push Notifications';})(this)">🔔 Enable Push Notifications</button>
 
       
-      <!-- ── Role Switch Section (Phase 1) ── -->
+      <!-- ── Your Account ── -->
       <div class="card" style="padding:20px 24px;margin-top:24px;">
         <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
           <div>
-            <div style="font-size:.82rem;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">Your Current Role</div>
-            <div style="font-size:1.05rem;font-weight:700;color:var(--text);" id="profileRoleDisplay">Loading...</div>
+            <div style="font-size:.82rem;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">Your Account</div>
+            <div style="font-size:1.05rem;font-weight:700;color:var(--text);" id="profileRoleDisplay">Loading…</div>
             <div style="font-size:.78rem;color:var(--gray-500);margin-top:3px;" id="profileEnterpriseStatus"></div>
           </div>
-          <button onclick="openRoleSwitchModal()" style="padding:9px 20px;background:rgba(13,148,136,.1);color:var(--primary,#0d9488);border:1.5px solid var(--primary,#0d9488);border-radius:8px;font-weight:700;font-size:.85rem;cursor:pointer;font-family:inherit;transition:background .18s;" onmouseover="this.style.background='rgba(13,148,136,.2)'" onmouseout="this.style.background='rgba(13,148,136,.1)'">Switch Role</button>
+          <a href="settings.html" style="padding:9px 18px;background:rgba(13,148,136,.12);color:var(--primary,#0d9488);border:1.5px solid rgba(13,148,136,.3);border-radius:10px;font-size:.82rem;font-weight:700;text-decoration:none;display:inline-block;">⚙️ Account Settings</a>
         </div>
-      </div>
-
-      <!-- Role Switch Modal -->
-      <div id="roleSwitchModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:1000;align-items:center;justify-content:center;padding:16px;">
-        <div style="background:var(--surface,#1a1a1a);border:1px solid var(--gray-200,#2a2a2a);border-radius:16px;padding:28px 24px;max-width:420px;width:100%;box-shadow:0 16px 48px rgba(0,0,0,.4);">
-          <h3 style="margin:0 0 8px;color:var(--text,#f0f0f0);font-size:1.1rem;">Switch Your Role</h3>
-          <p style="margin:0 0 20px;color:var(--gray-500,#999);font-size:.85rem;">Your dashboard and features will update immediately after switching.</p>
-          <div style="display:grid;gap:10px;margin-bottom:20px;">
-            <label style="display:flex;align-items:center;gap:12px;padding:12px 14px;border:1.5px solid var(--gray-300,#333);border-radius:10px;cursor:pointer;transition:border-color .18s;" onmouseover="this.style.borderColor='#D9993A'" onmouseout="this.style.borderColor='var(--gray-300,#333)'">
-              <input type="radio" name="switchRole" value="poster" style="accent-color:#D9993A;" />
-              <div><div style="font-weight:700;color:var(--text,#f0f0f0);font-size:.9rem;">&#128203; Poster</div><div style="font-size:.75rem;color:var(--gray-500,#999);">Post gigs, hire Taskers</div></div>
-            </label>
-            <label style="display:flex;align-items:center;gap:12px;padding:12px 14px;border:1.5px solid var(--gray-300,#333);border-radius:10px;cursor:pointer;transition:border-color .18s;" onmouseover="this.style.borderColor='#D9993A'" onmouseout="this.style.borderColor='var(--gray-300,#333)'">
-              <input type="radio" name="switchRole" value="tasker" style="accent-color:#D9993A;" />
-              <div><div style="font-weight:700;color:var(--text,#f0f0f0);font-size:.9rem;">&#9889; Tasker</div><div style="font-size:.75rem;color:var(--gray-500,#999);">Browse gigs, earn money</div></div>
-            </label>
-            <label style="display:flex;align-items:center;gap:12px;padding:12px 14px;border:1.5px solid var(--gray-300,#333);border-radius:10px;cursor:pointer;transition:border-color .18s;" onmouseover="this.style.borderColor='#D9993A'" onmouseout="this.style.borderColor='var(--gray-300,#333)'">
-              <input type="radio" name="switchRole" value="enterprise" style="accent-color:#D9993A;" />
-              <div><div style="font-weight:700;color:var(--text,#f0f0f0);font-size:.9rem;">&#127970; Enterprise</div><div style="font-size:.75rem;color:var(--gray-500,#999);">Bulk hiring (requires admin approval)</div></div>
-            </label>
-          </div>
-          <div style="display:flex;gap:10px;">
-            <button onclick="confirmRoleSwitch()" style="flex:1;padding:12px;background:#D9993A;color:#fff;border:none;border-radius:10px;font-weight:700;font-size:.9rem;cursor:pointer;font-family:inherit;" id="roleSwitchConfirmBtn">Confirm Switch</button>
-            <button onclick="closeRoleSwitchModal()" style="padding:12px 20px;background:transparent;color:var(--gray-400,#aaa);border:1.5px solid var(--gray-300,#333);border-radius:10px;font-weight:600;font-size:.9rem;cursor:pointer;font-family:inherit;">Cancel</button>
-          </div>
+        <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border,#2a2a2a);font-size:.78rem;color:var(--text-muted);">
+          Want to switch your role or manage notifications? <a href="settings.html" style="color:var(--primary);font-weight:600;">Go to Settings →</a>
         </div>
       </div>
 
@@ -284,7 +261,57 @@
 
   <script type="module">
     import { requireAuth } from './auth-router.js';
-    requireAuth(null);
+    import { db } from './firebase-config.js';
+    import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+
+    requireAuth(async function(user) {
+      try {
+        var snap = await getDoc(doc(db, 'users', user.uid));
+        var ud   = snap.exists() ? snap.data() : {};
+        var role = ud.role || 'tasker';
+
+        /* ── Role badge in hero ── */
+        var roleEl = document.getElementById('heroRole');
+        var joined = ud.createdAt
+          ? new Date(ud.createdAt.toDate ? ud.createdAt.toDate() : ud.createdAt)
+              .toLocaleDateString('en-IN', { month:'long', year:'numeric' })
+          : 'Recently joined';
+        var roleBadge = { poster:'📋 Poster', client:'📋 Poster', tasker:'⚡ Tasker',
+                          worker:'⚡ Tasker', enterprise:'🏢 Enterprise', admin:'🛡️ Admin' }[role] || '👤 Member';
+        if (roleEl) roleEl.innerHTML =
+          '<span style="background:rgba(13,148,136,.15);color:var(--primary);font-size:.72rem;font-weight:700;' +
+          'padding:2px 9px;border-radius:20px;letter-spacing:.3px;margin-right:8px">' + roleBadge + '</span>' +
+          'Member since ' + joined;
+
+        /* ── Role display in account card ── */
+        var rdEl = document.getElementById('profileRoleDisplay');
+        if (rdEl) rdEl.textContent = roleBadge;
+        var esEl = document.getElementById('profileEnterpriseStatus');
+        if (esEl && ud.enterpriseStatus) {
+          var esMap = { approved:'✅ Enterprise Approved', pending:'⏳ Approval Pending — review within 24h', rejected:'❌ Application Rejected' };
+          var esCol = { approved:'#059669', pending:'#D9993A', rejected:'#dc2626' };
+          esEl.textContent = esMap[ud.enterpriseStatus] || '';
+          esEl.style.color = esCol[ud.enterpriseStatus] || '';
+        }
+
+        /* ── Role-specific visibility ── */
+        var isTasker = role === 'tasker' || role === 'worker';
+        var isPoster = role === 'poster' || role === 'client';
+        var isEnt    = role === 'enterprise';
+
+        var hide = function(id){ var e=document.getElementById(id); if(e) e.style.display='none'; };
+        var show = function(id){ var e=document.getElementById(id); if(e) e.style.display=''; };
+
+        if (!isTasker) { hide('sectionSkills'); hide('sectionWorkType'); }
+        if (isTasker)  { hide('statWrapPosted'); hide('statWrapSpent'); }
+        if (!isTasker) { hide('statWrapDone'); hide('statWrapEarned'); }
+
+        /* Populate name from Firestore */
+        var nf = document.getElementById('fieldName');
+        if (nf && !nf.value && ud.name) nf.value = ud.name;
+
+      } catch(e) { console.warn('[GigLega] profile init:', e.message); }
+    });
   </script>
   <script>
   (function () {
@@ -705,37 +732,7 @@
           } catch(e) { console.warn('[GigLega] loadRole error:', e); }
         }
 
-        window.openRoleSwitchModal = function() {
-          var modal = document.getElementById('roleSwitchModal');
-          modal.style.display = 'flex';
-        };
-        window.closeRoleSwitchModal = function() {
-          document.getElementById('roleSwitchModal').style.display = 'none';
-        };
-        window.confirmRoleSwitch = async function() {
-          var newRole = document.querySelector('input[name="switchRole"]:checked');
-          if (!newRole) { if (window.showToast) showToast('Please select a role.', 'warning'); return; }
-          var role = newRole.value;
-          var btn = document.getElementById('roleSwitchConfirmBtn');
-          btn.disabled = true; btn.textContent = 'Switching...';
-          try {
-            var uid = _auth.currentUser.uid;
-            await updateDoc(doc(_db, 'users', uid), {
-              role: role,
-              mode: role === 'tasker' ? 'worker' : role,
-              enterpriseStatus: role === 'enterprise' ? 'pending' : null,
-              roleHistory: arrayUnion({ role: role, switchedAt: new Date().toISOString() })
-            });
-            if (window.showToast) showToast('Role switched! Redirecting...', 'success');
-            var routes = { poster:'dashboard-client.html', tasker:'dashboard-worker.html', enterprise:'enterprise.html' };
-            setTimeout(function() { window.location.href = routes[role] || 'index.html'; }, 1400);
-          } catch(e) {
-            console.warn('[GigLega] role switch failed:', e);
-            btn.disabled = false; btn.textContent = 'Confirm Switch';
-            if (window.showToast) showToast('Role switch failed. Please try again.', 'error');
-          }
-        };
-      });
+        /* openRoleSwitchModal moved to settings.html */        /* closeRoleSwitchModal moved to settings.html */        /* confirmRoleSwitch moved to settings.html */      });
     })();
 
   </script>
