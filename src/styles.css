@@ -95,8 +95,8 @@
   --surface-3:    #21262d;   /* Inputs, code blocks, nested surfaces    */
 
   /* Text — 3 semantic levels */
-  --text:         #e6edf3;   /* Primary — cool white, not harsh        */
-  --text-muted:   #8b949e;   /* Secondary — medium gray                */
+  --text:         #f0f6fc;   /* Primary — bright white for readability */
+  --text-muted:   #adbac7;   /* Secondary — lighter gray for readability */
   --text-faint:   #484f58;   /* Tertiary — dividers, placeholders      */
 
   /* Borders & dividers */
