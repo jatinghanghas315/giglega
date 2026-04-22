@@ -4,10 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>GigLega &bull; Choose Your Role</title>
+  <script>(function(){try{var t=localStorage.getItem('gl_theme')||'dark';document.documentElement.setAttribute('data-theme',t);if(t==='dark')document.documentElement.classList.add('dark');else document.documentElement.classList.remove('dark');}catch(e){document.documentElement.setAttribute('data-theme','dark');document.documentElement.classList.add('dark');}})();</script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="theme-dark.css" />
   <style>
     body { min-height:100vh; display:flex; align-items:center; justify-content:center; background:var(--bg,#0f0f0f); padding:24px 16px; }
     .ob-card { background:var(--surface,#1a1a1a); border:1px solid var(--gray-200,#2a2a2a); border-radius:20px; padding:40px 32px; max-width:580px; width:100%; box-shadow:0 16px 48px rgba(0,0,0,.32); }
@@ -164,5 +166,6 @@
       }
     };
   </script>
+  <script src="shared.js"></script>
 </body>
 </html>
