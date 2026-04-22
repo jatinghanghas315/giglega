@@ -422,7 +422,7 @@
     import { requireAuth } from './auth-router.js';
 import { auth, db } from './firebase-config.js';
 import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
-import { collection, addDoc, serverTimestamp }
+import { collection, addDoc, serverTimestamp, getDoc, doc }
   from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
 
 /* ── State ── */
@@ -740,9 +740,27 @@ async function submitGig(){
   $('fDate').min=y+'-'+mo+'-'+dy; $('fDate').value=y+'-'+mo+'-'+dy;
 })();
 
-requireAuth(function(user) {
+requireAuth(async function(user) {
     currentUser = user;
-    
+    /* ── Role guard: block taskers from posting ── */
+    try {
+      var uSnap = await getDoc(doc(db, 'users', user.uid));
+      if (uSnap.exists()) {
+        var role = uSnap.data().role || '';
+        if (role === 'tasker' || role === 'worker') {
+          var main = document.getElementById('main-content') || document.querySelector('main');
+          if (main) main.innerHTML = '<div style="text-align:center;padding:80px 20px">' +
+            '<div style="font-size:3rem;margin-bottom:16px">??</div>' +
+            '<h2 style="color:var(--primary);margin-bottom:8px">Taskers Can't Post Gigs</h2>' +
+            '<p style="color:var(--text-muted);margin-bottom:24px">You are logged in as a <strong>Tasker</strong>. Only Poster or Enterprise accounts can post gigs.</p>' +
+            '<div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">' +
+              '<a href="dashboard-worker.html" class="btn btn-primary">Go to My Dashboard →</a>' +
+              '<a href="settings.html" class="btn btn-ghost">Change Account Type</a>' +
+            '</div></div>';
+          return;
+        }
+      }
+    } catch(roleErr) { console.warn('[GigLega] post-gig role check:', roleErr); }
   });
 </script>
   <script src="onboarding.js" defer>
