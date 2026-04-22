@@ -193,6 +193,31 @@
     .skel-lines { flex:1; display:flex; flex-direction:column; gap:6px; }
     .skel-line { height:10px;border-radius:4px; }
     .skel-line.short { width:60%; }
+  
+  /* ── Dark mode: chat-specific components ────────── */
+  [data-theme="dark"] .chat-sidebar { background: var(--surface); border-color: var(--border); }
+  [data-theme="dark"] .chat-thread-item { border-color: var(--border); }
+  [data-theme="dark"] .chat-thread-item:hover,
+  [data-theme="dark"] .chat-thread-item.active { background: var(--teal-subtle); }
+  [data-theme="dark"] .chat-thread-name { color: var(--text); }
+  [data-theme="dark"] .chat-thread-preview { color: var(--text-muted); }
+  [data-theme="dark"] .chat-main { background: var(--bg); }
+  [data-theme="dark"] .chat-header { background: var(--surface); border-color: var(--border); }
+  [data-theme="dark"] .chat-header-name { color: var(--text); }
+  [data-theme="dark"] .chat-messages { background: var(--bg); }
+  [data-theme="dark"] .msg-bubble { background: var(--surface-2); color: var(--text); }
+  [data-theme="dark"] .msg-bubble.mine { background: var(--teal); color: #fff; }
+  [data-theme="dark"] .msg-time,
+  [data-theme="dark"] .chat-day-label,
+  [data-theme="dark"] .chat-msg-status { color: var(--text-faint); }
+  [data-theme="dark"] .chat-input-area { background: var(--surface); border-color: var(--border); }
+  [data-theme="dark"] .chat-input { background: var(--surface-3); color: var(--text); border-color: var(--border); }
+  [data-theme="dark"] .chat-input::placeholder { color: var(--text-faint); }
+  [data-theme="dark"] .chat-send-btn { background: var(--teal); color: #fff; }
+  [data-theme="dark"] .chat-empty { color: var(--text-muted); }
+  [data-theme="dark"] .chat-search { background: var(--surface-3); border-color: var(--border); color: var(--text); }
+  [data-theme="dark"] .chat-attachment-btn { color: var(--text-muted); }
+  [data-theme="dark"] .chat-typing { color: var(--text-faint); }
   </style>
 
   <script type="module">
