@@ -14,43 +14,7 @@
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="GigLega - Gurugram's #1 Gig Platform" />
   <meta name="twitter:description" content="Post gigs or find work near you in Gurugram NCR. Same-day gigs, Trusted Platform." />
-  <link rel="stylesheet" href="styles.css" />   <!-- V1.2: Schema.org structured data -->   <script type="application/ld+json">   {     "@context": "https://schema.org",     "@type": "Organization",     "name": "GigLega",     "url": "https://giglega.vercel.app",     "description": "Gurugram's #1 hyperlocal gig platform connecting verified taskers with customers for cleaning, delivery, tutoring, and more.",     "areaServed": {"@type": "City", "name": "Gurugram"},     "sameAs": ["https://instagram.com/giglega"]   }   
-  /* Count-up animation for hero stats */
-  function countUp(el, target, duration, prefix, suffix) {
-    var start = 0;
-    var startTime = null;
-    var isFloat = target % 1 !== 0;
-    function step(timestamp) {
-      if (!startTime) startTime = timestamp;
-      var progress = Math.min((timestamp - startTime) / duration, 1);
-      var eased = 1 - Math.pow(1 - progress, 3);
-      var current = Math.round(eased * target * 10) / 10;
-      el.textContent = (prefix||'') + (isFloat ? current.toFixed(1) : Math.round(current)) + (suffix||'');
-      if (progress < 1) requestAnimationFrame(step);
-    }
-    requestAnimationFrame(step);
-  }
-
-  /* Trigger on scroll into view */
-  var statsObserver = new IntersectionObserver(function(entries) {
-    entries.forEach(function(e) {
-      if (e.isIntersecting) {
-        var nums = e.target.querySelectorAll('.hero-stat-num[data-target]');
-        nums.forEach(function(el) {
-          var t = parseFloat(el.dataset.target);
-          var pre = el.dataset.prefix || '';
-          var suf = el.dataset.suffix || '';
-          countUp(el, t, 1200, pre, suf);
-        });
-        statsObserver.unobserve(e.target);
-      }
-    });
-  }, { threshold: 0.3 });
-
-  var heroStats = document.querySelector('.hero-stats');
-  if (heroStats) statsObserver.observe(heroStats);
-
-  </script>
+  <link rel="stylesheet" href="styles.css" />
     <link rel="stylesheet" href="theme-dark.css" />
   
   <link rel="stylesheet" href="mobile.css?v=20260411-0215" />
@@ -438,20 +402,20 @@
 
         <div class="hero-stats">
           <div class="hero-stat-item">
-            <div class="hero-stat-num" id="statGigs" data-target="12" data-suffix="+">0</div>
+            <div class="hero-stat-num" id="statGigs">0+</div>
             <div class="hero-stat-lbl">Live Gigs</div>
           </div>
           <div class="hero-stat-item">
-            <div class="hero-stat-num" id="statWorkers" data-target="38" data-suffix="+">0</div>
+            <div class="hero-stat-num" id="statWorkers">0+</div>
             <div class="hero-stat-lbl">Active Taskers</div>
           </div>
           <div class="hero-stat-item">
-            <div class="hero-stat-num" data-target="0" data-prefix="₹" data-suffix=" Fee">₹0</div>
-            <div class="hero-stat-lbl">First Gig Free</div>
+            <div class="hero-stat-num" id="statUsers">0+</div>
+            <div class="hero-stat-lbl">Total Users</div>
           </div>
           <div class="hero-stat-item">
-            <div class="hero-stat-num" id="statHelp" data-target="15" data-suffix="min">15min</div>
-              <div class="hero-stat-lbl">Get Help In</div>
+            <div class="hero-stat-num" id="statTotalGigs">0+</div>
+              <div class="hero-stat-lbl">Gigs Posted</div>
             </div>
           </div>
 
@@ -737,190 +701,141 @@
 
   <script src="shared.js?v=20260411" defer></script>
 
-  <script>
-  document.addEventListener("DOMContentLoaded", function () {
-
-    var GIGS_KEY = (typeof GL !== "undefined") ? GL.STORAGE_KEY_GIGS : "gl_gigs";
+  <script type="module">
+    import { db } from './firebase-config.js';
+    import {
+      collection, query, where, orderBy, limit, onSnapshot
+    } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
 
     /* ── Helpers ── */
-    function getGigs() {
-      try { return JSON.parse(localStorage.getItem(GIGS_KEY) || "[]"); } catch(e) { return []; }
-    }
     function escH(s) {
-      return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+      return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
     }
-    function timeAgo(iso) {
-      var diff = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
-      if (diff < 60)    return diff + "s ago";
-      if (diff < 3600)  return Math.floor(diff/60)  + "m ago";
-      if (diff < 86400) return Math.floor(diff/3600) + "h ago";
-      return Math.floor(diff/86400) + "d ago";
+    function timeAgo(val) {
+      var ts = val && val.toDate ? val.toDate() : new Date(val || Date.now());
+      var diff = Math.floor((Date.now() - ts.getTime()) / 1000);
+      if (diff < 60)    return diff + 's ago';
+      if (diff < 3600)  return Math.floor(diff/60) + 'm ago';
+      if (diff < 86400) return Math.floor(diff/3600) + 'h ago';
+      return Math.floor(diff/86400) + 'd ago';
     }
-
-    /* ── Live stats from localStorage ── */
-    var allGigs    = getGigs();
-    var liveGigs   = allGigs.filter(function(g){ return g.status === "open"; });
-    var allUsers   = [];
-    try { allUsers = JSON.parse(localStorage.getItem((typeof GL!=="undefined"?GL.STORAGE_KEY_USERS:"gl_users"))||"[]"); } catch(e){}
-
-    /* Animate number counter */
-    function animCount(elId, target, suffix) {
+    function animCount(elId, target) {
       var el = document.getElementById(elId);
       if (!el) return;
-      target = target || 0;
-      suffix = suffix || "";
-      if (target === 0) { el.textContent = "0" + suffix; return; }
-      var start = 0, duration = 1200, step = Math.ceil(target / 40);
-      var timer = setInterval(function(){
+      if (target === 0) { el.textContent = '0+'; return; }
+      var start = 0, steps = 50, step = Math.max(1, Math.ceil(target / steps));
+      el.textContent = '0+';
+      var timer = setInterval(function() {
         start = Math.min(start + step, target);
-        el.textContent = start + suffix;
+        el.textContent = start.toLocaleString('en-IN') + '+';
         if (start >= target) clearInterval(timer);
-      }, duration / 40);
-    }
-        if(liveGigs.length > 0) animCount("statGigs", liveGigs.length); else document.getElementById("statGigs").textContent = liveGigs.length;
-    var workerCount = allUsers.filter(function(u){ return u.role==="worker"; }).length; if(workerCount > 0) animCount("statWorkers", workerCount); else document.getElementById("statWorkers").textContent = workerCount;
-
-    /* ── Categories ── */
-    var CATS = [
-      {icon:"🧹", label:"House Help"},
-      {icon:"📦", label:"Moving"},
-      {icon:"🛒", label:"Errands"},
-      {icon:"🔧", label:"Handyman"},
-      {icon:"💻", label:"Tech Help"},
-      {icon:"📚", label:"Tutoring"},
-      {icon:"🎉", label:"Events"},
-      {icon:"🚗", label:"Driver"},
-      {icon:"🐕", label:"Pet Care"},
-      {icon:"🎨", label:"Design"},
-      {icon:"🌐", label:"Web Dev"},
-      {icon:"📱", label:"Social Media"}
-    ];
-    var catsGrid = document.getElementById("catsGrid");
-    CATS.forEach(function(cat){
-      var a = document.createElement("a");
-      a.className = "cat-chip";
-      a.href = "browse.html?cat=" + encodeURIComponent(cat.label);
-      a.innerHTML = cat.icon + " " + cat.label;
-      catsGrid.appendChild(a);
-    });
-
-    /* ── Featured gigs (max 6 open gigs) ── */
-    var container = document.getElementById("featuredGigs");
-    var emptyEl   = document.getElementById("gigsEmpty");
-    var show      = liveGigs.slice(0, 6);
-
-    if (!show.length) {
-      container.classList.add("hidden");
-      emptyEl.classList.remove("hidden");
-    } else {
-      emptyEl.classList.add("hidden");
-      show.forEach(function(gig){
-        var fee    = Math.round((gig.budget || 0) * 0.10);
-        var earn   = (gig.budget || 0) - fee;
-        var isHyper = gig.type === "hyperlocal";
-        container.innerHTML += '<div class="gig-card card-hover">' +
-          '<div class="gig-type-tag ' + (isHyper ? "tag-hyperlocal" : "tag-remote") + '">' +
-            (isHyper ? "Hyperlocal" : "Remote") +
-          '</div>' +
-          '<div class="gig-card-title">' + escH(gig.title) + '</div>' +
-          '<div class="gig-card-desc line-clamp-2">' + escH(gig.description||"") + '</div>' +
-          '<div class="gig-card-meta">' +
-            '<span class="gig-meta-chip">📍 ' + escH(gig.location||"Gurugram") + '</span>' +
-            '<span class="gig-meta-chip">🕐 ' + timeAgo(gig.createdAt) + '</span>' +
-            (gig.category ? '<span class="gig-meta-chip">🏷️ ' + escH(gig.category) + '</span>' : '') +
-          '</div>' +
-          '<div class="gig-earn-strip">' +
-            '<div>' +
-              '<div class="gig-earn-label">You Earn</div>' +
-              '<div class="gig-earn-val">₹' + earn.toLocaleString("en-IN") + '</div>' +
-            '</div>' +
-            '<div style="text-align:right">' +
-              '<div class="gig-earn-label">Posted Budget</div>' +
-              '<div class="gig-price">₹' + (gig.budget||0).toLocaleString("en-IN") + '</div>' +
-            '</div>' +
-          '</div>' +
-          '<a href="gig-detail.html?id=' + escH(gig.id) + '" class="btn btn-primary btn-sm btn-block" style="margin-top:auto">Book This Gig →</a>' +
-        '</div>';
-      });
+      }, 1400 / steps);
     }
 
-    /* ── Empty state when no real gigs exist ── */
-    if (!allGigs.length) {
-      container.innerHTML =
-        '<div style="grid-column:1/-1;text-align:center;padding:48px 24px;">' +
-          '<div style="font-size:2.5rem;margin-bottom:12px">📋</div>' +
-          '<div style="font-weight:700;font-size:1.1rem;margin-bottom:8px;color:var(--text)">No gigs near you yet</div>' +
-          '<div style="color:var(--gray-500);font-size:.9rem;margin-bottom:20px;max-width:320px;margin-left:auto;margin-right:auto">GigLega is just launching in Gurugram. Be the first to post a gig!</div>' +
-          '<a href="post-gig.html" style="display:inline-block;padding:11px 24px;background:var(--primary);color:#fff;border-radius:10px;font-weight:700;text-decoration:none;font-size:.95rem">Post the First Gig →</a>' +
-        '</div>';
-      container.classList.remove("hidden");
-      emptyEl.classList.add("hidden");
-      animCount("statGigs", 0);
-    }
-
-    /* ── Hero search ── */
-    function doSearch() {
-      var q = document.getElementById("heroSearch").value.trim();
-      if (!q) { window.location.href = "browse.html"; return; }
-      window.location.href = "browse.html?q=" + encodeURIComponent(q);
-    }
-    document.getElementById("heroSearchBtn").addEventListener("click", doSearch);
-    document.getElementById("heroSearch").addEventListener("keydown", function(e){
-      if (e.key === "Enter") doSearch();
-    });
-
-    /* ── FAQ ── */
-    var FAQS = [
-      { q:"How do I join GigLega?",                      a:"It's completely free! Click the 'Join Free' button enter your name, email/phone and password. Ready in 2 minutes." },
-      { q:"How do workers get paid?",                a:"After a gig is completed, payment goes to your in-app wallet. Withdraw to UPI or bank anytime. Same-day processing." },
-      { q:"Is there a charge for Posters?",                     a:"Posting a gig is completely free. A platform fee (charged at checkout) only applies on successful completion — no upfront charges." },
-      { q:"Is GigLega safe?",                              a:"Yes! All workers are verified. In-app chat means you never share your personal number, and the reviews system builds trust." },
-      { q:"Are gigs available outside Gurugram?",         a:"Currently we're focused on Gurugram NCR. For remote gigs (design, coding, writing), anyone across India can apply." },
-      { q:"I couldn't find a gig — what should I do?",            a:"Use filters on the Browse page — category, budget, type (remote/hyperlocal). Build a strong profile so posters can find and reach you." }
-    ];
-
-    var faqList = document.getElementById("faqList");
-    FAQS.forEach(function(f, i){
-      var item = document.createElement("div");
-      item.className = "faq-item";
-      item.innerHTML =
-        '<div class="faq-q" tabindex="0" role="button" aria-expanded="false">' +
-          '<span>' + escH(f.q) + '</span>' +
-          '<span class="faq-chevron">▼</span>' +
+    /* ── Gig card renderer ── */
+    function renderGigCard(gig) {
+      var fee  = Math.round((gig.budget || 0) * 0.10);
+      var earn = (gig.budget || 0) - fee;
+      var isHyper = gig.type === 'hyperlocal';
+      var cat = gig.category ? '<span class="gig-meta-chip">??️ ' + escH(gig.category) + '</span>' : '';
+      return '<div class="gig-card card-hover">' +
+        '<div class="gig-type-tag ' + (isHyper ? 'tag-hyperlocal' : 'tag-remote') + '">' +
+          (isHyper ? '?? Hyperlocal' : '?? Remote') +
         '</div>' +
-        '<div class="faq-a">' + escH(f.a) + '</div>';
+        '<div class="gig-card-title">' + escH(gig.title) + '</div>' +
+        '<div class="gig-card-desc line-clamp-2">' + escH(gig.description || '') + '</div>' +
+        '<div class="gig-card-meta">' +
+          '<span class="gig-meta-chip">?? ' + escH(gig.location || gig.area || 'Gurugram') + '</span>' +
+          '<span class="gig-meta-chip">?? ' + timeAgo(gig.createdAt) + '</span>' + cat +
+        '</div>' +
+        '<div class="gig-earn-strip">' +
+          '<div><div class="gig-earn-label">You Earn</div>' +
+          '<div class="gig-earn-val">₹' + earn.toLocaleString('en-IN') + '</div></div>' +
+          '<div style="text-align:right"><div class="gig-earn-label">Budget</div>' +
+          '<div class="gig-price">₹' + (gig.budget || 0).toLocaleString('en-IN') + '</div></div>' +
+        '</div>' +
+        '<a href="gig-detail.html?id=' + escH(gig.id) + '" class="btn btn-primary btn-sm btn-block" style="margin-top:14px">View &amp; Accept →</a>' +
+      '</div>';
+    }
 
-      var q = item.querySelector(".faq-q");
-      function toggle() {
-        var isOpen = item.classList.contains("open");
-        /* Close all first */
-        document.querySelectorAll(".faq-item.open").forEach(function(el){ el.classList.remove("open"); el.querySelector(".faq-q").setAttribute("aria-expanded","false"); });
-        if (!isOpen) { item.classList.add("open"); q.setAttribute("aria-expanded","true"); }
-      }
-      q.addEventListener("click", toggle);
-      q.addEventListener("keydown", function(e){ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); toggle(); } });
-      faqList.appendChild(item);
-    });
+    var container = document.getElementById('featuredGigs');
+    var emptyEl   = document.getElementById('gigsEmpty');
 
-    /* ── Redirect post-gig / signup if already logged in ── */
-    var currentUser = (typeof getCurrentUser === "function") ? getCurrentUser() : null;
-    if (currentUser) {
-      /* Swap "Join Free" CTA to dashboard link */
-      document.querySelectorAll('a[href="login.html#mode=register"], a[href="login.html#mode=register&role=worker"], a[href="login.html#mode=register&role=poster"]').forEach(function(a){
-        if (a.href.includes("login.html")) {
-                    // Role-based dashboard redirect
-          var dashUrl = "dashboard.html";
-          if (currentUser.role === "tasker" || currentUser.mode === "worker") dashUrl = "dashboard-tasker.html";
-          else if (currentUser.role === "poster") dashUrl = "dashboard-client.html";
-          else if (currentUser.role === "enterprise") dashUrl = "enterprise.html";
-          else if (currentUser.role === "admin") dashUrl = "dashboard.html";
-          a.href = dashUrl;
-          if (a.textContent.includes("Join")) a.innerHTML = "⚡ Go to Dashboard";
+    /* ══ 1. LIVE GIGS — real-time cards + counter ══ */
+    onSnapshot(
+      query(collection(db,'gigs'), where('status','==','open'), orderBy('createdAt','desc'), limit(6)),
+      function(snap) {
+        animCount('statGigs', snap.size);
+        var gigs = [];
+        snap.forEach(function(d) { gigs.push(Object.assign({ id: d.id }, d.data())); });
+        if (!gigs.length) {
+          container.classList.add('hidden');
+          emptyEl.classList.remove('hidden');
+        } else {
+          emptyEl.classList.add('hidden');
+          container.classList.remove('hidden');
+          container.innerHTML = gigs.map(renderGigCard).join('');
         }
+      },
+      function(e) {
+        console.warn('[GigLega] gigs snapshot:', e.message);
+        container.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px 24px;color:var(--text-muted)">⚠️ Could not load gigs. Check your connection.</div>';
+        container.classList.remove('hidden');
+      }
+    );
+
+    /* ══ 2. ACTIVE TASKERS — real-time counter ══ */
+    onSnapshot(
+      query(collection(db,'users'), where('role','in',['tasker','worker'])),
+      function(snap) { animCount('statWorkers', snap.size); },
+      function(e) { console.warn('[GigLega] taskers snapshot:', e.message); }
+    );
+
+    /* ══ 3. TOTAL REGISTERED USERS — real-time counter ══ */
+    onSnapshot(
+      collection(db,'users'),
+      function(snap) { animCount('statUsers', snap.size); },
+      function(e) { console.warn('[GigLega] users snapshot:', e.message); }
+    );
+
+    /* ══ 4. TOTAL GIGS EVER POSTED — real-time counter ══ */
+    onSnapshot(
+      collection(db,'gigs'),
+      function(snap) { animCount('statTotalGigs', snap.size); },
+      function(e) { console.warn('[GigLega] total gigs snapshot:', e.message); }
+    );
+
+    /* ══ CATEGORIES ══ */
+    var CATS = [
+      {icon:'??', label:'House Help'}, {icon:'??', label:'Moving'},
+      {icon:'??', label:'Errands'},     {icon:'??', label:'Handyman'},
+      {icon:'??', label:'Tech Help'},   {icon:'??', label:'Tutoring'},
+      {icon:'??', label:'Events'},       {icon:'??', label:'Driver'},
+      {icon:'??', label:'Pet Care'},    {icon:'??', label:'Design'},
+      {icon:'??', label:'Web Dev'},     {icon:'??', label:'Social Media'}
+    ];
+    var catsGrid = document.getElementById('catsGrid');
+    if (catsGrid) {
+      CATS.forEach(function(cat) {
+        var a = document.createElement('a');
+        a.className = 'cat-chip';
+        a.href = 'browse.html?cat=' + encodeURIComponent(cat.label);
+        a.innerHTML = cat.icon + ' ' + cat.label;
+        catsGrid.appendChild(a);
       });
     }
 
-  });
+    /* ══ HERO SEARCH ══ */
+    function doSearch() {
+      var q = document.getElementById('heroSearch');
+      if (!q || !q.value.trim()) { window.location.href = 'browse.html'; return; }
+      window.location.href = 'browse.html?q=' + encodeURIComponent(q.value.trim());
+    }
+    var searchBtn = document.getElementById('heroSearchBtn');
+    var searchBox = document.getElementById('heroSearch');
+    if (searchBtn) searchBtn.addEventListener('click', doSearch);
+    if (searchBox) searchBox.addEventListener('keydown', function(e) { if (e.key === 'Enter') doSearch(); });
+
   </script>
 </body>
 </html>
