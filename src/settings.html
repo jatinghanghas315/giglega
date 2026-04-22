@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Settings — GigLega</title>
+  <meta name="description" content="GigLega account settings — manage your role, notifications, password and account." />
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="theme-dark.css" />
+  <link rel="stylesheet" href="mobile.css?v=20260423" />
+  <script src="shared.js?v=20260423" defer></script>
+  <style>
+    .sw{max-width:720px;margin:0 auto;padding:32px 20px 80px}
+    .pg-title{font-size:1.4rem;font-weight:800;color:var(--text);margin:0 0 4px}
+    .pg-sub{font-size:.84rem;color:var(--text-muted);margin:0 0 32px}
+    .sc{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:16px}
+    .sc-title{font-size:.74rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:18px}
+    .sr{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:12px 0;border-bottom:1px solid var(--border)}
+    .sr:last-child{border-bottom:none;padding-bottom:0}
+    .sr:first-of-type{padding-top:0}
+    .sr-lbl{font-weight:600;font-size:.88rem;color:var(--text);margin-bottom:3px}
+    .sr-sub{font-size:.76rem;color:var(--text-muted);line-height:1.5}
+    .sr-r{flex-shrink:0;display:flex;align-items:center;gap:8px}
+    /* Toggle switch */
+    .tgl{position:relative;width:44px;height:24px;cursor:pointer;flex-shrink:0;display:inline-block}
+    .tgl input{opacity:0;width:0;height:0;position:absolute}
+    .tgl-track{position:absolute;inset:0;background:var(--border);border-radius:24px;transition:.2s}
+    .tgl-thumb{position:absolute;width:18px;height:18px;background:#fff;border-radius:50%;top:3px;left:3px;transition:.2s}
+    .tgl input:checked + .tgl-track{background:var(--primary)}
+    .tgl input:checked ~ .tgl-thumb{left:23px}
+    /* Role options */
+    .ro{border:1.5px solid var(--border);border-radius:12px;padding:14px 16px;cursor:pointer;transition:all .18s;display:flex;align-items:center;gap:12px;margin-bottom:8px}
+    .ro:hover{border-color:var(--primary)}
+    .ro.sel{border-color:#D9993A;background:rgba(217,153,58,.06)}
+    .ro input[type=radio]{accent-color:#D9993A;width:16px;height:16px;flex-shrink:0}
+    .ro-lbl{font-weight:700;font-size:.88rem;color:var(--text);margin-bottom:2px}
+    .ro-sub{font-size:.74rem;color:var(--text-muted)}
+    /* Danger */
+    .danger-sc{background:rgba(220,38,38,.04);border-color:rgba(220,38,38,.2)}
+    .danger-sc .sc-title{color:#dc2626}
+    .btn-dng{background:rgba(220,38,38,.1);color:#dc2626;border:1.5px solid rgba(220,38,38,.3);padding:9px 18px;border-radius:10px;font-weight:700;font-size:.83rem;cursor:pointer;transition:all .18s}
+    .btn-dng:hover{background:#dc2626;color:#fff}
+    .role-badge{background:rgba(13,148,136,.12);color:var(--primary);font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:20px}
+    .msg-ok{color:#059669;font-size:.8rem;margin-top:6px}
+    .msg-err{color:#dc2626;font-size:.8rem;margin-top:6px}
+  </style>
+</head>
+<body>
+  <nav id="main-nav"></nav>
+  <div class="sw" id="main-content">
+
+    <div class="pg-title">Account Settings</div>
+    <div class="pg-sub">Manage your role, notifications, security and preferences.</div>
+
+    <!-- Account Info -->
+    <div class="sc">
+      <div class="sc-title">?? Account Info</div>
+      <div class="sr">
+        <div><div class="sr-lbl">Name</div><div class="sr-sub" id="infoName">Loading…</div></div>
+        <div class="sr-r"><a href="profile.html" style="font-size:.8rem;font-weight:600;color:var(--primary);text-decoration:none">Edit Profile →</a></div>
+      </div>
+      <div class="sr">
+        <div><div class="sr-lbl">Email</div><div class="sr-sub" id="infoEmail">Loading…</div></div>
+        <div class="sr-r"><span id="vBadge" style="font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:20px"></span></div>
+      </div>
+      <div class="sr">
+        <div><div class="sr-lbl">Current Role</div><div class="sr-sub">Your account type on GigLega</div></div>
+        <div class="sr-r"><span class="role-badge" id="roleBadge">Loading…</span></div>
+      </div>
+      <div class="sr">
+        <div><div class="sr-lbl">Member Since</div><div class="sr-sub" id="infoJoined">Loading…</div></div>
+      </div>
+    </div>
+
+    <!-- Role Switch -->
+    <div class="sc">
+      <div class="sc-title">?? Switch Account Type</div>
+      <div style="font-size:.82rem;color:var(--text-muted);margin-bottom:16px;line-height:1.6">Changing your role updates how you use GigLega. All your existing gigs and history are preserved.</div>
+      <div id="roleOptions">
+        <div class="ro" id="ro-poster" onclick="selectRole('poster')">
+          <input type="radio" name="newRole" value="poster" />
+          <div><div class="ro-lbl">?? Poster</div><div class="ro-sub">Post gigs and hire taskers in your area</div></div>
+        </div>
+        <div class="ro" id="ro-tasker" onclick="selectRole('tasker')">
+          <input type="radio" name="newRole" value="tasker" />
+          <div><div class="ro-lbl">⚡ Tasker</div><div class="ro-sub">Browse and accept gigs near you, earn money</div></div>
+        </div>
+        <div class="ro" id="ro-enterprise" onclick="selectRole('enterprise')">
+          <input type="radio" name="newRole" value="enterprise" />
+          <div><div class="ro-lbl">?? Enterprise</div><div class="ro-sub">Bulk posting, team management and priority support</div></div>
+        </div>
+      </div>
+      <div style="margin-top:16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <button id="btnApplyRole" class="btn btn-primary btn-sm" onclick="applyRole()" disabled>Apply Role Change</button>
+        <span id="roleMsg" style="font-size:.8rem;color:var(--text-muted)"></span>
+      </div>
+    </div>
+
+    <!-- Notifications -->
+    <div class="sc">
+      <div class="sc-title">?? Notifications</div>
+      <div class="sr">
+        <div><div class="sr-lbl">Gig Alerts</div><div class="sr-sub">Notify when new gigs match your skills</div></div>
+        <div class="sr-r"><label class="tgl"><input type="checkbox" id="nGigs" checked onchange="saveNotif()"><div class="tgl-track"></div><div class="tgl-thumb"></div></label></div>
+      </div>
+      <div class="sr">
+        <div><div class="sr-lbl">Chat Messages</div><div class="sr-sub">Notify on new messages</div></div>
+        <div class="sr-r"><label class="tgl"><input type="checkbox" id="nChat" checked onchange="saveNotif()"><div class="tgl-track"></div><div class="tgl-thumb"></div></label></div>
+      </div>
+      <div class="sr">
+        <div><div class="sr-lbl">Gig Updates</div><div class="sr-sub">Status changes, acceptances, completions</div></div>
+        <div class="sr-r"><label class="tgl"><input type="checkbox" id="nUpdates" checked onchange="saveNotif()"><div class="tgl-track"></div><div class="tgl-thumb"></div></label></div>
+      </div>
+      <div class="sr">
+        <div><div class="sr-lbl">Wallet &amp; Payments</div><div class="sr-sub">Credits, debits and payouts</div></div>
+        <div class="sr-r"><label class="tgl"><input type="checkbox" id="nWallet" checked onchange="saveNotif()"><div class="tgl-track"></div><div class="tgl-thumb"></div></label></div>
+      </div>
+    </div>
+
+    <!-- Security -->
+    <div class="sc">
+      <div class="sc-title">?? Security</div>
+      <div class="sr">
+        <div><div class="sr-lbl">Password</div><div class="sr-sub">Send a reset link to your email</div></div>
+        <div class="sr-r"><button class="btn btn-ghost btn-sm" onclick="resetPw()">Reset Password</button></div>
+      </div>
+      <div id="pwMsg"></div>
+      <div class="sr">
+        <div><div class="sr-lbl">Email Verification</div><div class="sr-sub" id="evStatus">Checking…</div></div>
+        <div class="sr-r"><button class="btn btn-ghost btn-sm" id="btnVerify" onclick="verifyEmail()" style="display:none">Verify Now</button></div>
+      </div>
+      <div id="verifyMsg"></div>
+    </div>
+
+    <!-- Appearance -->
+    <div class="sc">
+      <div class="sc-title">?? Appearance</div>
+      <div class="sr">
+        <div><div class="sr-lbl">Dark Mode</div><div class="sr-sub">Switch between dark and light theme</div></div>
+        <div class="sr-r"><label class="tgl"><input type="checkbox" id="tDark" checked onchange="setTheme(this.checked)"><div class="tgl-track"></div><div class="tgl-thumb"></div></label></div>
+      </div>
+    </div>
+
+    <!-- Danger Zone -->
+    <div class="sc danger-sc">
+      <div class="sc-title">⚠️ Danger Zone</div>
+      <div class="sr">
+        <div><div class="sr-lbl">Log Out</div><div class="sr-sub">Sign out on this device</div></div>
+        <div class="sr-r"><button class="btn-dng" onclick="doLogout()">?? Log Out</button></div>
+      </div>
+      <div class="sr">
+        <div><div class="sr-lbl">Delete Account</div><div class="sr-sub">Permanently delete your account and all data. Cannot be undone.</div></div>
+        <div class="sr-r"><button class="btn-dng" onclick="doDelete()">??️ Delete Account</button></div>
+      </div>
+    </div>
+
+  </div>
+  <footer id="main-footer"></footer>
+  <div id="toast-container"></div>
+
+  <script type="module">
+    import { requireAuth }  from './auth-router.js';
+    import { auth, db }     from './firebase-config.js';
+    import { doc, getDoc, updateDoc, deleteDoc, serverTimestamp }
+      from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+    import { sendPasswordResetEmail, sendEmailVerification, signOut, deleteUser, reload }
+      from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+
+    const ROLE_MAP = { poster:'dashboard-client.html', client:'dashboard-client.html',
+      tasker:'dashboard-worker.html', worker:'dashboard-worker.html',
+      enterprise:'dashboard-enterprise.html', admin:'dashboard-admin.html' };
+    const ROLE_LABELS = { poster:'?? Poster', client:'?? Poster',
+      tasker:'⚡ Tasker', worker:'⚡ Tasker',
+      enterprise:'?? Enterprise', admin:'??️ Admin' };
+
+    var currentUser = null, userData = null, selRole = null;
+
+    requireAuth(async function(user) {
+      currentUser = user;
+      await reload(user);
+
+      document.getElementById('infoName').textContent  = user.displayName || '—';
+      document.getElementById('infoEmail').textContent = user.email || '—';
+
+      var vb = document.getElementById('vBadge');
+      vb.textContent = user.emailVerified ? '✅ Verified' : '⚠️ Not Verified';
+      vb.style.cssText = user.emailVerified
+        ? 'background:rgba(5,150,105,.12);color:#059669;font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:20px'
+        : 'background:rgba(217,153,58,.15);color:#D9993A;font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:20px';
+
+      var evS = document.getElementById('evStatus');
+      if (user.emailVerified) {
+        evS.textContent = '✅ Email is verified';
+        evS.style.color = '#059669';
+      } else {
+        evS.textContent = '⚠️ Not verified — click to send link';
+        var bv = document.getElementById('btnVerify');
+        if (bv) bv.style.display = 'inline-block';
+      }
+
+      try {
+        var snap = await getDoc(doc(db, 'users', user.uid));
+        userData = snap.exists() ? snap.data() : {};
+        var role = userData.role || 'tasker';
+
+        document.getElementById('roleBadge').textContent = ROLE_LABELS[role] || role;
+        var joined = userData.createdAt
+          ? new Date(userData.createdAt.toDate ? userData.createdAt.toDate() : userData.createdAt)
+              .toLocaleDateString('en-IN', { month:'long', year:'numeric' })
+          : 'Recently';
+        document.getElementById('infoJoined').textContent = joined;
+
+        /* Pre-select current role */
+        var norm = role === 'client' ? 'poster' : role === 'worker' ? 'tasker' : role;
+        var opt = document.getElementById('ro-' + norm);
+        if (opt) { opt.classList.add('sel'); opt.querySelector('input').checked = true; }
+
+        /* Notification prefs */
+        var np = userData.notificationPrefs || {};
+        var setT = function(id, v){ var e=document.getElementById(id); if(e) e.checked = v !== false; };
+        setT('nGigs', np.gigs); setT('nChat', np.chat);
+        setT('nUpdates', np.updates); setT('nWallet', np.wallet);
+
+        /* Dark mode */
+        document.getElementById('tDark').checked =
+          document.documentElement.getAttribute('data-theme') !== 'light';
+      } catch(e) { console.warn('[GigLega] settings load:', e.message); }
+    });
+
+    window.selectRole = function(role) {
+      document.querySelectorAll('.ro').forEach(function(o){
+        o.classList.remove('sel'); o.querySelector('input').checked = false;
+      });
+      var opt = document.getElementById('ro-' + role);
+      if (opt) { opt.classList.add('sel'); opt.querySelector('input').checked = true; }
+      selRole = role;
+      var btn = document.getElementById('btnApplyRole');
+      var msg = document.getElementById('roleMsg');
+      var cur = userData ? (userData.role || 'tasker') : 'tasker';
+      var normCur = cur==='client'?'poster':cur==='worker'?'tasker':cur;
+      if (role === normCur) {
+        btn.disabled = true;
+        msg.textContent = 'This is your current role.';
+      } else {
+        btn.disabled = false;
+        msg.textContent = '';
+      }
+    };
+
+    window.applyRole = async function() {
+      if (!selRole || !currentUser) return;
+      var btn = document.getElementById('btnApplyRole');
+      var msg = document.getElementById('roleMsg');
+      btn.disabled = true;
+      msg.textContent = 'Applying…';
+      try {
+        var nr = selRole === 'poster' ? 'poster' : selRole === 'tasker' ? 'tasker' : 'enterprise';
+        var upd = { role: nr, mode: nr === 'tasker' ? 'worker' : nr, roleChangedAt: serverTimestamp(),
+          roleHistory: ((userData && userData.roleHistory) || []).concat([{ role: nr, switchedAt: new Date().toISOString() }]) };
+        if (nr === 'enterprise' && (!userData || !userData.enterpriseStatus || userData.enterpriseStatus === 'rejected'))
+          upd.enterpriseStatus = 'pending';
+        await updateDoc(doc(db, 'users', currentUser.uid), upd);
+        msg.style.color = '#059669';
+        msg.textContent = '✅ Role updated! Redirecting…';
+        if (window.showToast) showToast('Role updated!', 'success');
+        setTimeout(function(){ window.location.href = ROLE_MAP[nr] || 'dashboard-worker.html'; }, 1200);
+      } catch(e) {
+        msg.style.color = '#dc2626';
+        msg.textContent = '❌ ' + e.message;
+        btn.disabled = false;
+      }
+    };
+
+    window.saveNotif = async function() {
+      if (!currentUser) return;
+      try {
+        await updateDoc(doc(db, 'users', currentUser.uid), {
+          notificationPrefs: {
+            gigs:    document.getElementById('nGigs').checked,
+            chat:    document.getElementById('nChat').checked,
+            updates: document.getElementById('nUpdates').checked,
+            wallet:  document.getElementById('nWallet').checked,
+          }
+        });
+        if (window.showToast) showToast('Preferences saved.', 'success');
+      } catch(e) { console.warn('[GigLega] saveNotif:', e); }
+    };
+
+    window.resetPw = async function() {
+      if (!currentUser || !currentUser.email) return;
+      try {
+        await sendPasswordResetEmail(auth, currentUser.email);
+        var m = document.getElementById('pwMsg');
+        m.className = 'msg-ok'; m.textContent = '✅ Reset link sent to ' + currentUser.email;
+        if (window.showToast) showToast('Password reset email sent!', 'success');
+      } catch(e) { if (window.showToast) showToast('❌ ' + e.message, 'error'); }
+    };
+
+    window.verifyEmail = async function() {
+      if (!currentUser) return;
+      try {
+        await sendEmailVerification(currentUser);
+        var m = document.getElementById('verifyMsg');
+        m.className = 'msg-ok'; m.textContent = '✅ Verification email sent! Check your inbox.';
+        if (window.showToast) showToast('Verification email sent!', 'success');
+      } catch(e) { if (window.showToast) showToast('❌ ' + e.message, 'error'); }
+    };
+
+    window.setTheme = function(dark) {
+      document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+      try { localStorage.setItem('gl_theme', dark ? 'dark' : 'light'); } catch(e) {}
+    };
+
+    window.doLogout = async function() {
+      if (!confirm('Log out of GigLega?')) return;
+      try { await signOut(auth); window.location.href = 'login.html'; }
+      catch(e) { if (window.showToast) showToast('❌ ' + e.message, 'error'); }
+    };
+
+    window.doDelete = async function() {
+      if (!confirm('⚠️ Permanently delete your account? All gigs, wallet, and data will be erased. Cannot be undone.')) return;
+      if (!confirm('Are you 100% sure? This action is irreversible.')) return;
+      try {
+        await deleteDoc(doc(db, 'users', currentUser.uid));
+        await deleteUser(currentUser);
+        window.location.href = 'index.html';
+      } catch(e) {
+        var errMsg = e.code === 'auth/requires-recent-login'
+          ? 'Please log out and log back in first, then try again.'
+          : e.message;
+        if (window.showToast) showToast('❌ ' + errMsg, 'error');
+      }
+    };
+  </script>
+</body>
+</html>
