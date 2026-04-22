@@ -810,7 +810,7 @@
           try{
             await deleteDoc(doc(db,"gigs",gig.id));
             showToast("🗑️ Gig deleted","info");
-            setTimeout(function(){ window.location.href="dashboard-poster.html"; },1200);
+            setTimeout(function(){ window.location.href="dashboard-client.html"; },1200);
           }catch(e){ showToast("Error: "+e.message,"error"); }
         });
       }
