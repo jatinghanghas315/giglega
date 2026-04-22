@@ -911,7 +911,7 @@
                     // Role-based dashboard redirect
           var dashUrl = "dashboard.html";
           if (currentUser.role === "tasker" || currentUser.mode === "worker") dashUrl = "dashboard-tasker.html";
-          else if (currentUser.role === "poster") dashUrl = "dashboard-poster.html";
+          else if (currentUser.role === "poster") dashUrl = "dashboard-client.html";
           else if (currentUser.role === "enterprise") dashUrl = "enterprise.html";
           else if (currentUser.role === "admin") dashUrl = "dashboard.html";
           a.href = dashUrl;
