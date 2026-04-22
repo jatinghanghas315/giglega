@@ -1,4 +1,4 @@
-// auth-router.js — GigLega v2.0: Centralised role-based routing
+// auth-router.js — GigLega v2.1: Centralised role-based routing
 // ES Module — import in any <script type="module"> page
 import { auth, db } from './firebase-config.js';
 import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
@@ -10,9 +10,17 @@ export const ROLE_ROUTES = {
   worker:     'dashboard-worker.html',
   poster:     'dashboard-client.html',
   client:     'dashboard-client.html',
-  enterprise: 'enterprise.html',
+  enterprise: 'dashboard-enterprise.html',
   admin:      'dashboard-admin.html',
 };
+
+/* ── Normalize role aliases ──────────────────────────────── */
+export function normalizeRole(role) {
+  if (!role) return 'tasker';
+  if (role === 'worker') return 'tasker';
+  if (role === 'client') return 'poster';
+  return role;
+}
 
 /* ── Internal helpers ─────────────────────────────────────── */
 function redirectToLogin(currentPage) {
@@ -20,7 +28,7 @@ function redirectToLogin(currentPage) {
 }
 
 function redirectToDashboard(role) {
-  const target = ROLE_ROUTES[role] || 'dashboard-worker.html';
+  const target = ROLE_ROUTES[role] || ROLE_ROUTES[normalizeRole(role)] || 'dashboard-worker.html';
   if (!window.location.href.includes(target)) {
     window.location.href = target;
   }
@@ -39,14 +47,9 @@ async function getUserData(uid) {
 /* ═══════════════════════════════════════════════════════════
    routeByRole(requiredRole, onSuccess)
    ─ Enforces login + role. Admins bypass role check.
-   ─ requiredRole: 'tasker' | 'poster' | 'admin' | null
+   ─ requiredRole: 'tasker'|'poster'|'enterprise'|'admin'|null
+   ─ Pass null to allow any authenticated + onboarded user
    ─ onSuccess(user, userData) called when all checks pass
-   ─ Usage:
-       import { routeByRole } from './auth-router.js';
-       routeByRole('poster', (user, data) => {
-         currentUser = user;
-         loadDashboard(data);
-       });
 ════════════════════════════════════════════════════════════ */
 export function routeByRole(requiredRole, onSuccess) {
   const currentPage = window.location.pathname.split('/').pop();
@@ -56,8 +59,15 @@ export function routeByRole(requiredRole, onSuccess) {
     if (!data || !data.onboardingComplete) {
       window.location.href = 'onboarding.html'; return;
     }
-    const role = data.role || 'tasker';
-    if (requiredRole && role !== requiredRole && role !== 'admin') {
+    const role     = data.role || 'tasker';
+    const normRole = normalizeRole(role);
+    const normReq  = requiredRole ? normalizeRole(requiredRole) : null;
+    /* Admin bypasses all role checks */
+    if (role === 'admin') {
+      if (typeof onSuccess === 'function') onSuccess(user, data);
+      return;
+    }
+    if (normReq && normRole !== normReq) {
       redirectToDashboard(role); return;
     }
     if (typeof onSuccess === 'function') onSuccess(user, data);
@@ -66,10 +76,7 @@ export function routeByRole(requiredRole, onSuccess) {
 
 /* ═══════════════════════════════════════════════════════════
    requireAuth(onSuccess)
-   ─ Enforces login only — no role check
-   ─ Usage:
-       import { requireAuth } from './auth-router.js';
-       requireAuth((user) => { currentUser = user; init(); });
+   ─ Enforces login only — no role check, no onboarding check
 ════════════════════════════════════════════════════════════ */
 export function requireAuth(onSuccess) {
   const currentPage = window.location.pathname.split('/').pop();
@@ -81,16 +88,13 @@ export function requireAuth(onSuccess) {
 
 /* ═══════════════════════════════════════════════════════════
    getCurrentRole() → Promise<string|null>
-   ─ Usage:
-       import { getCurrentRole } from './auth-router.js';
-       const role = await getCurrentRole();
 ════════════════════════════════════════════════════════════ */
 export async function getCurrentRole() {
   return new Promise((resolve) => {
     onAuthStateChanged(auth, async (user) => {
       if (!user) { resolve(null); return; }
       const data = await getUserData(user.uid);
-      resolve(data ? (data.role || null) : null);
+      resolve(data ? normalizeRole(data.role) : null);
     });
   });
 }
