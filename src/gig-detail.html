@@ -524,7 +524,7 @@
       <div id="breadcrumb"></div>
 
       <!-- Main content injected by JS -->
-      <main id="pageContent" aria-label="Gig Detail"></main>
+      <main id="pageContent" aria-label="Gig Detail"><div style="text-align:center;padding:80px 20px;color:var(--text-muted)"><div style="font-size:2.5rem;margin-bottom:16px;animation:spin 1s linear infinite;display:inline-block">⏳</div><div style="font-weight:700;font-size:1.1rem;margin-bottom:8px;color:var(--text)">Loading gig details...</div><div style="font-size:.85rem">Please wait while we fetch this gig</div></div></main>
 
     </div>
   </main>
@@ -936,9 +936,19 @@
         '<div style="text-align:center;padding:80px 20px;color:var(--gray-400)"><div style="font-size:2rem;margin-bottom:12px">⏳</div>Loading gig...</div>';
 
       try{
+        /* Try Firestore doc ID first, fallback to gigId field for older links */
         var gigSnap = await getDoc(doc(db,"gigs",gigId));
-        if(!gigSnap.exists()){ renderNotFound("Gig not found or may have been removed."); return; }
-        var gig = Object.assign({id:gigSnap.id}, gigSnap.data());
+        var gig = null;
+        if(gigSnap.exists()){
+          gig = Object.assign({id:gigSnap.id}, gigSnap.data());
+        } else {
+          /* Fallback: query by gigId field (links from old localStorage-based cards) */
+          try {
+            var fbSnap = await getDocs(query(collection(db,"gigs"), where("gigId","==",gigId), limit(1)));
+            if(!fbSnap.empty){ var fd=fbSnap.docs[0]; gig=Object.assign({id:fd.id},fd.data()); }
+          } catch(fe){ console.warn("[GigLega] gigId field fallback:",fe.message); }
+        }
+        if(!gig){ renderNotFound("Gig not found or may have been removed."); return; }
 
         var poster = null;
         if(gig.posterId){
@@ -992,6 +1002,22 @@
       }
     }
 
+  </script>
+  <script>
+    /* Fallback: if module fails silently, show error after 5s */
+    setTimeout(function() {
+      var pc = document.getElementById('pageContent');
+      if (!pc) return;
+      var txt = pc.textContent || pc.innerText || '';
+      if (txt.includes('Loading gig details') || txt.trim() === '') {
+        var id = new URLSearchParams(window.location.search).get('id');
+        if (!id) {
+          pc.innerHTML = '<div style="text-align:center;padding:80px 20px"><div style="font-size:3rem;margin-bottom:16px">🔍</div><h2 style="color:var(--primary);margin-bottom:8px">No Gig Specified</h2><p style="color:var(--text-muted);margin-bottom:24px">No gig ID was found in the URL. Please go back and click a valid gig card.</p><a href="browse.html" class="btn btn-primary">Browse All Gigs →</a></div>';
+        } else {
+          pc.innerHTML = '<div style="text-align:center;padding:80px 20px"><div style="font-size:3rem;margin-bottom:16px">⚠️</div><h2 style="color:var(--primary);margin-bottom:8px">Could Not Load Gig</h2><p style="color:var(--text-muted);margin-bottom:8px">This could be because:</p><ul style="list-style:none;color:var(--text-muted);font-size:.85rem;margin-bottom:24px;line-height:2"><li>• Gig was deleted or expired</li><li>• You are not logged in — please login first</li><li>• Network or connection issue</li></ul><div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap"><a href="browse.html" class="btn btn-primary">Browse Gigs →</a><a href="login.html" class="btn btn-ghost">Login Again</a></div></div>';
+        }
+      }
+    }, 5000);
   </script>
 
   <!-- Mobile sticky Book bar (injected by JS) -->
