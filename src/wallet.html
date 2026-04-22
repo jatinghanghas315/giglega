@@ -895,6 +895,7 @@
   <meta name="twitter:image"      content="https://giglega.vercel.app/assets/og-banner.png">
 </head>
 <body>
+  <div id="gl-page-loader" class="gl-page-loader"><div class="gl-loader-dots"><div class="gl-loader-dot"></div><div class="gl-loader-dot"></div><div class="gl-loader-dot"></div></div></div>
 
   <div id="page-loader"></div>
   <div id="announce-bar"></div>
@@ -1792,6 +1793,37 @@
           console.error('[GigLega] withdraw save:', e.message);
           return null;
         }
+
+      /* ── Create admin withdrawal request ── */
+      window._createWithdrawalRequest = async function(amount, upiId, txnRefId) {
+        try {
+          const { addDoc, collection: col2, serverTimestamp: sts2 } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
+          await addDoc(col2(db, "withdrawal_requests"), {
+            uid:        uid,
+            amount:     amount,
+            upiId:      upiId,
+            txnRefId:   txnRefId || null,
+            status:     "pending",
+            createdAt:  sts2(),
+            userName:   (typeof currentUserName !== "undefined") ? currentUserName : "",
+          });
+        } catch(e) { console.warn("[GigLega] withdrawal_request write:", e.message); }
+      };
+
+      /* ── Notify user of withdrawal submission ── */
+      window._notifyWithdrawSubmitted = async function(amount, upiId, refId) {
+        try {
+          const { addDoc, collection: col3, serverTimestamp: sts3 } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
+          await addDoc(col3(db, "notifications", uid, "items"), {
+            type:      "payment",
+            title:     "💸 Withdrawal Submitted",
+            body:      "₹" + amount.toLocaleString("en-IN") + " withdrawal to " + upiId + " submitted. Processing within 30 min.",
+            read:      false,
+            timestamp: sts3(),
+            refId:     refId || null,
+          });
+        } catch(e) { console.warn("[GigLega] withdraw notif:", e.message); }
+      };
       };
   });
   </script>
@@ -1984,81 +2016,82 @@
       });
     }
 
-    function initiateWithdraw() {
+    async function initiateWithdraw() {
       const amount = parseInt(document.getElementById("withdrawAmount").value) || 0;
       if (amount < 100) { showToast("⚠️ Minimum ₹100 withdraw karo!"); return; }
       if (amount > currentBalance) { showToast("⚠️ Insufficient balance!"); return; }
 
-      const btn = document.getElementById("btnWithdraw");
-      btn.classList.add("loading");
-      btn.textContent = "⏳ Processing…";
+      // Validate UPI is set
+      const upiEl  = document.getElementById("upiSelectorWithdraw");
+      const upiId  = upiEl ? (upiEl.dataset.selected || "").trim() : "";
+      if (!upiId) {
+        showToast("⚠️ Pehle UPI ID set karo withdraw tab mein!");
+        openTab("upi");
+        return;
+      }
 
-      setTimeout(() => {
-        btn.classList.remove("loading");
-        btn.innerHTML = "Withdraw Now";
-        document.getElementById("withdrawAmount").value = "";
-        currentBalance -= amount;
-        document.getElementById("heroBalance").textContent = currentBalance.toLocaleString("en-IN");
-        // Show/hide pending payout card based on actual in-progress gigs
-        (async function checkPendingPayouts() {
-          try {
-            const { query, collection: col, where: whr, getDocs: gds } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
-            const pQ = query(col(db, "gigs"), whr("workerId","==",uid), whr("status","==","taken"));
-            const pSnap = await gds(pQ);
-            const pendingAmt = pSnap.docs.reduce((s,d) => {
-              const b = d.data().budget || 0;
-              return s + Math.round(b - b*b*0.10);
-            }, 0);
-            const ppCard = document.getElementById("pendingPayoutCard");
-            if (ppCard && pendingAmt > 0) {
-              ppCard.style.display = "";
-              const ppAmt = document.getElementById("pendingCardAmt");
-              if (ppAmt) ppAmt.textContent = "₹" + pendingAmt.toLocaleString("en-IN");
-              const ppSub = document.getElementById("pendingCardSub");
-              if (ppSub) ppSub.textContent = pSnap.size + " active gig" + (pSnap.size > 1 ? "s" : "") + " — payment releases on completion.";
-            }
-          } catch(pErr) { console.warn("[GigLega] pending check:", pErr.message); }
-        })();
-        // Update timestamp
-        const ltEl = document.getElementById('lastUpdatedTime');
-        if(ltEl) ltEl.textContent = new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
-        // Update chips from wallet doc
-        try {
-          const wSnap2 = await getDoc(doc(db,'wallets',uid));
-          const wd = wSnap2.exists() ? wSnap2.data() : {};
-          const allTime   = wd.totalEarned || 0;
-          const gigsDone  = wd.gigsCompleted || 0;
-          const chipP     = document.getElementById('chipPending');
-          const chipA     = document.getElementById('chipAllTime');
-          const chipM     = document.getElementById('chipThisMonth');
-          const chipG     = document.getElementById('chipGigsDone');
-          const srBal     = document.getElementById('srBalance');
-          const srPend    = document.getElementById('srPending');
-          const srAll     = document.getElementById('srAllTime');
-          const avail     = document.getElementById('availBal');
-          if(chipP) chipP.textContent  = '₹0';
-          if(chipA) chipA.textContent  = '₹' + allTime.toLocaleString('en-IN');
-          if(chipG) chipG.textContent  = gigsDone;
-          if(srBal) srBal.textContent  = '₹' + currentBalance.toLocaleString('en-IN');
-          if(srPend) srPend.textContent = '₹0';
-          if(srAll) srAll.textContent  = '₹' + allTime.toLocaleString('en-IN');
-          if(avail) avail.textContent  = '₹' + currentBalance.toLocaleString('en-IN');
-          // Calculate this-month earnings from transactions
-          const now2 = new Date(); const mStart = new Date(now2.getFullYear(), now2.getMonth(), 1);
-          // chipThisMonth populated by txn loop below
-        } catch(chipErr){ console.warn('[GigLega] chip stats:', chipErr.message); }
-        document.getElementById("availBal").textContent = "₹" + currentBalance.toLocaleString("en-IN");
-        // Also save to Firestore if available
-        const upiEl = document.getElementById("upiSelectorWithdraw");
-        const upiId = upiEl ? (upiEl.dataset.selected || "") : "";
-        if(typeof window._saveWithdrawToFirestore === 'function'){
-          window._saveWithdrawToFirestore(amount, upiId);
+      const btn = document.getElementById("btnWithdraw");
+      btn.disabled = true;
+      btn.innerHTML = "⏳ Processing…";
+
+      try {
+        // Use the module-scoped Firestore writer (defined in the module script above)
+        if (typeof window._saveWithdrawToFirestore !== "function") {
+          throw new Error("Wallet not ready — please refresh.");
         }
 
-        document.getElementById("modalAmount").textContent = "₹" + amount.toLocaleString("en-IN");
-        document.getElementById("modalRef").textContent = "Ref: GL-WD-" + Date.now().toString().slice(-8);
+        // 1. Write transaction + debit wallet balance
+        const refId = await window._saveWithdrawToFirestore(amount, upiId);
+        if (!refId) throw new Error("Failed to write withdrawal — try again.");
+
+        // 2. Create withdrawal_request doc for admin tracking
+        await window._createWithdrawalRequest(amount, upiId, refId);
+
+        // 3. Send notification to user
+        await window._notifyWithdrawSubmitted(amount, upiId, refId);
+
+        // 4. Update UI from Firestore (real value)
+        const newBal = Math.max(0, currentBalance - amount);
+        currentBalance = newBal;
+        window.currentBalance = newBal;
+
+        const fmt = (v) => "₹" + v.toLocaleString("en-IN");
+        const setEl = (id, val) => { const el = document.getElementById(id); if(el) el.textContent = val; };
+        setEl("heroBalance", newBal.toLocaleString("en-IN"));
+        setEl("availBal",    fmt(newBal));
+        setEl("srBalance",   fmt(newBal));
+
+        // 5. Clear form + show modal
+        document.getElementById("withdrawAmount").value = "";
+        const ref = "GL-WD-" + Date.now().toString().slice(-8);
+        setEl("modalAmount", fmt(amount));
+        setEl("modalRef",    "Ref: " + ref);
+
+        // Update modal body with UPI + time
+        const mbody = document.querySelector("#withdrawModal .wl-modal-body");
+        if (mbody) {
+          const eta = new Date(Date.now() + 30*60*1000)
+            .toLocaleTimeString("en-IN", {hour:"2-digit", minute:"2-digit"});
+          mbody.innerHTML = fmt(amount) + " ka withdrawal request submit ho gaya!<br><br>" +
+            "UPI: <strong>" + upiId + "</strong><br>" +
+            "Expected by: <strong>" + eta + "</strong> (within 30 min)<br>" +
+            "<small style='color:var(--gray-400)'>Admin approve karne ke baad credited hoga.</small>";
+        }
+
         document.getElementById("withdrawModal").classList.add("open");
-      }, 2000);
+        showToast("✅ Withdrawal request submitted!", "success");
+
+        // Update last-updated timestamp
+        const ltEl = document.getElementById("lastUpdatedTime");
+        if (ltEl) ltEl.textContent = new Date().toLocaleTimeString("en-IN", {hour:"2-digit", minute:"2-digit"});
+
+      } catch(err) {
+        console.error("[GigLega] initiateWithdraw:", err);
+        showToast("❌ Withdraw failed: " + (err.message || "Try again"), "error");
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = "Withdraw Now";
+      }
     }
 
     function closeWithdrawModal() {
