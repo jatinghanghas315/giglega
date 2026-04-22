@@ -1,41 +1,76 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>GigLega • Aadhaar Verification</title>
+  <title>Verify Email — GigLega</title>
   <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="theme-dark.css" />
+  <style>
+    body{display:flex;align-items:center;justify-content:center;min-height:100vh;background:var(--bg,#0f0f0f);margin:0}
+    .card{background:var(--surface,#1a1a1a);border:1.5px solid var(--border,#2a2a2a);border-radius:16px;padding:44px 36px;text-align:center;max-width:400px;width:90%}
+    .icon{font-size:3rem;margin-bottom:20px}
+    h2{font-size:1.2rem;font-weight:800;color:var(--text,#f0f0f0);margin:0 0 10px}
+    p{font-size:.85rem;color:var(--text-muted,#888);margin:0 0 24px;line-height:1.6}
+    .btn-primary{background:var(--primary,#0d9488);color:#fff;padding:11px 24px;border-radius:10px;font-weight:700;border:none;cursor:pointer;font-size:.9rem;text-decoration:none;display:inline-block}
+    .btn-ghost{background:transparent;color:var(--primary,#0d9488);padding:11px 24px;border-radius:10px;font-weight:700;border:1.5px solid var(--primary,#0d9488);cursor:pointer;font-size:.9rem;text-decoration:none;display:inline-block}
+    .actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+    .status-msg{font-size:.82rem;margin-top:16px;min-height:20px}
+    .status-msg.ok{color:#059669}.status-msg.err{color:#dc2626}
+    .logo{font-size:1rem;font-weight:800;color:#0d9488;margin-bottom:28px}
+  </style>
 </head>
 <body>
-  <main class="container-sm section">
-    <h1>Identity Verification</h1>
-    <ol>
-      <li>Create Account</li>
-      <li><strong>Verify Identity</strong></li>
-      <li>Start Earning</li>
-    </ol>
-    <p style="margin-top:16px;">Complete Aadhaar verification to get your Verified badge.</p>
-    <button id="startKyc">Start DigiLocker Verification</button>
-  </main>
+  <div class="card">
+    <div class="logo">GigLega</div>
+    <div class="icon" id="iconEl">??</div>
+    <h2 id="titleEl">Verify Your Email</h2>
+    <p id="bodyEl">We sent a verification link to your email address. Please check your inbox and click the link to activate your account.</p>
+    <div class="actions">
+      <button class="btn-primary" onclick="resendVerification()">Resend Email</button>
+      <a href="login.html" class="btn-ghost">Back to Login</a>
+    </div>
+    <div class="status-msg" id="statusMsg"></div>
+  </div>
 
-  <script>
-    const showToast = window.showToast || ((msg) => alert(msg));
-    document.getElementById('startKyc').addEventListener('click', async () => {
-      try {
-        const res = await fetch('/api/digilocker-init', { method: 'POST' });
-        if (!res.ok) {
-          throw new Error('KYC init failed');
-        }
-        const data = await res.json();
-        if (!data.url) {
-          throw new Error('Missing DigiLocker redirect URL');
-        }
-        window.location.href = data.url;
-      } catch (error) {
-        console.error('verify init failed:', error);
-        showToast('Could not start verification flow.', 'error');
+  <script type="module">
+    import { auth } from './firebase-config.js';
+    import { onAuthStateChanged, sendEmailVerification, reload }
+      from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+
+    var currentUser = null;
+    var statusEl = document.getElementById('statusMsg');
+
+    onAuthStateChanged(auth, async function(user) {
+      if (!user) {
+        document.getElementById('iconEl').textContent = '⚠️';
+        document.getElementById('titleEl').textContent = 'Not Logged In';
+        document.getElementById('bodyEl').textContent = 'Please log in first to verify your email.';
+        return;
+      }
+      currentUser = user;
+      await reload(user);
+      if (user.emailVerified) {
+        document.getElementById('iconEl').textContent = '✅';
+        document.getElementById('titleEl').textContent = 'Email Already Verified!';
+        document.getElementById('bodyEl').textContent = 'Your email is verified. Taking you to your dashboard…';
+        statusEl.className = 'status-msg ok';
+        statusEl.textContent = 'Redirecting…';
+        setTimeout(function(){ window.location.href = 'dashboard.html'; }, 1500);
       }
     });
+
+    window.resendVerification = async function() {
+      if (!currentUser) { statusEl.className='status-msg err'; statusEl.textContent='Not logged in.'; return; }
+      try {
+        await sendEmailVerification(currentUser);
+        statusEl.className = 'status-msg ok';
+        statusEl.textContent = '✅ Verification email sent! Check your inbox.';
+      } catch(e) {
+        statusEl.className = 'status-msg err';
+        statusEl.textContent = '❌ ' + (e.message || 'Failed to send email.');
+      }
+    };
   </script>
 </body>
 </html>
