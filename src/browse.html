@@ -660,7 +660,7 @@
           <h3>Koi kaam karwana hai? Post karo!</h3>
           <p>Verified workers ko directly reach karo — ek gig post karo aaj hi.</p>
         </div>
-        <a href="post-gig.html" class="btn" style="background:#fff;color:var(--primary);font-weight:800;border:none;padding:10px 20px;border-radius:var(--radius-sm);white-space:nowrap;text-decoration:none">
+        <a href="post-gig.html" class="btn" style="background:var(--surface);color:var(--primary);font-weight:800;border:none;padding:10px 20px;border-radius:var(--radius-sm);white-space:nowrap;text-decoration:none">
           Post a Gig
         </a>
       </div>
@@ -1061,7 +1061,7 @@
       return '<div class="gig-card' + (isTaken ? " taken" : "") + (isUrgent ? " urgent" : "") + (isExpired ? " expired" : "") + '" ' +
         'onclick="window.location.href=\'gig-detail.html?id=' + escH(gig.id) + '\'">' +
         '<div class="gig-card-left">' +
-          '<div class="gig-top-row">' + typeTag + urgentBadge + (gig.gigId ? '<span style="font-size:.6rem;font-weight:800;font-family:monospace;color:var(--primary);background:rgba(1,105,111,.08);border:1px solid rgba(1,105,111,.2);border-radius:6px;padding:2px 7px;cursor:pointer;user-select:all" title="Click to copy Gig ID" onclick="event.stopPropagation();navigator.clipboard&&navigator.clipboard.writeText(\'' + escH(gig.gigId) + '\').then(function(){var el=event.target;el.textContent=\'✅\';setTimeout(function(){el.textContent=\'' + escH(gig.gigId) + '\'}, 1400)})">' + escH(gig.gigId) + '</span>' : '') + '<div style="margin-left:auto">' + statusHtml + '</div></div>' +
+          '<div class="gig-top-row">' + typeTag + urgentBadge + (gig.gigId ? '<span style="font-size:.6rem;font-weight:800;font-family:monospace;color:var(--primary);background:var(--teal-subtle,rgba(13,148,136,.08));border:1px solid rgba(1,105,111,.2);border-radius:6px;padding:2px 7px;cursor:pointer;user-select:all" title="Click to copy Gig ID" onclick="event.stopPropagation();navigator.clipboard&&navigator.clipboard.writeText(\'' + escH(gig.gigId) + '\').then(function(){var el=event.target;el.textContent=\'✅\';setTimeout(function(){el.textContent=\'' + escH(gig.gigId) + '\'}, 1400)})">' + escH(gig.gigId) + '</span>' : '') + '<div style="margin-left:auto">' + statusHtml + '</div></div>' +
           '<div class="gig-card-title">' + escH(gig.title) + '</div>' +
           '<div class="gig-card-desc">' + escH((gig.description||"").slice(0,110)) + (gig.description && gig.description.length > 110 ? "…" : "") + '</div>' +
           '<div class="gig-card-meta">' +
