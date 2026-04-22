@@ -88,7 +88,7 @@
     import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
     import { doc, setDoc, getDoc, serverTimestamp, GeoPoint } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
     let currentUser = null, selectedRole = null, gpsCoords = null;
-    const ROLE_ROUTES = { poster:'dashboard-client.html', tasker:'dashboard-worker.html', enterprise:'enterprise.html' };
+    const ROLE_ROUTES = { poster:'dashboard-client.html', tasker:'dashboard-worker.html', enterprise:'dashboard-enterprise.html', admin:'dashboard-admin.html' };
     function showToast(msg, type='info') {
       const colors = { success:'#059669', error:'#dc2626', warning:'#d97706', info:'#0d9488' };
       const t = document.createElement('div');
