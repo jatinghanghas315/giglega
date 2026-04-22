@@ -180,7 +180,7 @@
             <div style="font-size:.95rem;font-weight:800;color:var(--text);">Tasker has requested the OTP!</div>
             <div style="font-size:.78rem;color:var(--gray-400);" id="otpGigTitle">—</div>
           </div>
-          <span style="margin-left:auto;width:10px;height:10px;background:#f59e0b;border-radius:50%;
+          <span style="margin-left:auto;width:10px;height:10px;background:var(--warning,#f59e0b);border-radius:50%;
             animation:pulse-otp 1.2s ease-in-out infinite;flex-shrink:0;"></span>
         </div>
         <div style="font-size:.82rem;color:var(--gray-500);margin-bottom:12px;">
@@ -251,7 +251,7 @@
           <div style="font-size:1.3rem;margin-bottom:8px">⭐</div>
           <div style="font-weight:700;font-size:.9rem;color:var(--text);margin-bottom:4px">Featured Gig Listing</div>
           <div style="font-size:.78rem;color:var(--gray-400);line-height:1.5;margin-bottom:12px">Get your gig to the top. 3x more applications on featured gigs.</div>
-          <a href="post-gig.html?boost=1" style="font-size:.78rem;font-weight:700;color:#D9993A;text-decoration:none">Boost a Gig →</a>
+          <a href="post-gig.html?boost=1" style="font-size:.78rem;font-weight:700;color:var(--accent,#D9993A);text-decoration:none">Boost a Gig →</a>
         </div>
 
         <!-- Referral Bonus -->
@@ -267,7 +267,7 @@
           <div style="font-size:1.3rem;margin-bottom:8px">📦</div>
           <div style="font-weight:700;font-size:.9rem;color:var(--text);margin-bottom:4px">Subscription Plan</div>
           <div style="font-size:.78rem;color:var(--gray-400);line-height:1.5;margin-bottom:12px">Post unlimited gigs at a flat monthly rate. Best for regular hirers.</div>
-          <a href="enterprise.html" style="font-size:.78rem;font-weight:700;color:#6366f1;text-decoration:none">View Plans →</a>
+          <a href="enterprise.html" style="font-size:.78rem;font-weight:700;color:var(--info,#6366f1);text-decoration:none">View Plans →</a>
         </div>
 
         <!-- 15 min support -->
@@ -275,7 +275,7 @@
           <div style="font-size:1.3rem;margin-bottom:8px">⚡</div>
           <div style="font-weight:700;font-size:.9rem;color:var(--text);margin-bottom:4px">Get Help Within 15 Minutes</div>
           <div style="font-size:.78rem;color:var(--gray-400);line-height:1.5;margin-bottom:12px">Our support team responds in under 15 minutes. Guaranteed.</div>
-          <a href="contact.html" style="font-size:.78rem;font-weight:700;color:#059669;text-decoration:none">Contact Support →</a>
+          <a href="contact.html" style="font-size:.78rem;font-weight:700;color:var(--success,#059669);text-decoration:none">Contact Support →</a>
         </div>
 
       </div>
@@ -425,7 +425,7 @@ function gigCardHtml(g) {
     '<span class="gig-meta-chip">💰 ' + pay + '</span>' +
     '<span class="gig-meta-chip">👥 ' + (g.workers||1) + ' worker(s)</span>' +
     '</div>' +
-    (g.category ? '<div style="margin-bottom:8px"><span style="background:rgba(13,148,136,.08);border:1px solid rgba(13,148,136,.15);border-radius:5px;padding:2px 9px;font-size:.7rem;font-weight:700;color:var(--teal)">' + escHtml(g.category) + '</span></div>' : '') +
+    (g.category ? '<div style="margin-bottom:8px"><span style="background:var(--teal-subtle,rgba(13,148,136,.08));border:1px solid rgba(13,148,136,.15);border-radius:5px;padding:2px 9px;font-size:.7rem;font-weight:700;color:var(--teal)">' + escHtml(g.category) + '</span></div>' : '') +
     '<div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">' +
     (g.status === 'taken' && g.workerId
       ? ('<div class="worker-row" style="width:100%;margin-bottom:8px">' +
@@ -439,7 +439,7 @@ function gigCardHtml(g) {
         + (g.reviewedByPoster
            ? '<span style="font-size:.72rem;color:var(--gray-400);margin-left:6px">✅ Rated</span>'
            : ' <a href="active-gig.html?id='+encodeURIComponent(g.id)+'&openReview=worker"'
-           + ' class="btn btn-sm" style="background:rgba(245,158,11,.1);color:#b45309;'
+           + ' class="btn btn-sm" style="background:var(--teal-faint,rgba(13,148,136,.1));color:var(--teal,#0d9488);'
            + 'border:1px solid rgba(245,158,11,.3);font-size:.72rem">⭐ Rate Tasker</a>'
           )
              '<a href="gig-detail.html?id=' + encodeURIComponent(g.id) + '" class="btn btn-sm btn-outline">View Gig</a>' +
@@ -463,7 +463,7 @@ function bindCardActions(container) {
         var existing = document.getElementById("gl-confirm-modal"); if(existing) existing.remove();
         var modal = document.createElement("div"); modal.id="gl-confirm-modal";
         modal.style.cssText="position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px;";
-        modal.innerHTML='<div style="background:var(--surface,#fff);border-radius:12px;padding:28px 24px;max-width:360px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.25);"><h3 style="font-size:1rem;font-weight:800;color:#dc2626;margin-bottom:8px">Gig Delete karna chahte ho?</h3><p style="font-size:.85rem;color:var(--gray-500,#6b7280);line-height:1.6;margin-bottom:20px">This action cannot be undone.</p><div style="display:flex;gap:10px;justify-content:flex-end;"><button id="dc-cancel" style="padding:9px 20px;border-radius:8px;border:1.5px solid #e5e7eb;background:none;font-weight:600;font-size:.875rem;cursor:pointer;">Cancel</button><button id="dc-ok" style="padding:9px 20px;border-radius:8px;border:none;background:#dc2626;color:#fff;font-weight:700;font-size:.875rem;cursor:pointer;">Delete</button></div></div>';
+        modal.innerHTML='<div style="background:var(--surface);border-radius:12px;padding:28px 24px;max-width:360px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.25);"><h3 style="font-size:1rem;font-weight:800;color:var(--danger,#dc2626);margin-bottom:8px">Gig Delete karna chahte ho?</h3><p style="font-size:.85rem;color:var(--gray-500,#6b7280);line-height:1.6;margin-bottom:20px">This action cannot be undone.</p><div style="display:flex;gap:10px;justify-content:flex-end;"><button id="dc-cancel" style="padding:9px 20px;border-radius:8px;border:1.5px solid #e5e7eb;background:none;font-weight:600;font-size:.875rem;cursor:pointer;">Cancel</button><button id="dc-ok" style="padding:9px 20px;border-radius:8px;border:none;background:#dc2626;color:#fff;font-weight:700;font-size:.875rem;cursor:pointer;">Delete</button></div></div>';
         document.body.appendChild(modal);
         document.getElementById("dc-cancel").onclick=function(){modal.remove();resolve(false);};
         document.getElementById("dc-ok").onclick=function(){modal.remove();_proceed=true;resolve(true);};
@@ -543,7 +543,7 @@ document.getElementById('btnSwitchRole').addEventListener('click', function() {
       var dispEl = document.getElementById('otpDisplay');
       if(dispEl && gig.completionOTP){
         dispEl.innerHTML = String(gig.completionOTP).split('').map(function(d){
-          return '<div style="width:44px;height:52px;background:rgba(245,158,11,.1);border:2px solid rgba(245,158,11,.3);' +
+          return '<div style="width:44px;height:52px;background:var(--teal-faint,rgba(13,148,136,.1));border:2px solid var(--teal-subtle,rgba(13,148,136,.2));' +
             'border-radius:8px;display:flex;align-items:center;justify-content:center;' +
             'font-size:1.6rem;font-weight:800;color:#b45309;">'+d+'</div>';
         }).join('');
