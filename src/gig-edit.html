@@ -791,6 +791,7 @@
   <link rel="canonical" href="https://giglega.vercel.app/gig-edit.html">
 </head>
 <body>
+  <div id="gl-page-loader" class="gl-page-loader"><div class="gl-loader-dots"><div class="gl-loader-dot"></div><div class="gl-loader-dot"></div><div class="gl-loader-dot"></div></div></div>
 
   <!-- Delete Confirm Modal -->
   <div class="modal-overlay" id="deleteModal">
@@ -1860,31 +1861,28 @@
       return ok;
     }
 
-    function saveGig(btn) {
-      if (!validateForm()) {
-        if (typeof showToast === "function") showToast("⚠️ Form mein errors hain — fix karo.", "error");
-        return;
-      }
-      if (btn) { btn.disabled = true; btn.innerHTML = "⏳ Saving…"; }
-      setSaveState("saving");
-      animateAutosaveBar();
-      setTimeout(function () {
-        hasChanges = false;
-        setSaveState("saved");
+    async function saveGig(btn) {
+      if (!validateForm()) { if(typeof showToast==="function") showToast("⚠️ Form errors — fix karo.","error"); return; }
+      if (btn) { btn.disabled=true; btn.innerHTML="⏳ Saving…"; }
+      setSaveState("saving"); animateAutosaveBar();
+      var saved = typeof window._realSaveGig==="function" ? await window._realSaveGig() : true;
+      if (saved) {
+        hasChanges=false; setSaveState("saved");
         document.getElementById("unsavedBanner").classList.remove("show");
-        if (btn) { btn.disabled = false; btn.innerHTML = btn.id === "btnSaveGig" ? "💾 Save Changes" : "💾 Save Changes"; }
-        var banner = document.getElementById("saveBanner");
-        banner.classList.add("show");
-        setTimeout(function () { banner.classList.remove("show"); }, 3500);
-        if (typeof showToast === "function") showToast("✅ Gig updated successfully!", "success");
-        changeLogs = {};
-        updateChangeLog();
-        ORIGINAL.title    = document.getElementById("gigTitle").value;
-        ORIGINAL.desc     = document.getElementById("gigDesc").value;
-        ORIGINAL.budget   = document.getElementById("gigBudget").value;
-        ORIGINAL.location = document.getElementById("gigLocation").value;
-        ORIGINAL.cat      = selectedCat;
-      }, 1000);
+        if (btn) { btn.disabled=false; btn.innerHTML="💾 Save Changes"; }
+        var banner=document.getElementById("saveBanner");
+        if (banner) { banner.classList.add("show"); setTimeout(()=>banner.classList.remove("show"),3500); }
+        if(typeof showToast==="function") showToast("✅ Gig updated!","success");
+        changeLogs={}; updateChangeLog();
+        ORIGINAL.title=document.getElementById("gigTitle").value;
+        ORIGINAL.desc=document.getElementById("gigDesc").value;
+        ORIGINAL.budget=document.getElementById("gigBudget").value;
+        ORIGINAL.location=document.getElementById("gigLocation").value;
+        ORIGINAL.cat=selectedCat;
+      } else {
+        setSaveState("unsaved");
+        if (btn) { btn.disabled=false; btn.innerHTML="💾 Save Changes"; }
+      }
     }
 
     document.getElementById("btnSaveGig").addEventListener("click",     function () { saveGig(this); });
@@ -1925,14 +1923,14 @@
       btnConfirmDel.disabled = this.value.trim() !== "DELETE";
     });
 
-    btnConfirmDel.addEventListener("click", function () {
-      this.disabled = true;
-      this.textContent = "⏳ Deleting…";
-      setTimeout(function () {
+    btnConfirmDel.addEventListener('click', async function() {
+      this.disabled=true; this.textContent="⏳ Deleting…";
+      var ok = typeof window._realDeleteGig==="function" ? await window._realDeleteGig() : true;
+      if (ok) {
         closeDeleteModal();
-        if (typeof showToast === "function") showToast("🗑️ Gig deleted.", "error");
-        setTimeout(function () { window.location.href = "dashboard.html"; }, 1200);
-      }, 1000);
+        if(typeof showToast==="function") showToast("🗑️ Gig deleted.","error");
+        setTimeout(()=>{ window.location.href='dashboard-client.html'; },1200);
+      } else { this.disabled=false; this.textContent="Yes, Delete"; }
     });
 
     /* ══════════════════════════════════
@@ -1944,5 +1942,109 @@
 
   });
   </script>
+
+  <!-- ═══ Firebase: load gig, real save, real delete ═══ -->
+  <script type="module">
+    import { requireAuth }  from './auth-router.js';
+    import { db }           from './firebase-config.js';
+    import {
+      doc, getDoc, updateDoc, deleteDoc, serverTimestamp
+    } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+
+    const params = new URLSearchParams(window.location.search);
+    const gigId  = params.get('id') || params.get('gigId') || params.get('gig');
+
+    function setField(id, val) {
+      const el = document.getElementById(id);
+      if (el && val !== undefined && val !== null && String(val) !== '') {
+        el.value = val;
+        el.dispatchEvent(new Event('input'));
+      }
+    }
+
+    requireAuth(async function(user) {
+      const loader = document.getElementById('gl-page-loader');
+      if (loader) { loader.style.opacity='0'; setTimeout(()=>loader.remove(),350); }
+
+      if (!gigId) {
+        if (typeof showToast==='function') showToast('⚠️ No gig ID — open from dashboard.','error');
+        return;
+      }
+      try {
+        const snap = await getDoc(doc(db,'gigs',gigId));
+        if (!snap.exists()) { if(typeof showToast==='function') showToast('❌ Gig not found!','error'); return; }
+        const gig = snap.data();
+
+        if (gig.posterId && gig.posterId !== user.uid) {
+          if(typeof showToast==='function') showToast('🔒 Not your gig!','error');
+          setTimeout(()=>{ window.location.href='dashboard-client.html'; },1500);
+          return;
+        }
+
+        setField('gigTitle',     gig.title || '');
+        setField('gigDesc',      gig.description || gig.desc || '');
+        setField('gigLocation',  gig.location || '');
+        setField('gigCity',      gig.city || '');
+        setField('gigBudget',    gig.budget || '');
+        setField('gigDate',      gig.date || '');
+        setField('gigTimeStart', gig.timeStart || '');
+        setField('gigTimeEnd',   gig.timeEnd || '');
+        setField('gigReqs',      gig.requirements || gig.reqs || '');
+        setField('gigSlots',     gig.slots || gig.workers || 1);
+
+        if (gig.category) {
+          const cb = document.querySelector('.cat-btn[data-cat="'+gig.category+'"]');
+          if (cb) cb.click();
+        }
+        const ht = document.querySelector('.ge-hero-title');
+        if (ht) ht.textContent = 'Edit Gig — '+(gig.gigId||('#'+gigId.slice(0,8)));
+        document.title = 'Edit: '+(gig.title||'Gig')+' — GigLega';
+
+        setTimeout(()=>{
+          if(typeof setSaveState==='function') setSaveState('saved');
+          const ub=document.getElementById('unsavedBanner'); if(ub) ub.classList.remove('show');
+        },400);
+        if(typeof showToast==='function') showToast('✅ Gig loaded!','success');
+      } catch(e) {
+        console.error('[GigLega] gig-edit load:',e);
+        if(typeof showToast==='function') showToast('Load failed: '+e.message,'error');
+      }
+
+      window._realSaveGig = async function() {
+        try {
+          await updateDoc(doc(db,'gigs',gigId),{
+            title:        (document.getElementById('gigTitle')?.value||'').trim(),
+            description:  (document.getElementById('gigDesc')?.value||'').trim(),
+            location:     (document.getElementById('gigLocation')?.value||'').trim(),
+            city:         (document.getElementById('gigCity')?.value||'').trim(),
+            budget:       parseFloat(document.getElementById('gigBudget')?.value)||0,
+            date:         document.getElementById('gigDate')?.value||'',
+            timeStart:    document.getElementById('gigTimeStart')?.value||'',
+            timeEnd:      document.getElementById('gigTimeEnd')?.value||'',
+            requirements: (document.getElementById('gigReqs')?.value||'').trim(),
+            category:     (typeof selectedCat!=='undefined')?selectedCat:'',
+            updatedAt:    serverTimestamp(),
+          });
+          return true;
+        } catch(e) {
+          console.error('[GigLega] saveGig:',e);
+          if(typeof showToast==='function') showToast('Save failed: '+e.message,'error');
+          return false;
+        }
+      };
+
+      window._realDeleteGig = async function() {
+        try {
+          await deleteDoc(doc(db,'gigs',gigId));
+          return true;
+        } catch(e) {
+          console.error('[GigLega] deleteGig:',e);
+          if(typeof showToast==='function') showToast('Delete failed: '+e.message,'error');
+          return false;
+        }
+      };
+    });
+  </script>
+
 </body>
 </html>
