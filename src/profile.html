@@ -289,21 +289,19 @@
   <script>
   (function () {
 
-    var GIG_KEY  = (typeof GL !== "undefined" && GL.STORAGE_KEY_GIGS)  ? GL.STORAGE_KEY_GIGS  : "gl_gigs";
     var USER_KEY = (typeof GL !== "undefined" && GL.STORAGE_KEY_USER)   ? GL.STORAGE_KEY_USER  : "gl_user";
     var FEE_RATE = 0.06;
 
-    /* ── Auth guard ── */
-  var user = (function() {
-  try {
-    var u = JSON.parse(localStorage.getItem("gl_user") || "null");
-    return (u && u.id) ? u : null;
-  } catch(e) { return null; }
-})();
-if (!user) {
-  window.location.href = "login.html?redirect=profile.html";
-  return;
-}
+    /* ── Auth guard (Firebase Auth) ── */
+    import("https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js").then(function(m){
+      import("./firebase-config.js").then(function(cfg){
+        m.onAuthStateChanged(cfg.auth, function(fbUser){
+          if(!fbUser){ window.location.href="login.html?redirect=profile.html"; }
+        });
+      });
+    }).catch(function(e){ console.warn("[GigLega] profile auth:",e.message); });
+    /* Temporary LS fallback while Firebase resolves */
+    var user = (function(){ try{ var u=JSON.parse(localStorage.getItem("gl_user")||"null"); return (u&&u.uid||u.id)?u:null; }catch(e){return null;} })();
 
   /* ── Firestore merge: refresh user data from server, fallback to localStorage ── */
   (async function syncProfileFromFirestore() {
@@ -563,12 +561,6 @@ if (!user) {
       /* Persist to localStorage first (instant UI) */
       localStorage.setItem(USER_KEY, JSON.stringify(user));
 
-      /* Also update in users array if it exists */
-      var USERS_KEY = (typeof GL !== "undefined" && GL.STORAGE_KEY_USERS) ? GL.STORAGE_KEY_USERS : "gl_users";
-      var users = JSON.parse(localStorage.getItem(USERS_KEY) || "[]");
-      var idx   = users.findIndex(function (u) { return u.id === user.id; });
-      if (idx > -1) { users[idx] = user; localStorage.setItem(USERS_KEY, JSON.stringify(users)); }
-
       /* Sync to Firestore users/{uid} so other pages see real name/skills */
       var uid = user.uid || user.id;
       if (uid) {
@@ -640,10 +632,6 @@ if (!user) {
             }
           } catch(e) {}
           // Clear localStorage
-          var USERS_KEY = (typeof GL !== "undefined" && GL.STORAGE_KEY_USERS) ? GL.STORAGE_KEY_USERS : "gl_users";
-          var users = JSON.parse(localStorage.getItem(USERS_KEY) || "[]");
-          users = users.filter(function (u) { return u.id !== user.id; });
-          localStorage.setItem(USERS_KEY, JSON.stringify(users));
           localStorage.removeItem(USER_KEY);
           if (typeof showToast === "function") showToast("Account deleted.", "success");
           setTimeout(function () { window.location.href = "index.html"; }, 1200);
