@@ -1,3 +1,19 @@
+// ── FOUC Prevention: apply theme before first paint ──────────────
+(function(){
+  try {
+    var t = localStorage.getItem('gl_theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', t);
+    if (t === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  } catch(e) {
+    document.documentElement.setAttribute('data-theme', 'dark');
+    document.documentElement.classList.add('dark');
+  }
+})();
+
 /* CACHE BUSTER v1.3.0 */
 (function(){
   const APP_BUILD = '1.9.0';
