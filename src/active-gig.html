@@ -528,6 +528,7 @@
   <div id="main-footer" role="contentinfo"></div>
 
   <script type="module">
+    import { requireAuth } from './auth-router.js';
         import { auth, db } from './firebase-config.js';
     import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
     import { collection, query, where, limit,
@@ -996,11 +997,9 @@
       });
     });
 
-    onAuthStateChanged(auth, async function(user){
-      if(!user){ window.location.replace('login.html?redirect=active-gig.html'); return; }
-      currentUser=user;
-
-      var params  = new URLSearchParams(window.location.search);
+    requireAuth(function(user) {
+    currentUser = user;
+    var params  = new URLSearchParams(window.location.search);
       var paramId = params.get('id');
       var gigDocId= null;
       var mode    = null; // will be 'poster' or 'worker' — determined from Firestore
@@ -1057,7 +1056,7 @@
       }
 
       if(gigDocId){ listenGig(gigDocId, mode); if(mode==='poster') startOTPPolling(gigDocId); }
-    });
+  });
 
     /* ══════════════════════════════════════════════════════
        REAL-TIME WORKER TRACKING
