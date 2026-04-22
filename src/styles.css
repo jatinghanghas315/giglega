@@ -151,17 +151,6 @@ html {
   -webkit-text-size-adjust: 100%;
 }
 
-body {
-  font-family: var(--font-body);
-  font-size: var(--text-base);
-  line-height: 1.6;
-  color: var(--text);
-  background: var(--bg);
-  min-height: 100vh;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  transition: background .3s, color .3s;
-}
 
 img, video {
   max-width: 100%;
@@ -187,7 +176,6 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--text);
 }
 
-p { color: var(--text-muted); }
 
 :focus-visible {
   outline: 2px solid var(--teal);
@@ -359,11 +347,6 @@ p { color: var(--text-muted); }
 }
 
 /* Danger */
-.btn-danger {
-  background: var(--danger);
-  color: #fff;
-  border-color: var(--danger);
-}
 .btn-danger:hover:not(:disabled) {
   opacity: .88;
   transform: translateY(-1px);
@@ -391,17 +374,9 @@ p { color: var(--text-muted); }
 .btn.loading .spinner  { display: inline-block; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-[data-theme="dark"] .btn-secondary { border-color: var(--gray-700); }
-[data-theme="dark"] .btn-ghost     { border-color: var(--gray-700); }
-
-
 /* ══════════════════════════════════════════════════════════
    6. FORM ELEMENTS
 ══════════════════════════════════════════════════════════ */
-.form-group {
-  margin-bottom: 18px;
-  position: relative;
-}
 
 .form-label {
   display: block;
@@ -410,8 +385,6 @@ p { color: var(--text-muted); }
   color: var(--gray-700);
   margin-bottom: 6px;
 }
-[data-theme="dark"] .form-label { color: var(--gray-300); }
-
 .form-label .required { color: var(--danger); margin-left: 2px; }
 
 .form-hint {
@@ -527,20 +500,6 @@ p { color: var(--text-muted); }
 .char-count.near  { color: var(--warning); }
 .char-count.over  { color: var(--danger); }
 
-[data-theme="dark"] .form-input,
-[data-theme="dark"] .form-select,
-[data-theme="dark"] .form-textarea {
-  border-color: var(--gray-700);
-  background: var(--gray-800);
-  color: var(--gray-100);
-}
-[data-theme="dark"] .form-input:focus,
-[data-theme="dark"] .form-select:focus,
-[data-theme="dark"] .form-textarea:focus {
-  border-color: var(--teal);
-}
-
-
 /* ══════════════════════════════════════════════════════════
    7. CARDS
 ══════════════════════════════════════════════════════════ */
@@ -561,9 +520,6 @@ p { color: var(--text-muted); }
 
 .card-sm { padding: var(--space-md); border-radius: var(--radius-sm); }
 .card-lg { padding: 32px; }
-
-[data-theme="dark"] .card { border-color: var(--gray-700); }
-
 
 /* ══════════════════════════════════════════════════════════
    8. BADGES & TAGS
@@ -604,9 +560,6 @@ p { color: var(--text-muted); }
 }
 .tag:hover { border-color: var(--teal); color: var(--teal); }
 .tag.active { border-color: var(--teal); background: rgba(13,148,136,.08); color: var(--teal); }
-
-[data-theme="dark"] .tag { background: var(--gray-800); border-color: var(--gray-700); color: var(--gray-300); }
-
 
 /* ══════════════════════════════════════════════════════════
    9. PAGE HERO (Shared section header)
@@ -654,20 +607,11 @@ p { color: var(--text-muted); }
 .empty-title { font-size: 1.05rem; font-weight: 700; color: var(--gray-600); margin-bottom: 6px; }
 .empty-body  { font-size: .86rem; color: var(--gray-400); line-height: 1.6; margin-bottom: 20px; }
 
-[data-theme="dark"] .empty-state { border-color: var(--gray-700); }
-
-
 /* ══════════════════════════════════════════════════════════
    11. LOADING STATES
 ══════════════════════════════════════════════════════════ */
 
 /* Skeleton */
-.skeleton {
-  background: var(--gray-100);
-  border-radius: 6px;
-  animation: skel-pulse 1.4s ease-in-out infinite;
-}
-[data-theme="dark"] .skeleton { background: var(--gray-700); }
 @keyframes skel-pulse {
   0%, 100% { opacity: 1; }
   50%       { opacity: .4; }
@@ -744,12 +688,6 @@ p { color: var(--text-muted); }
   color: #3730a3;
 }
 
-[data-theme="dark"] .alert-success { color: #6ee7b7; }
-[data-theme="dark"] .alert-error   { color: #fca5a5; }
-[data-theme="dark"] .alert-warning { color: #fcd34d; }
-[data-theme="dark"] .alert-info    { color: #a5b4fc; }
-
-
 /* ══════════════════════════════════════════════════════════
    13. STAT CARDS (Used in dashboards)
 ══════════════════════════════════════════════════════════ */
@@ -792,9 +730,6 @@ p { color: var(--text-muted); }
 .stat-card.stat-primary { border-left: 4px solid var(--primary); }
 .stat-card.stat-success { border-left: 4px solid var(--success); }
 .stat-card.stat-warning { border-left: 4px solid var(--warning); }
-
-[data-theme="dark"] .stat-card { border-color: var(--gray-700); }
-
 
 /* ══════════════════════════════════════════════════════════
    14. TABS
@@ -841,11 +776,6 @@ p { color: var(--text-muted); }
   margin-left: 6px;
 }
 .tab-btn.active .tab-count { background: var(--primary); color: #fff; }
-
-[data-theme="dark"] .tabs { border-color: var(--gray-700); }
-[data-theme="dark"] .tab-btn.active { background: rgba(13,148,136,.08); }
-[data-theme="dark"] .tab-count { background: var(--gray-700); color: var(--gray-300); }
-
 
 /* ══════════════════════════════════════════════════════════
    15. MODAL
@@ -903,11 +833,6 @@ p { color: var(--text-muted); }
 .modal-body    { padding: 20px 24px; }
 .modal-footer  { padding: 16px 24px 20px; border-top: 1.5px solid var(--gray-200); display: flex; gap: 10px; justify-content: flex-end; }
 
-[data-theme="dark"] .modal { border: 1.5px solid var(--gray-700); }
-[data-theme="dark"] .modal-header { border-color: var(--gray-700); }
-[data-theme="dark"] .modal-footer { border-color: var(--gray-700); }
-
-
 /* ══════════════════════════════════════════════════════════
    16. TABLE
 ══════════════════════════════════════════════════════════ */
@@ -933,12 +858,6 @@ td {
 }
 tbody tr:last-child td { border-bottom: none; }
 tbody tr:hover td { background: rgba(13,148,136,.03); }
-
-[data-theme="dark"] .table-wrap { border-color: var(--gray-700); }
-[data-theme="dark"] thead tr { background: var(--gray-800); }
-[data-theme="dark"] th { border-color: var(--gray-700); }
-[data-theme="dark"] td { border-color: var(--gray-700); }
-
 
 /* ══════════════════════════════════════════════════════════
    17. AVATAR
@@ -980,10 +899,6 @@ tbody tr:hover td { background: rgba(13,148,136,.03); }
   height: 1px;
   background: var(--gray-200);
 }
-[data-theme="dark"] .divider::before,
-[data-theme="dark"] .divider::after { background: var(--gray-700); }
-
-
 /* ══════════════════════════════════════════════════════════
    19. PROGRESS BAR
 ══════════════════════════════════════════════════════════ */
@@ -1002,9 +917,6 @@ tbody tr:hover td { background: rgba(13,148,136,.03); }
 }
 .progress-sm { height: 4px; }
 .progress-lg { height: 12px; }
-
-[data-theme="dark"] .progress { background: var(--gray-700); }
-
 
 /* ══════════════════════════════════════════════════════════
    20. STEP INDICATOR (for multi-step forms)
@@ -1062,18 +974,6 @@ tbody tr:hover td { background: rgba(13,148,136,.03); }
 /* ══════════════════════════════════════════════════════════
    21. GIG CARD (reusable across pages)
 ══════════════════════════════════════════════════════════ */
-.gig-card {
-  background: var(--surface);
-  border: 1.5px solid var(--gray-200);
-  border-radius: var(--radius);
-  padding: 20px;
-  box-shadow: var(--shadow-sm);
-  transition: transform .2s, box-shadow .2s;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-}
-.gig-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
 .gig-card.taken { opacity: .55; pointer-events: none; }
 
 .gig-type-tag {
@@ -1131,13 +1031,6 @@ tbody tr:hover td { background: rgba(13,148,136,.03); }
 .gig-earn-label { font-size: .74rem; color: var(--gray-500); }
 .gig-earn-val   { font-size: .9rem; font-weight: 800; color: var(--teal); }
 
-[data-theme="dark"] .gig-card { border-color: var(--gray-700); }
-[data-theme="dark"] .gig-earn-strip {
-  background: rgba(13,148,136,.1);
-  border-color: rgba(13,148,136,.25);
-}
-
-
 /* ══════════════════════════════════════════════════════════
    22. UTILITY CLASSES
 ══════════════════════════════════════════════════════════ */
@@ -1161,15 +1054,6 @@ tbody tr:hover td { background: rgba(13,148,136,.03); }
 .hidden  { display: none !important; }
 .block   { display: block; }
 .inline  { display: inline; }
-.sr-only {
-  position: absolute;
-  width: 1px; height: 1px;
-  padding: 0; margin: -1px;
-  overflow: hidden;
-  clip: rect(0,0,0,0);
-  white-space: nowrap;
-  border: 0;
-}
 
 /* Width */
 .w-full  { width: 100%; }
@@ -1197,9 +1081,6 @@ tbody tr:hover td { background: rgba(13,148,136,.03); }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--gray-300); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--gray-400); }
-
-[data-theme="dark"] ::-webkit-scrollbar-thumb { background: var(--gray-600); }
-
 
 /* ══════════════════════════════════════════════════════════
    24. PRINT
@@ -1318,23 +1199,7 @@ tbody tr:hover td { background: rgba(13,148,136,.03); }
 }
 
 /* ── Gig card improvements ── */
-.gig-card {
-  border: 1.5px solid var(--gray-200);
-  border-radius: var(--radius);
-  padding: 22px 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  box-shadow: var(--shadow-sm);
-  transition: transform .2s, box-shadow .2s;
-  background: var(--surface);
-  position: relative;
-}
 
-.gig-card:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-md);
-}
 
 /* Trust note on gig cards */
 .gig-trust-note {
@@ -1462,18 +1327,7 @@ tbody tr:hover td { background: rgba(13,148,136,.03); }
 }
 
 /* ── Navigation improvements ── */
-.nav-link {
-  font-size: var(--text-sm);
-  font-weight: 600;
-  padding: 8px 12px;
-  border-radius: var(--radius-sm);
-  transition: color .2s, background .2s;
-}
 
-.nav-link:hover {
-  color: var(--teal);
-  background: rgba(13,148,136,.06);
-}
 
 /* Primary nav CTA (Post a Gig) */
 .btn-nav-primary {
@@ -1550,191 +1404,6 @@ textarea:focus-visible {
 /* ============================================================
    DARK MODE — BATCH FIX v1.3 (login, stats, cards, inputs, breadcrumb)
    ============================================================ */
-
-/* --- Login / Register modal form --- */
-[data-theme=dark] .auth-card,
-[data-theme=dark] .login-card {
-  background: var(--surface);
-  border-color: var(--gray-700);
-}
-[data-theme=dark] .auth-card .form-label,
-[data-theme=dark] .auth-tab-btn,
-[data-theme=dark] .tab-label,
-[data-theme=dark] .remember-label,
-[data-theme=dark] .or-divider {
-  color: var(--gray-300) !important;
-}
-[data-theme=dark] .auth-tab-btn.active {
-  color: var(--teal) !important;
-  border-bottom-color: var(--teal);
-}
-[data-theme=dark] .form-input,
-[data-theme=dark] input[type=text],
-[data-theme=dark] input[type=email],
-[data-theme=dark] input[type=password],
-[data-theme=dark] input[type=tel],
-[data-theme=dark] input[type=number],
-[data-theme=dark] input[type=search],
-[data-theme=dark] select,
-[data-theme=dark] textarea {
-  background: var(--gray-800) !important;
-  color: var(--text) !important;
-  border-color: var(--gray-600) !important;
-}
-[data-theme=dark] input::placeholder,
-[data-theme=dark] textarea::placeholder {
-  color: var(--gray-500) !important;
-}
-[data-theme=dark] .or-divider-line,
-[data-theme=dark] .divider-line {
-  background: var(--gray-700) !important;
-}
-[data-theme=dark] .or-divider-text,
-[data-theme=dark] .or-text {
-  color: var(--gray-500) !important;
-  background: var(--surface);
-}
-
-/* --- Stat/counter numbers (low contrast fix) --- */
-[data-theme=dark] .stat-num,
-[data-theme=dark] .strip-stat-num,
-[data-theme=dark] .hero-stat-num,
-[data-theme=dark] .stat-value,
-[data-theme=dark] .counter-num {
-  color: var(--teal) !important;
-}
-[data-theme=dark] .stat-label,
-[data-theme=dark] .strip-stat-lbl,
-[data-theme=dark] .hero-stat-label,
-[data-theme=dark] .stat-desc {
-  color: var(--gray-400) !important;
-}
-
-/* --- Enterprise / Trust-Safety feature card titles & body --- */
-[data-theme=dark] .feature-card-title,
-[data-theme=dark] .feature-title,
-[data-theme=dark] .card-title {
-  color: var(--gray-100) !important;
-}
-[data-theme=dark] .feature-card-body,
-[data-theme=dark] .feature-desc,
-[data-theme=dark] .card-body,
-[data-theme=dark] .card-desc {
-  color: var(--gray-400) !important;
-}
-[data-theme=dark] .feature-card {
-  background: var(--surface);
-  border-color: var(--gray-700);
-}
-
-/* --- Help Center category cards --- */
-[data-theme=dark] .help-category-card,
-[data-theme=dark] .category-card {
-  background: var(--surface) !important;
-  border-color: var(--gray-700) !important;
-  color: var(--gray-200) !important;
-}
-[data-theme=dark] .category-card h3,
-[data-theme=dark] .category-card .card-name,
-[data-theme=dark] .help-category-card h3 {
-  color: var(--gray-100) !important;
-}
-[data-theme=dark] .category-card .article-count,
-[data-theme=dark] .help-category-card .article-count {
-  color: var(--gray-400) !important;
-}
-
-/* --- Browse page search/filter inputs --- */
-[data-theme=dark] .search-bar,
-[data-theme=dark] .search-input,
-[data-theme=dark] .filter-select,
-[data-theme=dark] .filter-btn {
-  background: var(--gray-800) !important;
-  border-color: var(--gray-600) !important;
-  color: var(--text) !important;
-}
-
-/* --- Breadcrumb white bg fix --- */
-[data-theme=dark] .breadcrumb-wrapper,
-[data-theme=dark] .breadcrumb-bar,
-[data-theme=dark] .page-header {
-  background: var(--bg) !important;
-  color: var(--gray-400);
-}
-
-/* --- Section headings low contrast fix --- */
-[data-theme=dark] .section-label,
-[data-theme=dark] .section-eyebrow,
-[data-theme=dark] .section-subtitle {
-  color: var(--gray-400) !important;
-}
-[data-theme=dark] .section-head h2,
-[data-theme=dark] .section-title {
-  color: var(--gray-100) !important;
-}
-[data-theme=dark] .section-head p {
-  color: var(--gray-400) !important;
-}
-
-/* --- Info / contact cards --- */
-[data-theme=dark] .info-card {
-  background: var(--surface) !important;
-  border-color: var(--gray-700) !important;
-}
-[data-theme=dark] .info-card-title,
-[data-theme=dark] .cm-label {
-  color: var(--gray-400) !important;
-  font-size: .72rem;
-  text-transform: uppercase;
-  letter-spacing: .6px;
-}
-[data-theme=dark] .cm-value a,
-[data-theme=dark] .cm-link {
-  color: var(--teal) !important;
-}
-[data-theme=dark] .cm-sub {
-  color: var(--gray-500) !important;
-}
-
-/* --- Press logo cards (about/enterprise) --- */
-[data-theme=dark] .press-logo {
-  background: var(--gray-800) !important;
-  border-color: var(--gray-700) !important;
-  color: var(--gray-300) !important;
-}
-
-/* --- Story / highlight block --- */
-[data-theme=dark] .story-highlight {
-  background: rgba(13,148,136,.08) !important;
-  color: var(--gray-300) !important;
-}
-[data-theme=dark] .story-body,
-[data-theme=dark] .story-visual-sub {
-  color: var(--gray-400) !important;
-}
-[data-theme=dark] .story-visual {
-  background: rgba(13,148,136,.06) !important;
-  border-color: rgba(13,148,136,.2) !important;
-}
-
-/* --- Sticky CTA bar dark mode --- */
-[data-theme=dark] .sticky-cta-bar {
-  background: var(--surface);
-  border-color: var(--gray-700);
-}
-
-/* --- V1.2 form-group inputs dark mode --- */
-[data-theme=dark] .form-group input,
-[data-theme=dark] .form-group textarea,
-[data-theme=dark] .form-group select {
-  background: var(--gray-800) !important;
-  color: var(--text) !important;
-  border-color: var(--gray-600) !important;
-}
-[data-theme=dark] .form-group label {
-  color: var(--gray-300);
-}
-
 
 /* ── Role-mode switch button in nav dropdown ── */
 .nav-dd-switch {
@@ -1848,17 +1517,6 @@ textarea:focus-visible {
   border-radius: var(--radius-sm);
 }
 
-[data-theme="dark"] .skeleton {
-  background: linear-gradient(
-    90deg,
-    var(--gray-800) 25%,
-    var(--gray-700) 50%,
-    var(--gray-800) 75%
-  );
-  background-size: 800px 100%;
-}
-
-
 /* ── Skip-to-content accessibility link ── */
 .sr-only-focusable {
   position: fixed;
@@ -1900,59 +1558,6 @@ textarea:focus-visible {
    PHASE 4 — Dark Mode Contrast Audit & Support SLA Copy
    ═══════════════════════════════════════════════════════ */
 
-/* ── Dark mode: ensure form inputs, labels and placeholders are readable ── */
-[data-theme="dark"] input,
-[data-theme="dark"] textarea,
-[data-theme="dark"] select {
-  color: var(--text, #e6edf3);
-  background: var(--surface-3, #21262d);
-  border-color: var(--border, rgba(255,255,255,.08));
-}
-[data-theme="dark"] input::placeholder,
-[data-theme="dark"] textarea::placeholder {
-  color: var(--text-faint, #484f58);
-}
-[data-theme="dark"] label,
-[data-theme="dark"] .form-label {
-  color: var(--text-muted, #8b949e);
-}
-
-/* ── Dark mode: badge text contrast fixes ── */
-[data-theme="dark"] .badge,
-[data-theme="dark"] .tag,
-[data-theme="dark"] .gig-id-tag,
-[data-theme="dark"] .status-badge {
-  color: var(--text, #e6edf3);
-}
-
-/* ── Dark mode: tab labels readable ── */
-[data-theme="dark"] .tab-btn,
-[data-theme="dark"] .tab-label {
-  color: var(--text-muted, #8b949e);
-}
-[data-theme="dark"] .tab-btn.active,
-[data-theme="dark"] .tab-btn[aria-selected="true"] {
-  color: var(--teal, #4fc3c8);
-}
-
-/* ── Dark mode: focus ring visible ── */
-[data-theme="dark"] input:focus,
-[data-theme="dark"] textarea:focus,
-[data-theme="dark"] select:focus {
-  outline: 2px solid var(--teal, #4fc3c8);
-  outline-offset: 2px;
-  border-color: var(--teal, #4fc3c8);
-}
-
-/* ── Dark mode: notification copy contrast ── */
-[data-theme="dark"] .notif-title,
-[data-theme="dark"] .notif-body {
-  color: var(--text, #e6edf3);
-}
-[data-theme="dark"] .notif-time {
-  color: var(--text-muted, #8b949e);
-}
-
 /* ── Support SLA — "Get help in 15 minutes" utility classes ── */
 .sla-badge {
   display: inline-flex;
@@ -1976,18 +1581,6 @@ textarea:focus-visible {
 .support-cta-text strong {
   color: #10b981;
 }
-
-/* ── Dark mode: card body text never goes below --text-muted ── */
-[data-theme="dark"] .card-body,
-[data-theme="dark"] .panel-body,
-[data-theme="dark"] p {
-  color: var(--text, #e6edf3);
-}
-[data-theme="dark"] .text-muted,
-[data-theme="dark"] small {
-  color: var(--text-muted, #8b949e) !important;
-}
-
 
 /* ═══════════════════════════════════════════════════════════════
    GIGLEGA UX IMPROVEMENT PATCH — v2.0
@@ -2037,22 +1630,11 @@ p { line-height: 1.65; }
   letter-spacing: .2px;
   white-space: nowrap;
 }
-[data-theme="dark"] .trust-badge {
-  background: rgba(16,185,129,.15);
-  color: #34d399;
-  border-color: rgba(52,211,153,.3);
-}
 .trust-badge-blue {
   background: rgba(99,102,241,.1);
   color: #4f46e5;
   border-color: rgba(99,102,241,.25);
 }
-[data-theme="dark"] .trust-badge-blue {
-  background: rgba(99,102,241,.15);
-  color: #818cf8;
-  border-color: rgba(129,140,248,.3);
-}
-
 /* ── 4. FEE TRANSPARENCY COMPONENT ──────────────────────────── */
 .fee-breakdown {
   background: rgba(245,158,11,.07);
@@ -2080,13 +1662,6 @@ p { line-height: 1.65; }
   color: var(--success, #10b981);
   font-weight: 700;
 }
-[data-theme="dark"] .fee-breakdown {
-  background: rgba(245,158,11,.06);
-  border-color: rgba(245,158,11,.2);
-}
-[data-theme="dark"] .fee-breakdown-row { color: var(--text-muted); }
-[data-theme="dark"] .fee-breakdown-row.total { color: var(--text); }
-
 /* ── 5. CARD IMPROVEMENTS ───────────────────────────────────── */
 .gig-card {
   transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
@@ -2096,10 +1671,6 @@ p { line-height: 1.65; }
   transform: translateY(-3px);
   box-shadow: var(--shadow-md);
   border-color: rgba(13,148,136,.35);
-}
-[data-theme="dark"] .gig-card:hover {
-  border-color: rgba(79,195,200,.3);
-  box-shadow: 0 6px 24px rgba(0,0,0,.35);
 }
 /* Urgent gig card — stronger visual cue */
 .gig-card.urgent {
@@ -2215,10 +1786,6 @@ p { line-height: 1.65; }
   border-radius: var(--radius);
   background: rgba(13,148,136,.04);
 }
-[data-theme="dark"] .gl-empty {
-  background: rgba(13,148,136,.06);
-  border-color: rgba(79,195,200,.25);
-}
 .gl-empty-icon {
   font-size: 3rem;
   line-height: 1;
@@ -2251,15 +1818,6 @@ p { line-height: 1.65; }
   animation: glShimmer 1.5s infinite ease-in-out;
   border-radius: var(--radius-sm);
 }
-[data-theme="dark"] .gl-skel {
-  background: linear-gradient(
-    90deg,
-    var(--gray-800) 25%,
-    var(--gray-700) 50%,
-    var(--gray-800) 75%
-  );
-  background-size: 200% 100%;
-}
 @keyframes glShimmer {
   0%   { background-position: 200% 0; }
   100% { background-position: -200% 0; }
@@ -2283,7 +1841,6 @@ p { line-height: 1.65; }
   margin-bottom: 7px;
   letter-spacing: .1px;
 }
-[data-theme="dark"] .gl-label { color: var(--text-muted); }
 .gl-input,
 .gl-select,
 .gl-textarea {
@@ -2403,8 +1960,6 @@ p { line-height: 1.65; }
   color: var(--gray-500);
   margin-top: 3px;
 }
-[data-theme="dark"] .stat-chip { border-color: var(--border); }
-
 /* ── 15. MOBILE RESPONSIVE FIXES ────────────────────────────── */
 @media (max-width: 480px) {
   .hero-cta { flex-direction: column; gap: 10px; }
@@ -2436,8 +1991,6 @@ p { line-height: 1.65; }
   background: rgba(13,148,136,.07);
   text-decoration: none;
 }
-[data-theme="dark"] .nav-link:hover { background: rgba(79,195,200,.08); }
-
 /* ── 17. GIG CARD CTA BUTTON — larger tap target ────────────── */
 .gig-cta-btn {
   min-height: 44px !important;
@@ -2466,12 +2019,6 @@ p { line-height: 1.65; }
 .support-strip-icon { font-size: 1.5rem; flex-shrink: 0; }
 .support-strip strong { color: var(--text); font-weight: 700; }
 .support-strip a { color: var(--teal); font-weight: 600; }
-[data-theme="dark"] .support-strip {
-  background: rgba(99,102,241,.08);
-  border-color: rgba(129,140,248,.2);
-  color: var(--text-muted);
-}
-
 /* ── 19. SUCCESS STATE ───────────────────────────────────────── */
 .gl-success-card {
   text-align: center;
@@ -2571,8 +2118,4 @@ p { line-height: 1.65; }
 .gl-progress-step.active .gl-progress-label,
 .gl-progress-step.done .gl-progress-label {
   color: var(--primary);
-}
-[data-theme="dark"] .gl-progress-step.active .gl-progress-label,
-[data-theme="dark"] .gl-progress-step.done .gl-progress-label {
-  color: var(--teal);
 }
