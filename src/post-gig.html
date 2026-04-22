@@ -419,6 +419,7 @@
 </div>
 
 <script type="module">
+    import { requireAuth } from './auth-router.js';
 import { auth, db } from './firebase-config.js';
 import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
 import { collection, addDoc, serverTimestamp }
@@ -739,10 +740,10 @@ async function submitGig(){
   $('fDate').min=y+'-'+mo+'-'+dy; $('fDate').value=y+'-'+mo+'-'+dy;
 })();
 
-onAuthStateChanged(auth, function(user){
-  if(!user){ window.location.replace('login.html?redirect=post-gig.html'); return; }
-  currentUser=user;
-});
+requireAuth(function(user) {
+    currentUser = user;
+    
+  });
 </script>
   <script src="onboarding.js" defer>
   /* ── Onboarding Tour: Poster — fires once on post-gig page ── */
