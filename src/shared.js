@@ -82,7 +82,11 @@
      2. CURRENCY
   ══════════════════════════════════════════════════════════ */
   
-  global.formatCurrency = formatINR;
+  function formatCurrency(n, sym) {
+    sym = sym || '₹';
+    return sym + Number(n || 0).toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+  }
+  global.formatCurrency = formatCurrency;
 
   /* ══════════════════════════════════════════════════════════
      3. AUTH HELPERS — Firebase Auth based, no localStorage for user data
