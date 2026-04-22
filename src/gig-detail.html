@@ -666,8 +666,13 @@
         }
       } else if(isWorkerWhoBooked){
         /* WORKER who already booked this gig */
-        actionHtml = '<div style="background:var(--teal-faint,rgba(13,148,136,.08));border-radius:10px;padding:14px;text-align:center;font-weight:700;color:var(--success,#16a34a);margin-bottom:10px">You have Booked This Gig!</div>';
-        posterCardCTA = '<a href="chat.html?with='+escH(gig.posterId)+'&gig='+escH(gig.id)+'" class="btn btn-primary" style="width:100%;display:block;text-align:center;margin-top:12px">Message Poster</a>';
+        var otpBtnHtml = (gig.status==='taken' && !gig.completionOTP)
+          ? '<button id="btnRequestOTP" class="btn btn-outline" style="width:100%;margin-top:8px;font-size:.88rem" onclick="requestCompletionOTP()">🔑 Request Completion OTP</button>'
+          : (gig.completionOTP
+            ? '<div style="margin-top:8px;background:rgba(217,153,58,.12);border-radius:8px;padding:10px;text-align:center;font-size:.85rem"><span style="color:#D9993A;font-weight:700">⏳ OTP Requested</span><br><span style="color:var(--gray-400)">Poster will share OTP when work is done.</span></div>'
+            : '');
+        actionHtml = '<div style="background:var(--teal-faint,rgba(13,148,136,.08));border-radius:10px;padding:14px;text-align:center"><div style="font-size:1.5rem">🎯</div><div style="font-weight:700;color:var(--primary)">You\'ve booked this gig!</div><div style="font-size:.82rem;color:var(--gray-400);margin-top:4px">Complete the work, then request OTP to confirm completion &amp; get paid.</div></div>'+otpBtnHtml;
+        posterCardCTA = '<a href="chat.html?with='+escH(gig.posterId)+'&gig='+escH(gig.id)+'" class="btn btn-primary" style="width:100%;display:block;text-align:center;margin-top:10px">💬 Chat with Poster</a>';
       } else if(isOpen){
         /* WORKER on open gig — show book button, no message */
         actionHtml = '<button class="btn btn-primary btn-accept" id="btnAccept" style="width:100%;font-size:1rem;padding:14px">Book This Gig</button>'+
@@ -703,6 +708,7 @@
               (gig.urgency==="urgent" ? '<span class="gig-cat-tag" style="background:var(--teal-subtle,rgba(245,158,11,.12));color:#b45309">🔥 Urgent</span>' : "")+
             '</div>'+
             '<h1 class="gig-title">'+escH(gig.title)+'</h1>'+
+              (!isOwner ? '<div style="text-align:right;margin:-4px 0 4px"><button onclick="reportGig()" style="background:none;border:none;color:var(--gray-400);font-size:.75rem;cursor:pointer;padding:4px 8px;border-radius:6px">🚩 Report Gig</button></div>' : '')+'+
             '<div class="gig-meta-row">'+
               '<span class="gig-meta-item">'+escH(gig.location||gig.area||"Gurugram")+'</span>'+
               '<span class="gig-meta-item">🏷️ '+escH(gig.category||"General")+'</span>'+
@@ -738,6 +744,10 @@
               '</div>'+
 
               (similar.length ? '<div class="detail-card"><div class="detail-card-title">🔥 Similar Gigs</div><div style="margin-top:8px">'+simHtml+'</div></div>' : "")+
+              '<div class="detail-card" id="reviewsSection" style="margin-top:0">'+
+                '<div class="detail-card-title">⭐ Poster Reviews</div>'+
+                '<div id="gdReviewsList" style="margin-top:8px"><div style="color:var(--gray-400);font-size:.85rem">Loading reviews…</div></div>'+
+              '</div>'+
 
             '</div>'+
 
@@ -922,6 +932,125 @@
       };
     }
 
+
+    /* ════ OTP: Worker requests completion ════ */
+    window.requestCompletionOTP = async function() {
+      var btn = document.getElementById('btnRequestOTP');
+      if (btn) { btn.disabled=true; btn.textContent='⏳ Requesting…'; }
+      try {
+        var gigId = getParam('id');
+        await updateDoc(doc(db,'gigs',gigId),{
+          completionOTP:         true,
+          completionRequested:   true,
+          completionRequestedAt: serverTimestamp(),
+        });
+        var gs = await getDoc(doc(db,'gigs',gigId));
+        var gd2 = gs.exists() ? gs.data() : {};
+        if (gd2.posterId) {
+          await addDoc(collection(db,'notifications',gd2.posterId,'items'),{
+            type:      'otp_requested',
+            title:     '🔑 OTP Requested',
+            body:      (currentUser.displayName||'Worker')+' ne gig "'+( gd2.title||'')+'" complete karne ke liye OTP maanga hai.',
+            gigId:     gigId,
+            workerId:  currentUser.uid,
+            read:      false,
+            timestamp: serverTimestamp(),
+          });
+        }
+        showToast('✅ OTP request sent! Poster will share OTP shortly.','success');
+        setTimeout(()=>location.reload(),1500);
+      } catch(e) {
+        console.error('[GigLega] OTP request:',e);
+        showToast('❌ OTP request failed: '+e.message,'error');
+        if (btn) { btn.disabled=false; btn.textContent='🔑 Request Completion OTP'; }
+      }
+    };
+
+    /* ════ REPORT GIG ════ */
+    window.reportGig = function() {
+      var gigId = getParam('id');
+      if (!currentUser) { showToast('Login karo pehle.','warning'); return; }
+      var old = document.getElementById('gl-report-modal'); if(old) old.remove();
+      var m = document.createElement('div');
+      m.id = 'gl-report-modal';
+      m.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px';
+      m.innerHTML =
+        '<div style="background:var(--surface);border-radius:16px;padding:24px;max-width:360px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.3)">' +
+          '<div style="font-size:1.5rem;margin-bottom:8px">🚩</div>' +
+          '<div style="font-weight:800;font-size:1rem;margin-bottom:6px">Report This Gig</div>' +
+          '<div style="font-size:.82rem;color:var(--gray-400);margin-bottom:16px">Kya problem hai? Hum 24 ghante mein review karenge.</div>' +
+          '<select id="rpt-reason" style="width:100%;padding:10px;border:1.5px solid var(--border,#333);border-radius:8px;background:var(--surface);color:var(--text);font-size:.88rem;margin-bottom:12px">' +
+            '<option value="">Select reason…</option>' +
+            '<option value="spam">Spam / Fake Gig</option>' +
+            '<option value="offensive">Offensive Content</option>' +
+            '<option value="fraud">Fraud / Scam</option>' +
+            '<option value="wrong_category">Wrong Category</option>' +
+            '<option value="other">Other</option>' +
+          '</select>' +
+          '<textarea id="rpt-desc" placeholder="Additional details (optional)…" style="width:100%;padding:10px;border:1.5px solid var(--border,#333);border-radius:8px;background:var(--surface);color:var(--text);font-size:.88rem;resize:none;height:80px;box-sizing:border-box;margin-bottom:16px"></textarea>' +
+          '<div style="display:flex;gap:10px">' +
+            '<button onclick="document.getElementById('gl-report-modal').remove()" style="flex:1;padding:10px;border:1.5px solid var(--border,#333);border-radius:8px;background:none;color:var(--text);cursor:pointer">Cancel</button>' +
+            '<button id="rpt-submit" onclick="submitReport(''+gigId+'')" style="flex:2;padding:10px;background:#ef4444;color:#fff;border:none;border-radius:8px;font-weight:700;cursor:pointer">Submit Report</button>' +
+          '</div>' +
+        '</div>';
+      document.body.appendChild(m);
+      m.addEventListener('click',function(e){ if(e.target===m) m.remove(); });
+    };
+
+    window.submitReport = async function(gigId) {
+      var reason = document.getElementById('rpt-reason')?.value;
+      var desc   = (document.getElementById('rpt-desc')?.value||'').trim();
+      if (!reason) { showToast('⚠️ Reason select karo.','warning'); return; }
+      var btn = document.getElementById('rpt-submit');
+      if (btn) { btn.disabled=true; btn.textContent='⏳ Submitting…'; }
+      try {
+        await addDoc(collection(db,'gig_reports'),{
+          gigId, reporterId: currentUser.uid,
+          reason, description: desc||null,
+          status: 'pending', createdAt: serverTimestamp(),
+        });
+        document.getElementById('gl-report-modal')?.remove();
+        showToast('✅ Report submitted. Thank you!','success');
+      } catch(e) {
+        console.error('[GigLega] report:',e);
+        showToast('❌ Report failed: '+e.message,'error');
+        if (btn) { btn.disabled=false; btn.textContent='Submit Report'; }
+      }
+    };
+
+    /* ════ LOAD POSTER REVIEWS ════ */
+    async function loadPosterReviews(posterId) {
+      var container = document.getElementById('gdReviewsList');
+      if (!container) return;
+      try {
+        var snap = await getDocs(query(
+          collection(db,'publicReviews'),
+          where('revieweeId','==',posterId),
+          limit(5)
+        ));
+        if (snap.empty) {
+          container.innerHTML = '<div style="color:var(--gray-400);font-size:.85rem">No reviews yet for this poster.</div>';
+          return;
+        }
+        var total=0, count=snap.size, html='';
+        snap.docs.forEach(function(d){
+          var rv=d.data(); total+=(rv.rating||0);
+          var stars='★'.repeat(Math.round(rv.rating||0))+'☆'.repeat(5-Math.round(rv.rating||0));
+          html+='<div style="border-top:1px solid var(--border,#2a2a2a);padding:10px 0">'+
+            '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">'+
+              '<span style="color:#f59e0b;font-size:.9rem">'+stars+'</span>'+
+              '<span style="font-size:.78rem;color:var(--gray-400)">'+escH(rv.reviewerName||'User')+'</span>'+
+            '</div>'+
+            '<div style="font-size:.85rem;color:var(--text)">'+escH(rv.comment||'')+'</div>'+
+          '</div>';
+        });
+        var avg=(total/count).toFixed(1);
+        container.innerHTML='<div style="font-size:.9rem;font-weight:700;color:var(--primary);margin-bottom:8px">⭐ '+avg+' avg ('+count+' review'+(count>1?'s':'')+')</div>'+html;
+      } catch(e) {
+        container.innerHTML='<div style="color:var(--gray-400);font-size:.82rem">Could not load reviews.</div>';
+      }
+    }
+
     /* ══════ MAIN ══════ */
     var _initDone = false;
     requireAuth(function(user) {
@@ -968,6 +1097,8 @@
         var isOwner = currentUser && currentUser.uid===gig.posterId;
         document.title=(gig.title||"Gig Detail")+" — GigLega";
         renderGig(gig, poster, similar, isOwner);
+        if(gig.posterId) loadPosterReviews(gig.posterId);
+        initMobileBookBar(gig, gig.status==="open", isOwner, !!(currentUser && gig.workerId===currentUser.uid));
 
       }catch(err){
         console.error("Gig load error:",err);
