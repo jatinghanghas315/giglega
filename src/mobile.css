@@ -943,3 +943,127 @@ body {
     stroke: currentColor;
   }
 }
+
+
+/* ════════════════════════════════════════════════════════════
+   MOBILE BOTTOM NAV BAR — GigLega v2.7
+   Role-aware, injected by shared.js for logged-in users
+════════════════════════════════════════════════════════════ */
+.gl-bottom-nav {
+  display: none;
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  height: 60px;
+  background: var(--surface, #1a1a1a);
+  border-top: 1.5px solid var(--border, #2a2a2a);
+  z-index: 9990;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+@media (max-width: 640px) {
+  .gl-bottom-nav { display: flex; align-items: stretch; }
+  body { padding-bottom: calc(60px + env(safe-area-inset-bottom, 0px)); }
+  /* Hide desktop top nav on mobile when bottom nav is present */
+  .main-nav .nav-links { display: none !important; }
+}
+.gl-bottom-nav-inner {
+  display: flex;
+  width: 100%;
+  align-items: stretch;
+}
+.gl-bnav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  text-decoration: none;
+  color: var(--text-muted, #888);
+  font-size: .60rem;
+  font-weight: 600;
+  letter-spacing: .2px;
+  padding: 6px 2px 4px;
+  position: relative;
+  transition: color .15s;
+  -webkit-tap-highlight-color: transparent;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+.gl-bnav-item svg {
+  width: 22px; height: 22px;
+  flex-shrink: 0;
+  transition: stroke .15s;
+}
+.gl-bnav-item.active { color: var(--primary, #0d9488); }
+.gl-bnav-item.active svg { stroke: var(--primary, #0d9488); }
+.gl-bnav-item:active { opacity: .7; }
+.gl-bnav-badge {
+  position: absolute;
+  top: 4px;
+  right: calc(50% - 20px);
+  background: #ef4444;
+  color: #fff;
+  font-size: .56rem;
+  font-weight: 800;
+  min-width: 16px;
+  height: 16px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 3px;
+  line-height: 1;
+}
+
+/* ════════════════════════════════════════════════════════════
+   SKELETON LOADING STATES
+════════════════════════════════════════════════════════════ */
+@keyframes gl-shimmer {
+  0%   { background-position: -600px 0; }
+  100% { background-position:  600px 0; }
+}
+.gl-skeleton {
+  background: linear-gradient(90deg,
+    var(--border, #2a2a2a) 25%,
+    rgba(255,255,255,.06) 50%,
+    var(--border, #2a2a2a) 75%
+  );
+  background-size: 600px 100%;
+  animation: gl-shimmer 1.4s infinite linear;
+  border-radius: 8px;
+  display: inline-block;
+}
+.gl-skel-line  { height: 13px; width: 100%; margin-bottom: 10px; }
+.gl-skel-title { height: 22px; width: 60%; margin-bottom: 14px; }
+.gl-skel-card  {
+  background: var(--surface, #1a1a1a);
+  border: 1.5px solid var(--border, #2a2a2a);
+  border-radius: var(--radius, 12px);
+  padding: 18px;
+  margin-bottom: 12px;
+}
+.gl-skel-avatar { width: 44px; height: 44px; border-radius: 50%; }
+.gl-skel-btn    { height: 38px; width: 120px; border-radius: 10px; }
+
+/* ── Page loader overlay ── */
+.gl-page-loader {
+  position: fixed; inset: 0;
+  background: var(--bg, #0f0f0f);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 9999;
+  transition: opacity .3s ease;
+}
+.gl-page-loader.hidden { opacity: 0; pointer-events: none; }
+.gl-loader-dots { display: flex; gap: 6px; }
+.gl-loader-dot {
+  width: 9px; height: 9px; border-radius: 50%;
+  background: var(--primary, #0d9488);
+  animation: gl-bounce .75s ease-in-out infinite;
+}
+.gl-loader-dot:nth-child(2) { animation-delay: .15s; }
+.gl-loader-dot:nth-child(3) { animation-delay: .30s; }
+@keyframes gl-bounce {
+  0%, 80%, 100% { transform: scale(.7); opacity: .45; }
+  40%           { transform: scale(1.1); opacity: 1; }
+}
