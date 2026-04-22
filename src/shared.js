@@ -16,7 +16,7 @@
 
 /* CACHE BUSTER v1.3.0 */
 (function(){
-  const APP_BUILD = '2.5.0';
+  const APP_BUILD = '2.6.0';
   const stored = localStorage.getItem('gl_app_build');
   if (stored !== APP_BUILD) {
     localStorage.setItem('gl_app_build', APP_BUILD);
