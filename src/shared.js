@@ -16,7 +16,7 @@
 
 /* CACHE BUSTER v1.3.0 */
 (function(){
-  const APP_BUILD = '2.7.0';
+  const APP_BUILD = '2.8.0';
   const stored = localStorage.getItem('gl_app_build');
   if (stored !== APP_BUILD) {
     localStorage.setItem('gl_app_build', APP_BUILD);
@@ -366,6 +366,28 @@
             : '';
 
           renderBottomNav(role);
+          /* ── Live unread notification badge ── */
+          (function startNotifBadge(uid) {
+            try {
+              var qUnread = fsMod.query(
+                fsMod.collection(fb.db, 'notifications', uid, 'items'),
+                fsMod.where('read', '==', false)
+              );
+              fsMod.onSnapshot(qUnread, function(snap) {
+                var count = snap.size;
+                var label = count > 0 ? (count > 99 ? '99+' : String(count)) : '';
+                var nb  = document.getElementById('navNotifBadge');
+                var bnb = document.getElementById('bnavNotifBadge');
+                if (nb)  { nb.textContent  = label; nb.style.display  = count > 0 ? 'inline-flex' : 'none'; }
+                if (bnb) { bnb.textContent = label; bnb.style.display = count > 0 ? 'flex'        : 'none'; }
+                if (count > 0 && !document.title.match(/^\(\d/)) {
+                  document.title = '(' + count + ') ' + document.title;
+                } else if (count === 0) {
+                  document.title = document.title.replace(/^\(\d+\)\s*/, '');
+                }
+              }, function(e) { console.warn('[GigLega] notif badge:', e.message); });
+            } catch(e) { console.warn('[GigLega] notif badge init:', e); }
+          })(user.uid);
           if (authSection) {
             authSection.innerHTML =
               (normRole!=='tasker'?'<a href="post-gig.html" class="btn btn-primary nav-post-btn">'+ICONS.plus+' Post Gig</a>':'') +
