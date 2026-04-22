@@ -11,7 +11,11 @@
     
   <link rel="stylesheet" href="mobile.css?v=20260411-0215" />
 <script src="shared.js?v=20260411" defer></script>
-    <script>
+    <script type="module">
+    import { routeByRole } from './auth-router.js';
+    routeByRole('tasker');
+  </script>
+  <script>
           if ('serviceWorker' in navigator && !sessionStorage.getItem('gl_sw_cleared')) {
                   sessionStorage.setItem('gl_sw_cleared', '1');
                   navigator.serviceWorker.getRegistrations().then(function(regs) {
