@@ -136,6 +136,94 @@
   --accent:       #d29922;
 }
 
+/* ════════════════════════════════════════════════════════════════
+   GigLega — Light Mode Tokens
+   Explicit [data-theme="light"] overrides for clean light experience
+   ════════════════════════════════════════════════════════════════ */
+[data-theme="light"] {
+  /* Base backgrounds */
+  --bg:           #f8fafc;
+  --surface:      #ffffff;
+  --surface-2:    #f3f4f6;
+  --surface-3:    #e5e7eb;
+  --bg-footer:    #1e293b;
+
+  /* Text */
+  --text:         #111827;
+  --text-muted:   #6b7280;
+  --text-faint:   #9ca3af;
+
+  /* Borders */
+  --border:       rgba(0,0,0,.08);
+  --border-soft:  rgba(0,0,0,.05);
+  --divider:      rgba(0,0,0,.06);
+
+  /* Brand */
+  --primary:      #1a3c5e;
+  --teal:         #0d9488;
+  --teal-bright:  #0f766e;
+  --teal-glow:    rgba(13,148,136,.12);
+  --teal-subtle:  rgba(13,148,136,.08);
+  --teal-faint:   rgba(13,148,136,.04);
+
+  /* Gray scale — light values */
+  --gray-50:      #f9fafb;
+  --gray-100:     #f3f4f6;
+  --gray-200:     #e5e7eb;
+  --gray-300:     #d1d5db;
+  --gray-400:     #9ca3af;
+  --gray-500:     #6b7280;
+  --gray-600:     #4b5563;
+  --gray-700:     #374151;
+  --gray-800:     #1f2937;
+  --gray-900:     #111827;
+
+  /* Shadows — lighter for light mode */
+  --shadow-sm:    0 1px 4px rgba(0,0,0,.06);
+  --shadow-md:    0 4px 16px rgba(0,0,0,.08);
+  --shadow-lg:    0 12px 40px rgba(0,0,0,.10);
+  --shadow-xl:    0 24px 64px rgba(0,0,0,.12);
+  --shadow:       0 4px 24px rgba(0,0,0,.08);
+
+  /* Status */
+  --success:      #059669;
+  --warning:      #d97706;
+  --danger:       #dc2626;
+  --info:         #6366f1;
+
+  /* Card/surface specifics */
+  --card-bg:      #ffffff;
+  --input-bg:     #ffffff;
+  --input-border: rgba(0,0,0,.15);
+}
+
+/* Light mode nav + footer overrides */
+[data-theme="light"] .main-nav,
+[data-theme="light"] .nav {
+  background: rgba(255,255,255,.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(0,0,0,.08);
+  box-shadow: 0 1px 0 rgba(0,0,0,.04);
+}
+
+[data-theme="light"] .main-footer {
+  background: var(--bg-footer);
+  color: #94a3b8;
+}
+
+[data-theme="light"] .nav-link { color: var(--text-muted); }
+[data-theme="light"] .nav-link:hover,
+[data-theme="light"] .nav-link.active { color: var(--primary); background: rgba(26,60,94,.08); }
+
+[data-theme="light"] .nav-icon-btn { border-color: rgba(0,0,0,.12); color: var(--text); }
+[data-theme="light"] .nav-icon-btn:hover { border-color: var(--primary); }
+
+[data-theme="light"] .nav-mobile-menu { background: var(--surface); border-top-color: var(--border); }
+[data-theme="light"] .nav-mobile-link { color: var(--text); }
+[data-theme="light"] .nav-mobile-link:hover { background: rgba(26,60,94,.06); color: var(--primary); }
+
+
 
 /* ══════════════════════════════════════════════════════════
    2. RESET & BASE
