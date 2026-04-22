@@ -62,24 +62,41 @@
     <div class="role-label">Choose Your Role</div>
     <div class="role-grid">
       <div class="role-card" data-role="poster" onclick="selectRole(this)">
-        <div class="rc-icon">&#128203;</div>
-        <h3>Poster</h3>
-        <p>Post gigs &amp; hire verified Taskers</p>
+        <div class="rc-icon">📋</div>
+        <h3>Poster <span style="font-size:.7rem;font-weight:500;color:var(--gray-400)">I need help</span></h3>
+        <p>Post any task — delivery, cleaning, packing, tutoring. You pay only when done. ✅</p>
       </div>
       <div class="role-card" data-role="tasker" onclick="selectRole(this)">
-        <div class="rc-icon">&#9889;</div>
-        <h3>Tasker</h3>
-        <p>Browse gigs &amp; earn money fast</p>
+        <div class="rc-icon">⚡</div>
+        <h3>Tasker <span style="font-size:.7rem;font-weight:500;color:var(--gray-400)">I want to earn</span></h3>
+        <p>Browse nearby gigs, accept work, get paid instantly to UPI. Students welcome. 💸</p>
       </div>
       <div class="role-card" data-role="enterprise" onclick="selectRole(this)">
-        <div class="rc-icon">&#127970;</div>
-        <h3>Enterprise</h3>
-        <p>Bulk hiring for businesses &amp; teams</p>
+        <div class="rc-icon">🏢</div>
+        <h3>Enterprise <span style="font-size:.7rem;font-weight:500;color:var(--gray-400)">Business hiring</span></h3>
+        <p>Bulk hire verified workers for your business. Dedicated support &amp; GST invoicing. 🏢</p>
       </div>
     </div>
     <div class="enterprise-note" id="enterpriseNote" style="display:none;">
       &#128272; Enterprise accounts require <strong>admin approval</strong> before activation. You will be notified once approved.
     </div>
+    <!-- extra fields shown after role selection -->
+    <div id="ob-extra-fields" style="display:none;margin-top:16px">
+      <div class="ob-field" id="ob-bio-wrap">
+        <label for="ob-bio">About You <span style="color:var(--gray-500);font-weight:400">(optional)</span></label>
+        <input id="ob-bio" type="text" placeholder="e.g. Student looking for weekend gigs..." maxlength="120" />
+      </div>
+      <div class="ob-field" id="ob-skills-wrap" style="display:none;margin-top:12px">
+        <label for="ob-skills">Your Skills <span style="color:var(--gray-500);font-weight:400">(helps posters find you)</span></label>
+        <input id="ob-skills" type="text" placeholder="e.g. Delivery, Cleaning, Data Entry" maxlength="120" />
+      </div>
+      <div class="ob-field" id="ob-upi-wrap" style="display:none;margin-top:12px">
+        <label for="ob-upi">UPI ID <span style="color:#D9993A;font-weight:700">for receiving payments</span></label>
+        <input id="ob-upi" type="text" placeholder="name@upi or 9999999999@ybl" maxlength="60" />
+        <small style="font-size:.72rem;color:var(--gray-500)">Changeable later in Wallet settings.</small>
+      </div>
+    </div>
+
     <button class="ob-submit" id="ob-submit" disabled onclick="submitOnboarding()">Continue to GigLega &rarr;</button>
   </div>
   <div id="toast-container"></div>
@@ -114,6 +131,12 @@
       card.classList.add('selected');
       selectedRole = card.dataset.role;
       document.getElementById('enterpriseNote').style.display = selectedRole === 'enterprise' ? 'block' : 'none';
+      var ef = document.getElementById('ob-extra-fields');
+      var sw = document.getElementById('ob-skills-wrap');
+      var uw = document.getElementById('ob-upi-wrap');
+      if (ef) ef.style.display = 'block';
+      if (sw) sw.style.display = selectedRole === 'tasker' ? 'block' : 'none';
+      if (uw) uw.style.display = selectedRole === 'tasker' ? 'block' : 'none';
       checkSubmit();
     };
     function checkSubmit() {
@@ -139,10 +162,16 @@
       if (!name || !locationName) { showToast('Please fill all fields.', 'warning'); return; }
       const btn = document.getElementById('ob-submit');
       btn.disabled = true; btn.textContent = 'Saving...';
+      const bio    = (document.getElementById('ob-bio')?.value    || '').trim();
+      const skills = (document.getElementById('ob-skills')?.value || '').trim();
+      const upiId  = (document.getElementById('ob-upi')?.value    || '').trim();
       const payload = {
         name, role: selectedRole,
         mode: selectedRole === 'tasker' ? 'worker' : selectedRole,
         locationName,
+        bio:    bio    || null,
+        skills: skills ? skills.split(',').map(s=>s.trim()).filter(Boolean) : [],
+        upiId:  upiId  || null,
         email: currentUser.email || '',
         phone: currentUser.phoneNumber || '',
         avatar: currentUser.photoURL || null,
