@@ -759,6 +759,7 @@
   <div id="toast-container"></div>
 
   <script type="module">
+    import { requireAuth } from './auth-router.js';
     import { auth, db } from './firebase-config.js';
     import { collection, getDocs, onSnapshot, query, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
     import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
@@ -853,8 +854,9 @@
     /* ── Auth check ── */
     /* ── Auth → then load gigs (ensures Firestore auth token is ready) ── */
     var _gigsLoaded = false;
-    onAuthStateChanged(auth, function(user) {
-      // Show post-gig promo for logged-in users
+    requireAuth(function(user) {
+    currentUser = user;
+    // Show post-gig promo for logged-in users
       if (user) {
         var promo = document.getElementById("postGigPromo");
         if (promo) promo.classList.remove("hidden");
@@ -864,7 +866,7 @@
         _gigsLoaded = true;
         loadGigs();
       }
-    });
+  });
 
     // Safety fallback: if onAuthStateChanged hasn't fired in 3s, load anyway
     setTimeout(function() {
