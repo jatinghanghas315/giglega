@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <script>(function(){try{var t=localStorage.getItem('gl_theme')||'dark';document.documentElement.setAttribute('data-theme',t);if(t==='dark')document.documentElement.classList.add('dark');else document.documentElement.classList.remove('dark');}catch(e){document.documentElement.setAttribute('data-theme','dark');document.documentElement.classList.add('dark');}})();</script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Checkout — GigLega</title>
   <link rel="stylesheet" href="styles.css" />
@@ -289,6 +290,24 @@
     @media (max-width: 540px) {
       .checkout-header, .gig-summary, .price-breakdown, .checkout-footer { padding-left: 18px; padding-right: 18px; }
     }
+  
+  /* ── Dark mode: checkout-specific components ─────── */
+  [data-theme="dark"] .checkout-wrap { background: var(--bg); }
+  [data-theme="dark"] .checkout-card,
+  [data-theme="dark"] .order-summary,
+  [data-theme="dark"] .state-card { background: var(--surface); border-color: var(--border); }
+  [data-theme="dark"] .checkout-title,
+  [data-theme="dark"] .checkout-section-title,
+  [data-theme="dark"] .state-title { color: var(--text); }
+  [data-theme="dark"] .order-row,
+  [data-theme="dark"] .order-total { color: var(--text); border-color: var(--border); }
+  [data-theme="dark"] .fee-label,
+  [data-theme="dark"] .fee-note,
+  [data-theme="dark"] .secure-badge,
+  [data-theme="dark"] .state-body { color: var(--text-muted); }
+  [data-theme="dark"] .payment-method-card { background: var(--surface-2); border-color: var(--border); }
+  [data-theme="dark"] .payment-method-card.selected { border-color: var(--teal); background: var(--teal-subtle); }
+  [data-theme="dark"] .razorpay-wrap { background: var(--surface-2); border-color: var(--border); }
   </style>
 </head>
 <body>
@@ -641,5 +660,6 @@
     else window.location.reload();
   });
 </script>
+  <script src="shared.js"></script>
 </body>
 </html>
