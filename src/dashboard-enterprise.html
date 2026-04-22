@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Enterprise Dashboard — GigLega</title>
+  <meta name="description" content="GigLega Enterprise Dashboard — manage team gigs, track spending, scale operations." />
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="theme-dark.css" />
+  <link rel="stylesheet" href="mobile.css?v=20260423" />
+  <script src="shared.js?v=20260423" defer></script>
+  <style>
+    .db-wrapper{min-height:100vh;background:var(--bg);display:flex;flex-direction:column}
+    .db-main{flex:1;max-width:1140px;margin:0 auto;width:100%;padding:28px 20px 80px}
+    /* Header */
+    .db-header{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:28px}
+    .db-header-left h1{font-size:1.55rem;font-weight:800;color:var(--primary);margin:0 0 4px}
+    .db-header-left p{font-size:.85rem;color:var(--text-muted);margin:0}
+    .db-header-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .badge-ent{background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;font-size:.7rem;font-weight:700;padding:3px 10px;border-radius:20px;letter-spacing:.5px}
+    .badge-pend{background:rgba(217,153,58,.2);color:#D9993A;font-size:.7rem;font-weight:700;padding:3px 10px;border-radius:20px}
+    /* Stats */
+    .stat-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:28px}
+    @media(max-width:900px){.stat-grid{grid-template-columns:repeat(3,1fr)}}
+    @media(max-width:520px){.stat-grid{grid-template-columns:repeat(2,1fr)}}
+    .stat-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);padding:18px 16px}
+    .stat-card.teal{border-color:rgba(13,148,136,.3)}.stat-card.amber{border-color:rgba(217,153,58,.3)}
+    .stat-card.indigo{border-color:rgba(99,102,241,.3)}.stat-card.green{border-color:rgba(5,150,105,.3)}
+    .stat-val{font-size:1.7rem;font-weight:800;color:var(--text);line-height:1;margin-bottom:4px}
+    .stat-lbl{font-size:.72rem;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+    .stat-sub{font-size:.73rem;color:var(--text-muted);margin-top:3px}
+    /* Tabs */
+    .tab-bar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px;border-bottom:1.5px solid var(--border);padding-bottom:0}
+    .tab-btn{background:none;border:none;padding:10px 16px;font-size:.84rem;font-weight:600;color:var(--text-muted);cursor:pointer;border-bottom:2.5px solid transparent;margin-bottom:-1.5px;transition:all .18s}
+    .tab-btn:hover{color:var(--text)}.tab-btn.active{color:var(--primary);border-bottom-color:var(--primary)}
+    .tab-panel{display:none}.tab-panel.active{display:block}
+    /* Gig cards */
+    .gig-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;transition:border-color .18s}
+    .gig-card:hover{border-color:var(--primary)}
+    .gig-title{font-weight:700;color:var(--text);margin-bottom:4px;font-size:.95rem}
+    .gig-meta{font-size:.78rem;color:var(--text-muted);display:flex;flex-wrap:wrap;gap:10px}
+    .gig-badge{display:inline-flex;align-items:center;gap:4px;font-size:.72rem;font-weight:700;padding:2px 9px;border-radius:20px}
+    .badge-open{background:rgba(5,150,105,.12);color:#059669}.badge-taken{background:rgba(217,153,58,.12);color:#D9993A}.badge-done{background:rgba(99,102,241,.12);color:#6366f1}
+    .gig-actions{display:flex;gap:8px;flex-wrap:wrap}
+    .btn-xs{font-size:.75rem;font-weight:600;padding:5px 12px;border-radius:8px;border:none;cursor:pointer;transition:all .15s}
+    .btn-xs.view{background:rgba(13,148,136,.12);color:var(--primary)}.btn-xs.edit{background:rgba(99,102,241,.12);color:#6366f1}.btn-xs.del{background:rgba(220,38,38,.1);color:#dc2626}
+    /* Empty */
+    .gl-empty{text-align:center;padding:50px 20px;color:var(--text-muted)}
+    .gl-empty-icon{font-size:2.5rem;margin-bottom:12px}
+    .gl-empty-title{font-weight:700;font-size:1rem;color:var(--text);margin-bottom:6px}
+    .gl-empty-sub{font-size:.83rem}
+    /* Pending banner */
+    .pend-banner{background:linear-gradient(135deg,rgba(217,153,58,.15),rgba(217,153,58,.05));border:1.5px solid rgba(217,153,58,.4);border-radius:var(--radius);padding:18px 20px;margin-bottom:24px;display:flex;align-items:center;gap:14px}
+    .pend-banner h3{margin:0 0 4px;font-size:.95rem;font-weight:700;color:#D9993A}
+    .pend-banner p{margin:0;font-size:.8rem;color:var(--text-muted)}
+    /* Grow */
+    .grow-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:14px}
+    @media(max-width:700px){.grow-grid{grid-template-columns:1fr}}
+    .grow-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);padding:18px;display:flex;flex-direction:column;gap:8px}
+    .grow-card h4{margin:0;font-size:.88rem;font-weight:700;color:var(--text)}
+    .grow-card p{margin:0;font-size:.76rem;color:var(--text-muted);line-height:1.5;flex:1}
+    .grow-card a{font-size:.76rem;font-weight:700;color:var(--primary);text-decoration:none;margin-top:4px}
+  </style>
+</head>
+<body class="db-wrapper">
+  <nav id="main-nav"></nav>
+  <main class="db-main" id="main-content">
+
+    <div class="db-header">
+      <div class="db-header-left">
+        <h1 id="greetingText">Welcome back!</h1>
+        <p>Enterprise Dashboard &mdash; Manage your team gigs &amp; operations</p>
+      </div>
+      <div class="db-header-actions">
+        <span id="entBadge" class="badge-ent">&#10022; Enterprise</span>
+        <a href="post-gig.html" class="btn btn-primary btn-sm">+ Post a Gig</a>
+        <a href="settings.html" class="btn btn-ghost btn-sm">&#9881; Settings</a>
+      </div>
+    </div>
+
+    <div class="pend-banner" id="pendBanner" style="display:none">
+      <div style="font-size:1.6rem">&#9203;</div>
+      <div>
+        <h3>Enterprise Approval Pending</h3>
+        <p>Our team is reviewing your application. You will be notified within 24 hours. You can post gigs and use all features while we review.</p>
+      </div>
+    </div>
+
+    <span class="section-label" style="margin-bottom:12px;display:block">Your Activity</span>
+    <div class="stat-grid">
+      <div class="stat-card teal"><div class="stat-val" id="statTotal">0</div><div class="stat-lbl">Total Posted</div><div class="stat-sub">All time</div></div>
+      <div class="stat-card amber"><div class="stat-val" id="statOpen">0</div><div class="stat-lbl">Open</div><div class="stat-sub">Awaiting worker</div></div>
+      <div class="stat-card"><div class="stat-val" id="statProgress">0</div><div class="stat-lbl">In Progress</div><div class="stat-sub">Tasker accepted</div></div>
+      <div class="stat-card green"><div class="stat-val" id="statCompleted">0</div><div class="stat-lbl">Completed</div><div class="stat-sub">All time</div></div>
+      <div class="stat-card indigo"><div class="stat-val" id="statSpent">&#8377;0</div><div class="stat-lbl">Total Spent</div><div class="stat-sub">On completed gigs</div></div>
+    </div>
+
+    <span class="section-label" style="margin:4px 0 10px;display:block">Your Posted Gigs</span>
+    <div class="tab-bar">
+      <button class="tab-btn active" data-tab="all">&#128203; All Gigs</button>
+      <button class="tab-btn" data-tab="open">&#128994; Open (<span id="cntOpen">0</span>)</button>
+      <button class="tab-btn" data-tab="progress">&#9889; In Progress (<span id="cntProgress">0</span>)</button>
+      <button class="tab-btn" data-tab="completed">&#9989; Completed (<span id="cntCompleted">0</span>)</button>
+    </div>
+    <div id="tabAll"       class="tab-panel active"></div>
+    <div id="tabOpen"      class="tab-panel"></div>
+    <div id="tabProgress"  class="tab-panel"></div>
+    <div id="tabCompleted" class="tab-panel"></div>
+
+    <div style="margin-top:36px">
+      <span class="section-label" style="margin-bottom:14px;display:block">Enterprise Tools</span>
+      <div class="grow-grid">
+        <div class="grow-card">
+          <div style="font-size:1.4rem">&#128230;</div>
+          <h4>Bulk Post Gigs</h4>
+          <p>Post multiple gigs at once for large operations. Saves time for teams with recurring needs.</p>
+          <a href="post-gig.html?bulk=1">Start Bulk Posting &#8594;</a>
+        </div>
+        <div class="grow-card">
+          <div style="font-size:1.4rem">&#128202;</div>
+          <h4>Spending Analytics</h4>
+          <p>Track all gig spending, worker performance, and completion rates across your team.</p>
+          <a href="wallet.html">View Wallet &amp; Spending &#8594;</a>
+        </div>
+        <div class="grow-card">
+          <div style="font-size:1.4rem">&#128172;</div>
+          <h4>Priority Support</h4>
+          <p>Enterprise accounts get priority support &mdash; responses in under 15 minutes guaranteed.</p>
+          <a href="contact.html">Contact Support &#8594;</a>
+        </div>
+      </div>
+    </div>
+
+  </main>
+  <footer id="main-footer"></footer>
+  <div id="toast-container"></div>
+
+  <script type="module">
+    import { routeByRole } from './auth-router.js';
+    import { db }          from './firebase-config.js';
+    import { collection, query, where, onSnapshot, doc, deleteDoc }
+      from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+
+    var currentUser = null, unsub = null;
+
+    routeByRole('enterprise', function(user, userData) {
+      currentUser = user;
+      var h = new Date().getHours();
+      var g = h<12?'Good morning':h<17?'Good afternoon':'Good evening';
+      document.getElementById('greetingText').textContent = g + ', ' + (userData.name || user.displayName || 'Enterprise') + '! ??';
+      if (userData.enterpriseStatus && userData.enterpriseStatus !== 'approved') {
+        document.getElementById('pendBanner').style.display = 'flex';
+        var b = document.getElementById('entBadge');
+        b.textContent = '⏳ Pending Approval'; b.className = 'badge-pend';
+      }
+      loadGigs(user.uid);
+    });
+
+    document.querySelectorAll('.tab-btn').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active');});
+        document.querySelectorAll('.tab-panel').forEach(function(p){p.classList.remove('active');});
+        btn.classList.add('active');
+        var t = 'tab' + btn.dataset.tab.charAt(0).toUpperCase() + btn.dataset.tab.slice(1);
+        var p = document.getElementById(t); if(p) p.classList.add('active');
+      });
+    });
+
+    function loadGigs(uid){
+      var q = query(collection(db,'gigs'), where('posterId','==',uid));
+      if(unsub) unsub();
+      unsub = onSnapshot(q, function(snap){
+        var all=[];
+        snap.forEach(function(d){ all.push(Object.assign({id:d.id},d.data())); });
+        renderAll(all);
+      }, function(err){ console.warn('[GigLega] enterprise gigs:',err); });
+    }
+
+    function renderAll(all){
+      var open=all.filter(function(g){return g.status==='open';}),
+          prog=all.filter(function(g){return g.status==='taken';}),
+          done=all.filter(function(g){return g.status==='completed'||g.status==='done';});
+      document.getElementById('statTotal').textContent=all.length;
+      document.getElementById('statOpen').textContent=open.length;
+      document.getElementById('statProgress').textContent=prog.length;
+      document.getElementById('statCompleted').textContent=done.length;
+      var spent=0; done.forEach(function(g){spent+=g.budget||0;});
+      document.getElementById('statSpent').textContent='₹'+spent.toLocaleString('en-IN');
+      document.getElementById('cntOpen').textContent=open.length;
+      document.getElementById('cntProgress').textContent=prog.length;
+      document.getElementById('cntCompleted').textContent=done.length;
+      panel('tabAll',all,'all'); panel('tabOpen',open,'open');
+      panel('tabProgress',prog,'taken'); panel('tabCompleted',done,'completed');
+    }
+
+    function panel(id,gigs,st){
+      var el=document.getElementById(id); if(!el) return;
+      if(!gigs.length){
+        var m={all:['No gigs posted yet.','Post your first enterprise gig.','post-gig.html','+ Post a Gig'],
+               open:['No open gigs.','Post a gig to find workers.','post-gig.html','Post Gig'],
+               taken:['No gigs in progress.','Accepted gigs appear here.','',''],
+               completed:['No completed gigs.','Completed gigs show payment records.','','']};
+        var r=m[st]||m.all;
+        el.innerHTML='<div class="gl-empty"><div class="gl-empty-icon">??</div><div class="gl-empty-title">'+r[0]+'</div><div class="gl-empty-sub">'+r[1]+'</div>'+(r[2]?'<a href="'+r[2]+'" class="btn btn-primary btn-sm" style="margin-top:14px">'+r[3]+'</a>':'')+'</div>';
+        return;
+      }
+      el.innerHTML=gigs.map(function(g){
+        var sb=g.status==='open'?'<span class="gig-badge badge-open">?? Open</span>':g.status==='taken'?'<span class="gig-badge badge-taken">⚡ In Progress</span>':'<span class="gig-badge badge-done">✅ Done</span>';
+        return '<div class="gig-card"><div><div class="gig-title">'+esc(g.title||'Untitled')+' '+sb+'</div><div class="gig-meta"><span>?? '+esc(g.location||'—')+'</span><span>?? ₹'+(g.budget||0).toLocaleString('en-IN')+'</span><span>?? '+esc(g.category||'—')+'</span></div></div><div class="gig-actions"><a href="gig-detail.html?id='+g.id+'" class="btn-xs view">View</a>'+(g.status==='open'?'<a href="gig-edit.html?id='+g.id+'" class="btn-xs edit">Edit</a>':'')+(g.status!=='taken'?'<button class="btn-xs del" onclick="delGig(''+g.id+'')">Delete</button>':'')+'</div></div>';
+      }).join('');
+    }
+
+    function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+    window.delGig=async function(id){
+      if(!confirm('Delete this gig? This cannot be undone.')) return;
+      try{ await deleteDoc(doc(db,'gigs',id)); if(window.showToast) showToast('Gig deleted.','success'); }
+      catch(e){ if(window.showToast) showToast('Error: '+e.message,'error'); }
+    };
+  </script>
+</body>
+</html>
