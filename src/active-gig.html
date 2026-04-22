@@ -365,7 +365,7 @@
         <!-- Real-time worker tracking map -->
         <div class="track-card" id="trackCard" style="display:none;">
           <div class="track-card-hdr" id="trackCardHdr">
-            <h3>📍 Worker Ka Live Location</h3>
+            <h3>📍 Tasker Live Location</h3>
             <button class="track-toggle-btn" id="trackToggleBtn">View Map ▾</button>
           </div>
           <div id="trackMap"></div>
@@ -392,7 +392,7 @@
           <div id="timeline">
             <div class="tl-step">
               <div class="tl-left"><div class="tl-dot done" id="tld1">✓</div><div class="tl-line done" id="tll1"></div></div>
-              <div class="tl-body"><div class="tl-title">Gig Booked</div><div class="tl-sub">Worker ne gig accept kar li.</div><div class="tl-time" id="tlt1"></div></div>
+              <div class="tl-body"><div class="tl-title">Gig Booked</div><div class="tl-sub">Tasker accepted the gig kar li.</div><div class="tl-time" id="tlt1"></div></div>
             </div>
             <div class="tl-step">
               <div class="tl-left"><div class="tl-dot active" id="tld2">⚡</div><div class="tl-line" id="tll2"></div></div>
@@ -400,7 +400,7 @@
             </div>
             <div class="tl-step">
               <div class="tl-left"><div class="tl-dot" id="tld3">🔑</div><div class="tl-line" id="tll3"></div></div>
-              <div class="tl-body"><div class="tl-title">OTP Request</div><div class="tl-sub" id="tls3">Worker ne abhi OTP nahi manga.</div><div class="tl-time" id="tlt3"></div></div>
+              <div class="tl-body"><div class="tl-title">OTP Request</div><div class="tl-sub" id="tls3">Tasker abhi OTP nahi manga.</div><div class="tl-time" id="tlt3"></div></div>
             </div>
             <div class="tl-step">
               <div class="tl-left"><div class="tl-dot" id="tld4">✅</div></div>
@@ -413,13 +413,13 @@
         <div class="ag-done" id="posterDone">
           <div class="ag-done-icon">🎉</div>
           <h2 style="font-size:1.3rem;font-weight:800;color:var(--text);margin-bottom:8px;">Gig Complete Ho Gayi!</h2>
-          <p style="color:var(--gray-400);font-size:.88rem;margin-bottom:8px;">Worker ne kaam poora kar diya.</p>
+          <p style="color:var(--gray-400);font-size:.88rem;margin-bottom:8px;">Tasker kaam poora kar diya.</p>
           <div style="font-size:1.7rem;font-weight:800;color:#dc2626;margin:12px 0;" id="posterDoneAmt"></div>
           <div style="font-size:.78rem;color:var(--gray-400);margin-bottom:22px;">Wallet se deducted (6% platform fee included)</div>
           <a href="dashboard-client.html" class="btn btn-primary">📊 Dashboard Dekho</a>
           <button id="btnRateWorker" style="margin-top:10px;width:100%;padding:11px;border:1.5px solid var(--teal,#0d9488);border-radius:10px;font-weight:700;color:var(--teal,#0d9488);background:none;cursor:pointer;font-size:.9rem;">⭐ Worker ko Rate Karo</button>
         </div>
-        <button class="btn-cancel-gig" id="btnCancelPoster">✕ Gig Cancel Karo</button>
+        <button class="btn-cancel-gig" id="btnCancelPoster" aria-label="Cancel this gig">✕ Cancel Gig</button>
 
       </div><!-- end posterView -->
 
@@ -428,7 +428,7 @@
       ═══════════════════════════════════ -->
       <div id="workerView" style="display:none;">
 
-        <button class="btn-cancel-gig" id="btnCancelWorker">✕ Gig Cancel Karo (Meri taraf se)</button>
+        <button class="btn-cancel-gig" id="btnCancelWorker" aria-label="Cancel gig as Tasker">✕ Cancel Gig</button>
         <!-- Chat quick link -->
         <a href="#" class="chat-quick" id="chatLink">
           <span style="font-size:1.4rem;">💬</span>
@@ -589,7 +589,7 @@
 
       var badge=el('agBadge'); badge.className='ag-badge poster';
       el('agBadgeText').textContent='Gig In Progress';
-      el('agHeading').textContent='Apni Active Gig Track Karo';
+      el('agHeading').textContent='Track Your Active Gig';
       el('gPersonLabel').textContent='Tasker';
 
       // Gig info
@@ -628,7 +628,7 @@
         // 3. Timeline
         el('tld2').className='tl-dot done'; el('tld2').textContent='✓'; el('tll2').classList.add('done');
         el('tld3').className='tl-dot active';
-        el('tls3').textContent='Tasker has requested OTP request kar diya — usse code batao.';
+        el('tls3').textContent='Tasker has requested the OTP — share the code with them.';
         if(gig.completionRequestedAt) el('tlt3').textContent=fmtDt(gig.completionRequestedAt);
       } else {
         var _b2=el('otpFixedBanner'); if(_b2) _b2.classList.remove('show');
@@ -766,8 +766,8 @@
           toast('📍 Location verified!','success');
         } else {
           setGps('far','❌ Tum '+dist+'m door ho (15m chahiye)');
-          el('gpsExtra').textContent='Aur nazdik jao — abhi '+dist+'m door.';
-          btn.disabled=false; btn.textContent='📍 Dobara Check Karo';
+          el('gpsExtra').textContent='Get closer — you are '+dist+'m away.';
+          btn.disabled=false; btn.textContent='📍 Retry Location';
         }
       }, function(err){
         var m={1:'GPS permission deny. Browser settings mein allow karo.',2:'GPS signal nahi mila.',3:'GPS timeout. Try again.'};
@@ -827,7 +827,7 @@
         var g=snap.data();
         if(g.completionOTPExpiry&&new Date(g.completionOTPExpiry)<new Date()){ toast('OTP expire ho gaya! Naya request karo.','error'); btn.disabled=false; btn.textContent='✅ Gig Complete Karo'; return; }
         var entered=boxes.map(function(b){return b.value;}).join('');
-        if(entered!==String(g.completionOTP)){ toast('❌ Galat OTP — poster se dobara pucho','error'); boxes.forEach(function(b){b.value='';b.classList.remove('filled');}); boxes[0].focus(); btn.disabled=false; btn.textContent='✅ Gig Complete Karo'; return; }
+        if(entered!==String(g.completionOTP)){ toast('❌ Incorrect OTP — please ask the poster to share it again','error'); boxes.forEach(function(b){b.value='';b.classList.remove('filled');}); boxes[0].focus(); btn.disabled=false; btn.textContent='✅ Gig Complete Karo'; return; }
         var pay=Number(g.budget||0), fee=Math.round(pay*0.06), earn=pay-fee;
 
         // ── 1. Mark gig completed ──
@@ -889,7 +889,7 @@
         // ── 4. Notify both parties ──
         await addDoc(collection(db,'notifications',g.posterId,'items'),{
           type:'gig_completed', title:'Gig Complete!',
-          body:'"'+g.title+'" complete ho gai. Worker ne kaam khatam kiya.',
+          body:'"'+g.title+'" complete ho gai. Tasker kaam khatam kiya.',
           gigId:gigId, read:false, createdAt:serverTimestamp()
         });
         await addDoc(collection(db,'notifications',currentUser.uid,'items'),{
@@ -1040,7 +1040,7 @@
             el('emptyWrap').style.display='block';
             el('emptyTitle').textContent='Koi Active Gig Nahi';
             el('emptyBody').textContent='Na koi gig posted & accepted, na koi gig kaam pe hai abhi.';
-            el('emptyBtn').textContent='🔍 Gigs Browse Karo'; el('emptyBtn').href='browse.html';
+            el('emptyBtn').textContent='🔍 Browse Gigs'; el('emptyBtn').href='browse.html';
             return;
           }
 
@@ -1159,7 +1159,7 @@
           var btn     = el('trackToggleBtn');
           mapEl.style.display  = _mapOpen ? 'block' : 'none';
           if (metaEl) metaEl.style.display = _mapOpen && hasWorkerLoc ? 'flex' : 'none';
-          if (btn) btn.textContent = _mapOpen ? 'Band Karo ▴' : 'Map Dekho ▾';
+          if (btn) btn.textContent = _mapOpen ? 'Close Map ▴' : 'View Map ▾';
           if (_mapOpen) {
             if (!_map) {
               _map = L.map('trackMap', { zoomControl: true, attributionControl: false });
@@ -1417,7 +1417,7 @@
   <!-- Sprint 2: Cancel Modal -->
   <div id="glCancelOverlay">
     <div class="cancel-box">
-      <h3 style="font-size:1.05rem;font-weight:800;color:#dc2626;margin-bottom:6px;">⚠️ Gig Cancel Karo</h3>
+      <h3 style="font-size:1.05rem;font-weight:800;color:#dc2626;margin-bottom:6px;">⚠️ Cancel This Gig</h3>
       <p style="font-size:.82rem;color:#6b7280;">Cancel karne ka reason batao:</p>
       <select class="cancel-sel" id="cancelReasonSel">
         <option value="">— Reason chuno —</option>
