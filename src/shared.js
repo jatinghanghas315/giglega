@@ -45,20 +45,7 @@
   /* ══════════════════════════════════════════════════════════
      0. FONT — Inter via Google Fonts
   ══════════════════════════════════════════════════════════ */
-  (function injectFonts() {
-    if (document.querySelector('link[data-gl-fonts]')) return;
-    const pc = document.createElement('link');
-    pc.rel = 'preconnect'; pc.href = 'https://fonts.googleapis.com';
-    document.head.insertBefore(pc, document.head.firstChild);
-    const pc2 = document.createElement('link');
-    pc2.rel = 'preconnect'; pc2.href = 'https://fonts.gstatic.com'; pc2.crossOrigin = 'anonymous';
-    document.head.insertBefore(pc2, document.head.firstChild);
-    const fl = document.createElement('link');
-    fl.rel = 'stylesheet';
-    fl.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap';
-    fl.setAttribute('data-gl-fonts', '1');
-    document.head.appendChild(fl);
-  })();
+  ()();
 
   /* ══════════════════════════════════════════════════════════
      1. CONSTANTS
@@ -94,10 +81,7 @@
   /* ══════════════════════════════════════════════════════════
      2. CURRENCY
   ══════════════════════════════════════════════════════════ */
-  function formatINR(paise) {
-    return '\u20B9' + (Number(paise || 0) / 100).toLocaleString('en-IN');
-  }
-  global.formatINR = formatINR;
+  
   global.formatCurrency = formatINR;
 
   /* ══════════════════════════════════════════════════════════
@@ -106,18 +90,7 @@
 
   let _cachedFirebaseUser = null;
 
-  function redirectByRole(role) {
-    const map = {
-      worker:     'dashboard-worker.html',
-      tasker:     'dashboard-worker.html',
-      poster:     'dashboard-client.html',
-      client:     'dashboard-client.html',
-      admin:      'admin.html',
-      enterprise: 'enterprise.html'
-    };
-    window.location.href = map[role] || 'dashboard-client.html';
-  }
-  global.redirectByRole = redirectByRole;
+  
 
   function logoutUser() {
     showToast('Logged out successfully.', 'success');
