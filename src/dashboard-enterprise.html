@@ -94,7 +94,7 @@
       <div class="stat-card amber"><div class="stat-val" id="statOpen">0</div><div class="stat-lbl">Open</div><div class="stat-sub">Awaiting worker</div></div>
       <div class="stat-card"><div class="stat-val" id="statProgress">0</div><div class="stat-lbl">In Progress</div><div class="stat-sub">Tasker accepted</div></div>
       <div class="stat-card green"><div class="stat-val" id="statCompleted">0</div><div class="stat-lbl">Completed</div><div class="stat-sub">All time</div></div>
-      <div class="stat-card indigo"><div class="stat-val" id="statSpent">&#8377;0</div><div class="stat-lbl">Total Spent</div><div class="stat-sub">On completed gigs</div></div>
+      <div class="stat-card indigo"><div class="stat-val" id="statSpent">&#8377;0</div><div class="stat-lbl" id="statSpentLbl">Total Spent</div><div class="stat-sub">On completed gigs</div></div>
     </div>
 
     <span class="section-label" style="margin:4px 0 10px;display:block">Your Posted Gigs</span>
@@ -140,7 +140,7 @@
   <script type="module">
     import { routeByRole } from './auth-router.js';
     import { db }          from './firebase-config.js';
-    import { collection, query, where, onSnapshot, doc, deleteDoc }
+    import { collection, query, where, onSnapshot, doc, deleteDoc, getDoc }
       from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
 
     var currentUser = null, unsub = null;
@@ -156,6 +156,7 @@
         b.textContent = '⏳ Pending Approval'; b.className = 'badge-pend';
       }
       loadGigs(user.uid);
+      loadWalletBalance(user.uid);
     });
 
     document.querySelectorAll('.tab-btn').forEach(function(btn){
@@ -203,16 +204,49 @@
                taken:['No gigs in progress.','Accepted gigs appear here.','',''],
                completed:['No completed gigs.','Completed gigs show payment records.','','']};
         var r=m[st]||m.all;
-        el.innerHTML='<div class="gl-empty"><div class="gl-empty-icon">??</div><div class="gl-empty-title">'+r[0]+'</div><div class="gl-empty-sub">'+r[1]+'</div>'+(r[2]?'<a href="'+r[2]+'" class="btn btn-primary btn-sm" style="margin-top:14px">'+r[3]+'</a>':'')+'</div>';
+        el.innerHTML='<div class="gl-empty"><div class="gl-empty-icon">📭</div><div class="gl-empty-title">'+r[0]+'</div><div class="gl-empty-sub">'+r[1]+'</div>'+(r[2]?'<a href="'+r[2]+'" class="btn btn-primary btn-sm" style="margin-top:14px">'+r[3]+'</a>':'')+'</div>';
         return;
       }
       el.innerHTML=gigs.map(function(g){
-        var sb=g.status==='open'?'<span class="gig-badge badge-open">?? Open</span>':g.status==='taken'?'<span class="gig-badge badge-taken">⚡ In Progress</span>':'<span class="gig-badge badge-done">✅ Done</span>';
-        return '<div class="gig-card"><div><div class="gig-title">'+esc(g.title||'Untitled')+' '+sb+'</div><div class="gig-meta"><span>?? '+esc(g.location||'—')+'</span><span>?? ₹'+(g.budget||0).toLocaleString('en-IN')+'</span><span>?? '+esc(g.category||'—')+'</span></div></div><div class="gig-actions"><a href="gig-detail.html?id='+g.id+'" class="btn-xs view">View</a>'+(g.status==='open'?'<a href="gig-edit.html?id='+g.id+'" class="btn-xs edit">Edit</a>':'')+(g.status!=='taken'?'<button class="btn-xs del" onclick="delGig(''+g.id+'')">Delete</button>':'')+'</div></div>';
+        var sb=g.status==='open'?'<span class="gig-badge badge-open">🟢 Open</span>':g.status==='taken'?'<span class="gig-badge badge-taken">⚡ In Progress</span>':'<span class="gig-badge badge-done">✅ Done</span>';
+        var workerRow = g.workerName ? '<span style="color:var(--primary);font-weight:600">👷 '+esc(g.workerName)+'</span>' : '';
+        var chatLink  = (g.status==='taken'&&g.workerId) ? '<a href="chat.html?with='+g.workerId+'&gig='+g.id+'" class="btn-xs view" style="background:var(--teal,#0d9488);color:#fff">💬 Chat</a>' : '';
+        var editLink  = g.status==='open' ? '<a href="gig-edit.html?id='+g.id+'" class="btn-xs edit">✏️ Edit</a>' : '';
+        var delBtn    = g.status!=='taken' ? '<button class="btn-xs del" onclick="delGig(\''+g.id+'\')">🗑️ Delete</button>' : '';
+        return '<div class="gig-card">'+
+          '<div>'+
+            '<div class="gig-title">'+esc(g.title||'Untitled')+' '+sb+'</div>'+
+            '<div class="gig-meta">'+
+              '<span>📍 '+esc(g.location||'—')+'</span>'+
+              '<span>💰 ₹'+(g.budget||0).toLocaleString('en-IN')+'</span>'+
+              '<span>🏷️ '+esc(g.category||'—')+'</span>'+
+              (workerRow?'<span>'+workerRow+'</span>':'')+
+            '</div>'+
+          '</div>'+
+          '<div class="gig-actions">'+
+            '<a href="gig-detail.html?id='+g.id+'" class="btn-xs view">👁️ View</a>'+
+            chatLink+editLink+delBtn+
+          '</div>'+
+        '</div>';
       }).join('');
     }
 
     function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+    async function loadWalletBalance(uid) {
+      try {
+        var snap = await getDoc(doc(db,'wallets',uid));
+        var bal  = snap.exists() ? (snap.data().balance||0) : 0;
+        var el   = document.getElementById('statSpent');
+        if (el) el.textContent = '₹'+bal.toLocaleString('en-IN');
+        var lbl  = document.getElementById('statSpentLbl');
+        if (lbl) lbl.textContent = 'Wallet Balance';
+      } catch(e) { console.warn('[GigLega] wallet balance:',e); }
+    }
+
+    // Dismiss page loader on auth resolve
+    routeByRole._loaderDismissed = false;
+
 
     window.delGig=async function(id){
       if(!confirm('Delete this gig? This cannot be undone.')) return;
