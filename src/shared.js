@@ -16,7 +16,7 @@
 
 /* CACHE BUSTER v1.3.0 */
 (function(){
-  const APP_BUILD = '2.6.0';
+  const APP_BUILD = '2.7.0';
   const stored = localStorage.getItem('gl_app_build');
   if (stored !== APP_BUILD) {
     localStorage.setItem('gl_app_build', APP_BUILD);
@@ -346,28 +346,29 @@
           } catch (e) { console.error('[GigLega] nav user fetch:', e); }
 
           const role = userData.role || 'poster';
+          const normRole = (role==='worker'||role==='tasker')?'tasker':(role==='client')?'poster':role;
           const name = userData.name || user.displayName || 'User';
           const isVerified = userData.aadhaarVerified === true;
           const initials = name.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
 
-          const dashLink = role === 'worker' || role === 'tasker'
-            ? 'dashboard-worker.html'
-            : role === 'admin' ? 'admin.html'
-            : role === 'enterprise' ? 'enterprise.html'
+          const dashLink = normRole==='tasker' ? 'dashboard-worker.html'
+            : normRole==='admin' ? 'dashboard-admin.html'
+            : normRole==='enterprise' ? 'dashboard-enterprise.html'
             : 'dashboard-client.html';
 
-          const dashLabel = role === 'worker' || role === 'tasker' ? 'Tasker Dashboard'
-            : role === 'admin' ? 'Admin Panel'
-            : role === 'enterprise' ? 'Enterprise Dashboard'
-            : 'Poster Dashboard';
+          const dashLabel = normRole==='tasker' ? '⚡ Tasker Dashboard'
+            : normRole==='admin' ? '??️ Admin Panel'
+            : normRole==='enterprise' ? '?? Enterprise Dashboard'
+            : '?? Poster Dashboard';
 
           const verifiedBadge = isVerified
             ? '<span class="verified-badge" title="Aadhaar Verified">Verified</span>'
             : '';
 
+          renderBottomNav(role);
           if (authSection) {
             authSection.innerHTML =
-              '<a href="post-gig.html" class="btn btn-primary nav-post-btn">' + ICONS.plus + ' Post Gig</a>' +
+              (normRole!=='tasker'?'<a href="post-gig.html" class="btn btn-primary nav-post-btn">'+ICONS.plus+' Post Gig</a>':'') +
               '<div class="nav-user-menu" id="navUserMenu">' +
                 '<button class="nav-avatar-btn" id="navAvatarBtn" aria-expanded="false" aria-haspopup="true">' +
                   '<div class="nav-avatar">' + initials + '</div>' +
@@ -429,6 +430,65 @@
         });
       }).catch(e => console.error('[GigLega] nav auth init:', e));
     } catch (e) { console.error('[GigLega] nav init:', e); }
+  }
+
+
+  /* ── Mobile bottom nav ── */
+  function renderBottomNav(role) {
+    if (document.getElementById('gl-bottom-nav')) return;
+    var nr = (role==='worker'||role==='tasker')?'tasker':(role==='client')?'poster':(role||'tasker');
+    var pg = window.location.pathname.split('/').pop()||'index.html';
+    var ic = {
+      home:   '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
+      search: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>',
+      plus:   '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>',
+      wallet: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>',
+      bell:   '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>',
+      zap:    '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>',
+      grid:   '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>',
+    };
+    var tabs = nr==='tasker' ? [
+      {href:'index.html',            icon:ic.home,   lbl:'Home'},
+      {href:'browse.html',           icon:ic.search, lbl:'Browse'},
+      {href:'dashboard-worker.html', icon:ic.zap,    lbl:'Dashboard'},
+      {href:'wallet.html',           icon:ic.wallet, lbl:'Wallet'},
+      {href:'notifications.html',    icon:ic.bell,   lbl:'Alerts', badge:true},
+    ] : nr==='enterprise' ? [
+      {href:'index.html',                icon:ic.home,   lbl:'Home'},
+      {href:'browse.html',               icon:ic.search, lbl:'Browse'},
+      {href:'post-gig.html',             icon:ic.plus,   lbl:'Post'},
+      {href:'dashboard-enterprise.html', icon:ic.grid,   lbl:'Dashboard'},
+      {href:'notifications.html',        icon:ic.bell,   lbl:'Alerts', badge:true},
+    ] : [
+      {href:'index.html',            icon:ic.home,   lbl:'Home'},
+      {href:'browse.html',           icon:ic.search, lbl:'Browse'},
+      {href:'post-gig.html',         icon:ic.plus,   lbl:'Post'},
+      {href:'dashboard-client.html', icon:ic.grid,   lbl:'Dashboard'},
+      {href:'notifications.html',    icon:ic.bell,   lbl:'Alerts', badge:true},
+    ];
+    var inner = tabs.map(function(t){
+      var cls = 'gl-bnav-item'+(pg===t.href?' active':'');
+      var bdg = t.badge?'<span class="gl-bnav-badge" id="bnavNotifBadge" style="display:none"></span>':'';
+      return '<a href="'+t.href+'" class="'+cls+'">'+bdg+t.icon+'<span>'+t.lbl+'</span></a>';
+    }).join('');
+    var nav = document.createElement('nav');
+    nav.id = 'gl-bottom-nav';
+    nav.className = 'gl-bottom-nav';
+    nav.setAttribute('aria-label','Mobile navigation');
+    nav.innerHTML = '<div class="gl-bottom-nav-inner">'+inner+'</div>';
+    document.body.appendChild(nav);
+  }
+
+  /* ── Page loader auto-dismiss ── */
+  function initPageLoader() {
+    var loader = document.getElementById('gl-page-loader');
+    if (!loader) return;
+    var dismiss = function(){
+      loader.style.opacity='0';
+      setTimeout(function(){ if(loader.parentNode) loader.remove(); },350);
+    };
+    window.addEventListener('load', dismiss);
+    setTimeout(dismiss, 3000);
   }
 
   function bindNavEvents() {
@@ -656,6 +716,7 @@
     applyTheme(getTheme());
     renderNav();
     renderFooter();
+    initPageLoader();
     renderBottomNav();
     hideSpinner();
     injectSharedStyles();
