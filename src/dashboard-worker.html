@@ -165,7 +165,7 @@
     /* Status badges */
     .s-badge{font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:10px}
     .s-open{background:rgba(16,185,129,.1);color:#059669}
-    .s-taken{background:rgba(245,158,11,.1);color:#b45309}
+    .s-taken{background:var(--teal-faint,rgba(13,148,136,.1));color:#b45309}
     .s-completed{background:rgba(107,114,128,.1);color:#374151}
 
     
@@ -296,7 +296,7 @@
           <div style="font-size:.97rem;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" id="activeBannerTitle">Gig chal raha hai...</div>
           <div style="font-size:.75rem;opacity:.75;margin-top:2px;" id="activeBannerLoc"></div>
         </div>
-        <div style="flex-shrink:0;background:rgba(255,255,255,.2);padding:8px 14px;border-radius:8px;font-size:.8rem;font-weight:700;">
+        <div style="flex-shrink:0;background:rgba(255,255,255,.12);padding:8px 14px;border-radius:8px;font-size:.8rem;font-weight:700;">
           Mark Complete →
         </div>
       </a>
@@ -412,7 +412,7 @@
         <div style="flex:1;min-width:200px">
           <div style="font-weight:700;font-size:.95rem;color:var(--text);margin-bottom:4px">Add Your Bank Details to Get Paid</div>
           <div style="font-size:.8rem;color:var(--gray-400);line-height:1.5;margin-bottom:12px">Add and verify your bank account to withdraw your wallet balance instantly. No minimum withdrawal amount.</div>
-          <a href="wallet.html#bank" style="display:inline-block;padding:9px 20px;background:#D9993A;color:#fff;border-radius:8px;font-weight:700;font-size:.82rem;text-decoration:none">Add Bank Account →</a>
+          <a href="wallet.html#bank" style="display:inline-block;padding:9px 20px;background:var(--accent,#D9993A);color:#fff;border-radius:8px;font-weight:700;font-size:.82rem;text-decoration:none">Add Bank Account →</a>
         </div>
       </div>
     </div>
@@ -608,7 +608,7 @@ if (_workerRole && _workerRole !== 'tasker' && _workerRole !== 'worker' && _work
 
       return '<div class="gig-item">' +
         '<div class="gig-item-left">' +
-          '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:2px">' +'<div class="gig-item-title" style="margin-bottom:0">' + escHtml(g.title) + '</div>' +(g.gigId ? '<span style="font-size:.65rem;font-weight:700;color:var(--gray-400,#999);background:rgba(255,255,255,.05);border:1px solid var(--gray-200,#333);border-radius:5px;padding:2px 7px;font-family:monospace">' + escHtml(g.gigId) + '</span>' : '') +'</div>' +
+          '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:2px">' +'<div class="gig-item-title" style="margin-bottom:0">' + escHtml(g.title) + '</div>' +(g.gigId ? '<span style="font-size:.65rem;font-weight:700;color:var(--gray-400,#999);background:var(--surface-2,rgba(255,255,255,.05));border:1px solid var(--gray-200,#333);border-radius:5px;padding:2px 7px;font-family:monospace">' + escHtml(g.gigId) + '</span>' : '') +'</div>' +
           '<div class="gig-item-meta">' +
             (g.location ? '<span class="gig-item-chip">📍 ' + escHtml(g.location) + '</span>' : '') +
             '<span class="gig-item-chip">🕒 ' + timeAgo(g.postedAt) + '</span>' +
@@ -625,7 +625,7 @@ if (_workerRole && _workerRole !== 'tasker' && _workerRole !== 'worker' && _work
             : (g.reviewedByWorker
                ? '<span style="font-size:.72rem;color:var(--gray-400)">✅ Rated</span>'
                : '<a href="active-gig.html?id='+encodeURIComponent(g.id)+'&openReview=poster"'
-               + ' class="btn btn-sm" style="margin-top:4px;background:rgba(245,158,11,.1);'
+               + ' class="btn btn-sm" style="margin-top:4px;background:var(--teal-faint,rgba(13,148,136,.1));'
                + 'color:#b45309;border:1px solid rgba(245,158,11,.3);font-size:.72rem">'
                + '⭐ Rate Poster</a>'
               )
