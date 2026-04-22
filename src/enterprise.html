@@ -1239,14 +1239,21 @@
   <script>
   document.addEventListener("DOMContentLoaded", function () {
 
-    var GIGS_KEY  = (typeof GL !== "undefined") ? GL.STORAGE_KEY_GIGS  : "gl_gigs";
-    var ENT_KEY   = "gl_enterprise_leads";
+    var ENT_KEY = "gl_enterprise_leads";
 
-    /* ── Live metric ── */
-    var gigs = [];
-    try { gigs = JSON.parse(localStorage.getItem(GIGS_KEY)||"[]"); } catch(e){}
-    var mGigsEl = document.getElementById("mGigs");
-    if (mGigsEl) mGigsEl.textContent = gigs.length + "+";
+    /* Live metrics from Firestore */
+    import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js").then(function(fs){
+      import("./firebase-config.js").then(function(cfg){
+        /* Live open gigs */
+        fs.onSnapshot(fs.query(fs.collection(cfg.db,"gigs"),fs.where("status","==","open")),function(snap){
+          var el=document.getElementById("mGigs"); if(el) el.textContent=snap.size.toLocaleString("en-IN")+"+";
+        });
+        /* Total registered users */
+        fs.onSnapshot(fs.collection(cfg.db,"users"),function(snap){
+          var el=document.getElementById("mUsers"); if(el) el.textContent=snap.size.toLocaleString("en-IN")+"+";
+        });
+      });
+    }).catch(function(e){ console.warn("[GigLega] ent stats:",e.message); });
 
     /* ── Breadcrumb ── */
     if (typeof buildBreadcrumb === "function") {
